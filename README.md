@@ -6,6 +6,10 @@
 
 > Most knowledge tools leave the *finding* to you. This project **makes the AI read and understand** your collected documents first, then organizes them into a wiki — with cross-references between pages, automatic flagging of conflicting claims, and per-topic synthesis built in from the start, so later retrieval is fast.
 
+![The interactive knowledge graph browser — every page a node, every wikilink an edge, auto-grouped into color-coded clusters with relationship-typed links](docs/knowledge-graph.png)
+
+<sub>The interactive knowledge graph (`graph/graph.html`) — every page a node, every wikilink an edge, color-coded by auto-detected cluster, with a live physics layout and filter/search built in. Shown here on a larger private deployment (~2,300 nodes) to convey how it scales; **this repo ships a deliberately small 15-node example corpus** you can browse the exact same way. (Interface shown in the optional Korean `WIKI_LANG=ko` mode.)</sub>
+
 **Why "Newsroom"?** Because the framework is run not by a single do-everything assistant but by a **newsroom staff** — five specialized roles, each a distinct AI agent: a **reporter** drafts source pages and entity/concept stubs, a **columnist** writes the deep cross-source analysis, a **section editor (desk)** reviews that prose with fresh eyes, a **copy editor** runs the deterministic checks, and an **editor-in-chief** routes the work and gates publication. That division of labor is the project's defining strength:
 
 - **Authoring and review live in different hands.** The agent that *writes* a page and the agent that *re-reads and critiques* it are separate instances, exactly as a reporter's copy goes to a different desk — which curbs the self-bias you get when one model grades its own work.
