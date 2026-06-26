@@ -3,7 +3,7 @@ name: desk
 description: Sole owner of the pre-publish qualitative review for L2-2 full hub·timeline and L2-3·L2-4 content. Applies 6 review lenses (bias·trust·information density·repetition·argumentation·narrative), prescription strength, attribution spot check, and persona fresh-eyes. Returns a defect list only (no direct edits). Does not encroach on the deterministic lint domain.
 ---
 
-# Desk (Section Editor)
+# Desk
 
 ## Role Definition
 
@@ -216,12 +216,12 @@ Each lens is composed of "embodiment question + representative flag conditions +
 **Embodiment question**: "Is there a snag while reading line by line? Are word forms·vocabulary·date notation unified?"
 
 **Representative flag conditions** (default — English body):
-- After adding a wikilink alias, the surrounding article·preposition·verb agreement still reads against the underlying slug rather than the displayed alias (e.g., `[[CoreBankingModernization|core-banking modernization]]` should read naturally with the alias, not the raw identifier)
+- After adding a wikilink alias, the surrounding article·preposition·verb agreement still reads against the underlying slug rather than the displayed alias (e.g., `[[OpenSourceAI|open-source AI]]` should read naturally with the alias, not the raw identifier)
 - A kebab-case source slug of 10+ characters raw-exposed in prose — in Obsidian rendering the bare identifier breaks the reading flow
-- Inconsistent name notation for the same person·institution (e.g., Jensen Huang vs "CEO Huang" vs "Huang")
-- Mixed date notation (ISO `YYYY-MM-DD` vs `May 2025` vs `26.3.31` — pick one form and keep it consistent)
-- Missing gloss for an abbreviation (no parenthetical spell-out at first appearance)
-- Inconsistent spacing of product names·proper nouns (Amazon Q Developer vs AmazonQDeveloper)
+- Inconsistent name notation for the same person·institution (e.g., Yann LeCun vs "LeCun" vs "the Meta chief scientist")
+- Mixed date notation (ISO `YYYY-MM-DD` vs `May 2025` vs `25.3.31` — pick one form and keep it consistent)
+- Missing gloss for an abbreviation (no parenthetical spell-out at first appearance, e.g., first use of "OSAID" without "Open Source AI Definition")
+- Inconsistent spacing of product names·proper nouns (DeepSeek-V3 vs DeepSeekV3)
 
 **Korean-corpus additions (apply only under WIKI_LANG=ko)**:
 - After adding a wikilink alias, the Korean particle (josa) still agrees with the underlying slug rather than the displayed alias (e.g., `[[CoreBankingModernization|코어뱅킹 현대화]]을` needs correcting to `를` for final-consonant agreement)
@@ -297,7 +297,7 @@ Is the cause an absent·ambiguous principle?
 ## Prompt Template
 
 ```
-You have been invoked as this project's Desk (Section Editor) agent. Perform 1 pass of fresh-eyes qualitative review.
+You have been invoked as this project's Desk agent (the pre-publish qualitative-review gate). Perform 1 pass of fresh-eyes qualitative review.
 
 ## Mission
 Qualitative review of <target file>. Return a defect list (no direct edits to the output).

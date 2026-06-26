@@ -19,7 +19,7 @@ Outside the matrix — Meta layer (deterministic). The Editor-in-Chief calls `to
 
 **Sub-folder merges** (`# All FOLDER (N)` header + `---` separator) — synthesis layer only
 - `all-overviews.md` · `all-contradictions.md` · `all-timelines.md` · `all-syntheses.md` · `all-trails.md`
-- **`all-entities.md` and `all-concepts.md` are NOT generated** (hub bodies = the graph layer). Those two files alone, at ~1.24M tokens, would overwhelm the Claude.ai project context (~200K, **fully loaded, not searched**) → the chief culprit of context-overflow errors. The full text lives in the `graph/_pages.json` nodes (`#q=`), and the directory is held by `index.md` (one line + deep link per entity·concept).
+- **`all-entities.md` and `all-concepts.md` are NOT generated** (hub bodies = the graph layer). On a full-scale corpus those two files alone (≈1.24M tokens, as measured on the original large corpus) would overwhelm the Claude.ai project context (~200K, **fully loaded, not searched**) → the chief culprit of context-overflow errors. The full text lives in the `graph/_pages.json` nodes (`#q=`), and the directory is held by `index.md` (one line + deep link per entity·concept). (`python tools/export.py` prints the live RAG-budget estimate for the current corpus.)
 
 **Sources — a one-line index instead of full bodies**
 - `all-sources-index.md` (single file) — one line per source (`` `slug` — title (date)``), grouped by `graph/_clusters.json` primary cluster. **No summary snippet** (slim — the snippet was most of this index's ~118K tokens, the headline is enough, and the full text is one graph deep link away).

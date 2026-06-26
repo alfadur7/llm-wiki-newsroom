@@ -201,10 +201,11 @@ def _file_structure_table() -> str:
     return '\n'.join(rows)
 
 
-# Rough Korean-heavy token estimate (≈ tokens per character), calibrated against
-# the Claude.ai context-overflow error on the full corpus. Used only for the
-# upload-budget guide — an order-of-magnitude aid, not an exact count.
-_TOK_PER_CHAR = 0.75
+# Rough token estimate (≈ tokens per character) for the upload-budget guide — an
+# order-of-magnitude aid, not an exact count. English averages ~0.25 tok/char;
+# Korean (WIKI_LANG=ko) is denser at ~0.75 (Hangul tokenizes to more sub-tokens),
+# calibrated against the Claude.ai context-overflow error on the Korean corpus.
+_TOK_PER_CHAR = 0.75 if korean_mode() else 0.25
 # Claude.ai project context ceiling (knowledge is loaded whole, not retrieved).
 # The core tier must fit under this with headroom for the query + instructions;
 # the budget guide flags an overrun instead of always claiming "safe".
@@ -338,7 +339,7 @@ def _write_export_readme() -> str:
         '## Answer Rules\n',
         ('1. Answer **in Korean, using polite/honorific speech to the operator**.\n'
          if korean_mode() else
-         '1. Answer **in English**.\n')
+         '1. Answer **in English**.\n') +
         '2. Exploration order: `overview` · `contradiction` · `all-overviews` '
         '(context · synthesis) → `index` (what exists · deep-link starting point) → '
         '`all-syntheses` · `all-contradictions` (in-depth) → detail via graph deep-link.\n'

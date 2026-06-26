@@ -33,6 +33,6 @@ References to the human reviewer (operator) are standardized as **"the wiki oper
 
 ### Enforcement
 
-`python tools/lint.py meta schema` auto-enforces English section headers on `CLAUDE.md` + `.claude/commands/*.md` — it exits non-zero on any non-ASCII character in their section headers. The convention applies to the remaining meta-doc groups (agents · layers · policies · operations) by convention.
+`python tools/lint.py meta schema` auto-enforces English section headers on `CLAUDE.md` + `.claude/commands/*.md` — it exits non-zero on any Korean (Hangul) character in their section headers (the `[가-힣]` guard). The convention applies to the remaining meta-doc groups (agents · layers · policies · operations) by convention.
 
 Bundled with CLAUDE.md integrity checks (anchor · file-ref · slash-cmd), Rubric drift detection, and the flat-path guard in the same `meta schema` subcommand. This check is also part of `/wiki-lint`. Run it before committing any change to meta-docs.

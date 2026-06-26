@@ -55,9 +55,11 @@ _TRAIL_ITEM_RE = re.compile(
 )
 # Timeline dated entry: "- **2026-04** ..." / "- ★ **May 13, 2026** — ...".
 _TL_ENTRY_RE = re.compile(r"^\s*-\s*(?:★\s*)?\*\*\s*([^*]+?)\s*\*\*\s*(.*)$", re.MULTILINE)
-# A bold token that is a pure date (digits + date separators only), so the
-# `## Flow Summary` range-label bullets ("2019~2021 laying the groundwork") are rejected.
-_DATE_ONLY_RE = re.compile(r"^\d{4}[\d\s\-.년월일]*$")
+# A bold token that is a date — digits + date separators, with an optional
+# trailing parenthetical qualifier so the prescribed future-anchor form
+# `**YYYY (planned)**` (timeline.md) is kept, while `## Flow Summary` range-label
+# bullets ("2019~2021 laying the groundwork") are still rejected.
+_DATE_ONLY_RE = re.compile(r"^\d{4}[\d\s\-.년월일]*(?:\s*\([^)]*\))?$")
 
 
 def _section(content: str, header: str) -> str:

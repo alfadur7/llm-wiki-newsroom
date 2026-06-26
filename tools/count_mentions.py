@@ -13,7 +13,7 @@ calls, use this tool instead of a raw grep.**
 
 Usage:
   python tools/count_mentions.py "Anthropic"
-  python tools/count_mentions.py "Anthropic" --claimant   # only ## Key Claims grade lines
+  python tools/count_mentions.py "Anthropic" --claimant   # only grade lines ([fact]/[analysis]/[forecast]), anywhere in the body
   python tools/count_mentions.py "Dario|Amodei"           # term is a regex (alias OR allowed)
 """
 from __future__ import annotations
@@ -73,7 +73,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Tally name/term frequency and cluster distribution over real sources (auto-generated excluded)")
     ap.add_argument("term", help="name/term to search for (regex — aliases as `A|B`)")
     ap.add_argument("--claimant", action="store_true",
-                    help="tally only the grade lines (`[fact]`/`[analysis]`/`[forecast]`) under `## Key Claims`")
+                    help="tally only the grade lines (`[fact]`/`[analysis]`/`[forecast]`), anywhere in the body")
     args = ap.parse_args()
     return run(args.term, args.claimant)
 

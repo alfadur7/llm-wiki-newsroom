@@ -95,7 +95,7 @@ TIMELINE_MIN_SECTION_EVENTS = 18     # year (20YY) mentions ≥ N inside the hub
 # body (accumulated dated events) matured enough to split into its own page? All 8
 # existing timelines were split off from a hub that carried this section. No cluster
 # allowlist needed (reads the hub's own structure, so it's robust to reorg).
-TIMELINE_SECTION_RE = re.compile(r"^##\s*.*(시간축|연대기|타임라인)", re.MULTILINE)
+TIMELINE_SECTION_RE = re.compile(r"^##\s*.*(Timeline|시간축|연대기|타임라인)", re.MULTILINE)
 _YEAR_RE = re.compile(r"20\d{2}")
 
 

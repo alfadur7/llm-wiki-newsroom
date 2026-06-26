@@ -16,7 +16,7 @@ last_updated: YYYY-MM-DD
 
 ## Timeline: [[Hub]] (N entries)
 
-## Flow summary
+## Flow Summary
 
 **Trajectory overview**: Phase-1 stage (YYYY) → Phase-2 stage (YYYY) → … one-line arrow trajectory.
 

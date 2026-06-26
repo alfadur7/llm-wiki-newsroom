@@ -25,8 +25,11 @@ from __future__ import annotations
 import json
 import sys
 from collections import Counter, defaultdict
+from datetime import datetime
 from pathlib import Path
 from typing import Any
+
+YEAR = str(datetime.now().year)  # recency token for generated search queries
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from _lib import GRAPH, REPO_ROOT, WIKI, korean_mode, parse_frontmatter  # noqa: E402
@@ -142,10 +145,10 @@ def build_queries_for_sparse_cluster(rows: list[dict],
         # substring match — Korean tags rarely collide, English acronyms do).
         unique_tags = [t for t in tags if t.lower() not in name_lower]
         qt = _qt()
-        queries = [f"{name} 2026 {qt['issue_trends']}"]
+        queries = [f"{name} {YEAR} {qt['issue_trends']}"]
         if unique_tags:
             tag_part = " ".join(unique_tags[:2])
-            queries.append(f"{name} {tag_part} 2026")
+            queries.append(f"{name} {tag_part} {YEAR}")
         queries = queries[:QUERIES_PER_SPARSE_CLUSTER]
         out.append({
             "gap": "sparse-cluster",
@@ -173,8 +176,8 @@ def build_queries_for_single_source(rows: list[dict],
         queries: list[str] = []
         qt = _qt()
         if peers:
-            queries.append(f"{title} {peers[0]} 2026")
-        queries.append(f"{title} 2026 {qt['announcement']}")
+            queries.append(f"{title} {peers[0]} {YEAR}")
+        queries.append(f"{title} {YEAR} {qt['announcement']}")
         if cname:
             queries.append(f"{title} {cname} {qt['trends']}")
         queries = queries[:QUERIES_PER_SINGLE_SOURCE]
@@ -201,11 +204,11 @@ def build_queries_for_stale_hub(rows: list[dict],
         title = _hub_label(hub_id, hub_fm)
         peers = [p for p in cluster_top_hubs.get(cluster_slug, []) if p != title]
         qt = _qt()
-        queries = [f"{title} 2026 {qt['announcement_update']}"]
+        queries = [f"{title} {YEAR} {qt['announcement_update']}"]
         if peers:
-            queries.append(f"{title} {peers[0]} 2026")
+            queries.append(f"{title} {peers[0]} {YEAR}")
         elif cluster_info.get(cluster_slug, {}).get("name"):
-            queries.append(f"{title} {cluster_info[cluster_slug]['name']} 2026")
+            queries.append(f"{title} {cluster_info[cluster_slug]['name']} {YEAR}")
         queries = queries[:QUERIES_PER_STALE_HUB]
         out.append({
             "gap": "stale-hub",

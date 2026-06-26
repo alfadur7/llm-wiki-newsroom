@@ -99,7 +99,9 @@ def _is_news_misfile(slug: str, fm: dict) -> bool:
         return True
     # Secondary: no sources AND title reads as a dated news/briefing report.
     title = str(fm.get("title", ""))
-    if not _sources_list(fm) and re.search(r"(뉴스 검색|주간 브리핑|리포트 \(20)", title):
+    if not _sources_list(fm) and re.search(
+        r"(News search|Weekly [Bb]riefing|Report \(20|뉴스 검색|주간 브리핑|리포트 \(20)", title
+    ):
         return True
     return False
 

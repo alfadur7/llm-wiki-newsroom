@@ -95,7 +95,7 @@ Craft principles, criteria, and thresholds are the SoT in the craft skills' `cri
 - **Conclusion up front** (`con.so-what`): `## Summary` answers the question conclusion-first. Don't lay out background first and defer the conclusion.
 - **Inline-attribution obligation** (`cit.grounding`): every key claim·number in the body is attributed to its source via `[[source-slug]]`. The narrator does not assert without a source (`enc.verdict-restraint`).
 - **Integration value**: a synthesis is **a through-running analysis laid on top of** its underlying hubs·sources, not a repetition of their detail. If it's a mere summary, an overview·hub suffices.
-- **Korean alias** (`enc.slug-alias`): no raw exposure of kebab-case slugs ≥ 10 chars — `[[ai-coding-10x-productivity-myth|METR 19% productivity myth]]`.
+- **Slug alias** (`enc.slug-alias`): no raw exposure of kebab-case slugs ≥ 10 chars — `[[ai-coding-10x-productivity-myth|METR 19% productivity myth]]`.
 - **Numeric precision** (`con.numeric-precision`): comparison numbers state unit·basis·point-in-time.
 
 ### Feedback loop (iterate until Rubric conditions met)

@@ -53,7 +53,7 @@ Setup guide: [`.claude/operations/mobile-inbox-setup.md`](../operations/mobile-i
 
 ## Parallel Batch (Genuine new 3+)
 
-If there are **3 or more** Genuine new candidates, branch out with the Agent tool. 12-step split:
+If there are **3 or more** Genuine new candidates, branch out with the Agent tool. 13-step split:
 
 - **Pre-fanout (main, once)**: read the wiki (`index.md`·`overview.md`) — shared sub-agent context
 - **Fanout (N sub-agents in parallel)**: each sub-agent, for one candidate, (a) reads the raw, (b) matches URL/path, (c) writes `wiki/sources/<slug>.md`. It reports back to main with collected results (proposed new entities/concepts · `## Connections` links · discovered contradictions · missing quote speakers).
@@ -61,7 +61,7 @@ If there are **3 or more** Genuine new candidates, branch out with the Agent too
 
 Race avoidance: two sub-agents never write to the same file simultaneously. `wiki/sources/<slug>.md` is isolated per slug. `wiki/entities/`·`wiki/concepts/`·`wiki/overview.md`·`log.md` are updated serially by main.
 
-## 12-Step Procedure (Serial or per Sub-agent)
+## 13-Step Procedure (Serial or per Sub-agent)
 
 1. **Read the source file**:
    - **md**: body via the Read tool

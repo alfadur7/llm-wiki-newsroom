@@ -89,7 +89,7 @@ The backend diagnostic tool is `tools/lint.py`, and you can call the same group/
 | `graph` | `internal-refs` | Detects **markdown links** from published content (root meta + entities·concepts·overviews·contradictions·syntheses·timelines·trails) into the build/governance tree (`.claude/`·`tools/`·`CLAUDE.md`·`raw/`·`log.md`). A RAG reader cannot open these, and they pollute the corpus with self-meta. **Link-based, so no false positives** — plain-text topic mentions like Claude Code's `CLAUDE.md`·`.claude/` are not links and are not detected. Symmetric check to `hub voice`·claude-guideline-voice (sources are out of scope since their bodies aren't exported) | Unsupported — removal/rephrasing is the author's call (same as `hub voice`) |
 | `graph` | `gaps` | 10-type deterministic gap diagnostic. Output is split by Track A (sparse-cluster·single-source·stale-hub — auto-enrich targets) · Track B (bridge — surfaced for wiki-operator decision) · Track C (orphan-claims·cap-theme·stale-theme — separate cycle) · Track D (synthesis·trail·timeline — Columnist-derived authoring). **OPT-IN — not auto-run by `lint all`** (betweenness sampling + a full hub-frontmatter scan is heavy). Definitions·thresholds are SoT in [`.claude/operations/gap-detection-rollout.md`](../operations/gap-detection-rollout.md) | Unsupported — enrichment triggers are `/wiki-news --gap`, theme rewrite is `/wiki-lint contradiction theme --fix` |
 | `graph` | `drift` | Compares warm↔cold Leiden partition quality (modularity) — detects cluster-stability drift. **OPT-IN — not auto-run by `lint all`** (cost of cold Leiden recomputation) | Unsupported |
-| `hub` | `speakers` | Among quoted speakers (the `> "..." — Name (role)` pattern), those that meet **both** conditions of **multiple quotes (≥3 total) AND appearing in multiple sources (≥3 distinct files)** while `entities/<name>.md` is missing. Thresholds adjustable via `--min-quotes`·`--min-sources` flags | Unsupported (current-role verification required; Claude must not auto-stub) |
+| `hub` | `speakers` | **WIKI_LANG=ko only** (the byline matcher keys on Hangul names + Korean role nouns; a no-op on the English-native default — English attribution is covered by `cit.A2` + `count_mentions.py`). Among quoted speakers (the `> "..." — Name (role)` pattern), those that meet **both** conditions of **multiple quotes (≥3 total) AND appearing in multiple sources (≥3 distinct files)** while `entities/<name>.md` is missing. Thresholds adjustable via `--min-quotes`·`--min-sources` flags | Unsupported (current-role verification required; Claude must not auto-stub) |
 | `hub` | `suggestions` | Commonly-referenced but not-yet-created links + frequently-mentioned terms with no page (informational — no pass/fail impact) | Unsupported |
 | `hub` | `schema` | L2-2 hub frontmatter (entities/concepts/timelines all require `title·type·tags·sources·last_updated` + `type` value matches the directory) | **Auto-fill type + last_updated** (deterministic, based on directory · git log). title/tags/sources need semantic inference → report only |
 | `hub` | `voice` | L2-2 hub body self-meta voice antipatterns (`this hub …`·`covered separately`, etc. — and the ko-mode antipattern tokens `본 hub는`·`별도 정리한다` — violations of encyclopedic neutrality). FAIL → exit 1. Fenced code blocks are excluded from the check | Unsupported (rephrasing is the author's call; symmetric to `internal-refs`) |
@@ -126,7 +126,7 @@ For target-based groups (`overview`·`contradiction`), the second positional arg
 4. **Missing entity pages** (`graph structure`) — names referenced by 3+ pages but lacking their own page.
 5. **Korean entity with English filename** (`graph structure`) — entities that are Korean companies · institutions · people but have an English filename (industry-standard English brands are excluded via the `ENGLISH_STANDARD` whitelist).
 5-A. **Uncovered cited speakers** (`hub speakers`) — `> "..." — Name (role)` quoted speakers who meet **both** conditions of **≥3 total quotes + ≥3 distinct source files** while lacking an `entities/<name>.md` page. The two conditions are the operational threshold of the memory policy `feedback_no_single_source_stub` ("stub only for core figures who are quoted multiple times and appear across several sources"); single-source · 1–2-quote one-off citations are not actionable stub candidates. Single-file detection is handled by `/wiki-ingest` workflow step 10. **When creating a stub, current-role verification via `WebSearch` is mandatory** — between the article's writing date and now, the person may have changed jobs, retired, or been promoted. For people no longer in their role due to retirement · resignation, hold off on creation or request human-reviewer confirmation.
-6. **Cluster health** (`graph clusters`) — reports Leiden codes [A]–[G]. Code definitions · Korean display names · action guides are defined inline in the `graph clusters` row of the [`## Group Structure`](#group-structure) table above (single SoT — drift prevention).
+6. **Cluster health** (`graph clusters`) — reports Leiden codes [A]–[G]. Code definitions · action guides are defined inline in the `graph clusters` row of the [`## Group Structure`](#group-structure) table above (single SoT — drift prevention).
 7. **Meta-doc schema** (`meta schema`) — a 4-axis bundle for meta documents:
    - **Integrity**: CLAUDE.md self-consistency — anchor-link targets exist, backtick file-path files exist, `/wiki-*` slash commands' definition files exist
    - **Rubric drift**: L2-3 Rubric ↔ L2-4 Rubric common-criterion-row sync (`.claude/layers/overview.md`·`.claude/layers/contradiction.md` `## Evaluation Rubric` sections are SoT; the row count's single SoT is the guide table)
@@ -268,7 +268,7 @@ The script **does not edit the EDITOR area directly**. Instead, at the end of th
 **Common procedure**:
 
 1. **Read `.claude/layers/overview.md`** — the Part matching the target scope (L2-3=Part 1, L2-4=Part 2).
-2. **Read `.claude/layers/overview.md`** — the same Part.
+2. **Read `.claude/layers/overview.md`** — the same Part's `## Evaluation Rubric`.
 3. **Read the target file(s)**: for a single cluster, `wiki/overviews/<slug>.md`; for aggregate, `wiki/overview.md` + all cluster overviews (`graph/_clusters.json::clusters[]` SoT) in full.
 4. **Rewrite the EDITOR area following the Authoring Guide "execution order."** Never modify AUTO blocks (`<!-- AUTO:... BEGIN/END -->` and their contents).
 5. **Re-diagnose**: re-run `python tools/lint.py overview <target>` → confirm Rubric metrics · Freshness.
@@ -319,7 +319,7 @@ In the same pattern as overview, the script **does not edit the EDITOR area dire
 **Common procedure** (the order the rewrite block outputs):
 
 1. **Read `.claude/layers/contradiction.md`** — the Part matching the target scope (L2-3=Part 1, L2-4=Part 2).
-2. **Read `.claude/layers/contradiction.md`** — the same Part.
+2. **Read `.claude/layers/contradiction.md`** — the same Part's `## Evaluation Rubric`.
 3. **Read the target file(s)**: for a theme slug, `wiki/contradictions/<theme>.md` + resolve the `_contradictions.json` records via that theme's `claim_ids` in `_contradictions_themes.json` + the key source files. For aggregate, `wiki/contradiction.md` + all theme files in full (by `_contradictions_themes.json` keys).
 4. **Rewrite following the Authoring Guide "execution order."** A theme MD has 4 H2 sections; the aggregate has the `# Contradictions by Theme` root + 4 required sections. All are EDITOR area in their entirety, with no AUTO blocks.
 5. **Re-diagnose**: re-run `python tools/lint.py contradiction <target>` → schema · mapping · Rubric metrics all auto-output.
@@ -708,7 +708,7 @@ Before output, you must pass all of the below. If any one is short, fix and re-v
 - [ ] **Slug format**: every slug matches the `[a-z0-9-]+` pattern (kebab-case English)
 - [ ] **Slug reserved word**: no theme uses the bare slug `theme` (lint collision)
 - [ ] **Slug quality**: each slug is a 2–5-word structure suggesting the contradiction axis
-- [ ] **Name quality**: Korean, and whether the contradiction · tension · dispute is apparent
+- [ ] **Name quality**: English by default (Korean under WIKI_LANG=ko), and whether the contradiction · tension · dispute is apparent
 - [ ] **Grouping reasonableness**: sample 1 claim from each theme and self-question its membership rationale — Core Principle 2 satisfied
 - [ ] **Cross-assignment justification**: a claim assigned to multiple themes has explicit evidence for each membership
 - [ ] **phase field accurate**: matches the Phase number this run performed

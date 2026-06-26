@@ -16,8 +16,45 @@ import sys
 
 import check_bullet_depth
 
-DRIFT_OV_RE = re.compile(r"(🔴|🟡|🟢)\s+[a-z][a-z0-9-]+.*member_jaccard")
-DRIFT_CN_RE = re.compile(r"(🔴|🟡|🟢)\s+[a-z][a-z0-9-]+.*claim_jaccard")
+# Per-target drift block (`- 🔴/🟡/🟢 <slug> …`). 🔴/🟡 blocks self-identify by
+# their `*_jaccard` metric or `/wiki-lint <group>` action; 🟢-stable blocks carry
+# neither (`🟢 <slug> — drift stable`, wiki-lint.md), so they are attributed to the
+# section they fall under — see `_drift_group_counts`.
+_DRIFT_BLOCK_RE = re.compile(r"^[\s>]*[-*]\s*(?:🔴|🟡|🟢)\s+[a-z][a-z0-9-]+")
+_OV_SIGNAL_RE = re.compile(r"member_jaccard|/wiki-lint\s+overview")
+_CN_SIGNAL_RE = re.compile(r"claim_jaccard|/wiki-lint\s+contradiction")
+
+
+def _drift_group_counts(scan: str) -> tuple[int, int]:
+    """Count per-target drift blocks per group → (overview, contradiction).
+
+    A 🟢-stable block (`🟢 <slug> — drift stable`) carries no `*_jaccard` metric,
+    so the earlier metric-only regexes counted an all-stable group as 0 and
+    falsely flagged asymmetry. Here 🔴/🟡 blocks self-identify by their metric or
+    `/wiki-lint <group>` action; an unmarked 🟢 block inherits the current section,
+    set by the nearest preceding heading/bold-label naming a group.
+    """
+    ov = cn = 0
+    section = None  # 'ov' | 'cn' | None
+    for ln in scan.splitlines():
+        low = ln.lower()
+        is_block = bool(_DRIFT_BLOCK_RE.match(ln))
+        stripped = ln.lstrip()
+        if not is_block and (stripped.startswith("#") or stripped.startswith("**") or "example (" in low):
+            if "overview" in low:
+                section = "ov"
+            elif "contradiction" in low:
+                section = "cn"
+        line_group = "ov" if _OV_SIGNAL_RE.search(ln) else ("cn" if _CN_SIGNAL_RE.search(ln) else None)
+        if line_group:
+            section = line_group
+        if is_block:
+            g = line_group or section
+            if g == "ov":
+                ov += 1
+            elif g == "cn":
+                cn += 1
+    return ov, cn
 AUTO_MARKER_RE = re.compile(r"<!--\s*AUTO:")
 SCRATCH_EXTS = {".py", ".sh", ".tmp", ".scratch", ".ipynb"}
 GUIDE_DIRS = ("/.claude/agents/", "/.claude/commands/", "/.claude/layers/",
@@ -256,8 +293,7 @@ def run_pre(data: dict) -> int:
         # old_string or unreadable file, so no new false block is introduced.
         full, _ = check_bullet_depth.expected_text(tool_input)
         scan = full if full is not None else content
-        ov = sum(1 for ln in scan.splitlines() if DRIFT_OV_RE.search(ln))
-        cn = sum(1 for ln in scan.splitlines() if DRIFT_CN_RE.search(ln))
+        ov, cn = _drift_group_counts(scan)
         if ov > 0 and cn == 0:
             print(LINT_REPORT_OV_ONLY, file=sys.stderr)
             return 2

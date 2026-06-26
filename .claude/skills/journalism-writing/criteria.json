@@ -87,7 +87,7 @@
     },
     "jrn.monitoring-balance": {
       "name": "Synthesis / monitoring balance", "dimension": "Dialectic", "judge": "M",
-      "pass_condition": "The synthesis (Interpretation Direction) includes a monitoring point for each side's (A·B·optional C) winning scenario (≥1 each). Skew to one side is FAIL (due impartiality) — place them symmetrically so no editorial verdict is hidden beneath hedged wording.",
+      "pass_condition": "The synthesis (Interpretive Direction) includes a monitoring point for each side's (A·B·optional C) winning scenario (≥1 each). Skew to one side is FAIL (due impartiality) — place them symmetrically so no editorial verdict is hidden beneath hedged wording.",
       "legacy": {"contradiction-theme": "D2"},
       "source": "Hegel's Dialectics — Stanford Encyclopedia of Philosophy", "source_url": "https://plato.stanford.edu/entries/hegel-dialectics/"
     }

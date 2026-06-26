@@ -78,10 +78,12 @@ def _title_and_type(content: str) -> tuple[str, str]:
     return fm.get("title", ""), fm.get("type", "unknown")
 
 
-# Wikilink with a trailing " — description" (or "--") on the same line.
-_LABELED_LINK_RE = re.compile(r"\[\[([^\]|]+)(?:\|[^\]]+)?\]\]\s*(?:—|--)\s*(.+?)(?:\n|$)")
-# All wikilinks (used for the second dedup-aware pass).
-_ANY_LINK_RE = re.compile(r"\[\[([^\]|]+)(?:\|[^\]]+)?\]\]")
+# Wikilink with a trailing " — description" (or "--") on the same line. group(1)
+# is the bare stem — the optional `#section` anchor / `|alias` are stripped so an
+# anchored link like `[[slug#section]]` still resolves against id_map (keyed on slug).
+_LABELED_LINK_RE = re.compile(r"\[\[([^\]|#]+)(?:[#|][^\]]*)?\]\]\s*(?:—|--)\s*(.+?)(?:\n|$)")
+# All wikilinks (used for the second dedup-aware pass). Stem only, anchor stripped.
+_ANY_LINK_RE = re.compile(r"\[\[([^\]|#]+)(?:[#|][^\]]*)?\]\]")
 
 # H2 section header at line start. Used to slice each file into
 # (start, end, section_title) spans so each wikilink can be tagged with

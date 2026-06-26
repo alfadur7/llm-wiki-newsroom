@@ -11,10 +11,10 @@ injected by the orchestrator (tools/_lint/source.py) — this module uses only p
 text measurement + injected context. The measurement logic was ported verbatim
 from source.py `_evaluate` (diff-0).
 
-NOTE: many matchers below key on the Korean wiki schema (## Key Claims·## Connections·
-[fact]/[analysis]/[forecast]·## Key Quotes) and Korean prose features. The wiki is now
-English, so those schema/prose matchers are dormant; per the i18n policy they are
-left as-is with a dormant flag rather than replaced (see FLAGs in summary).
+NOTE: the schema matchers below key on the live English wiki schema (## Key Claims·
+## Connections·[fact]/[analysis]/[forecast]·## Key Quotes·## Representative Evidence)
+and fire normally. Only the Korean-prose matchers are dormant on an English corpus —
+G3 (와/및 conjunctions), G5 (Korean verb endings) — and fire under WIKI_LANG=ko.
 """
 
 from __future__ import annotations
@@ -23,9 +23,7 @@ import re
 
 
 # ── cit measurement regexes (ported verbatim from source.py) ──
-# (dormant: the grade markers [fact]/[analysis]/[forecast] are the Korean schema; the English
-#  wiki uses [fact]/[analysis]/[forecast]. These regexes will NOT fire on English
-#  pages. An English equivalent would key on \[(fact|analysis|forecast)\]. See FLAG.)
+# Grade markers [fact]/[analysis]/[forecast] — the live English source.md schema.
 GRADE_MARKER_RE = re.compile(r"^-\s*\[(fact|analysis|forecast)\]", re.MULTILINE)
 CLAIM_LINE_RE = re.compile(r"^-\s+(.+?)\s*$", re.MULTILINE)
 GRADE_PLUS_CLAIMANT_RE = re.compile(r"^-\s*\[(fact|analysis|forecast)\]\s+\[\[", re.MULTILINE)
@@ -43,7 +41,7 @@ G3_COMPOSITE_RE = re.compile(r"\[\[[^\]]+\]\][^\n]*\s(와|및)\s[^\n]*\[\[[^\]]+
 #  "…did, and …did". See FLAG.)
 G5_VERB_SPLIT_RE = re.compile(r"했고\s*,\s*[^\n]*?(했다|한다|이다|된다)")
 ANCHOR_LINK_RE = re.compile(r"\[\[([^\]|#]+)#([^\]|]+)(?:\|[^\]]+)?\]\]")
-# (dormant: keys on the Korean grade markers fact/analysis/forecast — see GRADE_MARKER_RE FLAG.)
+# Keys on the live English grade markers [fact]/[analysis]/[forecast].
 CLAIMANT_AFTER_GRADE_RE = re.compile(
     r"^-\s*\[(?:fact|analysis|forecast)\]\s+\[\[([^\]|#]+)(?:\|[^\]]+)?\]\]", re.MULTILINE
 )
@@ -153,9 +151,7 @@ def evaluate_citation(
     returned dict is byte-identical to source.py `_evaluate`'s key tuples.
     """
     # G1, G2, G3 — atomic units in `## Key Claims`.
-    # (dormant: the section header `## Key Claims` is Korean; the English wiki uses
-    #  `## Key Claims`, so claims_body is empty and G1/G2/G3/G4/G5 all evaluate to
-    #  trivially-pass on English pages. See FLAG.)
+    # `## Key Claims` is the live English source.md section header.
     claims_body = _section_body(body, "## Key Claims")
     claim_lines = [m.group(1) for m in CLAIM_LINE_RE.finditer(claims_body)]
     claim_total = len(claim_lines)
@@ -199,9 +195,7 @@ def evaluate_citation(
             g5_violations += 1
     g5_pass = g5_violations == 0
 
-    # C1, C2 — citation-type prefix in `## Connections`.
-    # (dormant: the section header `## Connections` is Korean; the English wiki uses
-    #  `## Connections`, so connect_body is empty and C1/C2/C3 trivially pass. See FLAG.)
+    # C1, C2 — citation-type prefix in `## Connections` (live English header).
     connect_body = _section_body(body, "## Connections")
     connect_lines = [m.group(0) for m in CONNECT_LINE_RE.finditer(connect_body)]
     connect_total = len(connect_lines)
@@ -234,7 +228,7 @@ def evaluate_citation(
     c3_pass = len(c3_violations) == 0
 
     # A1 — anchor presence in `[fact]`·`[analysis]` claim lines (advisory only).
-    # (dormant: keys on the Korean grade markers [fact]/[analysis] — see GRADE_MARKER_RE FLAG.)
+    # Keys on the live English grade markers [fact]/[analysis].
     anchor_eligible_lines = [ln for ln in claim_lines if re.match(r"\[(fact|analysis)\]", ln)]
     anchored_lines = [
         ln for ln in anchor_eligible_lines if re.search(r"\[\[[^\]]*#[^\]]+\]\]", ln)
@@ -243,9 +237,7 @@ def evaluate_citation(
     a1_anchored = len(anchored_lines)
     a1_pass = True  # advisory — always PASS
 
-    # A2 — blockquote speaker attribution in `## Key Quotes`.
-    # (dormant: the section header `## Key Quotes` is Korean; the English wiki uses
-    #  `## Key Quotes`, so quotes_body is empty and A2 trivially passes. See FLAG.)
+    # A2 — blockquote speaker attribution in `## Key Quotes` (live English header).
     quotes_body = _section_body(body, "## Key Quotes")
     quote_lines = QUOTE_LINE_RE.findall(quotes_body)
     quote_with_speaker = QUOTE_WITH_SPEAKER_RE.findall(quotes_body)
@@ -298,13 +290,13 @@ def evaluate_citation(
 L3_ITEM_MIN_CHARS = 20       # minimum item length to register
 L3_SUBSTRING_CHARS = 20      # leading chars used for body substring match
 _QUOTE_BLOCK_RE = re.compile(r'>\s*"([^"]+)"', re.MULTILINE)
-# (dormant: the section headers `## Key Quotes`/`## Key Claims` are Korean; the English
-#  wiki uses `## Key Quotes`/`## Key Claims`, so these source-evidence extractors
-#  return nothing and L3 grounding has no items to match against. See FLAG.)
-_SECTION_QUOTES_RE = re.compile(r'##\s*주요\s*인용\s*\n(.*?)(?=\n##\s|\Z)', re.DOTALL)
-_SECTION_CLAIMS_RE = re.compile(r'##\s*주요\s*주장\s*\n(.*?)(?=\n##\s|\Z)', re.DOTALL)
+# Source-evidence extractors for L3 grounding: match the live English source-page
+# headers `## Key Quotes` / `## Key Claims` (source.md schema). The Korean headers
+# `## 주요 인용` / `## 주요 주장` fire under WIKI_LANG=ko.
+_SECTION_QUOTES_RE = re.compile(r'##\s*(?:Key Quotes|주요\s*인용)\s*\n(.*?)(?=\n##\s|\Z)', re.DOTALL)
+_SECTION_CLAIMS_RE = re.compile(r'##\s*(?:Key Claims|주요\s*주장)\s*\n(.*?)(?=\n##\s|\Z)', re.DOTALL)
 _BULLET_RE = re.compile(r'^\s*-\s+(.+?)$', re.MULTILINE)
-# (dormant: keys on the Korean grade markers fact/analysis/forecast — see GRADE_MARKER_RE FLAG.)
+# Keys on the live English grade markers [fact]/[analysis]/[forecast].
 _CLAIM_PREFIX_RE = re.compile(r'^\s*\[(?:fact|analysis|forecast)\]\s*\[\[[^\]]+\]\]\s*[—–-]\s*')
 _SMART_QUOTE_TRANS = str.maketrans({
     "“": '"', "”": '"',
@@ -315,10 +307,8 @@ _QUOTE_IN_BULLET_RE = re.compile(
     re.MULTILINE,
 )
 _ANCHORED_LINK_RE = re.compile(r"\[\[([^#\]|]+)#([^|\]]+)(?:\|[^\]]+)?\]\]")
-# (dormant: the allowed anchor-section set is Korean (Key Quotes/Key Claims/Summary =
-#  Key Quotes/Key Claims/Summary); on the English wiki an anchor points to those
-#  English section titles, so L4 never recognizes an anchored bullet. An English
-#  equivalent would be {"Key Quotes", "Key Claims", "Summary"}. See FLAG.)
+# The live English anchor-target section titles (an anchored bullet points to one
+# of these source.md sections).
 _ANCHOR_ALLOWED_SECTIONS = {"Key Quotes", "Key Claims", "Summary"}
 
 
@@ -397,9 +387,7 @@ def _quote_grounding(body: str, evidence_slugs: set, sources_dir):
 
 def _evidence_anchor_check(body: str, source_slugs: set):
     """L4 advisory — (anchored, quoted_total, unanchored_samples)."""
-    # (dormant: `Representative Evidence` is the Korean "Representative Evidence" section header; the
-    #  English wiki uses an English title, so evidence_section is empty and L4 returns
-    #  (0, 0, []). See FLAG.)
+    # `Representative Evidence` is the live English contradiction.md section header.
     evidence_section = _extract_section(body, "Representative Evidence")
     if not evidence_section:
         return 0, 0, []

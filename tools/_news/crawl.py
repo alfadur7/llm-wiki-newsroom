@@ -52,7 +52,7 @@ from bs4 import BeautifulSoup
 
 sys.path.insert(0, str(Path(__file__).parent.parent))  # _news/ → tools/ root
 from _lib import REPO_ROOT, WIKI, canonicalize_url, korean_mode  # noqa: E402
-from _net import safe_get_stream, BLOCKED_STATUSES, UnsafeURLError  # noqa: E402
+from _net import safe_get_stream, UnsafeURLError  # noqa: E402
 from _news.domains import GLOBAL_IT_FINANCE_NEWS, KOREAN_IT_FINANCE_NEWS  # noqa: E402
 from _news.gap_queries import _load_hub_fm, load_gaps_json  # noqa: E402
 from _news.normalize import hub_korean_label, normalize_tags  # noqa: E402
@@ -152,7 +152,8 @@ def build_vocabulary(hub_fm: dict[str, dict] | None = None) -> dict[str, int]:
         hub_fm = _load_hub_fm()
     vocab: dict[str, int] = {}
     for hub_id, fm in hub_fm.items():
-        raw = fm.get("title") or hub_id.split("/")[-1].removesuffix(".md")
+        t = fm.get("title")
+        raw = t if isinstance(t, str) and t else hub_id.split("/")[-1].removesuffix(".md")
         label = hub_korean_label(raw).strip().lower()
         if _term_ok(label):
             vocab[label] = LABEL_WEIGHT
@@ -280,7 +281,7 @@ def _fetch_page(url: str, timeout: int = 15) -> tuple[str, str] | None:
     """
     try:
         with safe_get_stream(url, headers=HEADERS, timeout=timeout) as r:
-            if r.status_code in BLOCKED_STATUSES or r.status_code >= 400:
+            if r.status_code >= 400:
                 return None
             if "html" not in r.headers.get("Content-Type", "").lower():
                 return None

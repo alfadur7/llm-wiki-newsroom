@@ -42,7 +42,7 @@ An entity stub is created **only for a core entity that is cited multiple times 
 **Threshold conditions** (all must be met to create a stub):
 - **≥3 distinct source citations** (multiple citations within a single source do not count toward the threshold — a hub is a multi-source synthesis anchor)
 - Appears in multiple clusters ≥ 2 clusters (natural appearance, not via paired_with)
-- A core narrative role — mere enumeration or a peripheral-layer citation does not qualify; it must be a functional anchor such as a consortium leader, an SI mainstay, or a dominant claimant
+- A core narrative role — mere enumeration or a peripheral-layer citation does not qualify; it must be a functional anchor such as a consortium leader, a major systems integrator, or a dominant claimant
 
 **Demotion conditions** (plain text on one-off appearance):
 - Appears one or two times in the body, isolated

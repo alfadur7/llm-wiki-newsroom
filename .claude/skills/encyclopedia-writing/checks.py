@@ -235,15 +235,16 @@ N6_NUMBER_REUSE_MAX = 2
 # (dormant: Korean transition keywords (before/after/generation/reversal/turning
 #  point/angle/timeline); none fire on English. See FLAG.)
 N6_DERIVED_TRANSITION_KEYWORDS = ["이전", "이후", "세대", "반전", "전환점", "각도", "Timeline"]
-# (dormant: the bold-label subtitle alternation (입장/중재/제3관점 = position/
-#  mediation/third-view) is Korean; an English dialectic uses **A Position** /
-#  **C Mediation** etc. See FLAG.)
-DIALECTIC_LABEL_RE = re.compile(r"\*\*([ABC])\s*(입장|중재|제3관점|중재/제3관점)[^*]*\*\*")
-# (dormant: Korean value-laden words (myth/empirical/skepticism/science/heresy/
-#  mainstream/orthodoxy/innovation/optimism/pessimism/extreme/fanaticism/blind-faith/
-#  illusion/bubble/camp/orthodox). An English equivalent would carry the English
-#  value words. See FLAG.)
+# A/B/C position label (N7). group(1) = the letter, captured whether it leads
+# (`**C — Mediation**`, Korean `**A 입장**`) or follows `Position ` (English
+# `**Position A**`, per contradiction.md). \b avoids matching ordinary bold words.
+DIALECTIC_LABEL_RE = re.compile(r"\*\*(?:Position\s+)?([ABC])\b[^*]*\*\*")
+# Value-laden words used in a faction subtitle (N7 skew). English-native set first;
+# the Korean set fires under WIKI_LANG=ko. Matched case-insensitively in _value_hits.
 LABEL_VALUE_WORDS = {
+    "myth", "empirical", "skepticism", "science", "heresy", "mainstream",
+    "orthodoxy", "orthodox", "innovation", "optimism", "pessimism", "extreme",
+    "fanaticism", "blind faith", "illusion", "bubble", "camp",
     "신화", "실증", "회의론", "과학", "이단", "주류", "정설",
     "혁신", "낙관", "비관", "극단", "광신", "맹신", "환상", "거품",
     "진영", "정통",
@@ -291,7 +292,7 @@ def evaluate_contradiction_npov(
     top_reused = sorted(slug_counts.items(), key=lambda x: -x[1])[:3]
     reuse_max = top_reused[0][1] if top_reused else 0
 
-    # N5 — verdict sentences in `## Interpretation Direction` (dormant Korean matcher)
+    # N5 — verdict sentences in `## Interpretive Direction` (Korean verdict matcher; ko-mode)
     verdict_fails = 0
     for sentence in _split_sentences(verdict_section):
         if any(p.search(sentence) for p in VERDICT_FAIL_PATTERNS):
@@ -334,7 +335,7 @@ def evaluate_contradiction_npov(
         full = match.group(0)
         paren = re.search(r"\(([^)]+)\)", full)
         subtitle = paren.group(1) if paren else ""
-        hits = [w for w in LABEL_VALUE_WORDS if w in subtitle]
+        hits = [w for w in LABEL_VALUE_WORDS if w in subtitle.lower()]
         if hits and not label_value_words[label]:
             label_value_words[label] = hits
     a_has = bool(label_value_words["A"])
@@ -392,8 +393,8 @@ def evaluate_contradiction_aggregate(
         parts = re.split(r"\s+(?:vs|대|·|/)\s+", axis_name.strip(), maxsplit=1)
         if len(parts) != 2:
             continue
-        left_hits = [w for w in LABEL_VALUE_WORDS if w in parts[0]]
-        right_hits = [w for w in LABEL_VALUE_WORDS if w in parts[1]]
+        left_hits = [w for w in LABEL_VALUE_WORDS if w in parts[0].lower()]
+        right_hits = [w for w in LABEL_VALUE_WORDS if w in parts[1].lower()]
         if bool(left_hits) != bool(right_hits):
             axis_skew_hits.append(f"{axis_name.strip()} (L={left_hits}, R={right_hits})")
     n7_skew = len(axis_skew_hits)
@@ -417,9 +418,8 @@ def evaluate_contradiction_aggregate(
         if not lines:
             continue
         axis_name = lines[0].strip()
-        # (dormant: skips the Korean residual axis '기타'/other; an English wiki would
-        #  title it e.g. 'Other'. See FLAG.)
-        if axis_name in ("기타",):
+        # Skip the MECE residual axis: English `Other` or, under WIKI_LANG=ko, `기타`.
+        if axis_name.lower() in ("other", "기타"):
             continue
         body = "\n".join(lines[1:])
         count = sum(
@@ -503,9 +503,8 @@ def evaluate_overview_aggregate(content: str, *, section_spans: list, all_links:
 
 _HUB_FM_RE = re.compile(r"^---\n(.*?)\n---\n", re.DOTALL)
 _HUB_HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
-# (dormant: section header `## Connections` is the Korean "Connections" header; an English
-#  wiki uses `## Connections`, so this section is never found and the hub body /
-#  link-grouping checks effectively measure the whole body. See FLAG.)
+# Matches the `## Connections` hub section (the live English header, per hub.md);
+# the hub body / link-grouping checks scope to this section.
 _HUB_YEONGYEOL_RE = re.compile(r"^##\s+Connections\s*$(.*?)(?=^##\s|\Z)", re.MULTILINE | re.DOTALL)
 _HUB_WIKILINK_RE = re.compile(r"\[\[([^\]\|]+)(?:\|[^\]]+)?\]\]")
 

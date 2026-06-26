@@ -35,7 +35,7 @@ from datetime import date as _date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import FRONTMATTER_BLOCK_RE as FRONTMATTER_RE, WIKI, parse_frontmatter, read_text_cached  # noqa: E402
+from _lib import FRONTMATTER_BLOCK_RE as FRONTMATTER_RE, WIKI, korean_mode, parse_frontmatter, read_text_cached  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).parent))
 from _schema_common import check_frontmatter  # noqa: E402
@@ -290,17 +290,18 @@ def _check_directory(directory: Path, dir_label: str, expected_type: str, fix: b
                     f"(expected one of {sorted(VALID_ENTITY_KINDS)})"
                 )
 
-        # Korean-named hub → Korean title alignment. CLAUDE.md → Language
-        # Rules: the `title` value must be written in Hangul. A Hangul filename
-        # signals the Korean entity convention; the title must then carry Hangul
-        # too (canonical Korean name first, optional `(English)` after) so the
-        # graph node label and Obsidian page title don't drift to English.
-        # Without this guard, frontmatter like `title: "KBFinancialGroup"`
-        # on a `KB금융그룹.md` file silently produces an English graph
-        # label even though the filename is Korean (regression caught
-        # 2026-05-04 across 8 entity files).
+        # Korean-named hub → Korean title alignment. WIKI_LANG=ko only: a Hangul
+        # filename signals the Korean entity convention, so the title must then
+        # carry Hangul too (canonical Korean name first, optional `(English)`
+        # after) so the graph node label and Obsidian page title don't drift to
+        # English. Without this guard, frontmatter like `title: "KBFinancialGroup"`
+        # on a `KB금융그룹.md` file silently produces an English graph label even
+        # though the filename is Korean (regression caught 2026-05-04 across 8
+        # entity files). Gated behind korean_mode() like hub_voice.py — on the
+        # English-native default a stray Hangul filename is not forced to a
+        # Hangul title (it would be a hard FAIL otherwise).
         title_val = fm.get("title", "") or ""
-        if _has_hangul(path.stem) and not _has_hangul(title_val):
+        if korean_mode() and _has_hangul(path.stem) and not _has_hangul(title_val):
             issues.append(
                 f"  {dir_label}/{path.name}: Hangul filename → frontmatter "
                 f"`title: \"{title_val}\"` is English-only (CLAUDE.md → "

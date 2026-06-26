@@ -58,7 +58,7 @@
       "legacy": {"overview-cluster": "B1", "overview-aggregate": "B1", "contradiction-theme": "N5", "contradiction-aggregate": "N5"},
       "source": "Wikipedia:Neutral point of view",
       "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Neutral_point_of_view",
-      "note": "Count of verdict sentences ('is reasonable'·'has the most explanatory power'·'is consistent with', etc.) ≤ threshold (loose). Over → hedging/attribution needed. Threshold injected by manifest. For contradiction, measured only in the Interpretation Direction (theme) / Implications (aggregate) section. NOTE the underlying matcher (find_verdict_hits) keys on Korean verb endings and is dormant on English prose — see checks.py FLAG."
+      "note": "Count of verdict sentences ('is reasonable'·'has the most explanatory power'·'is consistent with', etc.) ≤ threshold (loose). Over → hedging/attribution needed. Threshold injected by manifest. For contradiction, measured only in the Interpretive Direction (theme) / Implications (aggregate) section. NOTE the underlying matcher (find_verdict_hits) keys on Korean verb endings and is dormant on English prose — see checks.py FLAG."
     },
     "enc.npov-asf": {
       "name": "ASF attribution",

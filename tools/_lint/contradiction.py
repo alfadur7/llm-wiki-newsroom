@@ -177,9 +177,15 @@ L24_THEMES_STAT_RE = re.compile(r"(\d+)\s*topic (?:clusters?|categories|themes?)
 # (faction-label value words) lexicons moved to craft measurement —
 # encyclopedia-writing (N5·N7) and journalism-writing (T4) checks.py own them.
 
-# D1 — bold-label matching for `**A 입장...**` / `**B 입장...**` / `**C 중재...**`.
-# A parenthetical subtitle may follow the label (e.g. `**A 입장 (공급사·대체론)**:`).
-DIALECTIC_LABEL_RE = re.compile(r"\*\*([ABC])\s*(입장|중재|제3관점|중재/제3관점)[^*]*\*\*")
+# Bold-label matching for the `## Opposing Positions` position labels, used only
+# to locate where the lead paragraph ends (the consumer uses `.start()`, not the
+# captured groups). The English layer prescribes `**Position A**` / `**Position B**`
+# / `**C — Mediation/Third view**` (contradiction.md); a parenthetical subtitle may
+# follow (e.g. `**Position A (suppliers / substitution)**:`). The Korean labels
+# `**A 입장…**` / `**C 중재…**` are kept for WIKI_LANG=ko corpora.
+DIALECTIC_LABEL_RE = re.compile(
+    r"\*\*(?:Position\s+[ABC]\b|[ABC]\s*(?:[—-]|입장|중재|제3관점))[^*]*\*\*"
+)
 
 
 # N6 — numeric token regex. Counts **only measurements that carry a unit** so
@@ -196,7 +202,10 @@ DIALECTIC_LABEL_RE = re.compile(r"\*\*([ABC])\s*(입장|중재|제3관점|중재
 # timestamps, not "core measurements". `시간` (duration) is included instead (`13시간 장애`).
 NUMBER_TOKEN_RE = re.compile(
     r"\d+(?:,\d{3})*(?:\.\d+)?\s*"
-    r"(?:조|억|만|천억|백만|%|퍼센트|"
+    r"(?:%|percent|"
+    r"billion|million|trillion|"  # English magnitude words (engine is English-native)
+    r"hours?|hrs?|people|users|cases?|points?|x|×|"
+    r"조|억|만|천억|백만|퍼센트|"
     r"달러|위안|유로|파운드|엔|"
     r"시간|배|명|건|개|대|기|점|"
     r"GW|MW|TB|PB|GB|"
@@ -932,8 +941,8 @@ def _check_contradictions_md(
     N5·N7 aggregate variants reuse the Part 1 lexicons owned by the
     encyclopedia-writing skill (checks.py) but target different sections:
       - N5 aggregate: `## Implications` section (Part 1 targets `## Interpretive Direction`)
-      - N7 aggregate: `### <axis>` subsection titles under `## 주제별 심층
-        analysis` (Part 1 targets `**A 입장 (...)**` bold labels)
+      - N7 aggregate: `### <axis>` subsection titles under `## Per-Theme Deep
+        Analysis` (Part 1 targets `**Position A (...)**` bold labels)
 
     Returns (issues, metrics_lines). Mirrors `overview._check_overview_md`
     pattern so `run(target="aggregate")` can consume the same shape.
@@ -985,8 +994,8 @@ def _check_contradictions_md(
     axes_named = _agg_con["axes_named"]
 
     # F2 — head-matter statistics match JSON SoT.
-    # Claim count stat: "**N건의 소스 간 모순**" vs len(claims).
-    # Theme count stat: "M개 주제 클러스터" vs the non-fragmentary theme count.
+    # Claim count stat: "**N source-to-source contradictions**" vs len(claims).
+    # Theme count stat: "M topic clusters" vs the non-fragmentary theme count.
     claim_stat_match = L24_CLAIMS_STAT_RE.search(content)
     theme_stat_match = L24_THEMES_STAT_RE.search(content)
     f2_drift: list[str] = []

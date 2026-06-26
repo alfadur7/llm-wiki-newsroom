@@ -133,10 +133,34 @@ def _title_korean_aliases(title: str, stem: str) -> list[str]:
     return list(aliases)
 
 
+def _title_english_aliases(title: str, stem: str) -> list[str]:
+    """Spaced display-form aliases for a multi-word Latin title.
+
+    PascalCase stems (``OpenSourceAI``) are matched verbatim by Pass 1's
+    ``\\bOpenSourceAI\\b``, which English prose — written spaced ("Open Source
+    AI") — never satisfies. The spaced title is registered as an alias so the
+    plain-text mention is detected. Single-word titles are already covered by
+    the stem pass; Korean titles go through ``_title_korean_aliases``.
+
+    For ``title="Open Source AI"`` → ``["Open Source AI"]``.
+    """
+    clean = re.sub(r"\(.*?\)", "", title)
+    clean = re.split(r"\s*[—\-:·]\s*", clean)[0].strip()
+    if " " not in clean:                       # single token → stem pass covers it
+        return []
+    if not re.search(r"[A-Za-z]", clean) or KOREAN_CHAR_RE.search(clean):
+        return []                              # not a pure-Latin phrase
+    if len(clean) < 4 or clean.lower() == stem.lower():
+        return []
+    return [clean]
+
+
 def index_hub_stems() -> tuple[set[str], dict[str, str]]:
     """Return (set of stems, dict alias→stem) for entity/concept pages.
 
-    Aliases are Korean display names extracted from frontmatter titles.
+    Aliases are spaced/compound display-name forms from frontmatter titles —
+    English multi-word titles (`_title_english_aliases`) and, for a Korean
+    corpus, Hangul compounds (`_title_korean_aliases`).
     """
     out: set[str] = set()
     alias_map: dict[str, str] = {}
@@ -167,7 +191,8 @@ def index_hub_stems() -> tuple[set[str], dict[str, str]]:
             if not isinstance(title, str):
                 title = ""
             if title and title != stem:
-                for alias in _title_korean_aliases(title, stem):
+                aliases = _title_english_aliases(title, stem) + _title_korean_aliases(title, stem)
+                for alias in aliases:
                     if alias not in out:  # don't shadow real stems
                         alias_map[alias] = stem
 
@@ -209,12 +234,15 @@ def find_unlinked(
             ctx = body[start:end].replace("\n", " ").strip()
             hits[stem].append(ctx)
 
-    # Pass 2: match by title-based Korean aliases
+    # Pass 2: match by title-based aliases (English spaced forms + Korean compounds)
     if alias_map:
         for alias, target_stem in alias_map.items():
             if target_stem in already_linked_norm:
                 continue
-            pattern = re.compile(re.escape(alias))
+            if re.search(r"[A-Za-z]", alias):  # Latin phrase → word-boundary, case-insensitive
+                pattern = re.compile(r"\b" + re.escape(alias) + r"\b", re.IGNORECASE)
+            else:
+                pattern = re.compile(re.escape(alias))
             for m in pattern.finditer(body):
                 start = max(0, m.start() - 20)
                 end = min(len(body), m.end() + 20)

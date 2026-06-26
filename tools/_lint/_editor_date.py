@@ -33,11 +33,16 @@ def editor_hash(content: str) -> str:
 
 def git_head_text(path: Path) -> str | None:
     """`git show HEAD:<path>` content (utf-8, cp949-safe bytes decode), or None
-    if `path` is new/removed in HEAD or git is unavailable. `path` is used as
-    given — callers run with cwd at the repo root (repo-relative paths)."""
+    if `path` is new/removed in HEAD or git is unavailable. Resolves `path` to
+    repo-relative first (via `_git_repo_rel`) — `git show HEAD:<abs-path>`
+    silently fails, and every real caller passes an absolute WIKI path."""
+    rr = _git_repo_rel(path)
+    if rr is None:
+        return None
+    toplevel, rel = rr
     try:
         r = subprocess.run(
-            ["git", "show", f"HEAD:{path.as_posix()}"],
+            ["git", "-C", toplevel, "show", f"HEAD:{rel}"],
             capture_output=True, timeout=5, check=False,
         )
         if r.returncode != 0:

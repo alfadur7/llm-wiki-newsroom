@@ -148,7 +148,7 @@ def _skeleton(slug: str) -> str:
     return (
         f'---\ntitle: "Timeline: {slug}"\ntype: timeline\ntags: []\n'
         f"last_updated: YYYY-MM-DD\n---\n\n"
-        f"## Timelines: [[{slug}]] (N)\n\n## Flow Summary\n\n"
+        f"## Timeline: [[{slug}]] (N entries)\n\n## Flow Summary\n\n"
         f"**Trajectory overview**: _TODO: phase → phase arrow trajectory._\n\n"
         f"- **YYYY~YYYY phase name**: _TODO: one paragraph per phase._\n\n"
         f"**Latest state**: _TODO._\n\n---\n\n"

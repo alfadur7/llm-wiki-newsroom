@@ -206,10 +206,11 @@ Checks are split into the groups below; invoking with no argument runs them all 
 (auxiliary groups like synthesis·trail·timeline also run, and staleness is shown for reference only):
 
   graph  — graph topology and reference consistency
-    · structure : broken wikilinks, orphan hubs, missing entity candidates, Korean entities with English filenames
+    · structure : broken wikilinks, orphan hubs, missing entity candidates (and, under WIKI_LANG=ko, Korean entities with English filenames)
     · orphans   : bidirectional source↔entity reference match (sources frontmatter ↔ source ## Connections)
     · clusters  : Leiden community health codes [A]–[G] + health-trend log (isolated hubs, unnamed groups, fragile bridges, etc.)
     · internal-refs : whether published content links internal build/guide files (.claude/·tools/·CLAUDE.md) — blocks self-references leaking into RAG
+    · raw-files : flags direct edits to auto-generated build artifacts / raw originals (fix the input and regenerate instead)
 
   hub    — L2-2 hub page (entity·concept·timeline) status
     · speakers     : people cited 2+ times across documents (speakers/quoted voices)
@@ -275,8 +276,9 @@ tools/build.py graph  (runs the graph stage only)
     · inferred edges: pairs sharing 3+ common referenced pages
   · Generate graph/_graph.json
   · graph.html itself is a committed static shell — when opened directly in a browser the physics
-    simulation runs live to decide node placement. The data wrappers (_graph.js·
-    _clusters.js) are generated in the clusters stage
+    simulation runs live to decide node placement. graph.html fetches its data as
+    JSON directly (_graph.json·_clusters.json·_pages.json); the reading-panel
+    bundle (_pages.json) is generated in the clusters stage
 
 A full wiki rebuild is run automatically by /wiki-ingest · /wiki-lint --fix.
 To run it directly: `python tools/build.py` — a 5-stage sequential pipeline:
@@ -295,7 +297,7 @@ Each stage can also run individually: `python tools/build.py <stage>`.
 
 ```
 1) Read the current wiki's topic composition (index.md, cluster meta) to generate search terms
-   · With a cluster specified: a Korean query combining 3–5 representative hubs of that topic
+   · With a cluster specified: a query combining 3–5 representative hubs of that topic (English by default; Korean only under WIKI_LANG=ko)
    · No argument: auto-iterate the top 5 clusters by document count
 2) Collect the latest articles via web search → dedup against existing source titles
 3) Summarize only new articles into a report and present them as ingest candidates
@@ -467,7 +469,7 @@ Double-click the file to open it, and these interactions are available right in 
 ### Automatic topic clustering
 Instead of a human assigning every entity/concept page to a category by hand, it uses an algorithm that **groups similar topics looking only at the connections between pages** ([Leiden community detection](https://en.wikipedia.org/wiki/Leiden_algorithm)). The result is intuitive clusters like the examples below — "bank IT · digital banking," "cloud · infrastructure," "LLM · foundation models," "security · governance," etc. Each source document is assigned by weighted vote to the cluster of the entities it referenced, so documents that overlap in topic are listed in multiple cluster catalogs at once.
 
-> Leiden is the successor to the better-known Louvain algorithm, solving Louvain's limitation (the modularity-local-maxima trap) where cluster boundaries swing wildly under small graph changes, via a refinement stage and connectivity guarantees. In the larger corpus this engine was built for, as the wiki grew to ~470 hubs Louvain entered a critical region where adding just 7 new sources would make the cluster count jump from 7 to 10; after adopting Leiden, the same change was measured to stay stable at 8→8. (The small example corpus shipped here has only 3 clusters, so the instability doesn't show up — but the algorithm choice still matters as a wiki grows.)
+> Leiden is the successor to the better-known Louvain algorithm, solving Louvain's limitation (the modularity-local-maxima trap) where cluster boundaries swing wildly under small graph changes, via a refinement stage and connectivity guarantees. In the larger corpus this engine was built for, as the wiki grew to ~470 hubs Louvain hit an unstable regime where adding just 7 new sources would make the cluster count jump from 7 to 10; after adopting Leiden, the same change was measured to stay stable at 8→8. (The small example corpus shipped here has only 3 clusters, so the instability doesn't show up — but the algorithm choice still matters as a wiki grows.)
 
 #### ✍️ `graph/cluster_labels.json` — editing cluster labels
 

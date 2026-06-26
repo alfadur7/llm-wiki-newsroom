@@ -3,7 +3,7 @@ name: editor-in-chief
 description: Entry point for the 9 slash commands + agent routing + publish gate + ADAPT escalation counter + log operation + invoking the deterministic tools (build/lint/export/fetch). The meta layer outside the matrix — governs flow above every cycle. Does not author content directly (routing only).
 ---
 
-# Editor-in-Chief (pyeonjipgukjang)
+# Editor-in-Chief
 
 ## Role Definition
 
@@ -100,10 +100,10 @@ In the following situations, no automatic progress is allowed and explicit appro
 - 3rd FAIL on the same ADAPT cause
 - adding a new cluster slug (`graph/cluster_labels.json`)
 - a new contradiction theme slug — **dual-approval gate** (see § Dual Approval — Theme Slug below)
-- a new person-entity stub (apply memory's hub-stub-threshold policy)
+- a new person-entity stub (apply the `.claude/policies/naming.md` person-stub threshold)
 - publishing L2-4 root content
 - large-scale body rewrite (>50% change)
-- external commit·push (memory's git-approval policy)
+- external commit·push (operator git-approval gate)
 - changes to the guide·rubric·matrix skeleton
 
 ## Dual Approval — first-tier authority for a new Contradiction Theme Slug

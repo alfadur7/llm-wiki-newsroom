@@ -17,9 +17,8 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, MARKUP_LEAK_RE, parse_frontmatter, read_text_cached, real_source_files, strip_code  # noqa: E402
+from _lib import WIKI, MARKUP_LEAK_RE, WIKILINK_TARGET_RE as LINK_RE, korean_mode, parse_frontmatter, read_text_cached, real_source_files, strip_code  # noqa: E402
 
-LINK_RE = re.compile(r"\[\[([^\]|]+)(?:\|[^\]]+)?\]\]")
 HEADING_RE = re.compile(r"^#{1,6}\s+(.+?)\s*$")
 
 ENGLISH_STANDARD = {
@@ -333,16 +332,21 @@ def run(fix: bool = False) -> int:
     missing = [(n, c) for n, c in source_count.items() if c >= 3]
     missing.sort(key=lambda x: -x[1])
 
+    # Korean-named entity heuristic — flags an English-filenamed entity whose body
+    # reads as Korean (it should carry a Hangul filename). A WIKI_LANG=ko concern;
+    # gated off on the English-native default so it can't hard-fail (it feeds the
+    # exit code below) a legitimate English page that merely quotes Korean context.
     korean_suspect: list[tuple[str, int]] = []
-    entity_stems = {p.stem for p in (WIKI / "entities").glob("*.md") if not p.name.startswith("_")}
-    for stem in entity_stems:
-        if re.search(r"[가-힣]", stem):
-            continue
-        p = all_pages[stem]
-        text = read_text_cached(p)
-        kor_signals = len(re.findall(r"한국|서울|은행|공사|청|그룹|보험", text))
-        if kor_signals >= 3 and stem.lower() not in ENGLISH_STANDARD:
-            korean_suspect.append((stem, kor_signals))
+    if korean_mode():
+        entity_stems = {p.stem for p in (WIKI / "entities").glob("*.md") if not p.name.startswith("_")}
+        for stem in entity_stems:
+            if re.search(r"[가-힣]", stem):
+                continue
+            p = all_pages[stem]
+            text = read_text_cached(p)
+            kor_signals = len(re.findall(r"한국|서울|은행|공사|청|그룹|보험", text))
+            if kor_signals >= 3 and stem.lower() not in ENGLISH_STANDARD:
+                korean_suspect.append((stem, kor_signals))
 
     print("=== LINT RESULTS ===")
     print(f"Total pages (scan scope): {len(all_pages)}")

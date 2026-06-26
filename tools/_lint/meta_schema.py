@@ -453,8 +453,6 @@ CLAUDE_VOICE_PATTERNS = [
         re.IGNORECASE | re.MULTILINE,
     )),
     ("recurrence prevention narrative", re.compile(r"재발\s*(방지|회피)")),
-    # Pattern literal split to survive future bulk s/단장님/.../ rewrites.
-    ("reviewer honorific", re.compile("단" + "장님")),
 ]
 
 # Self-skip — the policy files list antipatterns by example, not as violations.
@@ -524,7 +522,7 @@ def _check_flat_lint_paths() -> list[str]:
         p = ROOT / name
         if p.exists():
             targets.append(p)
-    for sub in ("commands", "guides"):
+    for sub in ("commands", "agents", "layers"):
         d = ROOT / ".claude" / sub
         if d.exists():
             targets.extend(sorted(d.glob("*.md")))

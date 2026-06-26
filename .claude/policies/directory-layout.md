@@ -11,8 +11,8 @@ raw/          # Immutable source documents — never modify these
   _archive.md # Accumulated fetch_inbox.py run results (includes channel and outcome, auto-managed)
 wiki/         # Claude owns this layer entirely · Obsidian vault root
   index.md              # Full page catalog + drill-down entry point (auto-generated)
-  overview.md           # Layer 2-4 global view of the landscape axis (dual-automated)
-  contradiction.md      # Layer 2-4 global view of the conflict axis (dual-automated)
+  overview.md           # Layer 2-4 global view of the landscape axis (hybrid AUTO/EDITOR)
+  contradiction.md      # Layer 2-4 global view of the conflict axis (hybrid AUTO/EDITOR)
   _backlinks.json       # Backlink index (auto-generated, for programmatic use)
   sources/              # Layer 2-1 source reflections (created on ingest)
     _source_map.json    # Ingest dedup-detection map (auto-generated)

@@ -251,7 +251,7 @@ def _load_clusters() -> dict:
 
 
 def _check_adjacency_aliases(content: str, cluster_slugs: set[str], path: Path) -> list[str]:
-    """Detect cluster-slug wikilinks missing a Korean alias in the
+    """Detect cluster-slug wikilinks missing a display-name alias in the
     `## Adjacent Domains & Scope` section."""
     m = ADJACENCY_SECTION_RE.search(content)
     if not m:
@@ -262,14 +262,14 @@ def _check_adjacency_aliases(content: str, cluster_slugs: set[str], path: Path) 
         if slug in cluster_slugs:
             issues.append(
                 f"  {path.name}: `## Adjacent Domains & Scope` has un-aliased cluster link "
-                f"`[[{slug}]]` — use `[[{slug}|<Korean cluster name>]]`"
+                f"`[[{slug}]]` — use `[[{slug}|<cluster name>]]`"
             )
     return issues
 
 
 def _fix_adjacency_aliases(path: Path, cluster_slug_to_name: dict[str, str]) -> list[str]:
     """Rewrite un-aliased `[[<cluster-slug>]]` inside the `## Adjacent Domains & Scope`
-    section to `[[<slug>|<Korean name>]]`. The cluster name mapping is the
+    section to `[[<slug>|<cluster name>]]`. The cluster name mapping is the
     authoritative `graph/_clusters.json` clusters[].name, so this fix is
     deterministic and side-effect free outside that section.
 
@@ -532,7 +532,7 @@ def _freshness_line(path: Path, last_updated: object) -> str | None:
 # them centralized here so they're discoverable/tunable.
 
 _WIKILINK_SLUG_RE = _LIB_WIKILINK_RE
-_SOURCE_TOTAL_RE = re.compile(r"전체\s+(\d+)\s*건")
+_SOURCE_TOTAL_RE = re.compile(r"(\d+)\s+total\b")
 
 DRIFT_JACCARD_STABLE = 0.85
 DRIFT_JACCARD_REWRITE = 0.70
@@ -563,7 +563,7 @@ def _auto_source_top(sources_body: str, n: int = 10) -> list[str]:
 
 
 def _auto_source_total(sources_body: str) -> int:
-    """Parse '전체 N건' header in AUTO:SOURCES body. 0 if absent."""
+    """Parse the 'N total' count in the AUTO:SOURCES body. 0 if absent."""
     m = _SOURCE_TOTAL_RE.search(sources_body)
     return int(m.group(1)) if m else 0
 
@@ -958,7 +958,7 @@ def _skeleton_overview(cluster: dict) -> str:
         f"## Key Trends & Figures\n\n"
         f"_TODO: Major events·figures·recent examples._\n\n"
         f"## Adjacent Domains & Scope\n\n"
-        f"_TODO: Reference adjacent cluster overviews as [[<slug>|<Korean cluster name>]] (the Korean alias is required·check the particle's final consonant — CLAUDE.md 'Cluster slug alias') + a one-line description of each boundary (2–4 bullets)._\n\n"
+        f"_TODO: Reference adjacent cluster overviews as [[<slug>|<cluster name>]] (a display-name alias is required — CLAUDE.md 'Cluster slug alias') + a one-line description of each boundary (2–4 bullets)._\n\n"
         f"<!-- AUTO:MEMBERS BEGIN -->\n"
         f"<!-- AUTO:MEMBERS END -->\n\n"
         f"<!-- AUTO:SOURCES BEGIN -->\n"
@@ -1340,7 +1340,7 @@ def _check_overview_md(cluster_slugs: set[str]) -> tuple[list[str], list[str]]:
     if not l1_ok:
         issues.append(
             f"  wiki/overview.md: L1 FAIL — {len(l1_raw)} raw kebab-case slugs without "
-            f"Korean alias: {', '.join(list(dict.fromkeys(l1_raw))[:5])}"
+            f"Slug alias: {', '.join(list(dict.fromkeys(l1_raw))[:5])}"
             f"{'...' if len(set(l1_raw)) > 5 else ''}"
         )
 

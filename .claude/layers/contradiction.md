@@ -132,7 +132,7 @@ The theme body narrative consciously reflects the evidence grade (`[fact]` Data 
 
 #### Feedback loop (iterate until the Rubric conditions are met)
 
-Iterate and improve the theme file until it meets the completion conditions (roster `contradiction-theme.roster` — required 11 PASS + overall 26+/28 PASS; `other-fragmentary` is adjusted by -2 for exemption from N2 and 3 other criteria). No limit on the number of iterations.
+Iterate and improve the theme file until it meets the completion conditions (roster `contradiction-theme.roster` — required 11 PASS + overall 26+/28 PASS; `other-fragmentary` exempts 4 criteria (N2·D5·D6·S3): -4 total / -1 required → 10 required + overall 22+/24 PASS). No limit on the number of iterations.
 
 1. **Iteration 1 (draft)**: author the 4 H2 sections based on the input material (`_contradictions_themes.json` claim_ids + `_contradictions.json` records + Read of the core sources).
 2. **Evaluation**: judge the automated (A) criteria via the `[Rubric]` line in the `python tools/lint.py contradiction <theme>` output, and the manual (M) criteria via body review as PASS/PARTIAL/FAIL.
@@ -164,7 +164,7 @@ Part 1 craft applies directly at aggregate scale (the unit being the theme summa
 L2-4-specific principles (apply to Part 2 only):
 - **Bottom-up roll-up + paragraph separation**: turn each theme file's `## Opposing Positions` · `## Interpretive Direction` into **1 paragraph of 3–5 short sentences per theme** (**1–2 paragraphs** also allowed when a theme is information-rich). contradiction.md holds not the details that overlap the child files but **the tension-axis narrative that sits above them**. Each sentence ≤ 200 characters · do not enumerate 5+ facts in one paragraph — split by meaning unit with periods or into additional paragraphs (same principle as overview.md's common-authoring "paragraph-separation principle"). Patterns like other-fragmentary that compress many fragment-issues into one paragraph should be split into a structured form such as **character-group bullets**.
 - **Tension-axis grouping · naming**: group all themes into **2–4 global tension axes**, each axis a `### <axis name>` subsection header (MECE completeness `con.mece-axes` — every theme under at least one axis, residuals under `### Other`). The value-neutrality of the vocabulary on both sides of an axis name is governed by the `enc.label-neutral` craft as SoT — e.g. instead of `expectation vs evidence` (which privileges "evidence"), use `forecast vs measurement`. Axis re-naming and count adjustment are fluid as the theme distribution shifts.
-- **Drill-down link**: at the head of each theme summary paragraph, provide the entry point to the child file in the form `[[<theme-slug>|<Korean theme name>]]` (`enc.summary-style` — the WP `{{Main}}` convention).
+- **Drill-down link**: at the head of each theme summary paragraph, provide the entry point to the child file in the form `[[<theme-slug>|<theme name>]]` (`enc.summary-style` — the WP `{{Main}}` convention).
 - **Implications block**: place the meta-insights derived across all themes in the `## Implications` (Implications) section as **3–6 bullets** (each bullet a `**bold one-line conclusion**` + 2–4 sentences of elaboration). The **cross-theme observations** that cannot be derived from a single theme are the core of the editorial value. **Operational-meta separation principle**: do not mix **operational meta-information** such as classifier stability or signal-to-noise ratio into the domain-insight implications; instead separate it into its own H2 (e.g. `## Classification Stability Notes`) placed just before `## Source References`. If domain insight and operational meta coexist under the same label, the label's meaning blurs.
 - **Implications entity attribution**: each `## Implications` bullet contains **at least one direct reference to a theme or entity**, and when a new entity first appears, narrate it continuing from the preceding-body context (overview · per-topic deep analysis). No inserting a judgment without a lead-in, like "Anthropic emerges as ~" — the meta-insight stays persuasive only if the underlying theme/entity is made explicit to the reader.
 - **Implications prescription strength**: control `## Implications` bullet sentences with the 3-level strength (observation · recommendation · assertion) of the `enc.verdict-restraint` craft — if flat verdicts pile up beneath hedged expressions, you get the dual structure of formal NPOV + substantive bias (loose criterion FAIL ≤ 2).
@@ -186,7 +186,7 @@ A Layer 2-4 conflict-axis global survey classifying the **N source-to-source con
 
 **Summary of recent update** (YYYY-MM-DD): … (1–2 sentences on the type distribution · theme reorganization rationale)
 
-### Synopsis
+## Synopsis
 
 This wiki's contradictions converge into K **tension axes**.
 
@@ -198,22 +198,22 @@ This wiki's contradictions converge into K **tension axes**.
 
 ---
 
-### Per-Theme Deep Analysis (M + Other)
+## Per-Theme Deep Analysis (M + Other)
 
-#### <axis 1 name>
+### <axis 1 name>
 
 1. **[[<theme-slug>|<theme name>]]** (~N items) — 3–5 sentence summary. Concisely present the actors · core claims · representative evidence.
 2. **[[<theme-slug>|<theme name>]]** (~N items) — …
 
-#### <axis 2 name>
+### <axis 2 name>
 
 3. **[[<theme-slug>|<theme name>]]** (~N items) — …
 
-#### Other
+### Other
 
 K. **[[other-fragmentary|Residual Fragmentary Issues]]** (~N items) — acceptance-bucket character summary.
 
-### Implications
+## Implications
 
 **① <one-line conclusion>** — 2–4 sentences of elaboration.
 
@@ -221,7 +221,7 @@ K. **[[other-fragmentary|Residual Fragmentary Issues]]** (~N items) — acceptan
 
 (3–6 bullets)
 
-### Source References
+## Source References
 
 - Program-layer raw DB: `wiki/contradictions/_contradictions.json` (auto-generated; detail per source and per type)
 - Per-topic deep dives: the `[[contradictions/<slug>]]` files in the list above, M+1 items
@@ -301,7 +301,7 @@ If there is an upper-bound exceedance, a reappearing token, or a consistency vio
 
 ```
     [Rubric] N4 over-reused slugs: <source-slug>×N, <source-slug>×N
-    [Rubric] N6 over-reused figures: "METR 19%"×4, "280B KRW"×3
+    [Rubric] N6 over-reused figures: "METR 19%"×4, "Llama 405B"×3
     [Rubric] N7 label value-words: A=[], B=[empirical evidence, skepticism]
     [Rubric] D6 C meta-critique keywords: [internal contradiction, self-serving]
     [Rubric] L1 raw slug samples: [...]

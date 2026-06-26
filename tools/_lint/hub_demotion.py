@@ -172,9 +172,7 @@ def _check_directory(
     resolved = 0
     if not directory.exists():
         return issues, resolved
-    for path in sorted(directory.glob("*.md")):
-        if path.name.startswith("_"):
-            continue
+    for path in iter_hub_files(directory):
         content = read_text_cached(path)
         if _gate(content):
             resolved += 1

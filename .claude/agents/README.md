@@ -4,13 +4,13 @@ This folder consolidates, in a single location, the SoT for the project's five m
 
 ## The 5 Roles
 
-| Role | Korean newsroom title | SoT |
-|---|---|---|
-| Editor-in-Chief | pyeonjipgukjang | [editor-in-chief.md](editor-in-chief.md) |
-| Reporter | chwijaegija | [reporter.md](reporter.md) |
-| Columnist | nonseolwiwon | [columnist.md](columnist.md) |
-| Section Editor | deseukeu (desk) | [desk.md](desk.md) |
-| Copy Editor | gyoyeolgija | [copyeditor.md](copyeditor.md) |
+| Role | SoT |
+|---|---|
+| Editor-in-Chief | [editor-in-chief.md](editor-in-chief.md) |
+| Reporter | [reporter.md](reporter.md) |
+| Columnist | [columnist.md](columnist.md) |
+| Desk | [desk.md](desk.md) |
+| Copy Editor | [copyeditor.md](copyeditor.md) |
 
 For the one-line announce on invocation plus the role-prefix format of the `Agent` `description` argument, see [`commands/README.md` "Announce Before Delegating"](../commands/README.md#convention--announce-before-delegating).
 
@@ -23,8 +23,8 @@ The project's essential design skeleton is a two-axis matrix of **content Layer 
 | L1 raw | (external) | (external) | format integrity (manual) | re-collect |
 | L2-1 source | Reporter | Reporter | Copy Editor + Desk (sub-trigger) | Reporter |
 | L2-2 stub | Reporter | Reporter | Copy Editor + Desk | Reporter |
-| L2-2 full hub | Columnist | Columnist | Copy Editor + Desk | Columnist |
-| L2-2 timeline | Columnist | Columnist | Copy Editor + Desk | Columnist |
+| L2-2 full hub | Columnist | Columnist | Copy Editor + **Desk** | Columnist |
+| L2-2 timeline | Columnist | Columnist | Copy Editor + **Desk** | Columnist |
 | L2-3 cluster overview | Columnist | Columnist | Copy Editor + **Desk** | Columnist |
 | L2-3 theme contradiction | Columnist | Columnist | Copy Editor + **Desk** | Columnist |
 | L2-3 synthesis·trail | Columnist | Columnist | Copy Editor + Desk | Columnist |
@@ -135,7 +135,7 @@ The matrix and ADAPT chain above are independent of the execution mechanism — 
 
 In either the default or the fallback, the 4 principles in § Change Procedure (one author · reviewer reads the shared FS directly · `subagent_type` boundary · Editor-in-Chief ADAPT counter) are preserved identically. Desk VERIFY₂ is non-waivable under any mechanism — self-preference bias exists independent of mechanism, so an independent qualitative review is mandatory.
 
-**Team lifecycle** (5 roles fixed): the team is **created once per session and reused** — do not repeat `TeamCreate`/`TeamDelete` for every task within a session. The team name (`wiki-newsroom`) and description are fixed values. **Role identity is determined by `subagent_type`**, and the **specific mission is briefed via `SendMessage`** (include the change SoT in GROUND) — do not bake the task into the spawn prompt. config.json is a session runtime product, so **do not reuse it across sessions or pre-populate members** (a non-surviving member becomes a phantom that blocks `TeamDelete` and causes name collisions) — a new session does a fresh `TeamCreate`. **Per-member decision**: **reusing an idle member is the default** (re-brief via `SendMessage`). **A new spawn** is limited to ① **parallel processing** of independent units, ② **independent qualitative review** that needs fresh eyes (to avoid self-bias·anchoring), and ③ **refresh** (accumulated context bloat·changed role guidance). A temporary parallel member whose role is done is cleaned up via **shutdown** to clear overhead. `TeamDelete` runs once, at session end.
+**Team lifecycle** (5 roles fixed): the team is **created once per session and reused** — do not repeat `TeamCreate`/`TeamDelete` for every task within a session. The team name (`wiki-newsroom`) and description are fixed values. **Role identity is determined by `subagent_type`**, and the **specific mission is briefed via `SendMessage`** (include the change SoT in GROUND) — do not bake the task into the spawn prompt. config.json is a session runtime product, so **do not reuse it across sessions or pre-populate members** (a member that no longer exists leaves a stale entry that blocks `TeamDelete` and causes name collisions) — a new session does a fresh `TeamCreate`. **Per-member decision**: **reusing an idle member is the default** (re-brief via `SendMessage`). **A new spawn** is limited to ① **parallel processing** of independent units, ② **independent qualitative review** that needs fresh eyes (to avoid self-bias·anchoring), and ③ **refresh** (accumulated context bloat·changed role guidance). A temporary parallel member whose role is done is cleaned up via **shutdown** to clear overhead. `TeamDelete` runs once, at session end.
 
 ## Change Procedure
 

@@ -1,5 +1,11 @@
 """News domain sets for `WebSearch allowed_domains` (gap auto-augmentation).
 
+NOTE: these lists are a reference example carried over from the original
+(Korean IT/finance) corpus this engine was built for — they are NOT tuned for
+the shipped open-source-AI example corpus. Re-curate both lists (and the
+Korean-summary convention below) per deployment; the selection mechanism is
+corpus-agnostic, only the domain inventory is corpus-specific.
+
 Two curated lists, selected at search time by the editor-in-chief:
 
   KOREAN_IT_FINANCE_NEWS  — default. Korean-entity / Korea-framed gaps.

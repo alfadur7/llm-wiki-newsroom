@@ -59,7 +59,7 @@ The default is that all types are **simple-answer** (Reporter mode·no save). A 
 
 | Type | Default mode | Synthesis save recommendation | Follow-up chain (optional) |
 |---|---|---|---|
-| **Topic** | simple-answer | **Recommended** — field overviews·concept definitions have lasting value as a wiki asset | on finding a missing overview·hub, route `/wiki-ingest` or hub-stub enrichment |
+| **Topic** | simple-answer | **Recommended** — field overviews·concept definitions have lasting value as a wiki asset | on finding a missing overview·hub, trigger `/wiki-ingest` or hub-stub enrichment |
 | **Contradiction** | simple-answer | Not recommended — the issue SoT is `wiki/contradictions/<theme>.md` (synthesis would duplicate it) | on finding a new issue, chain `/wiki-lint contradiction theme --fix` |
 | **Entity-centric** | simple-answer | Not recommended — information is concentrated in the entity hub | on finding a missing hub fact, route a hub update |
 | **Relation** | simple-answer | Optional — only when the two-hub relationship narrative is a new insight not in the wiki | — |

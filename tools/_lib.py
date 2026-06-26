@@ -537,7 +537,7 @@ def read_source_date(rel_path: str) -> str:
     return val
 
 
-# Query params that are append-only marketing tags or presentation variants \u2014
+# Query params that are append-only marketing tags or presentation variants —
 # they never change article identity, so two URLs differing only by these point
 # to the same source. Stripping them lets a re-scraped variant (e.g. mobile
 # share-sheet appends `&utm_source=...&fbclid=...`) match the clean by_url key
@@ -555,7 +555,7 @@ def canonicalize_url(url: str) -> str:
     Lowercases scheme/host, drops tracking query params (utm_*, fbclid, ...) and
     the fragment, and sorts the remaining params so order is irrelevant. The path
     is identity-bearing and kept verbatim. Returns the input unchanged on parse
-    failure. Additive by design \u2014 callers try an exact match first, then fall back
+    failure. Additive by design — callers try an exact match first, then fall back
     to comparing canonical forms, so existing exact matches never regress.
     """
     from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode

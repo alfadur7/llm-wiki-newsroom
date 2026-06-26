@@ -56,19 +56,24 @@ TIMELINE_ITEM_RE = re.compile(
     r"(\d{4})(?:[년\-]\s*(\d{1,2}))?(?:[월\-]\s*(\d{1,2}))?",
     re.MULTILINE,
 )
-# Reference pointer pattern matching the hub.md good example.
-# Matches the trigger inside any paren — both the standalone "(상세는 「섹션」 절)"
-# and the source-bundled "([[src]], 상세는 「섹션」 절)" forms. The earlier
-# `\(상세는…` form only matched when "(" sat immediately before "상세는",
-# so bundled pointers (source link before the trigger) went uncounted —
-# undercounting coverage and producing false pointer<50% advisories.
-POINTER_RE = re.compile(r"\([^)]*?상세는\s+「[^」]+」\s*절[^)]*?\)")
+# Reference pointer pattern matching the hub.md good example
+# `(detail in the 「section」 section)`. Matches the trigger inside any paren,
+# whether standalone or source-bundled (e.g. `([[src]], detail in the …)`), so
+# a source link before the trigger doesn't go uncounted. The English corpus
+# uses "detail in the …" (with 「」 corner brackets per hub.md, or straight
+# quotes per the advisory message below); the Korean "상세는 「섹션」 절" form is
+# kept for WIKI_LANG=ko corpora.
+POINTER_RE = re.compile(
+    r"\([^)]*?(?:상세는\s+「[^」]+」\s*절"
+    r"|detail in the\s+(?:「[^」]+」|\"[^\"]+\")\s*section)[^)]*?\)"
+)
 # Verdict keywords — Korean verdict/evaluation endings + quantitative figures.
 # Automates the hub.md forbidden pattern "restatement of the body's
 # facts/figures/quotes/verdict". To exclude timeline meta-notation like
 # dates/years/"M월"/"M월 D일", only figures with an attached unit are detected.
 VERDICT_NUM_RE = re.compile(
-    r"\d[\d,]*(?:\.\d+)?\s*(?:%|배|건|개|건당|만\s*원|억\s*원|조\s*원|"
+    r"\d[\d,]*(?:\.\d+)?\s*(?:%|billion|million|hours?|cases?|times?|people|"
+    r"배|건|개|건당|만\s*원|억\s*원|조\s*원|"
     r"달러|위안|엔|GB|TB|MW|GW|명|회|초)"
 )
 # Verdict/quote endings: diagnostic expressions like "쇼크"·"본격 논의"·"공식 발표"

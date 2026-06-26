@@ -21,7 +21,7 @@ This folder holds the guidance needed to author and review **each content type**
 |-----------|---------|------|------|
 | **L1** — Raw originals | `raw/*` | (immutable) | (external — user / mobile inbox / fetch_*.py) |
 | **L2-1** — Source reflections | `wiki/sources/<slug>.md` | `source` | Reporter |
-| **L2-2** — Extracted abstractions | `wiki/entities/`·`wiki/concepts/`·`wiki/timelines/`·`wiki/contradictions/_contradictions.json` | `entity`·`concept`·`timeline`·(JSON) | stub: Reporter / full hub·timeline: Columnist |
+| **L2-2** — Extracted abstractions | `wiki/entities/`·`wiki/concepts/`·`wiki/timelines/`·`wiki/contradictions/_contradictions.json` (auto-generated DB, not authored) | `entity`·`concept`·`timeline`·(JSON) | stub: Reporter / full hub·timeline: Columnist |
 | **L2-3** — Topic-level analyses | `wiki/overviews/<cluster>.md`·`wiki/contradictions/<theme>.md`·`wiki/syntheses/<slug>.md`·`wiki/trails/<slug>.md` | `overview`·`contradiction`·`synthesis`·`trail` | Columnist |
 | **L2-4** — Wiki-wide aggregation | `wiki/overview.md`·`wiki/contradiction.md` | (root meta) | Columnist |
 

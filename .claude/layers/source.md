@@ -97,7 +97,7 @@ This section is the **application and examples for this wiki's sources** of the 
 - **Mandatory claimant wikilink**: every claim must have at least one `[[claimant]]` entity wikilink. A plain-text subject ("the government", "the industry") is a weasel. Convert vague subjects like "the foundation" or "the community" into the nearest concrete entity (e.g., "OpenSourceInitiative", "Meta").
 - **Claimant = the speaking subject** (≠ the analysis target): the claimant is the subject who *said, analyzed, or announced* the claim. If the content is "<X> analyzed/announced", the claimant is `[[X]]`, and the entity that is the *target* of analysis goes under `## Connections references:` (beware of misattributing the target as the claimant in research and commentary sources).
 - **No concept-hub fallback when the speaking entity exists**: if the speaker X explicitly stated as "according to X", "X's report", or "X announced" has an entity page, the claimant is `[[X]]` — do not fall back to an about-subject concept hub. The concept fallback (priority ③ below) applies only when the speaker has no entity (anonymous, an uncreated person, or a publication with no entity).
-- **Content is a one-liner with a verb**: do not just list noun phrases like "500 billion KRW invested" or "AI acceleration". Make it a complete statement that includes a verb.
+- **Content is a one-liner with a verb**: do not just list noun phrases like "405B-parameter model" or "AI acceleration". Make it a complete statement that includes a verb.
 - **Evidence anchor recommended**: when a `[fact]` or `[analysis]` cites an external source, `[[<source-slug>#section]]` is recommended. For a self-source (this source's own body), omit the anchor.
 
 Examples:
@@ -162,7 +162,7 @@ judgment ambiguous                          → references: (default safe)
 ```
 
 **Decision-keyword dictionary**:
-- `cites:` signals — "announced · stated · mentioned · quoted · replied · said · disclosed · commented", or specific figures (`%` · `100M KRW` · `10,000 people`). But only when this source directly quotes the hub's announcement, figure, or quotation in the body. If the hub merely appears as a comparison target in the body, downgrade to `references:`.
+- `cites:` signals — "announced · stated · mentioned · quoted · replied · said · disclosed · commented", or specific figures (`%` · `$100M` · `10,000 people`). But only when this source directly quotes the hub's announcement, figure, or quotation in the body. If the hub merely appears as a comparison target in the body, downgrade to `references:`.
 - `contradicts:` signals — "oppose · conflict · rebut · negate · object · the opposite". However, **evolution vocabulary** ("pivot · evolve · shift in view · change of direction · paradigm shift") is NOT `contradicts:` — classify it as `references:` (it describes a stage change or evolution of view, not a rebuttal or negation).
 - `defines:` signals — "definition · concept · scope · is defined as"
 - everything else → `references:`

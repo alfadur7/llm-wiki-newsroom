@@ -11,13 +11,13 @@
 ```markdown
 # Wiki Index
 
-This file is auto-generated and refreshed.
+This file is auto-generated and updated.
 
 ## Overview
 - [Overview](overview.md) — global view along the landscape axis
 - [Contradiction Analysis](contradiction.md) — global view along the conflict axis (N contradictions, per-theme drill-down)
 
-## Recent Developments (N)            # only when there is at least 1 weekly-briefing-* (latest week first, max 8)
+## Recent Developments (N)            # only when there is at least 1 weekly-briefing-* (latest week first, max 8); over the cap the header is `## Recent Developments (latest 8/N)`
 - [Weekly briefing title](syntheses/weekly-briefing-slug.md) — description
 - _For the N earlier weekly briefings, see `wiki/syntheses/weekly-briefing-*`_  # only when N>8
 

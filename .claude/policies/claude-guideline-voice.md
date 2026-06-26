@@ -14,18 +14,17 @@ The principle is self-contained meaning: a third party should be able to read it
 
 ## Auto-Detected Antipattern
 
-`tools/_lint/meta_schema.py::_check_claude_voice_violations` detects these automatically. A FAIL blocks the commit. The regex/token cells below are the **Korean-corpus antipattern set**, matched under WIKI_LANG=ko — the regexes target Korean decision-narrative phrasing carried over from the prior corpus; the English glosses in the "Violation example" column explain what each one matches.
+`tools/_lint/meta_schema.py::_check_claude_voice_violations` detects these automatically on every `tools/lint.py meta` run (unconditional — not gated by WIKI_LANG). A FAIL blocks the commit. Several cells match English directly (e.g. `Reinforcement N`, `## Changelog`, the external-case `…model` pattern); the Korean-only regexes (옵션/보강/도입/재발) are carried over from the prior corpus and simply never fire on an English corpus. The "Violation example" column glosses what each one matches.
 
 | Category | Regex | Violation example | Resolution |
 |---|---|---|---|
 | Decision option name | `옵션\s*[A-Z][+]?(?!\s*입장)` | "옵션 E+ 도입" ("adopt option E+") | Move to log.md |
 | Reinforcement counter | `(reinforcement\|보강)\s*\d+` | "보강 1" ("reinforcement 1"), "Reinforcement 2" | Remove from body |
 | Introduction timestamp | `\d{4}-\d{2}-\d{2}\s*(도입\|시점\|적용)` | "(2026-05-10 도입)" ("(adopted 2026-05-10)") | Move to log.md |
-| External case reference | `(Wikipedia\|ProCon\|BERTopic\|Wikidata\|Stack Overflow\|Kialo)[…]?(등가\|모델\|model)` | "ProCon 모델 등가" ("equivalent to the ProCon model") | Remove from body |
+| External case reference | `(Wikipedia\|ProCon\|BERTopic\|Wikidata\|Stack Overflow\|Kialo)[^\n]{0,80}?(등가\|모델\|model)` | "ProCon 모델 등가" ("equivalent to the ProCon model") | Remove from body |
 | Benchmark absorption narrative | `외부 벤치마크\s*\d+/\d+` | "외부 벤치마크 5/6 흡수" ("absorbed 5/6 of the external benchmark") | Move to log.md |
 | Changelog section header | `^#{2,4}\s*(Changelog\|변경\s*이력\|변경\s*사항\|Change\s*Log)\s*$` | a `## Changelog` section | Move to log.md |
 | Recurrence prevention narrative | `재발\s*(방지\|회피)` | "이전 사례 재발 방지" ("preventing a recurrence of an earlier case") | Move to log.md |
-| Reviewer honorific | `단장님` | "단장님 명시 승인" ("explicit approval from the chief") | Replace with "the wiki operator" / "본 위키 운영자" ([language.md](language.md)) |
 
 **Scope**: `.claude/commands/*.md` · `.claude/agents/*.md` · `.claude/policies/*.md` · `.claude/layers/*.md` · `.claude/operations/*.md` · `.claude/skills/*/SKILL.md` · `CLAUDE.md`. wiki/ and tools/ are out of scope.
 

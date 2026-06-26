@@ -17,11 +17,16 @@ import re
 
 
 # ── dialectic/Toulmin measurement regexes (verbatim from contradiction.py) ──
-# (dormant: every QUALIFIER_PATTERN keys on Korean qualifier phrasings; none fire on
-#  English prose. An English equivalent would detect "in the short term", "on this
-#  metric", "within N years", "this study/sample/design", "as of YYYY", "currently",
-#  "over the medium/long term". See FLAG in summary.)
+# Toulmin qualifier phrasings (T4). English-native forms first; the Korean forms
+# fire under WIKI_LANG=ko.
 QUALIFIER_PATTERNS = [
+    re.compile(r"in the short[- ]term", re.IGNORECASE),
+    re.compile(r"on this metric", re.IGNORECASE),
+    re.compile(r"within \d+ years?", re.IGNORECASE),
+    re.compile(r"\bthis (?:study|sample|design|experiment)\b", re.IGNORECASE),
+    re.compile(r"as of \d{4}", re.IGNORECASE),
+    re.compile(r"\bcurrently\b", re.IGNORECASE),
+    re.compile(r"over the (?:medium|long)[- ]term", re.IGNORECASE),
     re.compile(r"단기적(으로|인)"),
     re.compile(r"이\s*지표(에서|로)"),
     re.compile(r"\d+년\s*(내|이내)"),
@@ -31,16 +36,18 @@ QUALIFIER_PATTERNS = [
     re.compile(r"현재\s*기준"),
     re.compile(r"중장기"),
 ]
-# (dormant: keys on the Korean subtitle words 입장/중재/제3관점 = position/mediation/
-#  third-view. On English labels (**A Position** / **C Mediation**) it never matches.
-#  An English equivalent would key on those English subtitle words. See FLAG.)
-DIALECTIC_LABEL_RE = re.compile(r"\*\*([ABC])\s*(입장|중재|제3관점|중재/제3관점)[^*]*\*\*")
+# Hegelian dialectic A/B/C position label (D1/D5). group(1) = the A/B/C letter,
+# captured whether it leads (`**C — Mediation**`, Korean `**A 입장**`) or follows
+# `Position ` (English `**Position A**`, per contradiction.md). \b after the letter
+# avoids matching ordinary bold words like `**Apple**`.
+DIALECTIC_LABEL_RE = re.compile(r"\*\*(?:Position\s+)?([ABC])\b[^*]*\*\*")
 C_LABEL_BROAD_RE = re.compile(r"\*\*C\s+[^*]+\*\*")  # language-agnostic (any **C …** label)
-# (dormant: Korean meta-critique keywords (internal contradiction / meta-criticism /
-#  interest bias / both sides at once / fully neutral observer). The two English
-#  literals 'self-serving' fire, but the rest do not. See FLAG.)
+# C-position meta-critique keywords (D6). English-native literals first; the Korean
+# forms fire under WIKI_LANG=ko.
 C_META_KEYWORDS = [
-    "내부 모순", "메타 비판", "메타 비평", "self-serving", "셀프 서빙",
+    "internal contradiction", "meta-critique", "meta-criticism", "self-serving",
+    "interest bias", "both sides at once", "both camps", "fully neutral observer",
+    "내부 모순", "메타 비판", "메타 비평", "셀프 서빙",
     "이해관계 편향", "양측 동시", "양쪽 모두", "완전 중립 관찰자",
     "모두 self", "둘 다 self",
 ]

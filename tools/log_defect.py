@@ -94,7 +94,7 @@ def append_records(records: list[dict], path: Path = LOG_PATH) -> int:
 
 
 def main() -> int:
-    for stream in (sys.stdin, sys.stdout):  # Windows defaults to cp949 → prevent mojibake in Korean mechanism text
+    for stream in (sys.stdin, sys.stdout):  # Windows defaults to cp949 → force UTF-8 so non-ASCII record text round-trips
         if hasattr(stream, "reconfigure"):
             try:
                 stream.reconfigure(encoding="utf-8")

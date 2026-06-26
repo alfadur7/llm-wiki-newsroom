@@ -40,9 +40,8 @@ from collections import Counter, defaultdict
 from datetime import date
 from pathlib import Path
 
-import _review  # shares the review-cycle watermark skeleton (isomorphic to mine_failures)
-
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import _review  # noqa: E402  # shares the review-cycle watermark skeleton (isomorphic to mine_failures)
 from _lib import REPO_ROOT, korean_mode  # noqa: E402
 
 # Default transcript dir is derived from the repo path (Claude Code encodes the

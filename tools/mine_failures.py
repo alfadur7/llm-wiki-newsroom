@@ -33,7 +33,8 @@ from collections import Counter, defaultdict
 from datetime import date
 from pathlib import Path
 
-import _review  # shares the review-cycle watermark skeleton (isomorphic to mine_feedback)
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import _review  # noqa: E402  # shares the review-cycle watermark skeleton (isomorphic to mine_feedback)
 
 LOG_PATH = Path(__file__).resolve().parent / "_defect-log.jsonl"
 WATERMARK_PATH = Path(__file__).resolve().parent / "_failure-review.json"

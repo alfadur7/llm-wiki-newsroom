@@ -150,7 +150,7 @@ def render_markdown(result: dict, verbose: bool = False) -> str:
         f"  URL-dup:     {s['url_dup']:>5}  (already in _source_map.by_url)",
         f"  Path-dup:    {s['path_dup']:>5}  (already in _source_map.by_path)",
         f"  Empty:       {s['skipped_empty']:>5}  (0 bytes, skipped)",
-        f"  Excluded:    {s['skipped_excluded']:>5}  (Raindrop legacy, skipped)",
+        f"  Excluded:    {s['skipped_excluded']:>5}  (Raindrop legacy / `_`-prefixed meta, skipped)",
         f"  Genuine new: {s['genuine_new']:>5}",
         "",
     ]

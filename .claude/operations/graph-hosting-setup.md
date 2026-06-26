@@ -34,7 +34,7 @@ python tools/build.py        # refresh graph data
 python tools/export.py       # stages _site/ with the <slug>-prefixed obscure filenames
 ```
 
-`export.py`'s `stage_site()` copies `graph/graph.html` + `_graph.json`·`_clusters.json`·`_overlays.json`·`_pages.json` into `_site/` with a `<slug>-` prefix and injects `<meta robots noindex>` + `window.ASSET_PREFIX="<slug>-"`. The RAG `.md` merge stays in `wiki-export/` only and is **not** placed in `_site/`, so it is never published.
+`export.py`'s `stage_site()` copies `graph/graph.html` + `_graph.json`·`_clusters.json`·`_overlays.json`·`_pages.json` into `_site/` with a `<slug>-` prefix and injects `<meta robots noindex,nofollow>` + `window.ASSET_PREFIX="<slug>-"`. The RAG `.md` merge stays in `wiki-export/` only and is **not** placed in `_site/`, so it is never published.
 
 Then upload `_site/` to the Pages project — either via the dashboard (Direct Upload) or the CLI:
 

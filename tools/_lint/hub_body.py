@@ -83,7 +83,7 @@ def _check_body(content: str, path: Path, dir_label: str) -> list[str]:
     issues: list[str] = []
     inbound = len(load_graph()["inbound"].get(f"{dir_label}/{path.name}", []))
     central_anchor = dir_label == "entities" or inbound >= CENTRALITY_EXEMPT
-    m = enc_skill.evaluate_hub_body(content, central_anchor=central_anchor, **_HUB_PARAMS)
+    m = getattr(enc_skill, _HUB_FN)(content, central_anchor=central_anchor, **_HUB_PARAMS)
     if m["body_fires"]:
         issues.append(
             f"  {dir_label}/{path.name}: body length {m['body_len']} chars "

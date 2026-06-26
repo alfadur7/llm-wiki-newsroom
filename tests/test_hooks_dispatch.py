@@ -75,6 +75,40 @@ def test_lint_report_edit_unreadable_file_falls_back_to_fragment(capsys):
     assert "ASYMMETRY" in capsys.readouterr().err
 
 
+def test_lint_report_all_stable_group_no_false_block(capsys):
+    # Real-world format (wiki-lint.md): 🟢-stable blocks are `🟢 <slug> — drift
+    # stable` with NO *_jaccard metric. A contradiction group that is entirely
+    # stable still wrote per-target blocks (under its section heading) and must
+    # NOT be flagged as a missing/asymmetric group.
+    content = (
+        "### overview drift\n"
+        "- 🔴 licensing-open-washing — member_jaccard=0.64 → `/wiki-lint overview licensing-open-washing --fix`\n"
+        "- 🟢 open-source-ai-definition — drift stable\n"
+        "\n"
+        "### contradiction drift\n"
+        "- 🟢 open-training-data-requirement — drift stable\n"
+        "- 🟢 other-fragmentary — drift stable\n"
+    )
+    rc = dispatch.run_pre(_input("Write", "/x/lint-report.md", content=content))
+    assert rc == 0
+    assert capsys.readouterr().err == ""
+
+
+def test_lint_report_summarized_group_still_blocks(capsys):
+    # Genuine asymmetry: overview detailed per-target, contradiction collapsed to
+    # a prose summary ("N drifts") with no per-target blocks → still blocks.
+    content = (
+        "### overview drift\n"
+        "- 🔴 licensing-open-washing — member_jaccard=0.64 → `/wiki-lint overview licensing-open-washing --fix`\n"
+        "\n"
+        "### contradiction drift\n"
+        "3 themes drifted (summary)\n"
+    )
+    rc = dispatch.run_pre(_input("Write", "/x/lint-report.md", content=content))
+    assert rc == 2
+    assert "ASYMMETRY" in capsys.readouterr().err
+
+
 def test_guideline_edit_advisory(capsys):
     rc = dispatch.run_pre(_input("Edit", "/r/.claude/commands/wiki-lint.md", new_string="- a"))
     assert rc == 0

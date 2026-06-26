@@ -59,7 +59,14 @@ from _lib import WIKI as wiki, atomic_write_if_changed, source_date_from_text  #
 TOOLS = Path(__file__).parent.parent
 RULES_PATH = TOOLS / "_contradiction_rules.json"
 
-SKIP_PHRASES = ["none", "None", "no contradictions found", "no contradiction", "consistency maintained"]
+# Whole-line placeholder markers for an empty `contradicts:` field. Matched on
+# the normalized full claim text (not substring) so a real claim that merely
+# contains one of these tokens — e.g. "argues nonexistent data" (contains "none"),
+# "no contradiction with X" — is not silently dropped.
+SKIP_MARKERS = {
+    "none", "no contradictions found", "no contradiction", "no contradictions",
+    "consistency maintained",
+}
 
 TYPE_ORDER = ["real", "superseded", "related", "soft"]
 
@@ -147,7 +154,7 @@ def _collect() -> list[dict]:
         section = m.group(1)
         for line_m in _CONTRADICTS_LINE_RE.finditer(section):
             claim_text = line_m.group(1).strip()
-            if len(claim_text) < 5 or any(s in claim_text for s in SKIP_PHRASES):
+            if len(claim_text) < 5 or claim_text.strip().lower().rstrip(".") in SKIP_MARKERS:
                 continue
             items.append({
                 "id": _claim_id(rel, claim_text),

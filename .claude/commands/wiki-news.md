@@ -14,7 +14,7 @@ Examples:
   /wiki-news DeepSeek open model      # free keyword
   /wiki-news --gap                    # gap fill: hub-gaps crawl, cluster-gaps search → _inbox.md (Track A)
   /wiki-news --gap single-source      # enrich a single gap type
-  /wiki-news --gap single-source --batch  # skip the gate (after Phase 2.5 is active)
+  /wiki-news --gap single-source --batch  # skip the gate (operator pre-approved batch mode)
   /wiki-news --gap --no-filter        # disable the domain filter
 ```
 
@@ -60,7 +60,7 @@ Definitions, thresholds, and domain set have their SoT in [`.claude/operations/g
 
 1. Call `python tools/lint.py graph gaps --json [--gap-type <slug>] --top 5` — Track A diagnosis (bridge·contradiction are outside this mode's domain).
 2. **hub-level gaps (single-source·stale-hub)** → call `python tools/_news/crawl.py --gap-seed --append-inbox` internally. Seeds are auto-derived hub→backlinks→`source_url`; the adjacent pages cited by each hub's existing sources are appended to `_inbox.md` as `source=auto-crawl` after passing the domain allowlist·`by_url` dedup check (no external search·query gate needed — the seeds are already trusted sources).
-3. **cluster-level gaps (sparse-cluster)** → generate queries with `python tools/_news/gap_queries.py --json --limit 5` → interactive gate (skipped with `--batch`) → WebSearch in parallel (`allowed_domains=KOREAN_IT_FINANCE_NEWS`, released with `--no-filter`) → `by_url` dedup → append to `_inbox.md` in the form `URL  # source=auto-gap gap=<slug> hub=<slug> ts=<iso>`.
+3. **cluster-level gaps (sparse-cluster)** → generate queries with `python tools/_news/gap_queries.py --json --limit 5` → interactive gate (skipped with `--batch`) → WebSearch in parallel with the editor-selected domain set (`GLOBAL_IT_FINANCE_NEWS` for global/English topics, `KOREAN_IT_FINANCE_NEWS` for Korean-entity gaps, or their union for a broad sweep — the lists live in `tools/_news/domains.py`; the filter is lifted with `--no-filter`) → `by_url` dedup → append to `_inbox.md` in the form `URL  # source=auto-gap gap=<slug> cluster=<slug> ts=<iso>`.
 4. Report the crawl hub/candidate counts + WebSearch new count + `_inbox.md` queue length. Ingest is the explicit `/wiki-ingest inbox`.
 
 ### Hard Cap
@@ -83,4 +83,4 @@ This command is responsible only up to WebSearch·report·`_inbox.md` append. Th
 - Discovery of a new cluster slug (an external keyword does not fit existing clusters)
 - Person entity stub candidate (memory hub-stub-threshold policy — only for key people cited multiple times)
 - Ingest decision (chain into `/wiki-ingest` — explicit approval)
-- **`--gap` mode query approval** (when `--batch` is absent) — the human reviewer edits·approves the `tools/_news/gap_queries.py` output. `--batch` is used only after Phase 2.5 is active
+- **`--gap` mode query approval** (when `--batch` is absent) — the human reviewer edits·approves the `tools/_news/gap_queries.py` output. `--batch` is used only with operator pre-approval

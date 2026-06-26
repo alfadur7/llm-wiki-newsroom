@@ -6,7 +6,7 @@ The SoT for how the wiki diagnoses weak areas ("gaps") deterministically, then r
 
 1. Diagnose wiki gaps deterministically with a single tool (`tools/lint.py graph gaps`).
 2. Handle gaps where auto-enrichment is effective (single-source · stale-hub · secondarily sparse-cluster) via a background chain keyed on the `_inbox.md` single queue.
-3. Route gaps where auto-enrichment is a poor fit (bridge · contradiction) to the operator decision surface (`/wiki-discover --gaps`).
+3. Route gaps where auto-enrichment is a poor fit to their owning channel: bridge → the operator decision surface (`/wiki-discover --gaps`, Track B); contradiction → the contradiction cycle (`/wiki-lint contradiction`, Track C).
 4. Unify the three entry channels (mobile · interactive · background) into a single inbox.
 
 ## Calibrating thresholds
@@ -57,8 +57,8 @@ Input gaps (Track A·B·C — external source ingest · operator decision · the
 |---|---|---|---|---|
 | A | **sparse-cluster** | weak label cohesion, size ≥ 20 | `coherence == "mixed"` AND `size >= 20` AND (`containment < 0.9` OR top-tag share < 60%) | `1 - containment` |
 | A | **single-source** | 1 source but normal influence | `len(sources) == 1` AND `hub_hub_degree >= 9` AND `cluster_count >= 2` | `log(degree+1) × 0.5` |
-| A | **stale-hub** | cluster active but this hub alone stagnant | `hub_age > 14d` AND `cluster_avg_age <= 10d` AND `cluster_recent_source_adds >= 3` | `(hub_age - cluster_avg_age) / 14` |
-| B | **bridge** | multi-cluster junction | `discover.py surprising` composite score top-20 | normalized composite score |
+| A | **stale-hub** | cluster active but this hub alone stagnant | `(hub_age - cluster_avg_age) >= 14d` AND `cluster_avg_age <= 10d` | `(hub_age - cluster_avg_age) / 14` |
+| B | **bridge** | multi-cluster junction | `discover.py surprising` composite-score top-N (default 10 via `detect_bridge_nodes` / 15 via the standalone CLI) | normalized composite score |
 | C | **orphan-claims** | raw claim not mapped to a theme | a source in `_contradictions.json` is in no theme's `sources:` | `count × 0.1` |
 | C | **cap-theme** | real-claim count near cap | `real_claim_count >= 30` (60% of the cap of 50) — the catch-all `other-fragmentary` theme is exempt (`CAP_THEME_EXEMPT_SLUGS`): by definition it holds genuine one-off residuals that fit no other theme, so a large count is normal even after full sub-axis extraction; forcing a split would force fragmentation | `(real - 30) / 20` |
 | C | **stale-theme** | claims accumulated vs theme MD not updated | `theme.last_updated < max(mapped_source.last_updated) - 7d` | `stale_days / 7` |
@@ -70,7 +70,7 @@ Input gaps (Track A·B·C — external source ingest · operator decision · the
 
 ```
 priority = impact × severity
-  impact   = log(backlinks_count + 1) × cluster_size_norm
+  impact   = log(degree + 1) × cluster_size_norm
   severity = per-gap definition above
 ```
 
@@ -106,7 +106,7 @@ Web search applies a curated allowlist of trusted, non-aggregator news domains a
 |---|---|---|
 | queries per gap | 2–3 (varies by gap kind) | 1 lacks diversity, 4+ is excessive |
 | results per query | 6 | keeps a cycle's volume manageable |
-| new sources per gap | 8 | over-flow is sorted by priority, then cut |
+| new sources per gap | 8 | overflow is sorted by priority, then cut |
 | gaps processed per cycle (`--batch`) | 5 | bounds the per-cycle enrichment volume |
 | `_inbox.md` queue-length alarm | 30 | sized to operator review capacity |
 
@@ -124,7 +124,7 @@ https://example.com/article-C  # source=interactive query="..."
 
 - The meta separator is **two spaces + `#`** after the URL (a URL's own `#fragment` attaches with no space, so it stays safe).
 - A URL with no meta defaults to `source=mobile`.
-- Meta keys: `source` · `gap` · `hub` · `cluster` · `query` · `priority` · `ts`.
+- Meta keys (common; varies by channel): `source` · `gap` · `hub` · `cluster` · `query` · `priority` · `ts` · `found_on` · `score` (the crawl channel writes `found_on`/`score`).
 
 ### fetch_inbox.py behavior
 

@@ -3,6 +3,13 @@
 Scans `> "..." — name (title)` blockquote attributions. Speakers cited
 at or above the threshold who lack an `entities/<name>.md` page are
 surfaced as actionable findings.
+
+WIKI_LANG=ko only: the name/title matchers key on the Korean byline
+convention (Hangul names + Korean role nouns), so the engine's English-native
+default skips this check (see `run`). On an English corpus, blockquote speaker
+attribution is covered by the scholarly-citation `cit.A2` check, and the
+person-stub threshold by `python tools/count_mentions.py <name>`
+(`.claude/policies/naming.md`).
 """
 from __future__ import annotations
 
@@ -13,7 +20,7 @@ from collections import defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, read_text_cached, strip_code  # noqa: E402
+from _lib import WIKI, korean_mode, read_text_cached, strip_code  # noqa: E402
 
 QUOTE_ATTR_RE = re.compile(
     r"^>\s.*?[\"\u201c\u201d\u2018\u2019].+?[\"\u201c\u201d\u2018\u2019]"
@@ -161,6 +168,19 @@ def run(
     min_quotes: int = DEFAULT_MIN_QUOTES,
     min_sources: int = DEFAULT_MIN_SOURCES,
 ) -> int:
+    if not korean_mode():
+        # Korean byline detector — fires only under WIKI_LANG=ko (see module
+        # docstring). English-native default: no-op, English attribution is
+        # covered by cit.A2 + count_mentions.py.
+        if json_out:
+            print(json.dumps(
+                {"skipped": "WIKI_LANG=ko only", "uncovered_speakers": []},
+                ensure_ascii=False,
+            ))
+        else:
+            print("Cited speakers: skipped (WIKI_LANG=ko only — English uses cit.A2 + count_mentions.py)")
+        return 0
+
     entity_stems: set[str] = {
         p.stem
         for p in (WIKI / "entities").glob("*.md")

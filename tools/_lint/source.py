@@ -244,10 +244,10 @@ H2_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
 # Rationale for raising: desk PoC found a 45% critical+high defect rate · 4x reduction in
 # operational burden · concentration on multi-speaker in-depth-reporting sources. SoT: the
 # applicability scope in .claude/agents/desk.md.
-DESK_TRIGGER_JARYO_MIN = 7
+DESK_TRIGGER_FACT_MIN = 7
 DESK_TRIGGER_QUOTE_MIN = 3
 DESK_QUOTE_RE = re.compile(r"^>\s+", re.MULTILINE)
-DESK_JARYO_RE = re.compile(r"^-\s*\[fact\]", re.MULTILINE)
+DESK_FACT_RE = re.compile(r"^-\s*\[fact\]", re.MULTILINE)
 
 
 def _has_section(content: str, header: str) -> bool:
@@ -298,9 +298,9 @@ def _evaluate(rel: str, content: str) -> dict:
     l1_pass = len(l1_raw_slugs) == 0
 
     # Desk-review sub-trigger (advisory).
-    desk_jaryo = len(DESK_JARYO_RE.findall(body))
+    desk_fact = len(DESK_FACT_RE.findall(body))
     desk_quote = len(DESK_QUOTE_RE.findall(body))
-    desk_trigger = desk_jaryo >= DESK_TRIGGER_JARYO_MIN and desk_quote >= DESK_TRIGGER_QUOTE_MIN
+    desk_trigger = desk_fact >= DESK_TRIGGER_FACT_MIN and desk_quote >= DESK_TRIGGER_QUOTE_MIN
 
     # T1 (HARD gate, unconditional — like the filename kebab check) —
     # frontmatter `tags` present AND non-empty. The source.md authoring standard
@@ -331,7 +331,7 @@ def _evaluate(rel: str, content: str) -> dict:
         "f1": (f1_pass,),
         "t1": (t1_pass,),
         "sc1": (sc1_pass,),
-        "desk": (desk_trigger, desk_jaryo, desk_quote),
+        "desk": (desk_trigger, desk_fact, desk_quote),
     }
 
 
@@ -403,10 +403,10 @@ def _print_per_file(result: dict) -> None:
     if not l1_pass and l1_samples:
         print(f"  [Rubric] L1 raw slug samples: {l1_samples}")
 
-    desk_trigger, desk_jaryo, desk_quote = result["desk"]
+    desk_trigger, desk_fact, desk_quote = result["desk"]
     if desk_trigger:
         print(
-            f"  [Advisory] Desk qualitative review recommended — [fact]={desk_jaryo} AND "
+            f"  [Advisory] Desk qualitative review recommended — [fact]={desk_fact} AND "
             f"quoted citations={desk_quote} (sub-trigger met)"
         )
 
@@ -464,7 +464,7 @@ def _print_corpus_summary(results: list[dict]) -> None:
     desk_n = sum(1 for r in results if r["desk"][0])
     print(
         f"  Desk-review trigger {desk_n}/{total} ({100 * desk_n // total}%) "
-        f"[advisory] — [fact] ≥ {DESK_TRIGGER_JARYO_MIN} AND quoted citations ≥ "
+        f"[advisory] — [fact] ≥ {DESK_TRIGGER_FACT_MIN} AND quoted citations ≥ "
         f"{DESK_TRIGGER_QUOTE_MIN}"
     )
 

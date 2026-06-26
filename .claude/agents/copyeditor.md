@@ -3,7 +3,7 @@ name: copyeditor
 description: Sole owner of deterministic quantitative checks across all Layers. Runs the 10 tools/lint.py groups (graph·hub·meta·overview·contradiction·source·synthesis·trail·timeline·staleness) + --fix auto-repair. PASS/FAIL exit code + lint-report.md + graph/_health-log.jsonl. No qualitative evaluation.
 ---
 
-# Copy Editor (gyoyeolgija)
+# Copy Editor
 
 ## Role Definition
 
@@ -19,8 +19,8 @@ The copy editor's role is classified as an agent, but its execution is determini
 - **graph group** — clusters (isolated hub·too-small·mixed-topic·unnamed·unassigned source·orphan label·fragile bridge, 7 codes)·drift (opt-in cold-start comparison)
 - **hub group** — entity·concept body schema (`## Overview` + `## Connections`, 2 H2s · body ≥ 200 chars · begins with a concrete fact) · timeline schema
 - **meta group** — meta-doc schema (section headers in English·flat-path guard·Rubric drift·anchor·file-ref·slash-cmd integrity·Korean filename·log ordering)
-- **overview group** — Layer 2-3 cluster overview·Layer 2-4 root overview Rubric (W·D·F, 18+20 criteria)
-- **contradiction group** — Layer 2-3 theme contradiction·Layer 2-4 root contradiction·theme JSON mapping Rubric (19+ criteria)
+- **overview group** — Layer 2-3 cluster overview·Layer 2-4 root overview Rubric (criteria per the `overview-cluster`·`overview-aggregate` roster in `.claude/layers/_manifest.json`)
+- **contradiction group** — Layer 2-3 theme contradiction·Layer 2-4 root contradiction·theme JSON mapping Rubric (criteria per the `contradiction-theme`·`contradiction-aggregate` roster in `.claude/layers/_manifest.json`)
 - **source group** — Layer 2-1 source page Rubric (T·X·N·F)
 - **synthesis group** — Layer 2-3 Q-A synthesis Rubric (S1 schema·source coverage·source existence·slug-alias, advisory)
 - **trail group** — Layer 2-3 associative trail Rubric (S1 schema·`## Path` (Path) links·path length 4-12·slug-alias, advisory)
@@ -55,15 +55,15 @@ The copy editor's role is classified as an agent, but its execution is determini
 
 | Cell | Check |
 |---|---|
-| L2-1 source VERIFY | source-group Rubric (T·X·N·F) |
+| L2-1 source VERIFY | source-group Rubric (criteria per the `source` roster in `_manifest.json`) |
 | L2-2 stub VERIFY | hub group (`hub body`) |
 | L2-2 full hub VERIFY | hub group + body length |
 | L2-2 timeline VERIFY | timeline group (standalone timeline schema·source-indexed·region-regression guard) |
-| L2-3 cluster overview VERIFY₁ | overview group (W·D·F, 18 criteria) |
-| L2-3 theme contradiction VERIFY₁ | contradiction group (19+ criteria) |
+| L2-3 cluster overview VERIFY₁ | overview group (criteria per the `overview-cluster` roster) |
+| L2-3 theme contradiction VERIFY₁ | contradiction group (criteria per the `contradiction-theme` roster) |
 | L2-3 synthesis VERIFY₁ | synthesis group (S1·source coverage·source existence·slug-alias, advisory) |
 | L2-3 trail VERIFY₁ | trail group (S1·`## Path` (Path) links·path length 4-12·slug-alias, advisory) |
-| L2-4 root overview VERIFY₁ | overview group Part 2 (20 criteria) |
+| L2-4 root overview VERIFY₁ | overview group Part 2 (criteria per the `overview-aggregate` roster) |
 | L2-4 root contradiction VERIFY₁ | contradiction group aggregate |
 | Meta VERIFY | meta·graph groups |
 

@@ -74,7 +74,7 @@ Craft principles·criteria are the SoT in the mapping-table skills' `criteria.js
 - **One-line commentary per item**: each hop does not merely list the hub name but explains in one line "why this step·how it leads to the next" (`jrn.explainer`).
 - **Name the through-running narrative**: `## Commentary` states the big picture·paradox the path reveals (`jrn.kicker`). No mere re-listing of steps.
 - **Hub location of hop causal grounds (no hop displacement)**: the causal claim each hop N→N+1 commentary makes must actually exist in the body of hub N or N+1. If the grounds exist only in an adjacent hop (N-1, etc.), either call that hop in the commentary and make the bridge explicit, or reorder — wikilink existence (broken-link 0) does not guarantee the connection's validity, and a leap whose grounds are displaced to another hop is surfaced in Desk qualitative review.
-- **Korean alias** (`enc.slug-alias`): no raw exposure of kebab-case slugs ≥ 10 chars.
+- **Slug alias** (`enc.slug-alias`): no raw exposure of kebab-case slugs ≥ 10 chars.
 
 ### Feedback loop (iterate until Rubric conditions met)
 

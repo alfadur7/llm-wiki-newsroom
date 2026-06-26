@@ -37,11 +37,12 @@ _DENSITY_DATE_YMD_RE = re.compile(r"\b\d{4}(?:[-./]\d{1,2}(?:[-./]\d{1,2})?)?\b"
 # (dormant: matched Korean date suffixes 년/월/일; an English wiki uses numeric or
 #  ISO dates, already covered by _DENSITY_DATE_YMD_RE above. See FLAG in summary.)
 _DENSITY_DATE_KO_RE = re.compile(r"\d{4}\s*년(?:\s*\d{1,2}\s*월(?:\s*\d{1,2}\s*일)?)?")
-# (dormant: the unit alternation is mostly Korean counters/units 조|억|만|건|대|명…;
-#  on English prose only the language-agnostic units %|GB|TB|PB will ever fire, so
-#  the per-paragraph number-token count is undercounted. See FLAG in summary.)
+# Number+unit token for paragraph figure density. English-native units/magnitudes
+# first; the Korean counters fire under WIKI_LANG=ko.
 _DENSITY_NUM_UNIT_RE = re.compile(
-    r"\d+(?:[,.]\d+)*\s*(?:조|억|천만|백만|만|%|GB|TB|PB|건|대|명|장|배|개월|개|호|층|년|번째|주|시간|분)"
+    r"\d+(?:[,.]\d+)*\s*(?:%|percent|billion|million|trillion|"
+    r"GB|TB|PB|GW|MW|km|kg|ppm|hours?|cases?|people|users|points?|"
+    r"조|억|천만|백만|만|건|대|명|장|배|개월|개|호|층|년|번째|주|시간|분)"
 )
 
 
@@ -72,10 +73,10 @@ def eval_contradiction_aggregate_mece(analysis_section: str) -> dict:
     residual). axes in the 2–4 range. axes_named is also returned because N7 (enc)
     reuses it. Ported verbatim from contradiction.py.
 
-    (The `기타` literal in the residual-axis exclusion below is dormant on an
-    English wiki — the residual axis would be titled e.g. 'Other'. See FLAG.)"""
+    (The residual axis is excluded from the count: English `Other` or, under
+    WIKI_LANG=ko, `기타`.)"""
     axis_matches = AXIS_SUBSECTION_RE.findall(analysis_section)
-    axes_named = [a for a in axis_matches if a.strip() not in ("기타",)]
+    axes_named = [a for a in axis_matches if a.strip().lower() not in ("other", "기타")]
     d1_axes = len(axes_named)
     return {
         "d1_axes": d1_axes,

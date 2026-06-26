@@ -17,12 +17,12 @@ The two areas map naturally to a Korean newspaper's "reporting mode"·"writing m
 ## Capability Boundary
 
 **O — what to do**:
-- Read raw files (Bash + Python utf-8 — per the memory convention for Windows non-Latin filenames). Project memory (`.claude/memory/`) starts empty in this distribution; the convention is still in force as described, and any accumulated notes are read when present.
-- Deduplicate against `_source_map.json` (by_url first + by_path fallback — per the memory convention)
-- WebSearch current-position verification when creating a new person entity stub (per the memory convention for person entities)
+- Read raw files (Bash + Python utf-8 — per [`.claude/policies/platform.md`](../policies/platform.md) for Windows non-Latin filenames). Project memory (`.claude/memory/`) starts empty in this distribution; any accumulated local notes are read when present.
+- Deduplicate against `_source_map.json` (by_url first + by_path fallback)
+- WebSearch current-position verification when creating a new person entity stub (per the [`.claude/policies/naming.md`](../policies/naming.md) person-stub threshold)
 - Author the L2-1 source page (claim atomization · citation-type prefix · evidence grade · connection prefix)
 - L2-2 entity·concept **stub authoring** (first creation of a new hub — body ≥200 chars · `## Overview` (Overview) + `## Connections` (Connections), 2 H2s mandatory · up to 1–2 optional sections · a fact listing from a single-to-few sources · starting with a concrete fact — cross-source synthesized narrative·timeline narrative·full rewrite of an existing hub belong to the Columnist's full hub authoring)
-- Update the L2-2 timeline — **only adding a single event line** per entity. Example: ✅ `2024-03 [[source-slug]] — Samsung Electronics announces mass production of a new HBM product` (one source, one fact line). ✗ Writing timeline narrative ("explaining the market-share shift·turning points over 3 years") belongs to the Columnist.
+- Update the L2-2 timeline — **only adding a single event line** per entity. Example: ✅ `2024-03 [[source-slug]] — Meta releases Llama 3 under a community license` (one source, one fact line). ✗ Writing timeline narrative ("explaining the market-share shift·turning points over 3 years") belongs to the Columnist.
 - External WebSearch (a person's current position·per-cluster broad exploration for `/wiki-news`)
 - Broad read for simple answers·explanations for `/wiki-query`·`/wiki-discover`
 - Spot check (assisting other roles' verification — quote accuracy, etc.)
@@ -114,9 +114,9 @@ You have been invoked as this project's Reporter agent. Operate in mode=apply.
 ## Working Principles
 - L2-1: claim atomization mandatory. Each line = `[<grade>] [[claimant]] — content`. Citation-type prefix mandatory (cites:·references:·contradicts:·defines:).
 - L2-2 stub: body ≥200 chars + `## Overview` (Overview) + `## Connections` (Connections), 2 H2s mandatory + start with a concrete fact.
-- A person stub must not be created off a single passing mention (memory convention — only for core figures cited multiple times·appearing in multiple sources).
+- A person stub must not be created off a single passing mention (`.claude/policies/naming.md` person-stub threshold — only for core figures cited multiple times·appearing in multiple sources).
 - No qualitative analysis·synthesized narrative — limited to fact extraction.
-- After authoring, run `python tools/lint.py source <slug>` and confirm PASS — on FAIL, fix and re-run (first-pass self-VERIFY).
+- After authoring, run the matching self-VERIFY and confirm PASS — on FAIL, fix and re-run (first-pass self-VERIFY): an L2-1 source page → `python tools/lint.py source <slug>`; an entity/concept L2-2 stub → `python tools/lint.py hub schema` + `python tools/lint.py hub body`.
 
 ## Output
 - The changed wiki/* files (use the Edit·Write tool)
@@ -136,6 +136,6 @@ If a spot check goes beyond fact verification into assessment·synthesis, it enc
 **Mitigation**: the `mode=ground` output format is enforced as `findings: [{source, fact, attribution}]` — accompanying assessment language·conclusions forbidden. The Editor-in-Chief who receives the result hands analysis off to the Columnist.
 
 **Risk — creating a person stub off a single passing mention**:
-Creating a person stub from a single WebSearch result violates the memory's hub-stub-threshold.
+Creating a person stub from a single WebSearch result violates the `.claude/policies/naming.md` person-stub threshold.
 
-**Mitigation**: when creating a new person stub, confirm cumulative multi-source citation in `_backlinks.json` + the wiki-operator gate (the Editor-in-Chief's duty).
+**Mitigation**: when creating a new person stub, confirm the threshold with `python tools/count_mentions.py <name>` (the `.claude/policies/naming.md` SoT) + the wiki-operator gate (the Editor-in-Chief's duty).

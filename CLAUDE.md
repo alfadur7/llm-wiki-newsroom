@@ -8,13 +8,15 @@ This wiki is an English-native knowledge base maintained by Claude Code; the exa
 
 This project operates as a five-role multi-agent system modeled on the staff of a Korean newsroom.
 
-| Role | English | Essence |
-|---|---|---|
-| **Pyeonjipgukjang** | Editor-in-Chief | Meta layer outside the matrix — entry, routing, gating, escalation, logging |
-| **Chwijaegija** | Reporter | Writes L2-1 / L2-2 stubs + broad external exploration (breadth-first parallel) |
-| **Nonseolwiwon** | Columnist | Writes L2-2 full / L2-3 / L2-4 (integrating its own GROUND, deep sequential) |
-| **Deseukeu** | Section Editor | Qualitative review of L2-3 / L2-4 (the areas the Rubric does not capture) — the pre-publish gate |
-| **Gyoyeolgija** | Copy Editor | Deterministic quantitative checks across all Layers (`tools/lint.py`) |
+| Role | Essence |
+|---|---|
+| **Editor-in-Chief** | Meta layer outside the matrix — entry, routing, gating, escalation, logging |
+| **Reporter** | Writes L2-1 / L2-2 stubs + broad external exploration (breadth-first parallel) |
+| **Columnist** | Writes L2-2 full / L2-3 / L2-4 (integrating its own GROUND, deep sequential) |
+| **Desk**[^desk] | Qualitative review of L2-3 / L2-4 (the areas the Rubric does not capture) — the pre-publish gate |
+| **Copy Editor** | Deterministic quantitative checks across all Layers (`tools/lint.py`) |
+
+[^desk]: "Desk" is the newsroom desk — the senior editor who reviews a piece for quality and judgment before it runs (as in "copy desk" / "news desk"). Here it is the pre-publish qualitative-review gate. The five roles are modeled on a newspaper newsroom; the agent and its SoT file are both named `desk`.
 
 Per-role capabilities, prompts, and risk mitigations: [`.claude/agents/`](.claude/agents/) is the SoT.
 
@@ -112,7 +114,7 @@ Each folder has a **single responsibility**; when adding a new instruction, use 
 - `scholarly-citation` (`cit.*`) — verifiable attribution and citation (claim atomization, evidence grading, citation typing, anchoring)
 
 *Coding discipline* (`SKILL.md` only, not lint-measured):
-- `ponytail-coding` — lazy-senior code restraint (the YAGNI ladder, reuse first, root-cause fixes). Divided in labor with karpathy-guidelines (assumptions, success criteria) and `/simplify` (after-the-fact cleanup).
+- `ponytail-coding` — lazy-senior code restraint (the YAGNI ladder, reuse first, root-cause fixes). Divides labor with karpathy-guidelines (assumptions, success criteria) and `/simplify` (after-the-fact cleanup).
 
 **What does NOT belong here**:
 - Content-type page formats, section names, execution order — [`.claude/layers/`](.claude/layers/) (skills cover craft only; the layers apply it to this project).

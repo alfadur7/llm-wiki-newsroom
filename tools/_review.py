@@ -10,6 +10,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from _lib import atomic_write_text
+
 
 def _load(path: Path) -> dict:
     try:
@@ -30,6 +32,7 @@ def load_history(path: Path) -> list:
 
 def write_review(path: Path, when: str, history: list) -> None:
     """Advance last_review to `when` and record history (committed to the repo)."""
-    path.write_text(
+    atomic_write_text(
+        path,
         json.dumps({"last_review": when, "history": history}, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8")
+    )

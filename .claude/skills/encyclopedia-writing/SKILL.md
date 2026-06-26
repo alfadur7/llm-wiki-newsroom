@@ -5,7 +5,7 @@ description: Encyclopedic neutral-reference writing craft — NPOV (attribute fa
 
 # encyclopedia-writing
 
-Neutral-reference writing craft drawn from the encyclopedic editing tradition (the Wikipedia policy family). It keeps this wiki's overview, issue, and hub pages a connected reference that is grounded in facts and sources and advocates no particular viewpoint. `criteria.json` is the SoT for each criterion's definition, comparator, and source; content-type thresholds and algorithm params are injected by `.claude/layers/_manifest.json` (the skill is content-type-agnostic). Examples are illustrative of the target English prose; the localization rules that are intrinsically about Korean rendering are retained for any Korean-localized labels.
+Neutral-reference writing craft drawn from the encyclopedic editing tradition (the Wikipedia policy family). It keeps this wiki's overview, issue, and hub pages a connected reference that is grounded in facts and sources and advocates no particular viewpoint. `criteria.json` is the SoT for each criterion's definition, comparator, and source; content-type thresholds and algorithm params are injected by `.claude/layers/_manifest.json` (the skill is content-type-agnostic). Examples are illustrative of the target English prose; the Korean-rendering rules below apply only when WIKI_LANG=ko and are inert on the default English corpus.
 
 ## Wikilink connectivity (enc.link-density · enc.first-mention · enc.lead-body)
 
