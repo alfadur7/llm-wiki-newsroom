@@ -138,7 +138,7 @@ Each folder has a **single responsibility**; when adding a new instruction, use 
 
 **When read**: on infra changes (adding a device, renewing a token, etc.).
 
-> **Note:** these operator runbooks are operator-specific and ship empty in this public distribution (the folder holds only a `.gitkeep`). The entries below describe what each runbook covers in the operator's full repo; links to them here are intentionally inert.
+> **Note:** the feature-facing runbooks ship in this distribution. Three operator-internal infra runbooks are not included — `cloud-web-batch-runbook.md`, `weekly-briefing-automation.md`, and `promotion-batch-runbook.md` (links to those three are intentionally inert).
 
 **Instructions located here**:
 - `mobile-inbox-setup.md` (one-time setup for mobile share-sheet → GitHub Contents API)
