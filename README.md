@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**A local-first, API-key-free framework for an LLM-maintained knowledge wiki.** Drop articles, documents, and PDFs into the `raw/` folder, type a single command, and an AI agent like Claude Code reads them, extracts entities, concepts, and relationships, and organizes everything into a fully cross-referenced wiki. Every new document you add also enriches the existing pages. This repo ships with a small example corpus — the open-source-AI ecosystem (the debate over what "open source" means for AI) — under `wiki/`, but the framework is domain-agnostic.
+**An open-source, local-first AI knowledge base — no API keys, no cloud, no vendor lock-in.** Drop articles, documents, and PDFs into the `raw/` folder, type a single command, and an AI agent like Claude Code reads them, extracts entities, concepts, and relationships, and organizes everything into a fully cross-referenced wiki — a structured, persistent alternative to RAG. Every new document you add also enriches the existing pages. This repo ships with a small example corpus — the open-source-AI ecosystem (the debate over what "open source" means for AI) — under `wiki/`, but the framework is domain-agnostic.
 
 > Most knowledge tools leave the *finding* to you. This project **makes the AI read and understand** your collected documents first, then organizes them into a wiki — with cross-references between pages, automatic flagging of conflicting claims, and per-topic synthesis built in from the start, so later retrieval is fast.
 
@@ -418,15 +418,15 @@ Having the LLM read every page in full to answer a question is costly, and an AI
 
 **Graph traversal** (`python tools/query.py graph ...`) — structural queries using link relationships:
 
-- **`graph path Meta GPU`** — shows the shortest path connecting two pages and why each link was formed (`[[X]] — connection reason` explanation). You can trace the logical flow from "Meta" to "GPU" without a single click.
-- **`graph explain HuggingFace`** — summarizes which cluster a page belongs to, which pages reference it, and what it points to.
-- **`graph neighbors AICC`** — groups directly connected pages by cluster to see "what's around" at a glance.
+- **`graph path Meta OpenSourceInitiative`** — shows the shortest path connecting two pages and why each link was formed (`[[X]] — connection reason` explanation). You can trace the logical flow from "Meta" to "OpenSourceInitiative" without a single click.
+- **`graph explain OpenWeights`** — summarizes which cluster a page belongs to, which pages reference it, and what it points to.
+- **`graph neighbors Meta`** — groups directly connected pages by cluster to see "what's around" at a glance.
 
 **Body search** (`python tools/query.py qmd ...`) — local search that actually inspects page bodies to find the ones matching a topic (no external transmission):
 
 - **`qmd hybrid "open weights vs open source"`** — recommendation search combining keyword, meaning, and reranking.
 - **`qmd search "OpenAI"`** — BM25 keyword matching (fastest).
-- **`qmd vsearch "AI that spends money autonomously"`** — vector-based semantic similarity (finds it by context even when the exact keyword isn't in the body).
+- **`qmd vsearch "models that are open in name only"`** — vector-based semantic similarity (finds it by context even when the exact keyword isn't in the body — here, surfacing the open-washing pages).
 
 `--budget N` limits the number of output lines so the agent pulls exactly as much as it can digest. `--json` enables program-to-program integration.
 
@@ -467,7 +467,7 @@ Double-click the file to open it, and these interactions are available right in 
 - **Shareable link** — filter, local-view, and highlight state are all recorded in the URL, so the same view can be shared as-is
 
 ### Automatic topic clustering
-Instead of a human assigning every entity/concept page to a category by hand, it uses an algorithm that **groups similar topics looking only at the connections between pages** ([Leiden community detection](https://en.wikipedia.org/wiki/Leiden_algorithm)). The result is intuitive clusters like the examples below — "bank IT · digital banking," "cloud · infrastructure," "LLM · foundation models," "security · governance," etc. Each source document is assigned by weighted vote to the cluster of the entities it referenced, so documents that overlap in topic are listed in multiple cluster catalogs at once.
+Instead of a human assigning every entity/concept page to a category by hand, it uses an algorithm that **groups similar topics looking only at the connections between pages** ([Leiden community detection](https://en.wikipedia.org/wiki/Leiden_algorithm)). The result is intuitive clusters — here, the example corpus splits cleanly into "open-source AI definition," "open weights," and "licensing · open-washing." Each source document is assigned by weighted vote to the cluster of the entities it referenced, so documents that overlap in topic are listed in multiple cluster catalogs at once.
 
 > Leiden is the successor to the better-known Louvain algorithm, solving Louvain's limitation (the modularity-local-maxima trap) where cluster boundaries swing wildly under small graph changes, via a refinement stage and connectivity guarantees. In the larger corpus this engine was built for, as the wiki grew to ~470 hubs Louvain hit an unstable regime where adding just 7 new sources would make the cluster count jump from 7 to 10; after adopting Leiden, the same change was measured to stay stable at 8→8. (The small example corpus shipped here has only 3 clusters, so the instability doesn't show up — but the algorithm choice still matters as a wiki grows.)
 
@@ -479,21 +479,21 @@ When a new topic cluster is discovered and needs a label, `/wiki-lint` tells you
 
 ```json
 {
-  "slug": "cybersecurity",
-  "name": "cybersecurity",
+  "slug": "licensing-open-washing",
+  "name": "Licensing & Open-Washing",
   "anchor_members": [
-    "concepts/ZeroTrust.md",
-    "concepts/CloudSecurity.md",
-    "entities/Cloudflare.md"
+    "concepts/ModelLicensing.md",
+    "concepts/OpenWashing.md",
+    "entities/Meta.md"
   ],
-  "paired_with": ["financial-regulation"]
+  "paired_with": ["open-source-ai-definition"]
 }
 ```
 
 - **`slug`** — an English identifier. Used as the catalog filename (`_catalog-<slug>.md`) and as the `/wiki-news <slug>` command argument, so use only letters, digits, and hyphens.
 - **`name`** — the human-readable display name. Surfaced in the catalog title and the index.
 - **`anchor_members`** — 3–6 pages representing this cluster. The script matches a label by "are at least half of the designated representative pages grouped into one community," so too few risks a match failure and too many risks overlap with another community.
-- **`paired_with`** *(optional)* — an array of paired-cluster slugs whose work naturally overlaps. E.g., model infrastructure ↔ adoption/productivity, core banking ↔ financial regulation. Writing it on one side applies it both ways, and even if a paired cluster's representative page appears in the per-domain overview body, `/wiki-lint` won't flag it as narrative drift. Do not list a split-off relationship where a domain broke away — there you *do* need to check whether the body is stuck in the old flow.
+- **`paired_with`** *(optional)* — an array of paired-cluster slugs whose work naturally overlaps. E.g., here "licensing · open-washing" ↔ "open-source AI definition" (the two debates share figures and arguments). Writing it on one side applies it both ways, and even if a paired cluster's representative page appears in the per-domain overview body, `/wiki-lint` won't flag it as narrative drift. Do not list a split-off relationship where a domain broke away — there you *do* need to check whether the body is stuck in the old flow.
 
 After editing, re-run `python tools/build.py` and the new name is reflected in every catalog and the index.
 
