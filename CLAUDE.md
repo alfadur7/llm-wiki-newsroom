@@ -138,15 +138,10 @@ Each folder has a **single responsibility**; when adding a new instruction, use 
 
 **When read**: on infra changes (adding a device, renewing a token, etc.).
 
-> **Note:** the feature-facing runbooks ship in this distribution. Three operator-internal infra runbooks are not included — `cloud-web-batch-runbook.md`, `weekly-briefing-automation.md`, and `promotion-batch-runbook.md` (links to those three are intentionally inert).
-
 **Instructions located here**:
 - `mobile-inbox-setup.md` (one-time setup for mobile share-sheet → GitHub Contents API)
 - `gap-detection-rollout.md` (the rollout plan for gap diagnosis, automatic backfill, and separating the operator surface + the SoT for thresholds, priorities, and the domain set)
 - `graph-hosting-setup.md` (setup for publicly deploying the graph browser's `_site/` artifact to Cloudflare Pages)
-- `cloud-web-batch-runbook.md` (setup procedure for the Claude Code Web cloud-session batch execution environment)
-- `promotion-batch-runbook.md` (the batch procedure for promoting un-started backlog → full hub: order, priority, gates)
-- `weekly-briefing-automation.md` (the unattended weekly-briefing pipeline — the Monday generation routine and dispatch + secrets; fetch and ingest stay local)
 - `codebase-audit-runbook.md` (the multi-agent batch procedure for ultrareviewing tools/ code and .claude/ instructions — group decomposition, review dimensions, adversarial verify, the mechanical/gated application policy)
 - `staleness-reground-runbook.md` (the batch procedure for re-grounding stale derived narratives surfaced by `/wiki-lint staleness` — per-type pipeline, Desk gate, verification, recurrence pitfalls)
 - `proposal-validation-runbook.md` (the batch procedure for measuring the effect of self-evolved, desk-judged guideline strengthenings — Control/Treatment prompt injection, held-in blind rewrite, held-out canary, blind-desk N aggregation; the acceptance rule lives in `agents/editor-in-chief.md` step 6)

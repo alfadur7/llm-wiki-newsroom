@@ -44,7 +44,7 @@ Read the question and classify it as 1 of 6 types, then enter the relevant proce
 - "simple mention" → `--edge-type references`
 - "appearing together" · "co-occurring" → `--edge-type inferred`
 
-`mcp__qmd__query`·`mcp__qmd__get` are available only when the qmd MCP is installed (separate setup — `.claude/operations/cloud-web-batch-runbook.md`; not included in the default cloud environment). Topic·Fact fallback in an uninstalled environment: `tools/query.py graph neighbors` + direct Read of candidate pages.
+`mcp__qmd__query`·`mcp__qmd__get` are available only when the qmd MCP is installed (separate setup — see the "Local semantic search" section in `README.md`). Topic·Fact fallback in an uninstalled environment: `tools/query.py graph neighbors` + direct Read of candidate pages.
 
 Combining multiple types: `--edge-type cites,contradicts`. **The natural-language intent mapping is merely a secondary signal for `--edge-type` and is unrelated to the mode branch** — the mode is decided solely by the table below.
 
