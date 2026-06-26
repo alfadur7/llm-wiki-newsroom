@@ -1,0 +1,13 @@
+# repo는 LF로 정규화 저장(git add가 CRLF→LF). 코드·스크립트(.sh)는 LF가 정확.
+#
+# EOL phantom 참고: 일부 .md가 과거 CRLF로 커밋돼 index에 CRLF가 잔존한다.
+# 파일이 touch되면(mtime 변경) git status가 일시적으로 M으로 표시하나, 전체
+# status 스캔/`git restore`로 자동 해소되고 eol-only라 git diff는 비며 git add가
+# LF 정규화하므로 잘못 커밋되지 않는다(코스메틱). Obsidian은 LF-native라 원인이
+# 아니다. 완전 제거를 원하면 1회 `git add --renormalize . && git commit`로
+# index 전체를 LF 통일(대량 eol-only 커밋).
+*.md text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.sh text eol=lf
+*.html text eol=lf

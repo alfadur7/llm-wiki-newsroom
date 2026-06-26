@@ -1,0 +1,95 @@
+{
+  "skill": "journalism-writing",
+  "_note": "Journalism/argumentation craft criteria, single SoT. The measurement function is given by each `algorithm` field — contradiction dialectic (qualifier·thesis-antithesis·c-section-size·c-stance-naming) uses `evaluate_contradiction_dialectic`; overview-aggregate reference balance (due-impartiality) uses `evaluate_overview_aggregate`. judge=M (narrative lead + Toulmin Claim-Warrant·Rebuttal·Hegel synthesis monitoring) keeps only definition + pass_condition and is reviewed qualitatively by desk. Authoring/review prose (with examples) is in SKILL.md. Shared parsing (conflict_section etc.) is orchestrator-injected. Any Korean literals are the wiki's actual section headers and matched tokens.",
+  "criteria": {
+    "jrn.lede": {
+      "name": "Lede concreteness", "dimension": "Narrative lead", "judge": "M",
+      "pass_condition": "The lede leads with the concrete conclusion via specific numbers and proper nouns (so-what upfront) rather than an abstract summary, compressed into 2–4 sentences.",
+      "legacy": {"overview-cluster": "J1", "overview-aggregate": "J1"},
+      "source": "Inverted Pyramid — Nielsen Norman Group", "source_url": "https://www.nngroup.com/articles/inverted-pyramid/"
+    },
+    "jrn.nutgraf": {
+      "name": "Nut graph 4W1H", "dimension": "Narrative lead", "judge": "M",
+      "pass_condition": "A core paragraph after the lede states why the story matters with 4W1H (scope·time·who·why).",
+      "legacy": {"overview-cluster": "J2", "overview-aggregate": "J2"},
+      "source": "Nut graph — Nieman Storyboard", "source_url": "https://niemanstoryboard.org/2021/10/26/nut-grafs-seven-steps-to-score-a-winning-story-structure/"
+    },
+    "jrn.kicker": {
+      "name": "Kicker forward-looking", "dimension": "Narrative lead", "judge": "M",
+      "pass_condition": "The intro closes with a forward-looking sentence declaring the tension/direction to track.",
+      "legacy": {"overview-cluster": "J3"},
+      "source": "Nut graph — Nieman Storyboard", "source_url": "https://niemanstoryboard.org/2021/10/26/nut-grafs-seven-steps-to-score-a-winning-story-structure/"
+    },
+    "jrn.page": {
+      "name": "PAGE framing", "dimension": "Narrative lead", "judge": "M",
+      "pass_condition": "Each tension axis is framed with at least 2 of the 4 PAGE elements (Problem·Analyze cause·Gauge responsibility·Examine solutions).",
+      "legacy": {"overview-cluster": "J4"},
+      "source": "The Power of News Frames (PAGE model) — Project Censored", "source_url": "https://www.projectcensored.org/the-power-of-news-frames/"
+    },
+    "jrn.explainer": {
+      "name": "Explainer orientation", "dimension": "Narrative lead", "judge": "M",
+      "pass_condition": "Body units are composed as explanation answering How/Why, not a bare list of facts.",
+      "legacy": {"overview-cluster": "J5", "overview-aggregate": "J5"},
+      "source": "Explanatory journalism — Wikipedia", "source_url": "https://en.wikipedia.org/wiki/Explanatory_journalism"
+    },
+    "jrn.inverted-pyramid": {
+      "name": "Inverted pyramid", "dimension": "Narrative lead", "judge": "M",
+      "pass_condition": "Lists/sections place the most important metric first (descending importance).",
+      "legacy": {"overview-cluster": "J6", "overview-aggregate": "J6"},
+      "source": "Inverted Pyramid — Nielsen Norman Group", "source_url": "https://www.nngroup.com/articles/inverted-pyramid/"
+    },
+    "jrn.due-impartiality": {
+      "name": "Due impartiality (reference balance)", "dimension": "Fairness", "judge": "A",
+      "algorithm": "evaluate_overview_aggregate", "comparator": "<=", "default_threshold": 3.0,
+      "legacy": {"overview-aggregate": "D3"},
+      "source": "Rethinking balance and impartiality in journalism — PMC (BBC)", "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5732589/",
+      "note": "In an aggregated piece, the max/min sub-unit reference ratio stays ≤ threshold so references do not over-skew to one side (BBC due impartiality). Measured by the evaluate_overview_aggregate bundle. A hub cluster may legitimately exceed this, so it is advisory (human review)."
+    },
+    "jrn.toulmin-claim": {
+      "name": "Claim-Warrant", "dimension": "Toulmin", "judge": "M",
+      "pass_condition": "Each side (A·B·optional C) pairs its claim with supporting grounds/data (≥1); no side asserts a claim with no grounds.",
+      "legacy": {"contradiction-theme": "T1", "contradiction-aggregate": "T1"},
+      "source": "Toulmin Argument — Purdue OWL", "source_url": "https://owl.purdue.edu/owl/general_writing/academic_writing/historical_perspectives_on_argumentation/toulmin_argument.html"
+    },
+    "jrn.rebuttal": {
+      "name": "Rebuttal acknowledgment", "dimension": "Toulmin", "judge": "M",
+      "pass_condition": "For each side (A·B), concede ≥1 real weakness grounded in one of (i) a limit the side itself admits, (ii) an internal contradiction in its logic, (iii) an evidence design limit (sample/timing/method). Re-citing the opposing side's evidence is NOT a rebuttal (it repeats the clash). No side left perfectly defended.",
+      "legacy": {"contradiction-theme": "T3"},
+      "source": "Toulmin Argument — Purdue OWL", "source_url": "https://owl.purdue.edu/owl/general_writing/academic_writing/historical_perspectives_on_argumentation/toulmin_argument.html"
+    },
+    "jrn.qualifier": {
+      "name": "Qualifier present", "dimension": "Toulmin", "judge": "A",
+      "algorithm": "evaluate_contradiction_dialectic", "comparator": ">=", "default_threshold": 1,
+      "legacy": {"contradiction-theme": "T4", "contradiction-aggregate": "T4"},
+      "source": "Toulmin Argument — Purdue OWL", "source_url": "https://owl.purdue.edu/owl/general_writing/academic_writing/historical_perspectives_on_argumentation/toulmin_argument.html",
+      "note": "≥1 scope qualifier ('in the short term'·'on this metric'·'within N years', etc.) in the body. Every issue holds only conditionally (Toulmin Qualifier). For aggregate, limited to the Implications section. NOTE the qualifier matcher (QUALIFIER_PATTERNS) keys on Korean phrasings and is dormant on English prose — see checks.py FLAG."
+    },
+    "jrn.thesis-antithesis": {
+      "name": "Thesis-Antithesis clarity", "dimension": "Dialectic", "judge": "A",
+      "algorithm": "evaluate_contradiction_dialectic", "comparator": ">=", "default_threshold": 2,
+      "legacy": {"contradiction-theme": "D1"},
+      "source": "Hegel's Dialectics — Stanford Encyclopedia of Philosophy", "source_url": "https://plato.stanford.edu/entries/hegel-dialectics/",
+      "note": "## Opposing Positions marks thesis/antithesis with **A Position**/**B Position** bold labels (≥2 label kinds). NOTE the label matcher (DIALECTIC_LABEL_RE) keys on the Korean subtitle words 입장/중재 and is dormant on English labels — see checks.py FLAG."
+    },
+    "jrn.c-section-size": {
+      "name": "C-section size limit", "dimension": "Dialectic", "judge": "A",
+      "algorithm": "evaluate_contradiction_dialectic", "comparator": "advisory", "default_threshold": null,
+      "legacy": {"contradiction-theme": "D5"},
+      "source": "Hegel's Dialectics — Stanford Encyclopedia of Philosophy", "source_url": "https://plato.stanford.edu/entries/hegel-dialectics/",
+      "note": "The C (mediating) paragraph word count ≤ each of A and B (so C is not mistaken for the main clash). A/B/C word counts measured."
+    },
+    "jrn.c-stance-naming": {
+      "name": "C-stance naming rule", "dimension": "Dialectic", "judge": "A",
+      "algorithm": "evaluate_contradiction_dialectic", "comparator": "==", "default_threshold": 0,
+      "legacy": {"contradiction-theme": "D6"},
+      "source": "Hegel's Dialectics — Stanford Encyclopedia of Philosophy", "source_url": "https://plato.stanford.edu/entries/hegel-dialectics/",
+      "note": "The C label is allowed only when synthesis/mediating. If meta-critique keywords ('internal contradiction'·'both sides at once', etc.) appear, move the content to the Derived Tension section (0 violations). NOTE the keyword list (C_META_KEYWORDS) is Korean and dormant on English prose — see checks.py FLAG."
+    },
+    "jrn.monitoring-balance": {
+      "name": "Synthesis / monitoring balance", "dimension": "Dialectic", "judge": "M",
+      "pass_condition": "The synthesis (Interpretation Direction) includes a monitoring point for each side's (A·B·optional C) winning scenario (≥1 each). Skew to one side is FAIL (due impartiality) — place them symmetrically so no editorial verdict is hidden beneath hedged wording.",
+      "legacy": {"contradiction-theme": "D2"},
+      "source": "Hegel's Dialectics — Stanford Encyclopedia of Philosophy", "source_url": "https://plato.stanford.edu/entries/hegel-dialectics/"
+    }
+  }
+}

@@ -1,0 +1,181 @@
+{
+  "_meta": {
+    "phase": "dependencies",
+    "note": "layer-cascade upstream index — page → {upstream pages it derives from, newest upstream date}. Consumed by tools/_lint/staleness.py (uniform staleness rule). Additive; no existing behavior changed.",
+    "page_count": 22
+  },
+  "pages": {
+    "sources/case-against-osaid.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/mozilla-celebrates-osaid.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/open-source-ai-models-how-open.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/osi-open-source-ai-definition.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "entities/DeepSeek.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [
+        "sources/open-source-ai-models-how-open.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    },
+    "entities/FreeSoftwareFoundation.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [
+        "sources/case-against-osaid.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    },
+    "entities/Meta.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [
+        "sources/mozilla-celebrates-osaid.md",
+        "sources/osi-open-source-ai-definition.md",
+        "sources/open-source-ai-models-how-open.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    },
+    "entities/Mozilla.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [
+        "sources/mozilla-celebrates-osaid.md",
+        "sources/osi-open-source-ai-definition.md",
+        "sources/case-against-osaid.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    },
+    "entities/OpenSourceInitiative.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [
+        "sources/osi-open-source-ai-definition.md",
+        "sources/case-against-osaid.md",
+        "sources/mozilla-celebrates-osaid.md",
+        "sources/open-source-ai-models-how-open.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    },
+    "concepts/FineTuning.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [
+        "sources/open-source-ai-models-how-open.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    },
+    "concepts/ModelLicensing.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [
+        "sources/open-source-ai-models-how-open.md",
+        "sources/case-against-osaid.md",
+        "sources/osi-open-source-ai-definition.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    },
+    "concepts/OpenSourceAI.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [
+        "sources/osi-open-source-ai-definition.md",
+        "sources/mozilla-celebrates-osaid.md",
+        "sources/case-against-osaid.md",
+        "sources/open-source-ai-models-how-open.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    },
+    "concepts/OpenWashing.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [
+        "sources/mozilla-celebrates-osaid.md",
+        "sources/osi-open-source-ai-definition.md",
+        "sources/open-source-ai-models-how-open.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    },
+    "concepts/OpenWeights.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [
+        "sources/open-source-ai-models-how-open.md",
+        "sources/osi-open-source-ai-definition.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    },
+    "concepts/TrainingData.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [
+        "sources/case-against-osaid.md",
+        "sources/osi-open-source-ai-definition.md",
+        "sources/open-source-ai-models-how-open.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    },
+    "overviews/licensing-open-washing.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [
+        "concepts/ModelLicensing.md",
+        "concepts/OpenWashing.md",
+        "entities/Meta.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    },
+    "overviews/open-source-ai-definition.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [
+        "concepts/OpenSourceAI.md",
+        "concepts/TrainingData.md",
+        "entities/FreeSoftwareFoundation.md",
+        "entities/Mozilla.md",
+        "entities/OpenSourceInitiative.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    },
+    "overviews/open-weights.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [
+        "concepts/FineTuning.md",
+        "concepts/OpenWeights.md",
+        "entities/DeepSeek.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    },
+    "contradictions/open-training-data-requirement.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [
+        "sources/case-against-osaid.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    },
+    "contradictions/other-fragmentary.md": {
+      "last_updated": "2026-06-26",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "overview.md": {
+      "last_updated": null,
+      "upstream": [
+        "overviews/licensing-open-washing.md",
+        "overviews/open-source-ai-definition.md",
+        "overviews/open-weights.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    },
+    "contradiction.md": {
+      "last_updated": null,
+      "upstream": [
+        "contradictions/open-training-data-requirement.md",
+        "contradictions/other-fragmentary.md"
+      ],
+      "upstream_max_date": "2026-06-26"
+    }
+  }
+}

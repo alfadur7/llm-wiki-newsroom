@@ -1,0 +1,34 @@
+{
+  "overlays": [
+    {
+      "type": "contradiction",
+      "slug": "open-training-data-requirement",
+      "title": "OSAID Definition vs Open Training-Data Requirement",
+      "flavor": "region",
+      "members": [
+        {
+          "id": "sources/case-against-osaid.md"
+        },
+        {
+          "id": "concepts/OpenSourceAI.md"
+        }
+      ]
+    }
+  ],
+  "node_overlays": {
+    "sources/case-against-osaid.md": [
+      {
+        "type": "contradiction",
+        "slug": "open-training-data-requirement",
+        "title": "OSAID Definition vs Open Training-Data Requirement"
+      }
+    ],
+    "concepts/OpenSourceAI.md": [
+      {
+        "type": "contradiction",
+        "slug": "open-training-data-requirement",
+        "title": "OSAID Definition vs Open Training-Data Requirement"
+      }
+    ]
+  }
+}

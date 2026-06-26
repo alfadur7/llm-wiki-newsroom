@@ -1,0 +1,9 @@
+root = true
+
+# 전 파일 LF 강제 — Windows 환경에서 에디터·도구가 CRLF를 넣지 않도록 선언.
+# git의 .gitattributes(eol=lf)가 커밋 시점 정규화 안전망이라면, 이쪽은 에디터가
+# 처음부터 LF로 저장하게 하는 선언이다(VS Code 등 .editorconfig 지원 도구 적용).
+[*]
+end_of_line = lf
+charset = utf-8
+insert_final_newline = true

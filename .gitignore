@@ -1,0 +1,55 @@
+# Original sources (personal scraps) — keep only the .gitkeep
+raw/*/
+
+# Claude Code local settings (contain machine paths)
+# settings.json is tracked (team-wide config such as hooks).
+# settings.local.json is gitignored (personal trust model, MCP, and other overrides).
+.claude/settings.local.json
+.claude/memory/
+.mcp.json
+
+# Obsidian local settings
+.obsidian/
+
+# Build artifacts (regenerable)
+# _graph.json, graph.html, and _clusters.json ARE tracked (they stay in sync with
+# wiki state — graph.html loads _graph.json/_clusters.json directly via fetch).
+# _pages.json is the reading-pane body bundle and is large (~9MB), so it is untracked —
+# regenerate after clone with `python tools/build.py clusters` (graph.html lazy-fetches it on click).
+# _health-log.jsonl is appended on every lint run (a trend log); committing it only
+# adds diff noise, so it is kept per local environment.
+graph/_pages.json
+graph/_health-log.jsonl
+# lint-report.md is a human-readable snapshot regenerated on every lint run — like
+# _health-log.jsonl it would only add diff noise, so it is untracked. /wiki-lint writes it to the repo root.
+lint-report.md
+
+# Hosting deploy staging — export.py assembles graph.html plus
+# <slug>-{graph,clusters,pages}.json under _site/ with obscured filenames for Cloudflare Pages. A byproduct, so untracked.
+_site/
+
+# raw-dependent tools (internal, `_` prefix)
+tools/_categorize_raindrop.py
+tools/_raindrop_categories.json
+
+# Operator-internal self-improvement loop state (regenerated locally by mine_feedback.py)
+tools/_feedback-review.json
+
+# Python bytecode cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Operator-local handoff note (must not be committed to the public mirror)
+HANDOFF.md
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temp files
+tmp_reads/
+tmp_migration/
+batch*.txt
+*.tmp

@@ -1,0 +1,479 @@
+{
+  "_note": "Per-content-type evaluation-configuration SoT — which craft criteria, thresholds/params, and completion counts apply to which page. Three sub-forms (each content-type keeps only what it needs): `checks` = per-criterion fixed thresholds (the orchestrator calls the criterion's algorithm function directly) · `bundles` = a single call to a relational, wiki-wide combined bundle (skill.<fn>, `produces` = the criterion IDs it emits; wiki-wide state and shared parsing are injected by the orchestrator) · `roster` = a full enumeration of evaluated criteria (required/optional; `_manifest_counts` derives the completion count — replacing the _rubric.py table parse). Criterion definitions, comparators, and rationale SoT live in .claude/skills/<skill>/criteria.json (dotted IDs); structural and house-style criteria with no external craft source (struct.*/house.*) live in the structural section of layers/<content-type>.md. Content-type order follows the Layer order (L2-1 source → L2-2 hub → L2-3/4 overview → L2-3/4 contradiction).",
+  "source": {
+    "_note": "L2-1 source page. The verifiable-attribution craft cit.* (G1–G5 · C1–C3 · A1–A3) is measured entirely by the scholarly-citation `evaluate_citation` bundle. Wiki-wide state (page_index, section titles) is injected by the orchestrator (source.py).",
+    "bundles": {
+      "scholarly-citation": {
+        "fn": "evaluate_citation",
+        "produces": [
+          "cit.grade-marker",
+          "cit.claimant-link",
+          "cit.atomic",
+          "cit.claimant-valid",
+          "cit.composite-split",
+          "cit.cite-type",
+          "cit.cite-distribution",
+          "cit.cite-type-hub",
+          "cit.anchor",
+          "cit.speaker-link",
+          "cit.anchor-valid"
+        ],
+        "params": {
+          "c2_ref_ratio_max": 0.95,
+          "c2_min_lines": 5
+        }
+      }
+    },
+    "roster": {
+      "required": [
+        "cit.grade-marker",
+        "cit.claimant-link",
+        "cit.cite-type",
+        "struct.schema-sections",
+        "enc.slug-alias",
+        "cit.claimant-valid",
+        "cit.cite-type-hub"
+      ],
+      "optional": [
+        "cit.atomic",
+        "cit.composite-split",
+        "cit.cite-distribution",
+        "cit.anchor",
+        "cit.speaker-link",
+        "cit.anchor-valid",
+        "enc.link-density"
+      ]
+    }
+  },
+  "hub": {
+    "_note": "L2-2 hub body density and `## Connections` grouping (the encyclopedic nav-anchor style) → encyclopedia-writing. central_anchor (an entity, or inbound ≥ CENTRALITY_EXEMPT) is exempt; inbound is wiki-wide so it is injected by the orchestrator (hub_body.py). The body floor (MIN_BODY_CHARS) and frontmatter schema remain structural in hub_schema.py. Advisory check.",
+    "bundles": {
+      "encyclopedia-writing": {
+        "fn": "evaluate_hub_body",
+        "produces": [
+          "enc.nav-anchor-density",
+          "enc.connection-grouping"
+        ],
+        "params": {
+          "body_len_advisory": 12000,
+          "yeongyeol_link_advisory": 50
+        }
+      }
+    }
+  },
+  "timeline": {
+    "_note": "L2-2 standalone timeline (wiki/timelines/<slug>.md). A source-indexed chronology — a path overlay parallel to a trail. If the first link of a dated entry is [[source-id]], the overlay is classified as a path (members = the ordered source nodes). The structural criteria (schema-sections, source-indexed) are defined in the structural section of timeline.md and measured automatically by timeline.py — source-indexed = src_n > hub_n, the same test as the builder's overlays.py:_timeline_overlay (a regression guard for the region logic). Sourceless historical anchors stay as [[entity]] (lossless). The raw source-id kebab slug of a dated entry is exempt from enc.slug-alias because indexing is its purpose (the key difference from a trail). The flow-summary trajectory narrative = enc.summary-style (manual; Desk VERIFY₂). broken-link is delegated to graph structure. roster = completion count.",
+    "roster": {
+      "required": [
+        "struct.schema-sections",
+        "struct.source-indexed",
+        "enc.broken-link"
+      ],
+      "optional": [
+        "enc.summary-style",
+        "enc.first-mention",
+        "house.sentence-length",
+        "house.date-format"
+      ]
+    }
+  },
+  "overview-cluster": {
+    "_note": "L2-3 cluster overview. Craft: jrn (the landscape narrative) · con (Executive Summary, figures) · enc (links, notation, neutrality) · cit (schema meta). Structural and house-style criteria with no external craft source (struct.*/house.*) are defined in the structural section of overview.md. checks = fixed-threshold craft; roster = completion count (out of 30).",
+    "checks": {
+      "enc.link-density": {
+        "skill": "encyclopedia-writing",
+        "threshold": 150,
+        "params": {
+          "strip_auto": true
+        }
+      },
+      "enc.first-mention": {
+        "skill": "encyclopedia-writing",
+        "threshold": 0,
+        "params": {
+          "strip_auto": true,
+          "exempt_sections": [
+            "## Adjacent Domains & Scope",
+            "## Recent Changes"
+          ]
+        }
+      },
+      "cit.grade-meta": {
+        "skill": "scholarly-citation",
+        "threshold": 2
+      },
+      "cit.cite-type-meta": {
+        "skill": "scholarly-citation",
+        "threshold": 1
+      },
+      "enc.verdict-restraint": {
+        "skill": "encyclopedia-writing",
+        "threshold": 2
+      },
+      "enc.slug-alias": {
+        "skill": "encyclopedia-writing",
+        "threshold": 0,
+        "params": {
+          "min_len": 10
+        }
+      },
+      "enc.abbr-gloss": {
+        "skill": "encyclopedia-writing",
+        "threshold": 3
+      },
+      "con.numeric-density": {
+        "skill": "consulting-writing",
+        "threshold": 0,
+        "params": {
+          "max_per_para": 5
+        }
+      }
+    },
+    "roster": {
+      "required": [
+        "jrn.lede",
+        "jrn.nutgraf",
+        "jrn.kicker",
+        "jrn.page",
+        "con.scr",
+        "enc.broken-link",
+        "struct.scope-match",
+        "con.numeric-precision",
+        "struct.cross-tension",
+        "struct.auto-editor",
+        "enc.slug-alias"
+      ],
+      "optional": [
+        "jrn.explainer",
+        "jrn.inverted-pyramid",
+        "con.bold-bullet",
+        "con.so-what",
+        "enc.link-density",
+        "enc.lead-body",
+        "enc.first-mention",
+        "struct.prose-rhythm",
+        "struct.prose-min",
+        "struct.subsection-min",
+        "struct.theme-drilldown",
+        "house.repetition",
+        "con.numeric-density",
+        "enc.verdict-restraint",
+        "house.date-format",
+        "enc.abbr-gloss",
+        "house.sentence-length",
+        "cit.grade-meta",
+        "cit.cite-type-meta"
+      ]
+    }
+  },
+  "overview-aggregate": {
+    "_note": "L2-4 root overview. Shares the cluster checks + aggregate bundles (D1 con.mece-clusters · D2 enc.summary-style · F1 enc.coatrack · D3 jrn.due-impartiality). Shared parsing (section_spans, all_links, theme_stems) is injected by the orchestrator (overview.py). Structural and house-style criteria share the structural section of overview.md Part 1 (scope = aggregate). roster = completion count (out of 29).",
+    "checks": {
+      "enc.link-density": {
+        "skill": "encyclopedia-writing",
+        "threshold": 200,
+        "params": {
+          "strip_auto": false
+        }
+      },
+      "enc.first-mention": {
+        "skill": "encyclopedia-writing",
+        "threshold": 0,
+        "params": {
+          "strip_auto": false,
+          "unit": "h3",
+          "include_preamble": false,
+          "exclude_patterns": [
+            "Details:\\s*\\[\\[[^\\]]+\\]\\]\\.?"
+          ],
+          "exempt_sections": [
+            "## Recent Changes"
+          ]
+        }
+      },
+      "cit.grade-meta": {
+        "skill": "scholarly-citation",
+        "threshold": 2
+      },
+      "cit.cite-type-meta": {
+        "skill": "scholarly-citation",
+        "threshold": 1
+      },
+      "enc.verdict-restraint": {
+        "skill": "encyclopedia-writing",
+        "threshold": 2
+      },
+      "enc.slug-alias": {
+        "skill": "encyclopedia-writing",
+        "threshold": 0,
+        "params": {
+          "min_len": 10
+        }
+      },
+      "enc.abbr-gloss": {
+        "skill": "encyclopedia-writing",
+        "threshold": 3
+      },
+      "con.numeric-density": {
+        "skill": "consulting-writing",
+        "threshold": 0,
+        "params": {
+          "max_per_para": 5
+        }
+      }
+    },
+    "bundles": {
+      "consulting-writing": {
+        "fn": "eval_overview_aggregate_mece",
+        "produces": [
+          "con.mece-clusters"
+        ]
+      },
+      "encyclopedia-writing": {
+        "fn": "evaluate_overview_aggregate",
+        "produces": [
+          "enc.summary-style",
+          "enc.coatrack"
+        ]
+      },
+      "journalism-writing": {
+        "fn": "evaluate_overview_aggregate",
+        "produces": [
+          "jrn.due-impartiality"
+        ]
+      }
+    },
+    "roster": {
+      "required": [
+        "jrn.lede",
+        "jrn.nutgraf",
+        "con.scr",
+        "enc.broken-link",
+        "struct.scope-match",
+        "con.numeric-precision",
+        "con.mece-clusters",
+        "enc.summary-style",
+        "enc.coatrack",
+        "enc.slug-alias"
+      ],
+      "optional": [
+        "jrn.explainer",
+        "jrn.inverted-pyramid",
+        "con.bold-bullet",
+        "con.so-what",
+        "enc.link-density",
+        "enc.lead-body",
+        "enc.first-mention",
+        "struct.prose-rhythm",
+        "struct.prose-min",
+        "struct.subsection-min",
+        "jrn.due-impartiality",
+        "house.repetition",
+        "con.numeric-density",
+        "enc.verdict-restraint",
+        "house.date-format",
+        "enc.abbr-gloss",
+        "house.sentence-length",
+        "cit.grade-meta",
+        "cit.cite-type-meta"
+      ]
+    }
+  },
+  "contradiction-theme": {
+    "_note": "L2-3 theme contradiction. cit.* (L2·L3·L4·G1·G2) → scholarly-citation · enc.* (N1·N2·N5·N7·W1·L1·X2) → encyclopedia-writing · jrn.* (T1·T3·T4·D1·D2·D5·D6) → journalism-writing. Structural criteria with no external craft source (N3·D4·S1·S2·S3·X1) and house-style criteria (N4·N6, recurring) are defined in the structural and house-style sections of contradiction.md (no craft ID assigned). The bundles get wiki-wide state (sources_dir) and shared parsing (claim_sources, evidence_slugs, conflict_section) injected by the orchestrator. checks = G1·G2 schema meta-use (fixed thresholds). roster = completion count (out of 28).",
+    "checks": {
+      "cit.grade-meta": {
+        "skill": "scholarly-citation",
+        "threshold": 2
+      },
+      "cit.cite-type-meta": {
+        "skill": "scholarly-citation",
+        "threshold": 1
+      }
+    },
+    "bundles": {
+      "scholarly-citation": {
+        "fn": "evaluate_contradiction_citation",
+        "produces": [
+          "cit.cite-consistency",
+          "cit.grounding",
+          "cit.anchor-evidence"
+        ]
+      },
+      "encyclopedia-writing": {
+        "fn": "evaluate_contradiction_npov",
+        "produces": [
+          "enc.link-density",
+          "enc.verdict-restraint",
+          "enc.label-neutral",
+          "enc.slug-alias",
+          "enc.back-reference",
+          "house.source-repetition",
+          "house.figure-repetition"
+        ]
+      },
+      "journalism-writing": {
+        "fn": "evaluate_contradiction_dialectic",
+        "produces": [
+          "jrn.qualifier",
+          "jrn.thesis-antithesis",
+          "jrn.c-section-size",
+          "jrn.c-stance-naming"
+        ]
+      }
+    },
+    "roster": {
+      "required": [
+        "enc.npov-asf",
+        "enc.due-weight",
+        "struct.verdict-position",
+        "jrn.toulmin-claim",
+        "jrn.rebuttal",
+        "jrn.qualifier",
+        "jrn.monitoring-balance",
+        "struct.schema-sections",
+        "struct.evidence-count",
+        "enc.broken-link",
+        "cit.cite-consistency"
+      ],
+      "optional": [
+        "house.source-repetition",
+        "enc.verdict-restraint",
+        "house.figure-repetition",
+        "enc.label-neutral",
+        "jrn.thesis-antithesis",
+        "struct.type-reflection",
+        "jrn.c-section-size",
+        "jrn.c-stance-naming",
+        "struct.lead-density",
+        "enc.link-density",
+        "struct.source-coverage",
+        "enc.back-reference",
+        "enc.slug-alias",
+        "cit.grounding",
+        "cit.anchor-evidence",
+        "cit.grade-meta",
+        "cit.cite-type-meta"
+      ]
+    }
+  },
+  "contradiction-aggregate": {
+    "_note": "L2-4 aggregate contradiction. con (D1 MECE axes) · enc (N1·N2·N5·N7·D2·D3·F1·W1) · jrn (T1·T4) · cit (G1·G2 schema meta-use). Structural criteria (N3·S1·S2·X1·F2, self-aggregated) remain in the structural section of contradiction.md. Shared parsing (insights, the analysis section, all_links, axes_named) is injected by the orchestrator. checks = G1·G2 (fixed thresholds). roster = completion count (out of 19).",
+    "checks": {
+      "cit.grade-meta": {
+        "skill": "scholarly-citation",
+        "threshold": 2
+      },
+      "cit.cite-type-meta": {
+        "skill": "scholarly-citation",
+        "threshold": 1
+      }
+    },
+    "bundles": {
+      "consulting-writing": {
+        "fn": "eval_contradiction_aggregate_mece",
+        "produces": [
+          "con.mece-axes"
+        ]
+      },
+      "encyclopedia-writing": {
+        "fn": "evaluate_contradiction_aggregate",
+        "produces": [
+          "enc.verdict-restraint",
+          "enc.label-neutral",
+          "enc.summary-style",
+          "enc.due-balance",
+          "enc.coatrack"
+        ]
+      },
+      "journalism-writing": {
+        "fn": "evaluate_contradiction_aggregate",
+        "produces": [
+          "jrn.qualifier"
+        ]
+      }
+    },
+    "roster": {
+      "required": [
+        "enc.npov-asf",
+        "enc.due-weight",
+        "struct.verdict-position",
+        "jrn.toulmin-claim",
+        "jrn.qualifier",
+        "struct.schema-sections",
+        "enc.broken-link",
+        "struct.theme-coverage",
+        "con.mece-axes",
+        "enc.summary-style",
+        "enc.coatrack",
+        "struct.headline-stats"
+      ],
+      "optional": [
+        "enc.verdict-restraint",
+        "enc.label-neutral",
+        "struct.insights-count",
+        "enc.link-density",
+        "enc.due-balance",
+        "cit.grade-meta",
+        "cit.cite-type-meta"
+      ]
+    }
+  },
+  "synthesis": {
+    "_note": "L2-3 Q-A synthesis (wiki/syntheses/<slug>.md). Craft-selection rationale (compared against the exemplar ai-coding-evolution): summary = jrn.lede · con.scr (a conclusion-first SCR for the question) · jrn.page (tension framing) · analysis section = jrn.explainer · con.bold-bullet · inline source attribution in the body = cit.grounding (a synthesis uses no typed prefixes, so cit.cite-consistency does not apply) · the per-axis `## Connections` roster = enc.connection-grouping · notation and neutrality = enc.*. Structural criteria with no external craft source (schema-sections, source-coverage, source-exists, through-line) and house-style criteria live in the structural section of synthesis.md. Automatic measurement is limited to the structural criteria + enc.slug-alias (synthesis.py); the craft criteria are manual (Desk VERIFY₂). roster = completion count.",
+    "roster": {
+      "required": [
+        "struct.schema-sections",
+        "struct.source-coverage",
+        "struct.source-exists",
+        "struct.through-line",
+        "enc.broken-link",
+        "jrn.lede",
+        "con.scr",
+        "cit.grounding"
+      ],
+      "optional": [
+        "jrn.nutgraf",
+        "jrn.page",
+        "con.so-what",
+        "jrn.explainer",
+        "jrn.inverted-pyramid",
+        "con.bold-bullet",
+        "enc.link-density",
+        "enc.slug-alias",
+        "enc.summary-style",
+        "enc.coatrack",
+        "enc.verdict-restraint",
+        "enc.connection-grouping",
+        "con.numeric-precision",
+        "con.numeric-density",
+        "house.repetition",
+        "house.date-format",
+        "house.sentence-length",
+        "cit.grade-meta",
+        "cit.cite-type-meta"
+      ]
+    }
+  },
+  "trail": {
+    "_note": "L2-3 associative trail (wiki/trails/<slug>.md). Memex trail-blazing. Craft-selection rationale (compared against the exemplar ai-coding-rapid-evolution): the per-hop commentary in `## Path` = jrn.explainer · enc.first-mention · enc.slug-alias · the through-line narrative in `## Commentary` = jrn.kicker (the closing insight — being a navigational essay, the con.scr business-document structure does not fit and is excluded) · enc.verdict-restraint. The structural criteria (schema-sections, path-links, path-length, through-line) live in the structural section of trail.md. The frontmatter carries `created` only (no last_updated/sources — accepted as is). Automatic measurement covers the structural criteria + enc.slug-alias (trail.py); the craft criteria are manual (Desk). roster = completion count.",
+    "roster": {
+      "required": [
+        "struct.schema-sections",
+        "struct.path-links",
+        "struct.through-line",
+        "enc.broken-link",
+        "enc.slug-alias"
+      ],
+      "optional": [
+        "struct.path-length",
+        "jrn.explainer",
+        "jrn.kicker",
+        "enc.first-mention",
+        "enc.link-density",
+        "enc.verdict-restraint",
+        "house.sentence-length"
+      ]
+    }
+  }
+}

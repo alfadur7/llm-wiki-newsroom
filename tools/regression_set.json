@@ -1,0 +1,27 @@
+{
+  "_note": "Held-out regression canary for guideline self-evolution — a fixed set of central, stable pages per content type. Consumed by the SoT self-evolution workflow (editor-in-chief.md step 6) acceptance rule: a guideline change is adopted only if this set's lint and Desk scores do not regress before vs. after. Human-curated; no automatic Claude edits — never used as a revision target so the proposer cannot game the comparison set (held-out). Paths are relative to wiki/.",
+  "overview": [
+    "overviews/llm-foundation.md",
+    "overviews/bank-it-digital.md"
+  ],
+  "contradiction": [
+    "contradictions/ai-coding-productivity-debate.md",
+    "contradictions/agentic-ai-saas-debate.md"
+  ],
+  "hub": [
+    "entities/AWS.md",
+    "concepts/AGI.md"
+  ],
+  "timeline": [
+    "timelines/Anthropic.md"
+  ],
+  "synthesis": [
+    "syntheses/ai-coding-evolution-developer-productivity.md"
+  ],
+  "trail": [
+    "trails/ai-coding-rapid-evolution.md"
+  ],
+  "source": [
+    "sources/33-year-financial-it-veteran.md"
+  ]
+}

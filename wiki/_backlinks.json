@@ -1,0 +1,332 @@
+{
+  "OpenSourceInitiative": [
+    {
+      "from": "sources/case-against-osaid.md",
+      "title": "The Case Against OSI's Open Source AI Definition"
+    },
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "title": "Celebrating an Important Step Forward for Open Source AI (Mozilla)"
+    },
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "title": "The Open Source AI Definition 1.0"
+    },
+    {
+      "from": "entities/FreeSoftwareFoundation.md",
+      "title": "Free Software Foundation"
+    },
+    {
+      "from": "entities/Meta.md",
+      "title": "Meta"
+    },
+    {
+      "from": "entities/Mozilla.md",
+      "title": "Mozilla"
+    },
+    {
+      "from": "concepts/ModelLicensing.md",
+      "title": "Model Licensing"
+    },
+    {
+      "from": "concepts/OpenSourceAI.md",
+      "title": "Open Source AI"
+    },
+    {
+      "from": "concepts/OpenWashing.md",
+      "title": "Open-Washing"
+    },
+    {
+      "from": "concepts/TrainingData.md",
+      "title": "Training Data"
+    }
+  ],
+  "FreeSoftwareFoundation": [
+    {
+      "from": "sources/case-against-osaid.md",
+      "title": "The Case Against OSI's Open Source AI Definition"
+    },
+    {
+      "from": "entities/OpenSourceInitiative.md",
+      "title": "Open Source Initiative"
+    },
+    {
+      "from": "concepts/TrainingData.md",
+      "title": "Training Data"
+    }
+  ],
+  "TrainingData": [
+    {
+      "from": "sources/case-against-osaid.md",
+      "title": "The Case Against OSI's Open Source AI Definition"
+    },
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "title": "Celebrating an Important Step Forward for Open Source AI (Mozilla)"
+    },
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "title": "The Open Source AI Definition 1.0"
+    },
+    {
+      "from": "entities/FreeSoftwareFoundation.md",
+      "title": "Free Software Foundation"
+    },
+    {
+      "from": "entities/Mozilla.md",
+      "title": "Mozilla"
+    },
+    {
+      "from": "entities/OpenSourceInitiative.md",
+      "title": "Open Source Initiative"
+    },
+    {
+      "from": "concepts/FineTuning.md",
+      "title": "Fine-Tuning"
+    },
+    {
+      "from": "concepts/OpenSourceAI.md",
+      "title": "Open Source AI"
+    },
+    {
+      "from": "concepts/OpenWeights.md",
+      "title": "Open Weights"
+    }
+  ],
+  "OpenSourceAI": [
+    {
+      "from": "sources/case-against-osaid.md",
+      "title": "The Case Against OSI's Open Source AI Definition"
+    },
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "title": "Celebrating an Important Step Forward for Open Source AI (Mozilla)"
+    },
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "title": "The Open Source AI Definition 1.0"
+    },
+    {
+      "from": "entities/DeepSeek.md",
+      "title": "DeepSeek"
+    },
+    {
+      "from": "entities/FreeSoftwareFoundation.md",
+      "title": "Free Software Foundation"
+    },
+    {
+      "from": "entities/Meta.md",
+      "title": "Meta"
+    },
+    {
+      "from": "entities/Mozilla.md",
+      "title": "Mozilla"
+    },
+    {
+      "from": "entities/OpenSourceInitiative.md",
+      "title": "Open Source Initiative"
+    },
+    {
+      "from": "concepts/FineTuning.md",
+      "title": "Fine-Tuning"
+    },
+    {
+      "from": "concepts/ModelLicensing.md",
+      "title": "Model Licensing"
+    },
+    {
+      "from": "concepts/OpenWashing.md",
+      "title": "Open-Washing"
+    },
+    {
+      "from": "concepts/OpenWeights.md",
+      "title": "Open Weights"
+    },
+    {
+      "from": "concepts/TrainingData.md",
+      "title": "Training Data"
+    }
+  ],
+  "OpenWashing": [
+    {
+      "from": "sources/case-against-osaid.md",
+      "title": "The Case Against OSI's Open Source AI Definition"
+    },
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "title": "Celebrating an Important Step Forward for Open Source AI (Mozilla)"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "title": "The Open Source AI Definition 1.0"
+    },
+    {
+      "from": "entities/Meta.md",
+      "title": "Meta"
+    },
+    {
+      "from": "entities/Mozilla.md",
+      "title": "Mozilla"
+    },
+    {
+      "from": "entities/OpenSourceInitiative.md",
+      "title": "Open Source Initiative"
+    },
+    {
+      "from": "concepts/ModelLicensing.md",
+      "title": "Model Licensing"
+    },
+    {
+      "from": "concepts/OpenSourceAI.md",
+      "title": "Open Source AI"
+    },
+    {
+      "from": "concepts/TrainingData.md",
+      "title": "Training Data"
+    }
+  ],
+  "ModelLicensing": [
+    {
+      "from": "sources/case-against-osaid.md",
+      "title": "The Case Against OSI's Open Source AI Definition"
+    },
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "title": "The Open Source AI Definition 1.0"
+    },
+    {
+      "from": "entities/DeepSeek.md",
+      "title": "DeepSeek"
+    },
+    {
+      "from": "entities/Meta.md",
+      "title": "Meta"
+    },
+    {
+      "from": "concepts/FineTuning.md",
+      "title": "Fine-Tuning"
+    },
+    {
+      "from": "concepts/OpenSourceAI.md",
+      "title": "Open Source AI"
+    },
+    {
+      "from": "concepts/OpenWashing.md",
+      "title": "Open-Washing"
+    },
+    {
+      "from": "concepts/OpenWeights.md",
+      "title": "Open Weights"
+    }
+  ],
+  "Mozilla": [
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "title": "Celebrating an Important Step Forward for Open Source AI (Mozilla)"
+    },
+    {
+      "from": "entities/OpenSourceInitiative.md",
+      "title": "Open Source Initiative"
+    }
+  ],
+  "Meta": [
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "title": "Celebrating an Important Step Forward for Open Source AI (Mozilla)"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "title": "The Open Source AI Definition 1.0"
+    },
+    {
+      "from": "entities/OpenSourceInitiative.md",
+      "title": "Open Source Initiative"
+    },
+    {
+      "from": "concepts/ModelLicensing.md",
+      "title": "Model Licensing"
+    },
+    {
+      "from": "concepts/OpenWashing.md",
+      "title": "Open-Washing"
+    }
+  ],
+  "OpenWeights": [
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "title": "The Open Source AI Definition 1.0"
+    },
+    {
+      "from": "entities/DeepSeek.md",
+      "title": "DeepSeek"
+    },
+    {
+      "from": "entities/Meta.md",
+      "title": "Meta"
+    },
+    {
+      "from": "concepts/FineTuning.md",
+      "title": "Fine-Tuning"
+    },
+    {
+      "from": "concepts/ModelLicensing.md",
+      "title": "Model Licensing"
+    },
+    {
+      "from": "concepts/OpenSourceAI.md",
+      "title": "Open Source AI"
+    },
+    {
+      "from": "concepts/OpenWashing.md",
+      "title": "Open-Washing"
+    },
+    {
+      "from": "concepts/TrainingData.md",
+      "title": "Training Data"
+    }
+  ],
+  "FineTuning": [
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
+    },
+    {
+      "from": "entities/DeepSeek.md",
+      "title": "DeepSeek"
+    },
+    {
+      "from": "concepts/OpenWeights.md",
+      "title": "Open Weights"
+    }
+  ],
+  "DeepSeek": [
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
+    },
+    {
+      "from": "concepts/OpenWeights.md",
+      "title": "Open Weights"
+    }
+  ]
+}

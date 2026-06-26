@@ -1,0 +1,118 @@
+{
+  "skill": "scholarly-citation",
+  "_note": "Single SoT for verifiable-attribution craft criteria (cit.*). legacy = old content-type-local IDs. The measurement function is given by each `algorithm` field — source G/C/A use `evaluate_citation`; contradiction synthesis integrity (L2·L3·L4) uses `evaluate_contradiction_citation`; schema meta (G1·G2) use `count_grade_meta`·`count_cite_type_meta`. Wiki-global state (page_index·section title·claim_sources·EDITOR region) is orchestrator-injected. All judge=A (deterministic). Any Korean literals are the wiki's actual schema markers and section headers (several matchers key on Korean schema markers — see checks.py FLAGs).",
+  "criteria": {
+    "cit.grade-marker": {
+      "name": "Grade marker present", "dimension": "Claim atomization", "judge": "A",
+      "algorithm": "evaluate_citation", "comparator": "==", "default_threshold": "claim_total",
+      "legacy": {"source": "G1"},
+      "source": "Elicit·scite citation classification", "source_url": "https://scite.ai/",
+      "note": "Every line of ## Key Claims carries one of [fact]·[analysis]·[forecast]."
+    },
+    "cit.claimant-link": {
+      "name": "Claimant wikilink", "dimension": "Attribution", "judge": "A",
+      "algorithm": "evaluate_citation", "comparator": "==", "default_threshold": "claim_total",
+      "legacy": {"source": "G2"},
+      "source": "Wikipedia:ASF", "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Attribution",
+      "note": "A [[claimant]] wikilink right after the grade marker is mandatory — no plain-text subject."
+    },
+    "cit.atomic": {
+      "name": "Atomic enforcement (multi-hub juxtaposition)", "dimension": "Claim atomization", "judge": "A",
+      "algorithm": "evaluate_citation", "comparator": "==", "default_threshold": 0,
+      "legacy": {"source": "G3"},
+      "source": "Toulmin argument model", "source_url": "https://owl.purdue.edu/owl/general_writing/academic_writing/historical_perspectives_on_argumentation/toulmin_argument.html",
+      "note": "No two subjects' claims on one line (Korean 와/및 'and' conjunction + two [[hub]]). NOTE the matcher (G3_COMPOSITE_RE) keys on the Korean conjunction and is dormant on English prose — see checks.py FLAG."
+    },
+    "cit.claimant-valid": {
+      "name": "Claimant validity", "dimension": "Attribution", "judge": "A",
+      "algorithm": "evaluate_citation", "comparator": "==", "default_threshold": "claimant_total",
+      "legacy": {"source": "G4"},
+      "source": "Internal standard (broken-link prevention)", "source_url": "",
+      "note": "The claimant wikilink target exists as a real page (page_index injected)."
+    },
+    "cit.composite-split": {
+      "name": "Composite split (verb-phrase)", "dimension": "Claim atomization", "judge": "A",
+      "algorithm": "evaluate_citation", "comparator": "==", "default_threshold": 0,
+      "legacy": {"source": "G5"},
+      "source": "Toulmin argument model", "source_url": "https://owl.purdue.edu/owl/general_writing/academic_writing/historical_perspectives_on_argumentation/toulmin_argument.html",
+      "note": "No '~했고, ~했다' (Korean '…did, and …did') verb-phrase juxtaposition on one line. NOTE the matcher (G5_VERB_SPLIT_RE) keys on Korean verb endings and is dormant on English prose — see checks.py FLAG."
+    },
+    "cit.cite-type": {
+      "name": "Type prefix present", "dimension": "Citation type", "judge": "A",
+      "algorithm": "evaluate_citation", "comparator": "==", "default_threshold": "connect_total",
+      "legacy": {"source": "C1"},
+      "source": "scite Smart Citations", "source_url": "https://scite.ai/",
+      "note": "Every line of ## Connections starts with a cites:·references:·contradicts:·defines: prefix."
+    },
+    "cit.cite-distribution": {
+      "name": "Type distribution sanity", "dimension": "Citation type", "judge": "A",
+      "algorithm": "evaluate_citation", "comparator": "<=", "default_threshold": 0.95,
+      "legacy": {"source": "C2"},
+      "source": "scite Smart Citations", "source_url": "https://scite.ai/",
+      "note": "references ratio ≥95% → advisory (default-safe avoidance). <5 lines exempt."
+    },
+    "cit.cite-type-hub": {
+      "name": "Type-hub consistency", "dimension": "Citation type", "judge": "A",
+      "algorithm": "evaluate_citation", "comparator": "==", "default_threshold": 0,
+      "legacy": {"source": "C3"},
+      "source": "Internal standard (decision-tree consistency)", "source_url": "",
+      "note": "After defines: only a concept hub (an entity hub = misclassification)."
+    },
+    "cit.anchor": {
+      "name": "Evidence anchor — source claim line (advisory)", "dimension": "Anchor", "judge": "A",
+      "algorithm": "evaluate_citation", "comparator": "advisory", "default_threshold": null,
+      "legacy": {"source": "A1"},
+      "source": "Project Xanadu citation anchoring(Nelson 1965)·Hyper-G(Maurer 1996)", "source_url": "https://en.wikipedia.org/wiki/Project_Xanadu",
+      "note": "[[slug#section]] anchor on [fact]·[analysis] lines. 0% also PASS (advisory)."
+    },
+    "cit.speaker-link": {
+      "name": "Quote speaker wikilink", "dimension": "Anchor", "judge": "A",
+      "algorithm": "evaluate_citation", "comparator": "==", "default_threshold": "quote_total",
+      "legacy": {"source": "A2"},
+      "source": "APA in-text citation", "source_url": "https://apastyle.apa.org/style-grammar-guidelines/citations/basic-principles",
+      "note": "A ## Key Quotes blockquote carries — ...[[wikilink]] attribution. Section absence exempt."
+    },
+    "cit.anchor-valid": {
+      "name": "Anchor validity", "dimension": "Anchor", "judge": "A",
+      "algorithm": "evaluate_citation", "comparator": "==", "default_threshold": "anchor_total",
+      "legacy": {"source": "A3"},
+      "source": "Internal standard (broken-link prevention)", "source_url": "",
+      "note": "The [[slug#section]] anchor's slug and section both exist (page_index·section title injected)."
+    },
+    "cit.cite-consistency": {
+      "name": "Cite consistency (body ⊆ frontmatter)", "dimension": "Synthesis citation", "judge": "A",
+      "algorithm": "evaluate_contradiction_citation", "comparator": "==", "default_threshold": 0,
+      "legacy": {"contradiction-theme": "L2"},
+      "source": "Internal standard (Select→Read→Cite consistency)", "source_url": "",
+      "note": "Every claim source cited in the body is registered in frontmatter sources: (body ⊆ frontmatter, 0 omissions). claim_sources orchestrator-injected."
+    },
+    "cit.grounding": {
+      "name": "Evidence grounding (read discipline)", "dimension": "Synthesis citation", "judge": "A",
+      "algorithm": "evaluate_contradiction_citation", "comparator": ">=", "default_threshold": 1,
+      "legacy": {"contradiction-theme": "L3"},
+      "source": "Internal standard (objective verification of read discipline)", "source_url": "",
+      "note": "A representative-evidence source's key-quote/key-claim item appears in the body as a substring (grounded≥1 when total≥1). evidence_slugs·sources_dir orchestrator-injected."
+    },
+    "cit.anchor-evidence": {
+      "name": "Evidence anchor — synthesis representative evidence (advisory)", "dimension": "Synthesis citation", "judge": "A",
+      "algorithm": "evaluate_contradiction_citation", "comparator": "advisory", "default_threshold": null,
+      "legacy": {"contradiction-theme": "L4"},
+      "source": "Project Xanadu citation anchoring(Nelson 1965)", "source_url": "https://en.wikipedia.org/wiki/Project_Xanadu",
+      "note": "A representative-evidence citation bullet anchors its source wikilink to a source section such as #Key Quotes. 0% also PASS (advisory·migration). NOTE the allowed-section set is Korean (주요 인용/주요 주장/요약) — see checks.py FLAG."
+    },
+    "cit.grade-meta": {
+      "name": "Evidence-grade meta-use", "dimension": "Schema meta-use", "judge": "A",
+      "algorithm": "count_grade_meta", "comparator": ">=", "default_threshold": 2,
+      "legacy": {"overview-cluster": "G1", "overview-aggregate": "G1", "contradiction-theme": "G1", "contradiction-aggregate": "G1"},
+      "source": "scite Smart Citations", "source_url": "https://scite.ai/",
+      "note": "The synthesis page's EDITOR body reflects sources' evidence grade (fact/analysis/forecast)·attribution strength as meta (≥2 advisory). content = AUTO-block-excluded EDITOR region, orchestrator-injected. NOTE the meta-phrase patterns (GRADE_META_PATTERNS) are largely Korean — see checks.py FLAG."
+    },
+    "cit.cite-type-meta": {
+      "name": "Citation-type meta-use", "dimension": "Schema meta-use", "judge": "A",
+      "algorithm": "count_cite_type_meta", "comparator": ">=", "default_threshold": 1,
+      "legacy": {"overview-cluster": "G2", "overview-aggregate": "G2", "contradiction-theme": "G2", "contradiction-aggregate": "G2"},
+      "source": "scite Smart Citations", "source_url": "https://scite.ai/",
+      "note": "The synthesis page's EDITOR body reflects cites/references/contradicts/defines meaning distinction as meta (≥1 advisory)."
+    }
+  }
+}

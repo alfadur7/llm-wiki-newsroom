@@ -1,0 +1,13 @@
+networkx>=3.2
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+# Leiden community detection (tools/_build/clusters.py) — igraph + leidenalg.
+# Without these, the `build clusters` stage fails with ImportError (easy to miss
+# locally if they happen to be installed already).
+igraph>=0.11
+leidenalg>=0.10
+# Weekly briefing email rendering (tools/_briefing/render.py) — markdown → HTML.
+# smtplib/email are in the standard library, so no extra dependency is needed.
+mistune>=3.0
+# Regression tests (tests/) — `python -m pytest tests/`.
+pytest>=8.0

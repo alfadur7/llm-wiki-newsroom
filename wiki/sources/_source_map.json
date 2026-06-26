@@ -1,0 +1,14 @@
+{
+  "by_url": {
+    "https://thenewstack.io/the-case-against-osis-open-source-ai-definition/": "case-against-osaid",
+    "https://blog.mozilla.org/en/mozilla/ai/open-source-ai-definition/": "mozilla-celebrates-osaid",
+    "https://www.hunton.com/insights/publications/part-1-open-source-ai-models-how-open-are-they-really": "open-source-ai-models-how-open",
+    "https://opensource.org/ai": "osi-open-source-ai-definition"
+  },
+  "by_path": {
+    "raw/NewsScrap/The Case Against OSI's Open Source AI Definition.md": "case-against-osaid",
+    "raw/NewsScrap/Celebrating An Important Step Forward For Open Source AI The Mozilla Blog.md": "mozilla-celebrates-osaid",
+    "raw/NewsScrap/Part 1 – Open Source AI Models How Open Are They Really.md": "open-source-ai-models-how-open",
+    "raw/NewsScrap/Open Source AI.md": "osi-open-source-ai-definition"
+  }
+}

@@ -1,0 +1,691 @@
+{
+  "nodes": [
+    {
+      "id": "concepts/FineTuning.md",
+      "label": "Fine-Tuning",
+      "type": "concept"
+    },
+    {
+      "id": "concepts/ModelLicensing.md",
+      "label": "Model Licensing",
+      "type": "concept"
+    },
+    {
+      "id": "concepts/OpenSourceAI.md",
+      "label": "Open Source AI",
+      "type": "concept"
+    },
+    {
+      "id": "concepts/OpenWashing.md",
+      "label": "Open-Washing",
+      "type": "concept"
+    },
+    {
+      "id": "concepts/OpenWeights.md",
+      "label": "Open Weights",
+      "type": "concept"
+    },
+    {
+      "id": "concepts/TrainingData.md",
+      "label": "Training Data",
+      "type": "concept"
+    },
+    {
+      "id": "entities/DeepSeek.md",
+      "label": "DeepSeek",
+      "type": "entity"
+    },
+    {
+      "id": "entities/FreeSoftwareFoundation.md",
+      "label": "Free Software Foundation",
+      "type": "entity"
+    },
+    {
+      "id": "entities/Meta.md",
+      "label": "Meta",
+      "type": "entity"
+    },
+    {
+      "id": "entities/Mozilla.md",
+      "label": "Mozilla",
+      "type": "entity"
+    },
+    {
+      "id": "entities/OpenSourceInitiative.md",
+      "label": "Open Source Initiative",
+      "type": "entity"
+    },
+    {
+      "id": "sources/case-against-osaid.md",
+      "label": "The Case Against OSI's Open Source AI Definition",
+      "type": "source"
+    },
+    {
+      "id": "sources/mozilla-celebrates-osaid.md",
+      "label": "Celebrating an Important Step Forward for Open Source AI (Mozilla)",
+      "type": "source"
+    },
+    {
+      "id": "sources/open-source-ai-models-how-open.md",
+      "label": "Open Source AI Models: How Open Are They Really? (Part 1)",
+      "type": "source"
+    },
+    {
+      "id": "sources/osi-open-source-ai-definition.md",
+      "label": "The Open Source AI Definition 1.0",
+      "type": "source"
+    }
+  ],
+  "edges": [
+    {
+      "from": "concepts/FineTuning.md",
+      "to": "concepts/OpenWeights.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the release model that makes fine-tuning practical"
+    },
+    {
+      "from": "concepts/FineTuning.md",
+      "to": "concepts/ModelLicensing.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "license terms govern whether fine-tuned derivatives may be shared"
+    },
+    {
+      "from": "concepts/FineTuning.md",
+      "to": "concepts/TrainingData.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "fine-tuning adds data without access to the original corpus"
+    },
+    {
+      "from": "concepts/FineTuning.md",
+      "to": "concepts/OpenSourceAI.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "fine-tuning is one of the four freedoms (modify)"
+    },
+    {
+      "from": "concepts/ModelLicensing.md",
+      "to": "concepts/OpenSourceAI.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "licensing is one component the OSAID evaluates"
+    },
+    {
+      "from": "concepts/ModelLicensing.md",
+      "to": "concepts/OpenWeights.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "a licensing posture that releases weights but not data"
+    },
+    {
+      "from": "concepts/ModelLicensing.md",
+      "to": "concepts/OpenWashing.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "restrictive license terms enable open-washing"
+    },
+    {
+      "from": "concepts/ModelLicensing.md",
+      "to": "entities/OpenSourceInitiative.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the body that judges license compatibility"
+    },
+    {
+      "from": "concepts/ModelLicensing.md",
+      "to": "entities/Meta.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "issuer of the contested Llama community license"
+    },
+    {
+      "from": "concepts/OpenSourceAI.md",
+      "to": "entities/OpenSourceInitiative.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "author and steward of the OSAID"
+    },
+    {
+      "from": "concepts/OpenSourceAI.md",
+      "to": "concepts/OpenWeights.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "the partial-release middle ground the definition does not accept as fully open"
+    },
+    {
+      "from": "concepts/OpenSourceAI.md",
+      "to": "concepts/OpenWashing.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the mislabeling practice the definition aims to constrain"
+    },
+    {
+      "from": "concepts/OpenSourceAI.md",
+      "to": "concepts/TrainingData.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "the most contested component of the definition"
+    },
+    {
+      "from": "concepts/OpenSourceAI.md",
+      "to": "concepts/ModelLicensing.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "the broader licensing context the definition sits within"
+    },
+    {
+      "from": "concepts/OpenWashing.md",
+      "to": "concepts/OpenSourceAI.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the definition positioned as a remedy for open-washing"
+    },
+    {
+      "from": "concepts/OpenWashing.md",
+      "to": "entities/OpenSourceInitiative.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the body that frames open-washing as the problem to solve"
+    },
+    {
+      "from": "concepts/OpenWashing.md",
+      "to": "entities/Meta.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "whose Llama license is the most-cited open-washing example"
+    },
+    {
+      "from": "concepts/OpenWashing.md",
+      "to": "concepts/ModelLicensing.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "restrictive license terms are the mechanism of open-washing"
+    },
+    {
+      "from": "concepts/OpenWashing.md",
+      "to": "concepts/OpenWeights.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "a partial-release posture sometimes labeled open source"
+    },
+    {
+      "from": "concepts/OpenWeights.md",
+      "to": "concepts/OpenSourceAI.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the stricter standard open weights does not meet"
+    },
+    {
+      "from": "concepts/OpenWeights.md",
+      "to": "concepts/ModelLicensing.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "open weights is a licensing posture distinct from open source"
+    },
+    {
+      "from": "concepts/OpenWeights.md",
+      "to": "concepts/FineTuning.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the primary capability an open-weights release enables"
+    },
+    {
+      "from": "concepts/OpenWeights.md",
+      "to": "concepts/TrainingData.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "the component an open-weights release withholds"
+    },
+    {
+      "from": "concepts/OpenWeights.md",
+      "to": "entities/DeepSeek.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "a prominent open-weights model release"
+    },
+    {
+      "from": "concepts/TrainingData.md",
+      "to": "concepts/OpenSourceAI.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "training data is the OSAID's most contested component"
+    },
+    {
+      "from": "concepts/TrainingData.md",
+      "to": "concepts/OpenWeights.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "open-weights releases withhold training data entirely"
+    },
+    {
+      "from": "concepts/TrainingData.md",
+      "to": "entities/FreeSoftwareFoundation.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "argues raw training data must be released"
+    },
+    {
+      "from": "concepts/TrainingData.md",
+      "to": "entities/OpenSourceInitiative.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "requires data information rather than full data"
+    },
+    {
+      "from": "concepts/TrainingData.md",
+      "to": "concepts/OpenWashing.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "opaque training data is central to open-washing concerns"
+    },
+    {
+      "from": "entities/DeepSeek.md",
+      "to": "concepts/OpenWeights.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the release category R1 exemplifies"
+    },
+    {
+      "from": "entities/DeepSeek.md",
+      "to": "concepts/ModelLicensing.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "R1's MIT-licensed weights"
+    },
+    {
+      "from": "entities/DeepSeek.md",
+      "to": "concepts/FineTuning.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "enabled by the public weights"
+    },
+    {
+      "from": "entities/DeepSeek.md",
+      "to": "concepts/OpenSourceAI.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the stricter standard R1 does not fully meet"
+    },
+    {
+      "from": "entities/FreeSoftwareFoundation.md",
+      "to": "concepts/TrainingData.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the FSF insists raw training data must be released"
+    },
+    {
+      "from": "entities/FreeSoftwareFoundation.md",
+      "to": "entities/OpenSourceInitiative.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the body whose OSAID the FSF rejects as too weak"
+    },
+    {
+      "from": "entities/FreeSoftwareFoundation.md",
+      "to": "concepts/OpenSourceAI.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the definition the FSF is building a stricter alternative to"
+    },
+    {
+      "from": "entities/Meta.md",
+      "to": "concepts/OpenWashing.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "Llama is the canonical open-washing example"
+    },
+    {
+      "from": "entities/Meta.md",
+      "to": "concepts/OpenWeights.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the release model Llama actually fits"
+    },
+    {
+      "from": "entities/Meta.md",
+      "to": "concepts/ModelLicensing.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "Llama's community license is the point of contention"
+    },
+    {
+      "from": "entities/Meta.md",
+      "to": "entities/OpenSourceInitiative.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "judged Llama non-compliant with the OSAID"
+    },
+    {
+      "from": "entities/Meta.md",
+      "to": "concepts/OpenSourceAI.md",
+      "type": "EXTRACTED",
+      "relation": "defines"
+    },
+    {
+      "from": "entities/Mozilla.md",
+      "to": "entities/OpenSourceInitiative.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the body whose definition Mozilla endorses"
+    },
+    {
+      "from": "entities/Mozilla.md",
+      "to": "concepts/OpenSourceAI.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "the definition Mozilla champions"
+    },
+    {
+      "from": "entities/Mozilla.md",
+      "to": "concepts/OpenWashing.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the practice Mozilla says the definition helps combat"
+    },
+    {
+      "from": "entities/Mozilla.md",
+      "to": "concepts/TrainingData.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the area Mozilla concedes needs refinement"
+    },
+    {
+      "from": "entities/OpenSourceInitiative.md",
+      "to": "concepts/TrainingData.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "including from OSI co-founder Bruce Perens — and was approved by OSI's 10-person"
+    },
+    {
+      "from": "entities/OpenSourceInitiative.md",
+      "to": "concepts/OpenSourceAI.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "the definition OSI authored"
+    },
+    {
+      "from": "entities/OpenSourceInitiative.md",
+      "to": "concepts/OpenWashing.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "the practice OSI frames the definition as countering"
+    },
+    {
+      "from": "entities/OpenSourceInitiative.md",
+      "to": "entities/Mozilla.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "a prominent endorser of the OSAID"
+    },
+    {
+      "from": "entities/OpenSourceInitiative.md",
+      "to": "entities/FreeSoftwareFoundation.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "a critic developing a stricter alternative"
+    },
+    {
+      "from": "entities/OpenSourceInitiative.md",
+      "to": "entities/Meta.md",
+      "type": "EXTRACTED",
+      "relation": "defines"
+    },
+    {
+      "from": "sources/case-against-osaid.md",
+      "to": "entities/OpenSourceInitiative.md",
+      "type": "EXTRACTED",
+      "relation": "cites",
+      "label": "approved the OSAID through its 10-person board rather than a full membership vot",
+      "evidence_grade": "fact"
+    },
+    {
+      "from": "sources/case-against-osaid.md",
+      "to": "entities/FreeSoftwareFoundation.md",
+      "type": "EXTRACTED",
+      "relation": "cites",
+      "label": "holds that a machine-learning application is not free unless its [[TrainingData]",
+      "evidence_grade": "analysis"
+    },
+    {
+      "from": "sources/case-against-osaid.md",
+      "to": "concepts/OpenSourceAI.md",
+      "type": "EXTRACTED",
+      "relation": "contradicts",
+      "label": "argues the OSAID dilutes the open-source brand and is \"less than Open Source\"",
+      "evidence_grade": "analysis"
+    },
+    {
+      "from": "sources/case-against-osaid.md",
+      "to": "concepts/TrainingData.md",
+      "type": "EXTRACTED",
+      "relation": "cites",
+      "label": "the omission at the heart of the criticism",
+      "evidence_grade": "analysis"
+    },
+    {
+      "from": "sources/case-against-osaid.md",
+      "to": "concepts/OpenWashing.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "critics fear the definition enables open-washed models"
+    },
+    {
+      "from": "sources/case-against-osaid.md",
+      "to": "concepts/ModelLicensing.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "the dispute is over what licensing terms count as open"
+    },
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "to": "entities/Mozilla.md",
+      "type": "EXTRACTED",
+      "relation": "cites",
+      "label": "endorses the [[OpenSourceInitiative]]'s Open Source AI Definition as \"an importa",
+      "evidence_grade": "fact"
+    },
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "to": "concepts/OpenSourceAI.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "the definition Mozilla endorses"
+    },
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "to": "entities/OpenSourceInitiative.md",
+      "type": "EXTRACTED",
+      "relation": "cites",
+      "label": "author of the definition",
+      "evidence_grade": "fact"
+    },
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "to": "concepts/OpenWashing.md",
+      "type": "EXTRACTED",
+      "relation": "cites",
+      "label": "the practice Mozilla says the definition helps combat",
+      "evidence_grade": "analysis"
+    },
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "to": "entities/Meta.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "Llama 3 cited as an \"open-ish\" example"
+    },
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "to": "concepts/TrainingData.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "the area Mozilla concedes needs refinement"
+    },
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "to": "entities/OpenSourceInitiative.md",
+      "type": "EXTRACTED",
+      "relation": "cites",
+      "label": "released the OSAID in October 2024, requiring data information, code, and parame",
+      "evidence_grade": "fact"
+    },
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "to": "concepts/OpenWeights.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "releases weights and parameters for [[FineTuning]] but typically withholds train",
+      "evidence_grade": "analysis"
+    },
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "to": "entities/DeepSeek.md",
+      "type": "EXTRACTED",
+      "relation": "cites",
+      "label": "R1 (January 2025, MIT-licensed weights) is an open-weights release because the w",
+      "evidence_grade": "analysis"
+    },
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "to": "concepts/OpenSourceAI.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "the stricter standard contrasted with open weights"
+    },
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "to": "concepts/FineTuning.md",
+      "type": "EXTRACTED",
+      "relation": "cites",
+      "label": "the capability open weights enables",
+      "evidence_grade": "analysis"
+    },
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "to": "concepts/TrainingData.md",
+      "type": "EXTRACTED",
+      "relation": "cites",
+      "label": "the component open weights withholds",
+      "evidence_grade": "analysis"
+    },
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "to": "concepts/ModelLicensing.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "permissive vs copyleft licensing context"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "to": "entities/OpenSourceInitiative.md",
+      "type": "EXTRACTED",
+      "relation": "cites",
+      "label": "defines an [[OpenSourceAI]] system by four freedoms (use, study, modify, share) ",
+      "evidence_grade": "fact"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "to": "concepts/OpenSourceAI.md",
+      "type": "EXTRACTED",
+      "relation": "defines",
+      "label": "this page is the canonical statement of the definition",
+      "evidence_grade": "fact"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "to": "concepts/OpenWeights.md",
+      "type": "EXTRACTED",
+      "relation": "cites",
+      "label": "distinguished as a separate, non-compliant category",
+      "evidence_grade": "analysis"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "to": "concepts/OpenWashing.md",
+      "type": "EXTRACTED",
+      "relation": "cites",
+      "label": "named as a motivation for the definition",
+      "evidence_grade": "analysis"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "to": "entities/Meta.md",
+      "type": "EXTRACTED",
+      "relation": "cites",
+      "label": "Llama 2 listed as non-compliant",
+      "evidence_grade": "fact"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "to": "concepts/TrainingData.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "data information is a required component"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "to": "concepts/ModelLicensing.md",
+      "type": "EXTRACTED",
+      "relation": "references",
+      "label": "compliance is judged on legal terms"
+    },
+    {
+      "from": "sources/case-against-osaid.md",
+      "to": "sources/osi-open-source-ai-definition.md",
+      "type": "INFERRED",
+      "confidence": 1.0,
+      "shared": [
+        "concepts/ModelLicensing.md",
+        "concepts/OpenSourceAI.md",
+        "concepts/OpenWashing.md",
+        "concepts/TrainingData.md",
+        "entities/OpenSourceInitiative.md"
+      ]
+    },
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "to": "sources/osi-open-source-ai-definition.md",
+      "type": "INFERRED",
+      "confidence": 1.0,
+      "shared": [
+        "concepts/OpenSourceAI.md",
+        "concepts/OpenWashing.md",
+        "concepts/TrainingData.md",
+        "entities/Meta.md",
+        "entities/OpenSourceInitiative.md"
+      ]
+    },
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "to": "sources/osi-open-source-ai-definition.md",
+      "type": "INFERRED",
+      "confidence": 1.0,
+      "shared": [
+        "concepts/ModelLicensing.md",
+        "concepts/OpenSourceAI.md",
+        "concepts/OpenWeights.md",
+        "concepts/TrainingData.md",
+        "entities/OpenSourceInitiative.md"
+      ]
+    }
+  ],
+  "stats": {
+    "node_count": 15,
+    "edge_count": 80,
+    "extracted_edges": 77,
+    "inferred_edges": 3,
+    "relations": {
+      "defines": 34,
+      "references": 28,
+      "cites": 14,
+      "contradicts": 1
+    },
+    "types": {
+      "concept": 6,
+      "entity": 5,
+      "source": 4
+    }
+  }
+}

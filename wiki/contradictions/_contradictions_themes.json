@@ -1,0 +1,17 @@
+{
+  "derived_at": "2026-06-26",
+  "derived_by": "claude",
+  "phase": 2,
+  "source_count": 1,
+  "themes": {
+    "open-training-data-requirement": {
+      "name": "OSAID Definition vs Open Training-Data Requirement",
+      "claim_ids": ["ba777b4a"]
+    },
+    "other-fragmentary": {
+      "name": "Residual Fragmentary Issues",
+      "claim_ids": []
+    }
+  },
+  "unassigned": []
+}

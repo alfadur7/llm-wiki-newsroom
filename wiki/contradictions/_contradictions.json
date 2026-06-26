@@ -1,0 +1,11 @@
+[
+  {
+    "id": "ba777b4a",
+    "source": "sources/case-against-osaid.md",
+    "claim": "[[OpenSourceAI]] — argues the OSAID dilutes the open-source brand and is \"less than Open Source\"",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.22
+  }
+]

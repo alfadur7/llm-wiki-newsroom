@@ -1,0 +1,2723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Wiki Knowledge Graph — Sigma v3 (Phase 2)</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; width: 100%; overflow: hidden; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0a; color: #e0e0e0; }
+#container { display: flex; height: 100vh; }
+#sidebar { width: 255px; background: #141414; border-right: 1px solid #333; padding: 16px; overflow-y: auto; flex-shrink: 0; }
+#graph-wrap { flex: 1; position: relative; background: #0a0a0a; }
+#sigma-container { position: absolute; inset: 0; background: transparent; z-index: 1; }
+/* Two overlay canvases with OPPOSITE z-order needs — split because one canvas
+   can't satisfy both (Sigma is a single WebGL layer, can't interleave between
+   its edges and labels):
+   • #hull-overlay (BELOW Sigma, z:0) — the trail/timeline path connector. Must
+     sit under Sigma's labels/nodes so the dense connector passes behind node
+     dots and under label text (fixes the 94-node timeline connector overdrawing
+     labels, 2026-06-17). Sigma's WebGL canvas is transparent (dark comes from
+     #graph-wrap's background) so this underlay shows through the gaps.
+   • #hull-overlay-top (ABOVE Sigma, z:2) — the cluster/region hull FILL. Must
+     sit over Sigma's edges or the dense edge mesh obscures the region tint
+     (cluster legend select had no edge-dimming, so the hull was buried). The
+     18% fill washes nodes/labels in the region too — a deliberate region-
+     highlight look, still readable through the low alpha.
+   Both pointer-events: none so clicks fall through to Sigma; UI (z ≥ 20)
+   stays above both. */
+#hull-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+#hull-overlay-top { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+#loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 18px; color: #667eea; z-index: 10; pointer-events: none; }
+
+h1 { font-size: 18px; margin-bottom: 4px; color: #fff; }
+#graph-summary { font-size: 11px; color: #777; margin: 0 0 12px; letter-spacing: .2px; }
+#graph-summary span { color: #aab8e6; font-weight: 600; }
+h2 { font-size: 13px; margin: 16px 0 8px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+
+#search { width: 100%; padding: 8px 12px; border: 1px solid #444; border-radius: 6px; background: #1a1a1a; color: #fff; font-size: 14px; margin-bottom: 12px; }
+#search:focus { outline: none; border-color: #667eea; }
+
+
+/* FPS meter — minimal top-right pill, separate from sidebar stats. */
+#fps-meter { position: absolute; top: 12px; right: 12px; padding: 3px 8px; background: rgba(20,20,20,.85); border: 1px solid #333; border-radius: 12px; font-size: 10px; color: #888; font-family: ui-monospace, "SF Mono", Monaco, Consolas, monospace; z-index: 20; letter-spacing: .3px; }
+#fps-meter.fps-good { color: #67c23a; border-color: #2a4a2a; }
+#fps-meter.fps-mid { color: #e6a23c; border-color: #4a3a20; }
+#fps-meter.fps-bad { color: #f56c6c; border-color: #4a2828; }
+
+.legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; border: 2px solid var(--c, #909399); background: var(--c, #909399); box-sizing: border-box; transition: background .15s; }
+.legend-bullet { width: 12px; flex-shrink: 0; text-align: center; color: #888; font-size: 15px; line-height: 1; }
+.legend-row { display: flex; align-items: center; gap: 8px; padding: 4px 6px; font-size: 13px; cursor: pointer; border-radius: 4px; transition: background .15s; user-select: none; }
+.legend-row:hover { background: #1a1a1a; }
+.legend-row .legend-name { flex: 1; }
+.legend-row.pinned { background: #20242e; box-shadow: inset 2px 0 0 #667eea; }
+/* Overlay stepper (guided trail/timeline walk-through) */
+#ni-stepper { margin-bottom: 12px; }
+#ni-stepper .step-nav { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+#ni-stepper .step-btn { padding: 4px 10px; border: 1px solid #555; border-radius: 4px; background: transparent; color: #ddd; font-size: 12px; cursor: pointer; transition: all .15s; }
+#ni-stepper .step-btn:hover:not(:disabled) { border-color: #667eea; color: #fff; }
+#ni-stepper .step-btn:disabled { opacity: .4; cursor: default; }
+#ni-stepper .step-counter { flex: 1; text-align: center; font-size: 12px; color: #aab8e6; }
+#ni-stepper .step-note { font-size: 13px; line-height: 1.65; color: #e0e0e0; background: #181818; border-left: 3px solid #667eea; padding: 10px 13px; border-radius: 4px; }
+#ni-stepper .step-note strong { color: #fff; }
+#ni-stepper .step-list { margin-top: 6px; }
+#ni-stepper .step-item { padding: 4px 8px; font-size: 12px; color: #bbb; cursor: pointer; border-radius: 3px; border-left: 2px solid transparent; }
+#ni-stepper .step-item:hover { background: #1a1a1a; color: #7aa2f7; border-left-color: #667eea; }
+/* Collapsible overlay groups (sidebar) */
+.overlay-group-head { display: flex; align-items: center; gap: 6px; padding: 5px 6px; font-size: 12.5px; color: #ccc; cursor: pointer; border-radius: 4px; user-select: none; }
+.overlay-group-head:hover { background: #1a1a1a; }
+.overlay-group-head.open { color: #fff; }
+.overlay-group-head .ogh-label { flex: 1; }
+.overlay-group-head .ogh-count { color: #667eea; font-weight: 600; font-size: 11px; }
+.overlay-group-body { margin: 0 0 4px 8px; }
+/* Contradiction faction legend (in the node-info panel) — colour chip + label
+   per camp so the node/label colours are legible without colour alone. */
+.side-legend { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+.side-chip { display: flex; align-items: flex-start; gap: 6px; font-size: 12px; color: #ccc; line-height: 1.4; }
+.side-tag { flex-shrink: 0; min-width: 16px; height: 16px; padding: 0 3px; border-radius: 4px; background: #2a2a2a; border: 1px solid #555; color: #ddd; font-size: 11px; font-weight: 700; line-height: 16px; text-align: center; box-sizing: border-box; }
+.legend-row.inactive { opacity: .55; }
+.legend-row.inactive .legend-name { text-decoration: line-through; }
+.legend-row.inactive .legend-dot { background: transparent; }
+
+.note { font-size: 11px; color: #666; margin-top: 12px; line-height: 1.4; }
+/* Section description sitting directly under its heading — pull it up tight. */
+h2 + .note { margin-top: 2px; margin-bottom: 8px; }
+
+.toggle-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; cursor: pointer; user-select: none; }
+.toggle-row input[type="checkbox"] { cursor: pointer; accent-color: #ffa940; }
+.toggle-row .toggle-count { color: #ffa940; font-weight: 600; }
+
+/* Ego (local-view) pill — top-left, shows ego root label + visible hood size. */
+#ego-pill { position: absolute; top: 16px; left: 16px; max-width: 340px; padding: 6px 6px 6px 14px; background: rgba(20,20,20,.95); border: 1px solid #667eea; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,.4); backdrop-filter: blur(4px); z-index: 20; display: none; align-items: center; gap: 6px; font-size: 12px; color: #ddd; }
+#ego-pill.visible { display: inline-flex; }
+#ego-label { margin-right: 4px; }
+#ego-clear { border: none; background: transparent; color: #888; cursor: pointer; font-size: 16px; line-height: 1; padding: 2px 8px; border-radius: 14px; transition: color .15s, background .15s; }
+#ego-clear:hover { color: #fff; background: #333; }
+
+/* Node-info reading panel — right-docked, full height. Header (title /
+   type / meta badges / connection count) is fixed; the body below scrolls
+   and holds the rendered markdown, connection list, and backlinks.
+   Click-outside (clickStage) or ESC dismisses. */
+#node-info { position: absolute; top: 0; right: 0; bottom: 0; width: min(460px, 46vw); display: none; flex-direction: column; background: rgba(18,18,18,.97); border-left: 1px solid #444; box-shadow: -8px 0 24px rgba(0,0,0,.4); backdrop-filter: blur(4px); z-index: 20; }
+#node-info.open { display: flex; }
+#ni-header { flex-shrink: 0; padding: 14px 16px 12px; border-bottom: 1px solid #2a2a2a; position: relative; }
+#ni-body { flex: 1; overflow-y: auto; padding: 14px 18px 28px; }
+#node-info h3 { font-size: 15px; color: #fff; margin: 0 24px 6px 0; word-break: break-all; }
+#node-info-close { position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border: none; background: transparent; color: #888; cursor: pointer; font-size: 18px; line-height: 1; padding: 0; border-radius: 4px; transition: color .15s, background .15s; }
+#node-info-close:hover { color: #fff; background: #333; }
+/* Frontmatter meta badges (status + tags). */
+#ni-meta { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px; }
+#ni-meta .meta-chip { font-size: 10px; padding: 2px 7px; border-radius: 10px; background: #232323; border: 1px solid #383838; color: #aaa; }
+#ni-meta .meta-chip.status { border-color: #4a5a8a; color: #aab8e6; }
+/* Rendered markdown body. */
+#ni-content { font-size: 13px; line-height: 1.65; color: #d4d4d4; word-break: break-word; }
+#ni-content h1 { font-size: 18px; color: #fff; margin: 4px 0 10px; }
+#ni-content h2 { font-size: 15px; color: #cfcfff; margin: 18px 0 7px; padding-bottom: 4px; border-bottom: 1px solid #2a2a2a; text-transform: none; letter-spacing: 0; }
+#ni-content h3 { font-size: 13.5px; color: #ddd; margin: 14px 0 5px; }
+#ni-content h4 { font-size: 12.5px; color: #bbb; margin: 12px 0 4px; }
+#ni-content p { margin: 6px 0; }
+#ni-content ul, #ni-content ol { margin: 6px 0 6px 20px; }
+#ni-content li { margin: 2px 0; }
+#ni-content blockquote { margin: 8px 0; padding: 4px 12px; border-left: 3px solid #444; color: #aaa; }
+#ni-content code { background: #232323; padding: 1px 5px; border-radius: 3px; font-size: 12px; font-family: ui-monospace, "SF Mono", Monaco, Consolas, monospace; }
+#ni-content pre { background: #161616; border: 1px solid #2a2a2a; border-radius: 6px; padding: 10px 12px; overflow-x: auto; margin: 8px 0; }
+#ni-content pre code { background: none; padding: 0; }
+#ni-content table { border-collapse: collapse; margin: 8px 0; font-size: 12px; display: block; overflow-x: auto; }
+#ni-content th, #ni-content td { border: 1px solid #333; padding: 4px 8px; text-align: left; }
+#ni-content th { background: #1e1e1e; color: #ccc; }
+#ni-content a { color: #7aa2f7; text-decoration: none; }
+#ni-content a:hover { text-decoration: underline; }
+#ni-content a.wikilink { color: #7aa2f7; cursor: pointer; }
+#ni-content a.wikilink:hover { text-decoration: underline; }
+#ni-content span.wikilink-dangling { color: #777; }
+#ni-content hr { border: none; border-top: 1px solid #2a2a2a; margin: 14px 0; }
+/* Path step view: compact header + curated note above the focused node body. */
+#ni-content .step-head { font-size: 11px; color: #aab8e6; margin: 0 0 2px; }
+#ni-content .step-note-inline { font-size: 12.5px; color: #cfcfcf; background: #181818; border-left: 3px solid #667eea; padding: 8px 12px; border-radius: 4px; margin: 6px 0 14px; }
+/* Backlinks section. */
+#ni-backlinks { margin-top: 18px; }
+#ni-backlinks .bl-head { color: #888; font-size: 11px; font-weight: 600; letter-spacing: .5px; margin-bottom: 4px; }
+#ni-backlinks div.bl-item { padding: 2px 0; font-size: 11px; color: #bbb; cursor: pointer; }
+#ni-backlinks div.bl-item:hover { color: #7aa2f7; }
+.hop-buttons { margin-top: 16px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.hop-buttons-label { color: #888; font-size: 11px; margin-right: 2px; }
+.hop-btn { padding: 3px 9px; border: 1px solid #555; border-radius: 3px; background: transparent; color: #ccc; font-size: 11px; cursor: pointer; transition: all .15s; }
+.hop-btn:hover { border-color: #667eea; color: #fff; }
+.hop-btn.active { background: #667eea; border-color: #667eea; color: #fff; }
+.type-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; color: #fff; }
+.connections { margin-top: 8px; font-size: 12px; color: #aaa; }
+.conn-list { margin-top: 6px; max-height: 200px; overflow-y: auto; font-size: 11px; }
+.conn-list div { padding: 2px 0; color: #bbb; cursor: pointer; }
+.conn-list div:hover { color: #667eea; }
+
+#error { position: absolute; inset: 0; align-items: center; justify-content: center; padding: 40px; color: #f56c6c; font-size: 14px; text-align: center; line-height: 1.8; display: none; z-index: 30; background: #0a0a0a; }
+#error code { background: #1a1a1a; padding: 2px 8px; border-radius: 4px; color: #ccc; }
+
+/* Edge tooltip — appears on hover over an edge incident to the selected
+   node. Explains "why they're connected": EXTRACTED → the page-body [[link]]
+   relation label, INFERRED → the shared-references page list. pointer-events:
+   none so the cursor never lands on the tooltip itself (which would re-fire
+   leaveEdge). */
+#edge-tooltip { position: absolute; display: none; max-width: 340px; padding: 8px 10px; background: rgba(20,20,20,.96); border: 1px solid #667eea; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,.5); backdrop-filter: blur(4px); z-index: 25; font-size: 12px; color: #ddd; pointer-events: none; line-height: 1.4; }
+#edge-tooltip .et-kind { color: #667eea; font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+#edge-tooltip .et-pair { color: #fff; word-break: keep-all; }
+#edge-tooltip .et-label { color: #ddd; margin-top: 4px; word-break: keep-all; }
+#edge-tooltip ul.et-shared { margin: 4px 0 0; padding-left: 16px; color: #aaa; font-size: 11px; }
+#edge-tooltip ul.et-shared li { padding: 1px 0; word-break: keep-all; }
+#edge-tooltip .et-shared-more { color: #666; font-size: 11px; padding: 1px 0 0 16px; }
+
+/* Sidebar drawer toggle — hidden on desktop, shown on phones (see @media).
+   z-index above the sidebar drawer so it stays tappable to close. */
+#sidebar-toggle { display: none; position: absolute; top: 12px; left: 12px; z-index: 31; width: 40px; height: 40px; align-items: center; justify-content: center; background: rgba(20,20,20,.92); border: 1px solid #444; border-radius: 8px; color: #ddd; font-size: 20px; line-height: 1; cursor: pointer; backdrop-filter: blur(4px); }
+
+/* --- Responsive: phones / narrow viewports (e.g. Samsung Internet) --- */
+@media (max-width: 640px) {
+  /* Sidebar → left slide-in drawer, hidden by default; toggle reveals it. */
+  #sidebar { position: absolute; top: 0; left: 0; height: 100%; width: min(300px, 84vw); z-index: 30; transform: translateX(-100%); transition: transform .25s ease; }
+  #sidebar.open { transform: translateX(0); box-shadow: 8px 0 24px rgba(0,0,0,.5); }
+  #sidebar-toggle { display: flex; }
+  /* Graph fills full width (drawer is out of flow now). */
+  #graph-wrap { width: 100%; }
+  /* Reading panel → bottom sheet so it never crushes the graph to a sliver. */
+  #node-info { top: auto; left: 0; right: 0; bottom: 0; width: 100%; height: 72vh; border-left: none; border-top: 1px solid #444; border-radius: 14px 14px 0 0; box-shadow: 0 -8px 24px rgba(0,0,0,.5); }
+  /* Keep the ego pill clear of the toggle button; hide the dev FPS meter. */
+  #ego-pill { top: 60px; left: 12px; max-width: calc(100vw - 24px); }
+  #fps-meter { display: none; }
+}
+</style>
+</head>
+<body>
+<div id="container">
+  <button id="sidebar-toggle" aria-label="Open/close menu" title="Menu">☰</button>
+  <div id="sidebar">
+    <h1>LLM Wiki Graph</h1>
+    <div id="graph-summary">Nodes <span id="s-nodes">-</span> · Clusters <span id="s-clusters">-</span> · Edges <span id="s-edges">-</span></div>
+    <input id="search" type="text" placeholder="Search by node name (Enter)">
+
+    <h2>Knowledge Cluster Map</h2>
+    <p class="note">Knowledge grouped into clusters. Click a row to highlight that region and open its summary on the right.</p>
+    <div id="legend"></div>
+
+    <h2>Overlays</h2>
+    <p class="note">Overlay associative trails, timelines, analyses, and contradictions on the graph. Click an item to expand.</p>
+    <div id="overlay-panel"></div>
+
+    <h2>Relations</h2>
+    <p class="note">Toggle the edges connecting nodes, by kind.</p>
+    <div id="relation-filter"></div>
+
+    <div id="fragile-section" style="display:none;">
+      <h2>Structural Weak Points</h2>
+      <label class="toggle-row">
+        <input type="checkbox" id="fragile-toggle">
+        <span>⚠️ Fragile bridges (<span class="toggle-count" id="fragile-count">0</span>)</span>
+      </label>
+      <p class="note">Points where two domains are joined by a single edge — if it breaks, the domains split apart.</p>
+    </div>
+  </div>
+
+  <div id="graph-wrap">
+    <div id="sigma-container"></div>
+    <canvas id="hull-overlay"></canvas>
+    <canvas id="hull-overlay-top"></canvas>
+    <div id="loading">Initializing Sigma...</div>
+    <div id="fps-meter">-</div>
+    <div id="ego-pill">
+      <span id="ego-label"></span>
+      <button id="ego-clear" aria-label="Clear local view" title="Clear local view (or ESC)">×</button>
+    </div>
+    <div id="edge-tooltip"></div>
+    <div id="error"></div>
+
+    <div id="node-info">
+      <div id="ni-header">
+        <button id="node-info-close" aria-label="Close" title="Close (ESC)">×</button>
+        <h3 id="ni-title"></h3>
+        <span class="type-badge" id="ni-type"></span>
+        <div class="connections" id="ni-cluster"></div>
+        <div class="connections" id="ni-conn"></div>
+        <div id="ni-meta"></div>
+      </div>
+      <div id="ni-body">
+        <div id="ni-stepper"></div>
+        <div id="ni-content"></div>
+        <div class="hop-buttons">
+          <span class="hop-buttons-label">Center view:</span>
+          <button class="hop-btn" data-depth="1">1-hop</button>
+          <button class="hop-btn" data-depth="2">2-hop</button>
+          <button class="hop-btn" data-depth="3">3-hop</button>
+        </div>
+        <div class="conn-list" id="ni-list"></div>
+        <div id="ni-backlinks"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+// --- Sigma v3 + Graphology via esm.sh (browser-ready ESM, no build step) ---
+import Graph from "https://esm.sh/graphology@0.25";
+import Sigma from "https://esm.sh/sigma@3";
+// ForceAtlas2 — synchronous + worker variants from the same package.
+// - forceAtlas2.assign(graph, {iterations}) pre-settles positions
+//   synchronously on the main thread. Used here to match upstream
+//   vis-network's `stabilization: {iterations: 250}` pattern: the
+//   graph is pre-converged BEFORE first render so users don't see the
+//   early chaotic expansion (the "flash" we had).
+// - FA2Layout (worker subpath) then takes over for continuous motion:
+//   responds to drag, makes small ongoing adjustments, keeps graph alive.
+// - inferSettings(graph) returns size-adaptive parameters, used for both.
+import forceAtlas2 from "https://esm.sh/graphology-layout-forceatlas2@0.10";
+import FA2Layout from "https://esm.sh/graphology-layout-forceatlas2@0.10/worker";
+
+// marked — client-side markdown → HTML for the reading panel. Same CDN-ESM
+// pattern as Sigma/graphology (no build step). GFM tables/lists are on by
+// default; the wiki uses no Obsidian-only syntax (callouts/embeds/footnotes
+// are absent), so stock marked covers every format the pages actually use.
+// The two non-standard pieces — YAML frontmatter and [[wikilinks]] — are
+// handled before marked sees the text (stripFrontmatter / linkifyWikilinks).
+import { marked } from "https://esm.sh/marked@14";
+marked.setOptions({ gfm: true, breaks: false });
+
+// Node border — Sigma default NodeCircleProgram draws flat circles with no
+// outline. When clusters pile up, same-color neighbors bleed into one
+// another. NodeBorderProgram with a 1.5px black outer ring separates nodes
+// visually at any zoom. Factory form lets us pin the border color/size
+// without needing per-node borderColor attributes.
+import * as nodeBorderMod from "https://cdn.jsdelivr.net/npm/@sigma/node-border@3/+esm";
+const createNodeBorderProgram = nodeBorderMod.createNodeBorderProgram;
+const NodeBorderProgram = createNodeBorderProgram
+  ? createNodeBorderProgram({
+      borders: [
+        { color: { value: '#000000' }, size: { value: 1.5, mode: 'pixels' } },
+        { color: { attribute: 'color' }, size: { fill: true } },
+      ],
+    })
+  : (nodeBorderMod.NodeBorderProgram || nodeBorderMod.default);
+if (!NodeBorderProgram) {
+  throw new Error('NodeBorderProgram not found in @sigma/node-border module exports');
+}
+
+// showError builds error display via textContent (no innerHTML) so error
+// strings from the runtime — which can contain arbitrary characters — can
+// never inject HTML. Structured second line (hint/cmd) is optional.
+const showError = (title, hint, cmd) => {
+  const el = document.getElementById('error');
+  el.replaceChildren();
+  const titleEl = document.createElement('div');
+  titleEl.textContent = title;
+  el.appendChild(titleEl);
+  if (cmd) {
+    const cmdEl = document.createElement('code');
+    cmdEl.textContent = cmd;
+    cmdEl.style.cssText = 'display:inline-block;margin-top:8px;';
+    el.appendChild(cmdEl);
+  }
+  if (hint) {
+    const hintEl = document.createElement('div');
+    hintEl.textContent = hint;
+    hintEl.style.cssText = 'color:#888;font-size:12px;margin-top:6px;';
+    el.appendChild(hintEl);
+  }
+  el.style.display = 'flex';
+  document.getElementById('loading').style.display = 'none';
+};
+
+// Surface unhandled errors with stack trace (console) + user-visible msg.
+// Stack trace in console is crucial for diagnosing CDN failures and
+// Sigma/graphology version mismatches; the UI summary just redirects to
+// the console for the full story.
+window.addEventListener('error', (ev) => {
+  const err = ev.error;
+  console.error('[graph.html] Uncaught error:', err || ev.message, err && err.stack);
+  showError('JS error: ' + (ev.message || (err && err.message) || 'unknown'), 'check console');
+});
+window.addEventListener('unhandledrejection', (ev) => {
+  const reason = ev.reason;
+  console.error('[graph.html] Unhandled rejection:', reason, reason && reason.stack);
+  showError(
+    'Module load failed: ' + ((reason && reason.message) || reason || 'unknown'),
+    'check CDN/network'
+  );
+});
+
+const t0 = performance.now();
+// Data is fetched as JSON over a web server (file:// is unsupported — open via
+// a local server, e.g. `python -m http.server`). PFX is "_" locally and the
+// deploy's "<slug>-" when stage_site injects window.ASSET_PREFIX, so the same
+// shell loads either the committed _graph.json or the obscured deploy copy.
+// Top-level await keeps the rest of the module synchronous after the fetch.
+const PFX = window.ASSET_PREFIX || '_';
+let GRAPH_DATA, CLUSTERS_DATA, OVERLAYS_DATA;
+try {
+  [GRAPH_DATA, CLUSTERS_DATA, OVERLAYS_DATA] = await Promise.all([
+    fetch(`./${PFX}graph.json`).then(r => { if (!r.ok) throw new Error('graph.json ' + r.status); return r.json(); }),
+    fetch(`./${PFX}clusters.json`).then(r => { if (!r.ok) throw new Error('clusters.json ' + r.status); return r.json(); }),
+    // _overlays.json — meta-page overlay structures (trail/timeline/synthesis/
+    // contradiction). Non-fatal: an older build without it degrades to no
+    // overlay panel rather than failing the whole graph.
+    fetch(`./${PFX}overlays.json`).then(r => r.ok ? r.json() : { overlays: [], node_overlays: {} }).catch(() => ({ overlays: [], node_overlays: {} })),
+  ]);
+} catch (e) {
+  showError('Failed to load graph data: ' + e.message,
+    'Make sure you opened it via a web server (file:// unsupported). e.g. python -m http.server',
+    'python tools/build.py');
+  throw e;
+}
+const { nodes: rawNodes, edges: rawEdges, stats } = GRAPH_DATA;
+const allClusters = CLUSTERS_DATA.clusters || [];
+const ALL_OVERLAYS = (OVERLAYS_DATA && OVERLAYS_DATA.overlays) || [];
+const NODE_OVERLAYS = (OVERLAYS_DATA && OVERLAYS_DATA.node_overlays) || {};
+
+// --- Type palette — matches original graph.html; types not in this map
+// (overview, contradiction, timeline, trail) don't get a filter row but
+// their nodes still render if activeTypes includes them (which the
+// default does NOT — matches original behavior exactly).
+const TYPE_COLORS = {
+  source: '#4a90d9',
+  entity: '#e6a23c',
+  concept: '#67c23a',
+  synthesis: '#f56c6c',
+  unknown: '#909399'
+};
+const DEFAULT_ACTIVE_TYPES = ['entity', 'concept', 'synthesis', 'source'];
+
+// --- cluster resolution ---
+const clusterBySlug = {};
+allClusters.forEach(c => { clusterBySlug[c.slug] = c; });
+const CLUSTER_BY_NODE = {};
+allClusters.forEach(c => {
+  (c.members || []).forEach(m => { CLUSTER_BY_NODE[m] = c.slug; });
+});
+Object.entries(CLUSTERS_DATA.source_assignments || {}).forEach(([path, entry]) => {
+  if (clusterBySlug[entry.primary]) CLUSTER_BY_NODE[path] = entry.primary;
+});
+const uniqueSlugs = [...new Set(allClusters.map(c => c.slug))];
+const slugHubSize = {};
+allClusters.forEach(c => { slugHubSize[c.slug] = (slugHubSize[c.slug] || 0) + c.size; });
+
+// Per-cluster, per-type member counts. Hubs (entity/concept) come from
+// cluster.members; sources come from source_assignments primary mapping.
+// Used to compute the dynamic legend count, which shifts when the type
+// filter toggles source visibility on/off.
+const slugTypeCount = {};
+uniqueSlugs.forEach(slug => { slugTypeCount[slug] = { entity: 0, concept: 0, source: 0 }; });
+allClusters.forEach(c => {
+  (c.members || []).forEach(m => {
+    if (m.startsWith('entities/')) slugTypeCount[c.slug].entity++;
+    else if (m.startsWith('concepts/')) slugTypeCount[c.slug].concept++;
+  });
+});
+Object.entries(CLUSTERS_DATA.source_assignments || {}).forEach(([_path, entry]) => {
+  if (slugTypeCount[entry.primary]) slugTypeCount[entry.primary].source++;
+});
+
+const CLUSTER_COLORS = {};
+uniqueSlugs.forEach((slug, i) => {
+  const c = clusterBySlug[slug];
+  CLUSTER_COLORS[slug] = (c && c.color)
+    ? c.color
+    : `hsl(${Math.round(360 * i / uniqueSlugs.length)}, 55%, 62%)`;
+});
+const UNCLUSTERED_COLOR = '#909399';
+
+// --- degree (pre-filter, so sizing is stable across toggle changes) ---
+const degree = {};
+for (const e of rawEdges) {
+  degree[e.to] = (degree[e.to] || 0) + 1;
+  degree[e.from] = (degree[e.from] || 0) + 1;
+}
+// maxDeg among non-source hubs — sets the upper bound for the size
+// formula below. Sources excluded to prevent one high-degree source
+// from compressing the hub scale (unlikely but cheap to be safe).
+let maxHubDeg = 1;
+for (const n of rawNodes) {
+  if (n.type !== 'source') {
+    const d = degree[n.id] || 0;
+    if (d > maxHubDeg) maxHubDeg = d;
+  }
+}
+
+// --- Graphology graph — ALL nodes/edges loaded. Visibility is a display
+// concern handled by Sigma reducers, not by what's in the graph. This lets
+// toggles flip in <1ms (just a Set update + renderer.refresh) instead of
+// rebuilding the graph on every filter change.
+const graph = new Graph({ multi: false, type: 'undirected' });
+
+// Initial positions — seeded by cluster sector + jitter. Server-side FA2
+// pre-bake was removed (tools/_build/html.py) so physics always runs from
+// scratch, matching upstream vis-network's "alive" feel. Seeding each
+// cluster to its own angular sector (instead of pure uniform random)
+// gives FA2 a head start — clusters don't have to disentangle from a
+// chaotic knot, so initial instability settles within a couple of seconds.
+// Larger seed radius (200 vs earlier 50) to reduce initial repulsion
+// spike: at tiny radius, node-pair distances are small → scalingRatio/d²
+// produces explosive forces in the first iterations. 200 gives nodes
+// room to breathe so the first-second "flash" of rapid reshuffling is
+// much subtler.
+const INIT_RADIUS = 200;
+const clusterAngle = {};
+uniqueSlugs.forEach((slug, i) => {
+  clusterAngle[slug] = (i / uniqueSlugs.length) * 2 * Math.PI;
+});
+
+// Node size formula: sqrt-scaled degree for non-source nodes. sqrt gives
+// better contrast at the top than log (log compressed top-tier hubs too
+// aggressively, making the highest-degree node only barely larger than
+// mid-range). sqrt spreads the top end while still compressing the long
+// low-degree tail so deg 1-5 nodes stay distinguishable. minSize 3 /
+// maxSize 8 — keeps the bottom end visible while the top cap compression
+// eases the visual pressure of high-edge hubs. SOURCE_SIZE 2.0 <
+// HUB_MIN_SIZE 3.0 preserves the source/hub distinction.
+const HUB_MIN_SIZE = 3;
+const HUB_MAX_SIZE = 8;
+const SOURCE_SIZE = 2.0;
+
+for (const n of rawNodes) {
+  const slug = CLUSTER_BY_NODE[n.id];
+  const color = slug ? CLUSTER_COLORS[slug] : UNCLUSTERED_COLOR;
+  const deg = degree[n.id] || 0;
+  let size;
+  if (n.type === 'source') {
+    size = SOURCE_SIZE;
+  } else {
+    const sqrtNorm = Math.sqrt(deg / maxHubDeg);
+    size = HUB_MIN_SIZE + (HUB_MAX_SIZE - HUB_MIN_SIZE) * sqrtNorm;
+  }
+  const baseAngle = slug != null ? clusterAngle[slug] : Math.random() * 2 * Math.PI;
+  const angleJitter = (Math.random() - 0.5) * 0.6;
+  const r = INIT_RADIUS * (0.3 + Math.random() * 0.7);
+  graph.addNode(n.id, {
+    label: n.label,
+    x: Math.cos(baseAngle + angleJitter) * r,
+    y: Math.sin(baseAngle + angleJitter) * r,
+    size,
+    color,
+    nodeType: n.type,
+  });
+}
+
+// Two-pass EXTRACTED-first dedup for multi:false — stronger signal wins.
+let droppedEdges = 0;
+let dedupedEdges = 0;
+const addEdgeSafe = (e) => {
+  if (!graph.hasNode(e.from) || !graph.hasNode(e.to)) { droppedEdges++; return; }
+  if (graph.hasEdge(e.from, e.to)) { dedupedEdges++; return; }
+  // Cluster-aware edge weight — mirrors the server-side Python FA2
+  // pre-bake (INTRA 1.0 / CROSS 0.3 / NO_CLUSTER 0.7). Under the client
+  // physics worker this keeps intra-cluster edges strong (hubs cohere)
+  // and cross-cluster edges weak (clusters stay apart) instead of the
+  // uniform attraction FA2 would use by default.
+  const cf = CLUSTER_BY_NODE[e.from];
+  const ct = CLUSTER_BY_NODE[e.to];
+  const weight = (!cf || !ct) ? 0.7 : (cf === ct ? 1.0 : 0.3);
+  // Pre-composited color on #0a0a0a background (Sigma WebGL ignores alpha —
+  // see Phase 1 notes; GitHub #1426 postponed-to-v4).
+  // Size calibrated against original vis-network Canvas 2D: its 0.5/0.3
+  // widths rendered at sub-pixel with OS-level AA, giving a light visual
+  // weight. Sigma's WebGL curve program can't sub-pixel below ~1px of
+  // effective coverage, so matching numerical widths over-thickens. Drop
+  // by ~40% to match the original's perceived density.
+  // Pre-composited edge color on #0a0a0a BG (Sigma WebGL ignores alpha,
+  // see Phase 1 notes). All five relations get a muted dark tint —
+  // readable as ambient density on the dark background without
+  // dominating the node layer. The bright variant (RELATION_HIGHLIGHT)
+  // kicks in only on node selection.
+  // cites edges vary only in luminance within the same hue, across 4 tiers by
+  // Phase 2 evidence_grade (fact/analysis/forecast) — fact (sharpest) →
+  // analysis → unmarked → forecast (darkest). The other 4 relation kinds keep
+  // a single tone because their grade distribution is sparse or schema-irrelevant.
+  let edgeColor;
+  if (e.type === 'INFERRED') {
+    edgeColor = '#181818';                           // dark grey (inferred demoted to achromatic)
+  } else if (e.relation === 'contradicts') {
+    edgeColor = '#2d1418';                           // dark red-brown
+  } else if (e.relation === 'defines') {
+    edgeColor = '#152a1d';                           // dark green
+  } else if (e.relation === 'cites') {
+    edgeColor =
+      e.evidence_grade === 'fact'     ? '#1d2e44' : // brighter dark blue
+      e.evidence_grade === 'analysis' ? '#15202d' : // base dark blue
+      e.evidence_grade === 'forecast' ? '#0e1620' : // deepest dark blue
+                                    '#121b25';       // unmarked (legacy)
+  } else {
+    edgeColor = '#1b1b1b';                           // references / fallback
+  }
+  // Width per relation — meaning intensity ladder (contradicts > defines/
+  // cites > references > inferred). WebGL sub-pixel range, so the
+  // perceived effect is intentionally subtle; color carries the primary
+  // signal and width is a reinforcing secondary cue.
+  const edgeSize =
+    e.relation === 'contradicts' ? 0.15 :
+    e.relation === 'defines'     ? 0.10 :
+    e.relation === 'cites'       ? 0.10 :
+    e.type === 'INFERRED'        ? 0.06 :
+                                   0.08;             // references / fallback
+  graph.addEdge(e.from, e.to, {
+    edgeType: e.type,
+    relation: e.relation || null,
+    color: edgeColor,
+    size: edgeSize,
+    weight,
+    // Explains "why they're connected" — read by the hover tooltip. `label`
+    // is the EXTRACTED edge's one-line description (written next to the
+    // [[link]] in the source body); `shared` is the INFERRED edge's list of
+    // shared-reference pages (≥3 shared → an inferred edge is created);
+    // `evidenceGrade` is a Phase 2 claim-atomization product (fact/analysis/
+    // forecast).
+    extLabel: e.label || null,
+    shared: e.shared || null,
+    confidence: typeof e.confidence === 'number' ? e.confidence : null,
+    evidenceGrade: e.evidence_grade || null,
+  });
+};
+for (const e of rawEdges) if (e.type === 'EXTRACTED') addEdgeSafe(e);
+for (const e of rawEdges) if (e.type !== 'EXTRACTED') addEdgeSafe(e);
+
+// --- Fragile bridges ---
+// Cluster pairs connected by ≤ threshold cross-cluster edges — losing the
+// single bridge splits the two fields topologically. Algorithm mirrors
+// tools/_lint/graph_clusters._find_fragile_bridges exactly, run client-side
+// on rawEdges so the count matches the lint report's. One sample edge per
+// fragile pair gets `isFragile: true` set on the deduped graphology edge.
+const FRAGILE_THRESHOLD = 1;
+const fragileState = (() => {
+  const pairCounts = new Map();
+  const pairSamples = new Map();
+  rawEdges.forEach(e => {
+    const cf = CLUSTER_BY_NODE[e.from];
+    const ct = CLUSTER_BY_NODE[e.to];
+    if (!cf || !ct || cf === ct) return;
+    const key = cf < ct ? (cf + '\0' + ct) : (ct + '\0' + cf);
+    pairCounts.set(key, (pairCounts.get(key) || 0) + 1);
+    if (!pairSamples.has(key)) pairSamples.set(key, { from: e.from, to: e.to });
+  });
+  const samples = [];
+  pairCounts.forEach((count, key) => {
+    if (count <= FRAGILE_THRESHOLD) samples.push(pairSamples.get(key));
+  });
+  return { samples, pairCount: samples.length };
+})();
+
+fragileState.samples.forEach(({ from, to }) => {
+  if (graph.hasEdge(from, to)) {
+    graph.setEdgeAttribute(graph.edge(from, to), 'isFragile', true);
+  }
+});
+
+// --- URL deep-link state ---
+// Parsed once at init. activeTypes/activeClusters/highlightFragile/ego/
+// activeRelations all honor URL params; invalid slugs are dropped
+// silently; invalid focus is validated after graph is built.
+const urlInit = (() => {
+  const p = new URLSearchParams(location.search);
+  const r = { types: null, clusters: null, focus: null, depth: 0, fragile: false, relations: null };
+  if (p.has('types')) {
+    const t = p.get('types').split(',').map(s => s.trim()).filter(Boolean);
+    if (t.length) r.types = t;
+  }
+  if (p.has('clusters')) {
+    const c = p.get('clusters').split(',').map(s => s.trim()).filter(Boolean);
+    if (c.length) r.clusters = c;
+  }
+  if (p.has('focus') && p.has('depth')) {
+    const d = parseInt(p.get('depth'), 10);
+    if (d >= 1 && d <= 3) { r.focus = p.get('focus'); r.depth = d; }
+  }
+  r.fragile = p.get('fragile') === '1';
+  if (p.has('relations')) {
+    const rs = p.get('relations').split(',').map(s => s.trim()).filter(Boolean);
+    if (rs.length) r.relations = rs;
+  }
+  return r;
+})();
+
+// --- Filter state ---
+// activeTypes / activeClusters are Sets we mutate in place on toggle.
+// URL-sourced subset takes precedence when present and non-empty after
+// validating against known slugs/types.
+const activeTypes = new Set(urlInit.types || DEFAULT_ACTIVE_TYPES);
+const urlClusters = urlInit.clusters ? urlInit.clusters.filter(s => uniqueSlugs.includes(s)) : null;
+const activeClusters = new Set(urlClusters && urlClusters.length ? urlClusters : uniqueSlugs);
+
+// Relation filter — Hyper-G typed edges (2026-05-02). 4 EXTRACTED relation
+// kinds + INFERRED virtualized as a 5th 'inferred' kind so the sidebar
+// toggle also gates inferred edges. The Sigma graph stores `relation: null` for
+// INFERRED (matching _graph.json shape); the legend / reducer / filter
+// derive 'inferred' on the fly via `effRelation()`.
+const RELATION_KINDS = ['contradicts', 'defines', 'cites', 'references', 'inferred'];
+// Legend swatch = highlight color (what the user sees when a node is
+// selected). The default render uses much darker pre-composited tints
+// so density is readable without dominating; the legend would be
+// invisible at those tints, so swatches show the bright variant.
+const RELATION_COLORS = {
+  contradicts: '#ff5566',
+  defines:     '#58cc88',
+  cites:       '#5fa8e8',
+  references:  '#9a9a9a',
+  inferred:    '#666666',   // achromatic — demoted 2026-06-18 (was lavender), frees violet for clusters
+};
+const RELATION_LABELS = {
+  contradicts: 'Contradicts',
+  defines:     'Defines',
+  cites:       'Cites',
+  references:  'References',
+  inferred:    'Inferred',
+};
+// Selected-node edge highlight palette. Same hues as legend swatches —
+// user picks up "this is a contradicts edge" from color match. contradicts/
+// defines/cites are chromatic; references & inferred are achromatic greys
+// (inferred demoted 2026-06-18 — it's the weakest/virtual relation, and
+// vacating its lavender lets the 6 cluster colours avoid relation hues).
+const RELATION_HIGHLIGHT = {
+  contradicts: '#ff5566',
+  defines:     '#58cc88',
+  cites:       '#5fa8e8',
+  references:  '#9a9a9a',
+  inferred:    '#666666',
+};
+function effRelation(attr) {
+  if (attr.relation) return attr.relation;
+  return attr.edgeType === 'INFERRED' ? 'inferred' : 'references';
+}
+const urlRelations = urlInit.relations ? urlInit.relations.filter(r => RELATION_KINDS.includes(r)) : null;
+const activeRelations = new Set(urlRelations && urlRelations.length ? urlRelations : RELATION_KINDS);
+
+let highlightFragile = urlInit.fragile || false;
+
+// visibleNodesCache — recomputed on any filter change. Reducers read from
+// this Set so they stay O(1) per call. Edge visibility derives from
+// endpoint visibility — no separate edge filter needed.
+let visibleNodesCache = new Set();
+
+// searchMatchIds — ids of nodes matching the current search query. Empty
+// when search is idle; capped at 10 to avoid overwhelming the view with
+// identical highlights. Node reducer reads this to boost matched nodes.
+let searchMatchIds = new Set();
+
+// labeledIds — set of node ids that pass label-overlap culling. null
+// means culling hasn't run yet → show all labels (Sigma default). Once
+// populated, nodes not in the set get their label blanked in the reducer.
+// Recomputed on camera change (debounced) and filter change.
+let labeledIds = null;
+let cullTimer = null;
+// Gate to suppress scheduleCullLabels calls before the Sigma renderer
+// exists — recomputeVisibility runs once during init before Sigma is
+// constructed, and its label cull trigger would otherwise hit TDZ.
+let cullingReady = false;
+// Neighbors of the currently selected node. Populated in openPopup, read
+// by the node reducer to size-boost those neighbors so their labels pass
+// Sigma's labelRenderedSizeThreshold. Without this, small (low-degree)
+// neighbors' labels get hidden by the threshold BEFORE our cull can
+// promote them via priority tier.
+let selectedNeighborsCache = null;
+
+// Ego (local-view) state. egoRoot null = global view. egoHoodCache is the
+// Set of nodes within egoDepth hops of egoRoot (inclusive). Computed once
+// per ego change; reducers read it per refresh. Pre-filter adjacency so
+// the neighborhood reflects real graph connectivity even if some hood
+// nodes are currently filtered out by type/cluster toggles.
+let egoRoot = null;
+let egoDepth = 0;
+let egoHoodCache = null;
+
+// Selected-node state — the node whose popup is currently open. The node
+// itself gets a highlight boost; edges incident to it are brightened so
+// the user can trace its connections without opening ego mode. Cleared
+// when popup closes (clickStage, close button, ESC).
+let selectedNodeId = null;
+
+// --- Overlay / cluster-overview state (2026-06-01 meta-overlay feature) ---
+// selectedCluster: cluster whose hull is pinned + overview shown in the panel
+//   (cluster legend click). pinnedOverlayKey: the pinned meta overlay
+//   (trail/timeline/synthesis/contradiction). A path overlay drives node+edge
+//   reducer highlighting (OVERLAY_HL); a region overlay drives the hull
+//   (regionLens). selectedCluster and pinnedOverlayKey are mutually exclusive
+//   — pinning one clears the other.
+let selectedCluster = null;     // cluster slug whose hull is pinned + overview shown
+let pinnedOverlayKey = null;    // "type/slug" of the pinned overlay (null = none)
+let regionLens = null;          // {memberIds:Set, color, hullColor, sideByNode} for the region lens (hover|pin); color null = keep node/edge own hue (synthesis)
+const OVERLAY_BY_KEY = {};      // "type/slug" → overlay record
+// Path-overlay highlight state read by node/edge reducers (null = none).
+// {memberIds:Set, badgeById:Map|null, color:string, focusId?:string}
+let OVERLAY_HL = null;
+// Synthetic ordered connector for path overlays (trail + timeline) — drawn on
+// the hull canvas. {orderedIds:[...], color}. null for region overlays / non-path.
+let pathDraw = null;
+// Stepper state for the pinned path overlay.
+let stepOverlay = null;   // the pinned path overlay record
+let stepIndex = -1;       // -1 = whole-path view; 0..n-1 = focused step
+
+// Animate the camera to frame a set of member nodes (fly-to-fit). Uses
+// framed-graph display coords (camera-independent [0,1] space), centroid +
+// padded extent → ratio. Single node → tight zoom. The biggest single UX
+// lever: a pinned overlay's members are otherwise scattered/off-screen.
+function frameNodes(ids, opts) {
+  opts = opts || {};
+  const dds = [];
+  ids.forEach(id => { if (graph.hasNode(id)) { const d = renderer.getNodeDisplayData(id); if (d) dds.push(d); } });
+  if (!dds.length) return;
+  const xs = dds.map(d => d.x), ys = dds.map(d => d.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  let cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+  // ratio: fit padded extent, but clamp the low end so a single / tight set
+  // doesn't zoom in absurdly (0.04 → unreadable). 0.28 keeps comfortable context.
+  const extent = Math.max(maxX - minX, maxY - minY);
+  const ratio = opts.ratio != null ? opts.ratio : Math.min(1.2, Math.max(extent * 1.6, 0.28));
+  // Panel-aware centering: the right #node-info panel (~460px) covers the
+  // graph, so shift the framed center left by half the panel width so the
+  // content sits in the visible area, not behind the panel. Skip on the
+  // mobile bottom-sheet layout (panel spans full width).
+  const panel = document.getElementById('node-info');
+  const cont = renderer.getContainer();
+  // 640px MUST match the CSS bottom-sheet breakpoint (@media max-width:640px);
+  // above it the panel is still right-docked so the centering shift applies.
+  if (panel.classList.contains('open') && !window.matchMedia('(max-width: 640px)').matches) {
+    const W = cont.offsetWidth, H = cont.offsetHeight, panelW = panel.offsetWidth;
+    const cur = renderer.getCamera().getState().ratio || 1;
+    const pCenter = renderer.viewportToFramedGraph({ x: W / 2, y: H / 2 });
+    const pVisCenter = renderer.viewportToFramedGraph({ x: (W - panelW) / 2, y: H / 2 });
+    cx += (pCenter.x - pVisCenter.x) * (ratio / cur);  // scale offset to target zoom
+  }
+  renderer.getCamera().animate({ x: cx, y: cy, ratio }, { duration: opts.duration || 650 });
+}
+
+function _overlayMemberIds(ov) {
+  const ids = new Set();
+  (ov.members || []).forEach(m => { if (graph.hasNode(m.id)) ids.add(m.id); });
+  return ids;
+}
+
+function recomputeVisibility() {
+  const next = new Set();
+  const clustersSeen = new Set();
+  graph.forEachNode((node, attr) => {
+    if (!activeTypes.has(attr.nodeType)) return;
+    const slug = CLUSTER_BY_NODE[node];
+    if (slug && !activeClusters.has(slug)) return;
+    next.add(node);
+    if (slug) clustersSeen.add(slug);
+  });
+  visibleNodesCache = next;
+  // Count visible edges by type — both endpoints must be visible AND the
+  // (effective) relation must be active. INFERRED maps to virtual
+  // 'inferred' relation. Runs only on filter changes (not per frame) so
+  // the O(E) walk is fine.
+  // Two counters with different scopes:
+  //  - visRelCounts (Relations panel rows): tallied on node-visibility alone,
+  //    ignoring activeRelations. This mirrors the cluster legend pattern
+  //    (getClusterCount → activeTypes only, indifferent to the row's own
+  //    toggle state) so toggling a relation off only adds strikethrough
+  //    via the .inactive class without zeroing the row's count. The count
+  //    represents "potential visible edges of this kind given current
+  //    node filters" — a stable reading of how much that relation would
+  //    contribute if re-activated.
+  //  - visEdges (the Edges stat): honors activeRelations so the
+  //    total reflects what is actually rendered on screen. EXTRACTED and
+  //    INFERRED are summed into a single Edges stat (the previous
+  //    EXTRACTED/INFERRED split lived in the stats; the per-kind breakdown is
+  //    already exposed in the Relations panel rows).
+  let visEdges = 0;
+  const visRelCounts = { contradicts: 0, defines: 0, cites: 0, references: 0, inferred: 0 };
+  graph.forEachEdge((edge, attr, from, to) => {
+    if (!next.has(from) || !next.has(to)) return;
+    const rel = effRelation(attr);
+    if (rel in visRelCounts) visRelCounts[rel]++;
+    if (!activeRelations.has(rel)) return;
+    visEdges++;
+  });
+  document.getElementById('s-clusters').textContent = clustersSeen.size;
+  document.getElementById('s-nodes').textContent = next.size.toLocaleString();
+  document.getElementById('s-edges').textContent = visEdges.toLocaleString();
+  // Sync relation legend row counts. NodeList is empty on the first
+  // recomputeVisibility() call (rows haven't been created yet) — querySelectorAll
+  // returns an empty list, the loop is a no-op, and the second call after
+  // row creation populates them.
+  document.querySelectorAll('.rel-count').forEach(span => {
+    const rel = span.dataset.rel;
+    span.textContent = (visRelCounts[rel] || 0).toLocaleString();
+  });
+  // Visible set just changed — re-cull labels so newly-visible nodes join
+  // the overlap contest and newly-hidden ones drop out of `placed`.
+  scheduleCullLabels();
+}
+recomputeVisibility();
+
+// Serialize filter + ego + fragile state to URL for shareable deep links.
+// Defaults are omitted to keep URLs short. replaceState keeps browser back
+// button useful (filter/ego toggles don't pile up in history).
+function serializeStateToUrl() {
+  const p = new URLSearchParams();
+  const defaultTypeSet = new Set(DEFAULT_ACTIVE_TYPES);
+  const typesDiffer =
+    activeTypes.size !== defaultTypeSet.size ||
+    [...activeTypes].some(t => !defaultTypeSet.has(t));
+  if (typesDiffer && activeTypes.size > 0) {
+    p.set('types', [...activeTypes].sort().join(','));
+  }
+  if (activeClusters.size !== uniqueSlugs.length) {
+    p.set('clusters', [...activeClusters].sort().join(','));
+  }
+  if (egoRoot && egoDepth >= 1) {
+    p.set('focus', egoRoot);
+    p.set('depth', String(egoDepth));
+  }
+  if (highlightFragile) p.set('fragile', '1');
+  if (activeRelations.size !== RELATION_KINDS.length) {
+    p.set('relations', [...activeRelations].sort().join(','));
+  }
+  const q = p.toString();
+  const url = q ? location.pathname + '?' + q : location.pathname;
+  history.replaceState(null, '', url);
+}
+
+// Sidebar stats are updated by recomputeVisibility — no one-time init needed.
+
+// --- Physics architecture: standard pattern ---
+// Worker runs on the SAME main `graph` that Sigma renders from — this is
+// the pattern every graphology + sigma example uses and is what Sigma's
+// event integration is designed around. An earlier refactor tried to
+// isolate physics on a subgraph with an event-listener sync to main,
+// but no official/community example does this; the listener chain broke
+// silently because the worker's attribute-update event payloads don't
+// match what a hand-rolled listener expects.
+//
+// Load-speed optimization: the INITIAL sync-pre-convergence runs on a
+// throwaway subgraph of visible nodes only (~500 vs 1,732). After that,
+// the Worker takes over on main graph. Hidden sources (default off) get
+// simulated in the worker too — minor CPU cost in a separate thread, and
+// gives them natural positions for when the user toggles source ON.
+const inferredSettings = forceAtlas2.inferSettings(graph);
+const fa2Settings = {
+  ...inferredSettings,
+  barnesHutOptimize: true,
+  edgeWeightInfluence: 1,
+  // Heavier damping than inferSettings default (1 + log N ≈ 8) to suppress
+  // residual jitter once the layout is ~converged. graphology FA2 has no
+  // vis-network-style minVelocity floor, so damping is our only knob for
+  // stillness at equilibrium. slowDown=30 gives noticeably less wobble.
+  slowDown: 30,
+};
+
+// --- Pre-converge layout synchronously ---
+// Mirrors upstream vis-network's `stabilization: { iterations: 250 }`:
+// run physics before the user sees the graph so the "flash" of initial
+// chaotic expansion happens off-screen. Covered by the "Initializing Sigma"
+// overlay.
+//
+// Runs on the FULL graph (not just visible). An earlier iteration ran
+// sync on a visible-only subgraph for speed, but that left 1,235 hidden
+// sources at their cluster-sector random seeds; when the worker started
+// on the full graph, those sources snapped toward equilibrium and
+// yanked already-settled hubs around via shared edges. Result: visible
+// instability for several seconds after load regardless of iter count.
+// Full-graph sync ensures every node has settled positions before the
+// worker takes over, so worker startup is a no-op.
+//
+// Barnes-Hut makes 1732 nodes × 75 iter ≈ 120-200ms — fast load with
+// enough settling to hand over to the worker without visible motion.
+// 50 iter was slightly too few (noticeable post-load drift); 75 is
+// the sweet spot for this graph size.
+const preT0 = performance.now();
+forceAtlas2.assign(graph, { iterations: 75, settings: fa2Settings });
+console.log(
+  `Sync pre-convergence: ${graph.order} nodes full graph, ` +
+  `75 iter, ${Math.round(performance.now() - preT0)}ms`
+);
+
+// --- Dark-theme hover label drawer ---
+// Draws a near-black rounded tooltip with brand-blue outline and white
+// text to the right of the hovered node. Replaces Sigma's default which
+// hardcodes a white background (github.com/jacomyal/sigma.js/issues/1210).
+function drawDarkHover(context, data, settings) {
+  if (!data.label) return;
+  const size = settings.labelSize || 14;
+  const weight = settings.labelWeight || 'normal';
+  const font = settings.labelFont || 'sans-serif';
+  context.font = `${weight} ${size}px ${font}`;
+  const padX = 6;
+  const padY = 3;
+  const textWidth = context.measureText(data.label).width;
+  const w = textWidth + padX * 2;
+  const h = size + padY * 2;
+  const nodeRadius = (data.size || 4) + 2;
+  const x = data.x + nodeRadius;
+  const y = data.y - h / 2;
+  context.fillStyle = 'rgba(20, 20, 20, 0.95)';
+  context.beginPath();
+  if (context.roundRect) context.roundRect(x, y, w, h, 4);
+  else context.rect(x, y, w, h);
+  context.fill();
+  context.fillStyle = '#fff';
+  context.textBaseline = 'middle';
+  context.fillText(data.label, x + padX, data.y);
+}
+
+// Blend a node colour toward the canvas background (#0a0a0a) so a dimmed node
+// keeps its hue but recedes. `keep` ∈ [0,1] = how much of the original colour
+// survives (0.4 → muted-but-recognizable). Handles #rgb / #rrggbb; anything
+// unparseable falls back to a neutral grey so the reducer never emits bad CSS.
+const _BG_RGB = [10, 10, 10];
+function fadeColor(hex, keep) {
+  if (typeof hex !== 'string' || hex[0] !== '#') return '#242424';
+  let h = hex.slice(1);
+  if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+  if (h.length !== 6) return '#242424';
+  const n = parseInt(h, 16);
+  if (Number.isNaN(n)) return '#242424';
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  const mix = (c, i) => Math.round(c * keep + _BG_RGB[i] * (1 - keep));
+  return `rgb(${mix(r, 0)},${mix(g, 1)},${mix(b, 2)})`;
+}
+
+// --- Sigma init with reducers ---
+const container = document.getElementById('sigma-container');
+const renderer = new Sigma(graph, container, {
+  renderEdgeLabels: false,
+  defaultNodeColor: UNCLUSTERED_COLOR,
+  defaultEdgeColor: '#1b1b1b',
+  // Lower the rendered-thickness floor from Sigma's default 1.7 so highlighted
+  // edges can actually read thin. At 1.7 every edge (ambient + highlighted)
+  // floored to ~the same width, so a selected hub's incident edges merged into
+  // one thick bright fan. 1.0 lets ambient stay hair-thin and the highlight
+  // size below render as a distinct, separable stroke.
+  minEdgeThickness: 1.0,
+  // Threshold 6: hide labels for nodes smaller than 6px rendered. Filters
+  // out the long tail of low-degree nodes by default. Tuned to HUB_MAX_SIZE 8
+  // — the top ~7% of hubs (deg ≥ 205) show labels (restoring the same exposure
+  // as the 41-label baseline from the earlier max=12 / threshold=8 era).
+  // Selected/search/neighbor highlights override
+  // via Math.max(size×N, threshold+) below so those cases still show labels
+  // regardless of base size.
+  labelRenderedSizeThreshold: 6,
+  // Disable Sigma's grid-based label density filter. Default (density 1,
+  // grid 60px) hides labels that happen to land in the "same cell" as
+  // another label — when physics causes micro-drift, nodes cross cell
+  // boundaries each frame and labels flicker on/off. Setting density to
+  // a very high value lets our cullLabels be the sole authority, giving
+  // stable labels even under slight position jitter.
+  labelDensity: 100,
+  labelFont: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  labelColor: { color: '#ccc' },
+  zIndex: true,
+  // Override default 'circle' node program with bordered variant. All our
+  // nodes use the default type, so every node gets the black outer ring.
+  nodeProgramClasses: { circle: NodeBorderProgram },
+  // Dark-theme hover label. Sigma v3 renamed v2's `hoverRenderer` setting
+  // to `defaultDrawNodeHover`; the v2 name was silently ignored, so our
+  // earlier attempt fell back to the built-in white-box drawer. Also note
+  // that node programs can export their own `drawHover` method which
+  // takes precedence over this setting — @sigma/node-border happens to
+  // inherit the default drawHover, so this setting does apply here.
+  defaultDrawNodeHover: drawDarkHover,
+  hideEdgesOnMove: true,
+  // Sigma v3 disables edge mouse events by default for perf — we need them
+  // on to attach the hover tooltip below (`renderer.on('enterEdge', ...)`).
+  // Hit-test radius scales with each edge's reduced `size`, so highlighted
+  // edges (size 0.4) are reliably hoverable while default-thin edges
+  // (0.05–0.1) are nearly impossible to grab — exactly the behavior we
+  // want, since the tooltip is gated on `selectedNodeId` anyway.
+  enableEdgeEvents: true,
+  // Node reducer — resolution order:
+  //   1. Filtered out  → hidden
+  //   2. Ego active + out-of-hood  → dim (solid dark, no label, smaller)
+  //   3. Selected (popup open)  → highlighted + size boost
+  //   4. Search match  → highlighted + size boost
+  //   5. default
+  // Called once per render pass (not per frame); state changes trigger refresh.
+  nodeReducer: (node, data) => {
+    if (!visibleNodesCache.has(node)) return { ...data, hidden: true };
+    if (egoHoodCache && !egoHoodCache.has(node)) {
+      return { ...data, color: '#2a2a2a', size: (data.size || 5) * 0.5, label: '' };
+    }
+    // Path overlay (trail/timeline) — spotlight member nodes (own colour/size +
+    // order badge + label), fade non-members to a same-hue context cloud. Region
+    // overlays draw a hull instead and skip node dimming.
+    if (OVERLAY_HL) {
+      if (OVERLAY_HL.memberIds.has(node)) {
+        const badge = OVERLAY_HL.badgeById && OVERLAY_HL.badgeById.get(node);
+        // Trail AND timeline members keep their OWN node colour and ORIGINAL
+        // size — no overlay-colour / date-gradient recolouring, no size boost.
+        // The badge (number/date), label and brightness mark the path/timeline.
+        const lbl = badge ? (badge + ' ' + data.label) : data.label;
+        // A step is focused → spotlight that node via its label + highlight.
+        if (OVERLAY_HL.focusId) {
+          if (OVERLAY_HL.focusId === node) {
+            return { ...data, label: lbl, highlighted: true, forceLabel: true, zIndex: 4 };
+          }
+          // Other path members keep their ORIGINAL colour (no fade) — only the
+          // focused node carries a label, which is enough to identify it, so the
+          // rest of the path stays fully visible in its own colours.
+          return { ...data, label: '', zIndex: 1 };
+        }
+        // Whole-path view → bright at own colour/size, but label only if it
+        // survives the overlap cull (cullLabels seeds labeledIds with members
+        // here). Forcing every member's label overlapped into noise on large
+        // timelines; culling keeps small trails fully labelled and thins dense
+        // ones. Date/order still live in the right-panel step list.
+        // No `highlighted` (same reason as region members): it would redraw the
+        // dot on Sigma's top hoverNodes layer, covering other nodes' labels. The
+        // focused-step node above keeps it (a single intentional spotlight).
+        const showLbl = !labeledIds || labeledIds.has(node);
+        return { ...data, label: showLbl ? lbl : '', forceLabel: showLbl, zIndex: 3 };
+      }
+      // Non-member nodes → keep their own hue but faded HARDER toward the
+      // background (not hidden, not flat grey) so the path's position within the
+      // whole graph stays legible while the colour still hints at cluster. Keep
+      // ORIGINAL size (no shrink) — the deeper fade alone de-emphasises them so
+      // members still dominate. Label off; edges hidden (edgeReducer).
+      return { ...data, color: fadeColor(data.color, 0.18), label: '' };
+    }
+    // Region overlay (synthesis / contradiction) — members keep their own colour
+    // and size; only the rest is dimmed so the region's nodes stand out against
+    // it (plus the hull). Dim (not hide) keeps surrounding context.
+    if (regionLens) {
+      if (regionLens.memberIds.has(node)) {
+        // Members keep their OWN node hue AND original size — exactly like path
+        // (trail/timeline) members. The region is shown by the achromatic hull +
+        // dimmed non-members, not by repainting or enlarging member nodes.
+        const col = regionLens.color || data.color;
+        // Contradiction: prefix the label with the camp tag ("[Position A]") so
+        // opposing sides read apart without a faction colour.
+        let lbl = data.label;
+        if (regionLens.sideByNode) {
+          const tag = regionLens.sideByNode.get(node);
+          if (tag) lbl = '[' + tag + '] ' + lbl;
+        }
+        // Label only if it survives the overlap cull (cullLabels seeds labeledIds
+        // from regionLens members) — forcing every member's label overlapped into
+        // noise on dense regions, same as the path-overlay whole view.
+        const showLbl = !labeledIds || labeledIds.has(node);
+        // No `highlighted` and no size boost — members keep data.size. In Sigma
+        // v3 a highlighted node is redrawn on the top hoverNodes layer (above the
+        // labels layer), covering other nodes' labels; members already stand out
+        // via the dimmed non-members + hull, and forceLabel + zIndex keep their
+        // labels/dots prominent without enlarging or promoting the dot.
+        return { ...data, color: col,
+                 label: showLbl ? lbl : '', forceLabel: showLbl, zIndex: 3 };
+      }
+      // Non-member nodes → keep their own hue faded HARDER toward the background
+      // (same treatment as path overlays), ORIGINAL size (no shrink), label off.
+      // The deeper fade de-emphasises them so members read against context that
+      // still hints at cluster colour. Unified for synthesis and contradiction.
+      return { ...data, color: fadeColor(data.color, 0.18), label: '' };
+    }
+    // Selected / search / neighbor branches use `forceLabel: true` to
+    // bypass labelRenderedSizeThreshold per-node — no need to inflate
+    // node size just to make the label pass the threshold gate. Node
+    // sizes stay at their degree-scaled values; only `highlighted` +
+    // zIndex signal selection state visually.
+    if (selectedNodeId === node) {
+      return { ...data, highlighted: true, forceLabel: true, zIndex: 3 };
+    }
+    if (searchMatchIds.size > 0 && searchMatchIds.has(node)) {
+      return { ...data, highlighted: true, forceLabel: true, zIndex: 2 };
+    }
+    // Neighbor of currently-selected node — force label regardless of
+    // size threshold. Cull outcome still applies: if this neighbor lost
+    // the AABB contest to a higher-priority sibling, its label gets
+    // blanked (forceLabel has no effect on blank labels).
+    if (selectedNeighborsCache && selectedNeighborsCache.has(node)) {
+      if (labeledIds && !labeledIds.has(node)) return { ...data, label: '' };
+      return { ...data, forceLabel: true };
+    }
+    // Label culling — blank label if this node lost the overlap contest.
+    // Placed after selected/search/neighbor returns so those cases always
+    // keep their label regardless of the cull outcome.
+    if (labeledIds && !labeledIds.has(node)) {
+      return { ...data, label: '' };
+    }
+    return data;
+  },
+  // Edge reducer — resolution order:
+  //   1. Endpoint filtered out  → hidden
+  //   2. Ego active + out-of-hood  → dim (near-black, thin)
+  //   3. Selected-node incident  → brighter blue + thicker (trace connections
+  //      without entering ego mode)
+  //   4. Fragile highlight toggle + edge is fragile  → red + thick
+  //   5. default (pre-composited color)
+  // Ego dim wins over selected/fragile: when ego is focused, out-of-hood
+  // edges shouldn't grab attention regardless of other state.
+  edgeReducer: (edge, data) => {
+    const [from, to] = graph.extremities(edge);
+    if (!visibleNodesCache.has(from) || !visibleNodesCache.has(to)) {
+      return { ...data, hidden: true };
+    }
+    // Relation filter — every edge has an effective relation (INFERRED
+    // maps to 'inferred'). Toggling that relation off hides the edge.
+    if (!activeRelations.has(effRelation(data))) {
+      return { ...data, hidden: true };
+    }
+    if (egoHoodCache && (!egoHoodCache.has(from) || !egoHoodCache.has(to))) {
+      return { ...data, color: '#0f0f0f', size: 0.05 };
+    }
+    // Path overlay — in whole-path view, brighten edges whose BOTH endpoints
+    // are members (curated path coinciding with a real link). During a focused
+    // step, dim all edges so only the spotlighted node stands out.
+    if (OVERLAY_HL) {
+      // A curated step coinciding with a real link → thicken but keep the edge's
+      // own relation colour (was recoloured to the overlay type colour).
+      if (!OVERLAY_HL.focusId && OVERLAY_HL.memberIds.has(from) && OVERLAY_HL.memberIds.has(to)) {
+        return { ...data, size: Math.max(data.size || 1, 2), zIndex: 2 };
+      }
+      // All other edges → hidden. Dimming them left too dense a hairball behind
+      // the path; the dimmed non-member nodes alone carry the "where" context,
+      // and the trail's own sequence is drawn by the synthetic connector line.
+      return { ...data, hidden: true };
+    }
+    // Region overlay — brighten member↔member edges, dim the rest.
+    if (regionLens) {
+      if (regionLens.memberIds.has(from) && regionLens.memberIds.has(to)) {
+        // Synthesis (color null) keeps the edge's own relation hue; contradiction
+        // tints member↔member edges with the type colour.
+        return { ...data, color: regionLens.color || data.color, size: Math.max(data.size || 1, 1.5) };
+      }
+      return { ...data, color: '#141414', size: 0.05 };
+    }
+    if (selectedNodeId && (from === selectedNodeId || to === selectedNodeId)) {
+      // Relation-aware highlight color — same hue as the legend swatch
+      // so users immediately recognize "this strand is a contradicts/defines/
+      // cites/references/inferred edge" without consulting the tooltip.
+      // Size 1.4 (with minEdgeThickness 1.0 above) — a thin, separable stroke:
+      // a high-degree hub's incident edges no longer merge into one thick bright
+      // fan, so individual strands stay distinguishable. Colour carries the
+      // primary signal; thickness is just enough to lift it off the hair-thin
+      // ambient mesh and stay hoverable (tooltip is gated on selection anyway).
+      const rel = effRelation(data);
+      const hi = RELATION_HIGHLIGHT[rel] || RELATION_HIGHLIGHT.references;
+      return { ...data, color: hi, size: 1.4, zIndex: 2 };
+    }
+    if (highlightFragile && data.isFragile) {
+      // Larger hover target for fragile-bridge highlighting — same
+      // rationale as selected-incident above. 4 to stay distinguishable
+      // from the highlight tier and to read clearly under the orange tint.
+      return { ...data, color: '#ffa940', size: 4 };
+    }
+    return data;
+  },
+});
+
+const t1 = performance.now();
+document.getElementById('loading').style.display = 'none';
+
+// --- Sidebar UI: cluster legend ---
+// Each row is both the legend entry and the toggle control — clicking the
+// row flips activeClusters and refreshes the renderer. Matches original.
+// Counts are dynamic — sum of per-type member counts across currently-
+// active types, so toggling 'source' on adds source counts in real time.
+function getClusterCount(slug) {
+  const counts = slugTypeCount[slug];
+  if (!counts) return 0;
+  let total = 0;
+  for (const t of activeTypes) total += counts[t] || 0;
+  return total;
+}
+const legendCountEls = {};  // slug → count <span>, updated on type toggle
+const legendEl = document.getElementById('legend');
+uniqueSlugs.forEach(slug => {
+  const c = clusterBySlug[slug];
+  const color = CLUSTER_COLORS[slug];
+  const row = document.createElement('div');
+  row.className = 'legend-row' + (activeClusters.has(slug) ? '' : ' inactive');
+  row.dataset.slug = slug;
+  row.title = "Click to open this cluster's overview";
+  row.innerHTML =
+    `<div class="legend-dot" style="--c:${color}"></div>` +
+    `<span class="legend-name">${c.name} (<span class="legend-count">${getClusterCount(slug)}</span>)</span>`;
+  legendCountEls[slug] = row.querySelector('.legend-count');
+  // Click = select this cluster: pin its hull + show overviews/<slug>.md in
+  // the right panel (2026-06-01 — replaced the low-value visibility toggle).
+  // Re-clicking the selected cluster deselects → root overview. Click-only:
+  // hover preview removed (2026-06-01, felt over-eager).
+  row.onclick = () => selectCluster(selectedCluster === slug ? null : slug);
+  legendEl.appendChild(row);
+});
+
+// --- Sidebar UI: relation filter ---
+// Hyper-G typed edges (2026-05-02, expanded 2026-05-03 to include inferred).
+// 5 relation kinds: 4 EXTRACTED (contradicts/defines/cites/references) +
+// INFERRED virtualized as 'inferred'. Toggling a row hides edges of that
+// relation. (Type-level
+// toggle was removed to avoid sidebar scroll — node visibility now derives
+// from cluster + DEFAULT_ACTIVE_TYPES alone, with optional URL `types=`
+// override for back-compat with older share links.)
+// Raw counts (graph total) determine which relation rows to render — a
+// relation with 0 edges in the graph gets no row. The displayed count
+// is visible-only, populated by recomputeVisibility() so the legend
+// stays in lock-step with the stats panel under any filter combination
+// (overview/contradiction/timeline/trail are excluded by default —
+// see DEFAULT_ACTIVE_TYPES — which makes raw and visible counts diverge
+// substantially for INFERRED edges).
+const relationCounts = {};
+graph.forEachEdge((edge, attr) => {
+  const r = effRelation(attr);
+  relationCounts[r] = (relationCounts[r] || 0) + 1;
+});
+const relationFilterEl = document.getElementById('relation-filter');
+for (const rel of RELATION_KINDS) {
+  if (!relationCounts[rel]) continue;
+  const row = document.createElement('div');
+  row.className = 'legend-row' + (activeRelations.has(rel) ? '' : ' inactive');
+  row.dataset.relation = rel;
+  row.title = 'Click to toggle this relation';
+  // Swatch shows the highlight color (what the user sees on selected
+  // edges) — the default render uses much darker pre-composited tints
+  // for ambient density, which would be invisible at this swatch size.
+  const swatch = RELATION_COLORS[rel];
+  row.innerHTML =
+    `<div class="legend-dot" style="--c:${swatch}; background:${swatch}; border-color:${swatch}"></div>` +
+    `<span class="legend-name">${RELATION_LABELS[rel]} (<span class="rel-count" data-rel="${rel}">0</span>)</span>`;
+  row.onclick = () => {
+    if (activeRelations.has(rel)) {
+      activeRelations.delete(rel);
+      row.classList.add('inactive');
+    } else {
+      activeRelations.add(rel);
+      row.classList.remove('inactive');
+    }
+    recomputeVisibility();
+    renderer.refresh();
+    serializeStateToUrl();
+  };
+  relationFilterEl.appendChild(row);
+}
+// Rows now exist — repopulate counts (the init recomputeVisibility() call
+// above ran before row creation and was a no-op for .rel-count spans).
+recomputeVisibility();
+
+// --- Search ---
+// Enter submits the query; matches the original's case-insensitive
+// label+id substring search, restricted to currently-visible nodes so
+// filter state is respected. Camera animates to the first match.
+// Empty query clears any existing highlights.
+const searchEl = document.getElementById('search');
+searchEl.addEventListener('keydown', (ev) => {
+  if (ev.key !== 'Enter') return;
+  const q = ev.target.value.toLowerCase().trim();
+  if (!q) {
+    if (searchMatchIds.size > 0) { searchMatchIds = new Set(); renderer.refresh(); }
+    return;
+  }
+  const matches = [];
+  graph.forEachNode((node, attr) => {
+    if (!visibleNodesCache.has(node)) return;
+    const lbl = (attr.label || '').toLowerCase();
+    if (lbl.includes(q) || node.toLowerCase().includes(q)) matches.push(node);
+  });
+  if (matches.length === 0) {
+    searchMatchIds = new Set();
+    renderer.refresh();
+    return;
+  }
+  searchMatchIds = new Set(matches.slice(0, 10));
+  renderer.refresh();
+  // Sigma camera operates in its own normalized coordinate space; use
+  // getNodeDisplayData to get the right {x,y} before animating.
+  const first = matches[0];
+  const pos = renderer.getNodeDisplayData(first);
+  if (pos) {
+    renderer.getCamera().animate(
+      { x: pos.x, y: pos.y, ratio: 0.3 },
+      { duration: 600 }
+    );
+  }
+});
+
+// --- Fragile toggle wiring ---
+// Section is hidden when no fragile bridges exist (don't advertise an option
+// with no visual effect).
+const fragileSectionEl = document.getElementById('fragile-section');
+const fragileToggleEl = document.getElementById('fragile-toggle');
+document.getElementById('fragile-count').textContent = fragileState.pairCount;
+if (fragileState.pairCount > 0) fragileSectionEl.style.display = '';
+fragileToggleEl.checked = highlightFragile;
+fragileToggleEl.addEventListener('change', (ev) => {
+  highlightFragile = ev.target.checked;
+  renderer.refresh();
+  serializeStateToUrl();
+});
+
+// --- BFS by hop depth (shared by popup list and later ego mode) ---
+// Runs on the full graph, not filter-restricted — matches original intent
+// (ego neighborhood reflects real connectivity, UI filters visibility).
+// Callers filter by visibleNodesCache when displaying.
+function bfsByDepth(root, maxDepth) {
+  const seen = new Set([root]);
+  const byDepth = new Map();
+  let frontier = [root];
+  for (let d = 1; d <= maxDepth; d++) {
+    const next = [];
+    const atDepth = [];
+    for (const n of frontier) {
+      graph.forEachNeighbor(n, (m) => {
+        if (!seen.has(m)) { seen.add(m); next.push(m); atDepth.push(m); }
+      });
+    }
+    byDepth.set(d, atDepth);
+    frontier = next;
+  }
+  return byDepth;
+}
+
+// --- Node-info popup ---
+const infoEl = document.getElementById('node-info');
+
+function renderConnList(nodeId, depth) {
+  const listEl = document.getElementById('ni-list');
+  listEl.innerHTML = '';
+  const d = depth || 1;
+  const byDepth = bfsByDepth(nodeId, d);
+  const CAP = 30;
+
+  for (let i = 1; i <= d; i++) {
+    const atD = (byDepth.get(i) || []).filter(cid => visibleNodesCache.has(cid));
+    if (atD.length === 0) continue;
+    if (d > 1) {
+      const header = document.createElement('div');
+      header.textContent = `${i}-hop · ${atD.length}`;
+      header.style.cssText = 'color:#888;font-size:11px;margin:8px 0 2px;font-weight:600;letter-spacing:.5px;';
+      listEl.appendChild(header);
+    }
+    atD.slice(0, CAP).forEach(cid => {
+      const attr = graph.getNodeAttributes(cid);
+      const icon = attr.nodeType === 'entity' ? '🏢 '
+        : attr.nodeType === 'concept' ? '💡 '
+        : '📄 ';
+      const div = document.createElement('div');
+      div.textContent = icon + (attr.label || cid);
+      div.onclick = () => navigateTo(cid);
+      listEl.appendChild(div);
+    });
+    if (atD.length > CAP) {
+      const more = document.createElement('div');
+      more.textContent = `... +${atD.length - CAP} more`;
+      more.style.color = '#555';
+      listEl.appendChild(more);
+    }
+  }
+}
+
+// --- Reading panel: markdown render + wikilink/backlink navigation ---
+// Page bodies + idmap + backlinks (~9MB) are fetched LAZILY on first node
+// open — `${PFX}pages.json`, same prefix convention as the graph/clusters
+// data — so the heavy bundle stays off the initial render/settle path.
+let PAGE_MD = {}, PAGE_IDMAP = {}, PAGE_BACKLINKS = {}, PAGE_OVERVIEWS = {}, PAGE_META = {};
+let _pagesLoaded = false;
+let _pagesPromise = null;
+function ensurePages() {
+  if (_pagesPromise) return _pagesPromise;
+  _pagesPromise = fetch(`./${PFX}pages.json`)
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(d => {
+      PAGE_MD = (d && d.pages) || {};
+      PAGE_IDMAP = (d && d.idmap) || {};
+      PAGE_BACKLINKS = (d && d.backlinks) || {};
+      PAGE_OVERVIEWS = (d && d.overviews) || {};
+      PAGE_META = (d && d.meta_pages) || {};
+      _pagesLoaded = true;
+    })
+    .catch(err => { console.error('[graph.html] pages load failed:', err); _pagesLoaded = true; });
+  return _pagesPromise;
+}
+
+function escHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// Split YAML frontmatter from body. Minimal parser — only the keys the
+// badge row shows (status, tags) are extracted; the rest of the block is
+// dropped so it never renders as stray text below the title.
+function splitFrontmatter(raw) {
+  const m = /^---\n([\s\S]*?)\n---\n?/.exec(raw);
+  if (!m) return { meta: {}, body: raw };
+  const meta = {};
+  const lines = m[1].split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const kv = /^([A-Za-z_][\w-]*):\s*(.*)$/.exec(lines[i]);
+    if (!kv) continue;
+    if (kv[2].trim() === '') {
+      // Block-list form (`key:` then `  - item` lines) → fold into inline [a, b].
+      const items = [];
+      let j = i + 1;
+      for (; j < lines.length; j++) {
+        const li = /^\s*-\s*(.*)$/.exec(lines[j]);
+        if (!li) break;
+        items.push(li[1].trim());
+      }
+      if (items.length) { meta[kv[1]] = '[' + items.join(', ') + ']'; i = j - 1; continue; }
+    }
+    meta[kv[1]] = kv[2].trim();
+  }
+  return { meta, body: raw.slice(m[0].length) };
+}
+
+// Parse an inline YAML list "[a, b, c]" → ["a","b","c"]; bare scalar → [v].
+function parseTags(v) {
+  if (!v) return [];
+  const inner = /^\[(.*)\]$/.exec(v.trim());
+  const s = inner ? inner[1] : v;
+  return s.split(',').map(t => t.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
+}
+
+// Replace [[target|label]] / [[target]] with an anchor (resolved to a real
+// graph node) or a muted span (dangling) BEFORE marked runs. Resolution
+// reuses the same idmap the edge builder used, so a link is clickable iff
+// it points at a node that exists in the graph.
+function linkifyWikilinks(body) {
+  return body.replace(/\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]/g, (full, rawTarget, rawLabel) => {
+    const target = rawTarget.trim();
+    const label = (rawLabel != null ? rawLabel : rawTarget).trim();
+    const id = PAGE_IDMAP[target];
+    if (!id) return '<span class="wikilink-dangling">' + escHtml(label) + '</span>';
+    return '<a class="wikilink" data-node="' + escHtml(id) + '">' + escHtml(label) + '</a>';
+  });
+}
+
+// Single navigation entry point: focus the node on the graph and (re)open
+// its panel. Used by wikilinks, backlinks, and the connection list so every
+// in-panel click behaves identically.
+//
+// Exit ego (local-view) first when it's active: the ego hood filters the
+// node reducer to egoRoot's neighborhood, so a destination outside that
+// hood would stay hidden and the camera would pan to an invisible node.
+// Clearing ego restores the full graph so the target is always visible.
+function navigateTo(nodeId) {
+  if (!graph.hasNode(nodeId)) return;
+  if (egoRoot && egoRoot !== nodeId) {
+    clearEgo();
+    serializeStateToUrl();
+  }
+  const pos = renderer.getNodeDisplayData(nodeId);
+  if (pos) renderer.getCamera().animate({ x: pos.x, y: pos.y, ratio: 0.3 }, { duration: 600 });
+  openPopup(nodeId);
+}
+
+async function renderPage(nodeId) {
+  const metaEl = document.getElementById('ni-meta');
+  const contentEl = document.getElementById('ni-content');
+  const blEl = document.getElementById('ni-backlinks');
+  metaEl.replaceChildren();
+  blEl.replaceChildren();
+  document.getElementById('ni-body').scrollTop = 0;
+
+  // Lazy: show a brief loading hint while the body bundle is fetched (hosted
+  // standalone, first open). Then bail if the user moved to another node.
+  if (!_pagesLoaded) {
+    contentEl.replaceChildren();
+    const loading = document.createElement('div');
+    loading.style.cssText = 'color:#777;font-size:12px;';
+    loading.textContent = 'Loading content…';
+    contentEl.appendChild(loading);
+  }
+  await ensurePages();
+  if (selectedNodeId !== nodeId) return;
+
+  const raw = PAGE_MD[nodeId];
+  if (raw == null) {
+    contentEl.replaceChildren();
+    const hint = document.createElement('div');
+    hint.style.cssText = 'color:#777;font-size:12px;';
+    hint.textContent = Object.keys(PAGE_MD).length
+      ? 'This node has no body.'
+      : 'Failed to load body data.';
+    contentEl.appendChild(hint);
+    return;
+  }
+
+  const { meta, body } = splitFrontmatter(raw);
+  if (meta.status) {
+    const c = document.createElement('span');
+    c.className = 'meta-chip status';
+    c.textContent = meta.status;
+    metaEl.appendChild(c);
+  }
+  for (const tag of parseTags(meta.tags)) {
+    const c = document.createElement('span');
+    c.className = 'meta-chip';
+    c.textContent = '#' + tag;
+    metaEl.appendChild(c);
+  }
+
+  contentEl.innerHTML = marked.parse(linkifyWikilinks(body));
+
+  const back = PAGE_BACKLINKS[nodeId] || [];
+  if (back.length) {
+    const head = document.createElement('div');
+    head.className = 'bl-head';
+    head.textContent = '← ' + back.length + ' backlinks';
+    blEl.appendChild(head);
+    back.forEach(srcId => {
+      const attr = graph.hasNode(srcId) ? graph.getNodeAttributes(srcId) : null;
+      const div = document.createElement('div');
+      div.className = 'bl-item';
+      div.textContent = '📄 ' + ((attr && attr.label) || srcId);
+      div.onclick = () => navigateTo(srcId);
+      blEl.appendChild(div);
+    });
+  }
+
+  // "Appears in overlays" — this node's membership in trail/timeline/synthesis/
+  // contradiction overlays (reverse map from _overlays.json). overview is
+  // implicit via the node's cluster, so it is not listed here.
+  const ovs = NODE_OVERLAYS[nodeId] || [];
+  if (ovs.length) {
+    const head = document.createElement('div');
+    head.className = 'bl-head';
+    head.style.marginTop = '10px';
+    head.textContent = '◆ Appears in ' + ovs.length + ' overlays';
+    blEl.appendChild(head);
+    ovs.forEach(o => {
+      const div = document.createElement('div');
+      div.className = 'bl-item';
+      div.textContent = (OVERLAY_ICON[o.type] || '•') + ' ' + o.title;
+      div.onclick = () => { const row = document.querySelector(
+        `#overlay-panel .legend-row[data-key="${o.type}/${o.slug}"]`); pinOverlay(o.type + '/' + o.slug, row); };
+      blEl.appendChild(div);
+    });
+  }
+}
+
+// Wikilink clicks (delegated once — #ni-content is replaced via innerHTML
+// per page, but the container element itself persists).
+document.getElementById('ni-content').addEventListener('click', (e) => {
+  const a = e.target.closest('a.wikilink');
+  if (!a) return;
+  e.preventDefault();
+  navigateTo(a.dataset.node);
+});
+
+function openPopup(nodeId) {
+  // Selecting a node clears any overlay/cluster lens (incl. path connector +
+  // stepper) so the node + its edges aren't dimmed and no green trail lingers.
+  if (pinnedOverlayKey || selectedCluster || OVERLAY_HL || regionLens || pathDraw) {
+    pinnedOverlayKey = null; selectedCluster = null;
+    document.querySelectorAll('.legend-row.pinned').forEach(r => r.classList.remove('pinned'));
+    hideOverlayVisual();
+  }
+  const attr = graph.getNodeAttributes(nodeId);
+  selectedNodeId = nodeId;
+  // Cache neighbors so the reducer can size-boost them. Pre-computing
+  // avoids calling graph.neighbors per render frame.
+  selectedNeighborsCache = new Set(graph.neighbors(nodeId));
+  renderer.refresh();
+  // Re-cull labels so this node's neighbors get priority-tier treatment
+  // and their labels appear even if they'd normally lose to higher-degree
+  // hubs. Debounced so rapid popup open/close doesn't thrash.
+  scheduleCullLabels();
+  infoEl.dataset.nodeId = nodeId;
+  document.getElementById('ni-title').textContent = attr.label || nodeId;
+  const badge = document.getElementById('ni-type');
+  badge.textContent = attr.nodeType;
+  badge.style.background = TYPE_COLORS[attr.nodeType] || '#909399';
+  const slug = CLUSTER_BY_NODE[nodeId];
+  document.getElementById('ni-cluster').textContent =
+    slug ? ('Cluster: ' + clusterBySlug[slug].name) : '';
+  // Connection count restricted to visible neighbors for consistency
+  // with what the user actually sees on screen.
+  let visibleConns = 0;
+  graph.forEachNeighbor(nodeId, (neighbor) => {
+    if (visibleNodesCache.has(neighbor)) visibleConns++;
+  });
+  document.getElementById('ni-conn').textContent = visibleConns + ' connections';
+  // Hop buttons: active state reflects current ego root/depth. List mode:
+  // grouped-by-hop when popup is open on the current ego root, else flat 1-hop.
+  infoEl.querySelectorAll('.hop-btn').forEach(btn => {
+    const d = parseInt(btn.dataset.depth, 10);
+    btn.classList.toggle('active', egoRoot === nodeId && egoDepth === d);
+  });
+  const listDepth = (egoRoot === nodeId && egoDepth > 0) ? egoDepth : null;
+  renderConnList(nodeId, listDepth);
+  _setNodeChromeVisible(true);  // restore hop buttons / conn list (meta panel hides them)
+  renderPage(nodeId);
+  // On mobile, collapse the sidebar drawer so the bottom-sheet panel is
+  // unobstructed (no-op on desktop where the drawer class is inert).
+  document.getElementById('sidebar').classList.remove('open');
+  infoEl.classList.add('open');
+}
+
+function closePopup() {
+  infoEl.classList.remove('open');
+  if (selectedNodeId) {
+    selectedNodeId = null;
+    selectedNeighborsCache = null;
+    renderer.refresh();
+    // Restore default label priority (degree only) now that no selection
+    // is driving the neighbor tier.
+    scheduleCullLabels();
+  }
+  // Edge tooltip is gated on selectedNodeId, so once selection clears any
+  // visible tooltip is stale — drop it immediately rather than waiting
+  // for a leaveEdge that may never fire (the highlight is gone). Query
+  // the DOM directly to avoid a TDZ reference to the `edgeTooltip` const
+  // declared further down in module scope.
+  const tip = document.getElementById('edge-tooltip');
+  tip.style.display = 'none';
+  tip.dataset.edge = '';
+  // Also release any pinned overlay / cluster-overview selection so ESC and
+  // the close button reset the view to neutral. hideOverlayVisual clears the
+  // path connector (pathDraw) + stepper state too — without it the green trail
+  // line lingers on the hull canvas after the panel closes.
+  if (pinnedOverlayKey || selectedCluster || OVERLAY_HL || regionLens || pathDraw) {
+    pinnedOverlayKey = null; selectedCluster = null;
+    document.querySelectorAll('.legend-row.pinned').forEach(r => r.classList.remove('pinned'));
+    hideOverlayVisual();  // OVERLAY_HL, regionLens, pathDraw, stepOverlay, stepper, refresh, drawHull
+  }
+}
+
+// =====================================================================
+// Meta-overlay feature (2026-06-01): cluster-overview binding + the 4-type
+// overlay panel. overview is realized via the cluster legend (click a
+// cluster → pin hull + show overviews/<slug>.md). trail/timeline/synthesis/
+// contradiction live in #overlay-panel: hover previews, click pins.
+// =====================================================================
+
+// Node-only panel chrome (hop buttons + connection list) — hidden when the
+// panel shows non-node meta/overview markdown.
+function _setNodeChromeVisible(show) {
+  const hop = infoEl.querySelector('.hop-buttons');
+  if (hop) hop.style.display = show ? '' : 'none';
+  const list = document.getElementById('ni-list');
+  if (list) list.style.display = show ? '' : 'none';
+}
+
+// Open the right panel on non-node markdown (overview or a meta page). Reuses
+// the node panel's markdown pipeline (splitFrontmatter→linkify→marked) but
+// clears node-specific state/chrome. `rawKey` is resolved after ensurePages.
+async function openMetaPanel({ title, typeLabel, typeColor, rawKey, headerHtml }) {
+  if (selectedNodeId) { selectedNodeId = null; selectedNeighborsCache = null; }
+  infoEl.dataset.nodeId = '';
+  document.getElementById('ni-title').textContent = title;
+  const badge = document.getElementById('ni-type');
+  badge.textContent = typeLabel; badge.style.background = typeColor || '#909399';
+  document.getElementById('ni-cluster').textContent = '';
+  document.getElementById('ni-conn').textContent = '';
+  document.getElementById('ni-meta').replaceChildren();
+  document.getElementById('ni-backlinks').replaceChildren();
+  document.getElementById('ni-stepper').replaceChildren();
+  _setNodeChromeVisible(false);
+  document.getElementById('ni-body').scrollTop = 0;
+  const contentEl = document.getElementById('ni-content');
+  contentEl.innerHTML = '<div style="color:#777;font-size:12px;">Loading content…</div>';
+  infoEl.classList.add('open');
+  document.getElementById('sidebar').classList.remove('open');
+  await ensurePages();
+  const raw = rawKey();
+  contentEl.innerHTML = (headerHtml || '') + (raw != null
+    ? marked.parse(linkifyWikilinks(splitFrontmatter(raw).body))
+    : '<div style="color:#777;font-size:12px;">No content.</div>');
+}
+
+// --- cluster select → pin hull + overview panel (root when slug is null) ---
+function selectCluster(slug) {
+  selectedCluster = slug;
+  pinnedOverlayKey = null; OVERLAY_HL = null; regionLens = null;  // cluster supersedes overlays
+  document.querySelectorAll('.legend-row.pinned').forEach(r => r.classList.remove('pinned'));
+  if (slug) document.querySelectorAll('#legend .legend-row').forEach(r =>
+    { if (r.dataset.slug === slug) r.classList.add('pinned'); });
+  renderer.refresh();
+  drawHull();
+  // Open panel first (.open set synchronously) so framing offsets left of it.
+  openMetaPanel(slug
+    ? { title: (clusterBySlug[slug] && clusterBySlug[slug].name) || slug, typeLabel: 'overview',
+        typeColor: CLUSTER_COLORS[slug], rawKey: () => PAGE_OVERVIEWS[slug] }
+    : { title: 'Overview', typeLabel: 'overview', typeColor: '#667eea',
+        rawKey: () => PAGE_OVERVIEWS._root });
+  if (slug) {
+    const mem = [];
+    graph.forEachNode(n => { if (CLUSTER_BY_NODE[n] === slug) mem.push(n); });
+    frameNodes(mem);
+  }
+}
+
+// --- overlay panel (trail/timeline/synthesis/contradiction) ---
+const OVERLAY_ICON = { trail: '➜', timeline: '⏱', synthesis: '◇', contradiction: '⚡' };
+const OVERLAY_COLOR = { trail: '#67c23a', timeline: '#4a90d9', synthesis: '#f56c6c', contradiction: '#e6a23c' };
+const OVERLAY_TYPE_LABEL = { trail: 'Trail', timeline: 'Timeline', synthesis: 'Synthesis', contradiction: 'Contradiction' };
+// Contradiction factions are distinguished by a "[Position A]"-style PREFIX on
+// the member labels (+ the panel legend), not by colour: like synthesis, the
+// region keeps each node's own hue and the hull is achromatic, so faction colour
+// would fight the node colours. Factions overlap spatially under FA2 (sub-hulls
+// would collide), so the prefix carries the camp instead.
+// sideTag compacts a faction label into the prefix tag:
+//   "Position A (replacement/reduction)" → "Position A",
+//   "Mediation C / third view" → "Mediation C"
+// (drop the parenthetical / slash detail, then strip leading/trailing spaces).
+const sideTag = label => label.split(/[(/（]/)[0].trim();
+
+// Set the visual lens for an overlay: path → reducer highlight (OVERLAY_HL);
+// region → hull (regionLens). Does not touch panel/pin state.
+function showOverlayVisual(ov, focus) {
+  // Labels always use the global default colour — factions are marked by an
+  // A/B/C prefix, not label colour. (Kept as an explicit reset in case an
+  // older state left a per-node labelColor setting.)
+  renderer.setSetting('labelColor', { color: '#ccc' });
+  if (ov.flavor === 'path') {
+    regionLens = null;
+    // Node label badge: trail → sequence number ("1."), timeline → the actual
+    // date ("2024-10") so the on-graph label carries time, not just an ordinal.
+    const isTimeline = ov.members.some(m => m.date);
+    const badgeById = new Map();
+    ov.members.forEach(m => {
+      if (isTimeline && m.date) badgeById.set(m.id, m.date);
+      else if (m.order != null) badgeById.set(m.id, m.order + '.');
+    });
+    OVERLAY_HL = { memberIds: _overlayMemberIds(ov), badgeById,
+                   color: OVERLAY_COLOR[ov.type], focusId: null, focus: !!focus };
+    // Both trail and timeline draw the ordered chain through their members
+    // (members are pre-sorted: trail by curated step, timeline chronologically).
+    // Neutral muted grey — members keep their own colours, so a type-coloured
+    // line would re-introduce a single overlay hue. Kept dark enough that a
+    // dense chain doesn't wash out the node labels behind it. Large timelines
+    // (~94 members) zigzag since chronological order ≠ spatial proximity;
+    // accepted by design (the date badges still carry order).
+    pathDraw = { orderedIds: ov.members.map(m => m.id), color: '#6e6e6e' };
+  } else {
+    OVERLAY_HL = null; pathDraw = null;
+    // Contradiction factions: map each member → its camp tag (first side wins if
+    // a hub appears in two camps) so the reducer prefixes each member label with
+    // a "[Position A]"-style tag. No per-node label colour — the camp reads from
+    // the prefix, leaving the node's own hue intact.
+    let sideByNode = null;
+    if (ov.sides) {
+      sideByNode = new Map();
+      ov.sides.forEach(s => {
+        const tag = sideTag(s.label);
+        s.members.forEach(id => { if (!sideByNode.has(id)) sideByNode.set(id, tag); });
+      });
+    }
+    // Both region types (synthesis & contradiction) are a neutral lens: members
+    // keep their own node/edge hue (color: null → reducers fall back to
+    // data.color) and the hull is achromatic grey, so the overlay shows "which
+    // nodes belong" without repainting them. Contradiction adds the A/B/C label
+    // prefix (sideByNode) to mark camps.
+    regionLens = { memberIds: _overlayMemberIds(ov),
+                   color: null, hullColor: '#a0a0a0', sideByNode };
+  }
+  renderer.refresh();
+  drawHull();
+}
+function hideOverlayVisual() {
+  OVERLAY_HL = null; regionLens = null; pathDraw = null;
+  stepOverlay = null; stepIndex = -1;
+  renderer.setSetting('labelColor', { color: '#ccc' });  // keep labels at default colour
+  document.getElementById('ni-stepper').replaceChildren();
+  renderer.refresh();
+  scheduleCullLabels();  // recompute labels from the normal pass (drop the member-only set)
+  drawHull();
+}
+
+function pinOverlay(key, rowEl) {
+  const ov = OVERLAY_BY_KEY[key];
+  if (!ov) return;
+  const wasPinned = pinnedOverlayKey === key;
+  selectedCluster = null;
+  document.querySelectorAll('.legend-row.pinned').forEach(r => r.classList.remove('pinned'));
+  if (wasPinned) { pinnedOverlayKey = null; hideOverlayVisual(); return; }
+  pinnedOverlayKey = key;
+  showOverlayVisual(ov, true);  // pin = full focus (path bright, rest dimmed)
+  if (rowEl) rowEl.classList.add('pinned');
+  // Open the panel FIRST (adds .open synchronously) so frameNodes can offset
+  // the camera left of the now-visible panel, then fly-to-fit the members.
+  openMetaPanel({ title: ov.title, typeLabel: OVERLAY_TYPE_LABEL[ov.type] || ov.type,
+    typeColor: OVERLAY_COLOR[ov.type],
+    rawKey: () => { const raw = PAGE_META[ov.rel];
+      return raw == null ? null : (ov.flavor === 'path' ? pathContextBody(raw, ov.type) : raw); } });
+  frameNodes(ov.members.map(m => m.id));
+  // Path overlays get a guided stepper (Prev/Next walk-through); contradiction
+  // regions get a faction legend. Both render into the #ni-stepper slot.
+  if (ov.flavor === 'path') { stepOverlay = ov; stepIndex = -1; renderStepper(); renderPathContent(); }
+  else { stepOverlay = null; renderSidesLegend(ov); }
+}
+
+// Faction legend for a pinned contradiction region — the camp tag ("[Position A]")
+// matching the on-graph label prefix + the camp's full label, in the stepper
+// slot (path overlays use it for the walk-through; regions leave it free).
+// Clears the slot for regions without sides.
+function renderSidesLegend(ov) {
+  const el = document.getElementById('ni-stepper');
+  el.replaceChildren();
+  if (!ov.sides) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'side-legend';
+  ov.sides.forEach(s => {
+    const chip = document.createElement('div');
+    chip.className = 'side-chip';
+    const tag = document.createElement('span');
+    tag.className = 'side-tag';
+    tag.textContent = sideTag(s.label);
+    chip.appendChild(tag);
+    chip.appendChild(document.createTextNode(s.label));
+    wrap.appendChild(chip);
+  });
+  el.appendChild(wrap);
+}
+
+// --- Guided stepper for path overlays (trail/timeline "follow") ---
+// Layout: #ni-stepper (top) holds the nav only (Prev/counter/Next/All) so it
+// stays short and visible. #ni-content (below) is owned by renderPathContent:
+//   whole view (stepIndex<0) → flow-summary/Commentary FIRST, then the clickable step
+//     list beneath it (so the summary is visible immediately, not buried).
+//   step view (stepIndex≥0) → the focused node's own page body, so browsing a
+//     step reads like that node's page rather than repeating the summary.
+function renderStepper() {
+  const el = document.getElementById('ni-stepper');
+  el.replaceChildren();
+  if (!stepOverlay) return;
+  const n = stepOverlay.members.length;
+  const nav = document.createElement('div'); nav.className = 'step-nav';
+  const prev = document.createElement('button'); prev.className = 'step-btn'; prev.textContent = '◀ Prev';
+  prev.disabled = stepIndex <= 0;
+  prev.onclick = () => goToStep(stepIndex - 1);
+  const counter = document.createElement('div'); counter.className = 'step-counter';
+  counter.textContent = stepIndex < 0 ? `Step-by-step (${n})` : `${stepIndex + 1} / ${n}`;
+  const next = document.createElement('button'); next.className = 'step-btn'; next.textContent = 'Next ▶';
+  next.disabled = stepIndex >= n - 1;
+  next.onclick = () => goToStep(stepIndex < 0 ? 0 : stepIndex + 1);
+  const all = document.createElement('button'); all.className = 'step-btn'; all.textContent = 'All';
+  all.disabled = stepIndex < 0;
+  all.onclick = () => goToStep(-1);
+  nav.append(prev, counter, next, all);
+  el.appendChild(nav);
+}
+
+// Owns #ni-content for a pinned path overlay (whole view = summary + step list;
+// step view = focused node body). async because the node bodies (PAGE_MD) and
+// meta page (PAGE_META) load lazily via ensurePages.
+async function renderPathContent() {
+  if (!stepOverlay) return;
+  const contentEl = document.getElementById('ni-content');
+  await ensurePages();
+  if (!stepOverlay) return;  // pin released while awaiting
+  if (stepIndex < 0) {
+    const raw = PAGE_META[stepOverlay.rel];
+    contentEl.innerHTML = raw != null
+      ? marked.parse(linkifyWikilinks(pathContextBody(raw, stepOverlay.type)))
+      : '';
+    const list = document.createElement('div'); list.className = 'step-list';
+    stepOverlay.members.forEach((m, i) => {
+      const label = graph.hasNode(m.id) ? graph.getNodeAttributes(m.id).label : m.id;
+      const it = document.createElement('div'); it.className = 'step-item';
+      it.textContent = `${i + 1}. ${label}` + (m.date ? `  ·  ${m.date}` : '');
+      it.onclick = () => goToStep(i);
+      list.appendChild(it);
+    });
+    contentEl.appendChild(list);
+  } else {
+    const m = stepOverlay.members[stepIndex];
+    const label = graph.hasNode(m.id) ? graph.getNodeAttributes(m.id).label : m.id;
+    const noteText = (m.note || '').replace(/\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]/g, (_, t, l) => l || t);
+    const head = `<div class="step-head">${stepIndex + 1} / ${stepOverlay.members.length}`
+      + (m.date ? ` · ${escHtml(m.date)}` : '') + `</div><h1>${escHtml(label)}</h1>`
+      + (noteText ? `<p class="step-note-inline">${marked.parseInline(escHtml(noteText))}</p>` : '');
+    const raw = PAGE_MD[m.id];
+    contentEl.innerHTML = head + (raw != null
+      ? marked.parse(linkifyWikilinks(splitFrontmatter(raw).body))
+      : '<div style="color:#777;font-size:12px;">This node has no body.</div>');
+  }
+}
+
+function goToStep(i) {
+  if (!stepOverlay) return;
+  const n = stepOverlay.members.length;
+  stepIndex = Math.max(-1, Math.min(i, n - 1));
+  if (OVERLAY_HL) OVERLAY_HL.focusId = stepIndex >= 0 ? stepOverlay.members[stepIndex].id : null;
+  renderer.refresh();
+  if (stepIndex >= 0) frameNodes([stepOverlay.members[stepIndex].id], { ratio: 0.4, duration: 500 });
+  else frameNodes(stepOverlay.members.map(m => m.id));
+  renderStepper();
+  renderPathContent();
+  document.getElementById('ni-body').scrollTop = 0;
+}
+
+// Path content for #ni-content: only the explanation/context, never the step
+// list (the stepper owns steps). Trail → `## Commentary`; timeline → flow summary
+// before the dated entries. Returns body text (frontmatter already implied).
+function pathContextBody(raw, type) {
+  const body = splitFrontmatter(raw).body;
+  if (type === 'trail') {
+    const m = body.match(/^##\s+Commentary\s*$/m);
+    if (m) return body.slice(m.index);
+    // No `## Commentary` (lint-failing trail): strip the whole `## Path` section
+    // up to the next H2 (or EOF). A regex lookahead with the /m flag would stop
+    // at the header line's own `$`, leaking the step list — so slice by index instead.
+    const i = body.search(/^##\s+Path/m);
+    if (i < 0) return body.trim();
+    const after = body.slice(i);
+    const rel = after.slice(1).search(/^##\s/m);  // next H2 after the Path header
+    return (body.slice(0, i) + (rel >= 0 ? after.slice(rel + 1) : '')).trim();
+  }
+  // timeline: everything before the first dated `### YYYY` header.
+  const m = body.match(/^###\s+\d{4}/m);
+  return (m ? body.slice(0, m.index) : body).trim();
+}
+
+function buildOverlayPanel() {
+  const panel = document.getElementById('overlay-panel');
+  if (!panel) return;
+  const RELDIR = { trail: 'trails', timeline: 'timelines', synthesis: 'syntheses', contradiction: 'contradictions' };
+  const order = ['trail', 'timeline', 'synthesis', 'contradiction'];
+  const byType = {};
+  ALL_OVERLAYS.forEach(ov => {
+    ov.key = ov.type + '/' + ov.slug;
+    ov.rel = RELDIR[ov.type] + '/' + ov.slug + '.md';
+    OVERLAY_BY_KEY[ov.key] = ov;
+    (byType[ov.type] = byType[ov.type] || []).push(ov);
+  });
+  // Collapsible groups — 34 rows is too tall to show at once, so each type is
+  // a header that expands/collapses its rows (all collapsed by default). Keeps
+  // the sidebar to 4 lines until the user drills into a type.
+  order.forEach(type => {
+    const list = byType[type]; if (!list) return;
+    const head = document.createElement('div');
+    head.className = 'overlay-group-head';
+    // No disclosure caret — the type icon (➜⏱◇⚡) already marks each row, and a
+    // second arrow-like glyph read as a redundant bullet. Open/closed state is
+    // shown via the `.open` class (header color) instead of a rotating caret.
+    head.innerHTML = `<span class="ogh-label">${OVERLAY_ICON[type]} ${OVERLAY_TYPE_LABEL[type]}</span><span class="ogh-count">${list.length}</span>`;
+    const body = document.createElement('div');
+    body.className = 'overlay-group-body';
+    body.style.display = 'none';
+    head.onclick = () => {
+      const open = body.style.display !== 'none';
+      body.style.display = open ? 'none' : '';
+      head.classList.toggle('open', !open);
+    };
+    list.forEach(ov => {
+      const row = document.createElement('div');
+      row.className = 'legend-row';
+      row.dataset.key = ov.key;
+      row.title = ov.flavor === 'path' ? 'Click: pin path + step through' : 'Click: pin region outline';
+      // Page titles may carry a "<type>: " prefix (e.g. timeline pages are
+      // "Timeline: ACME Bank"); strip it here since the group head already names
+      // the type, so the row isn't "Timeline ▾ / Timeline: ACME Bank".
+      const groupPrefix = `${OVERLAY_TYPE_LABEL[type]}: `;
+      const name = ov.title.startsWith(groupPrefix) ? ov.title.slice(groupPrefix.length) : ov.title;
+      // All overlay rows show a neutral bullet, not a coloured dot: every overlay
+      // now keeps each member node's own hue (paths spotlight members; synthesis
+      // and contradiction only outline an achromatic region), so a type-coloured
+      // swatch would be misleading.
+      const marker = `<span class="legend-bullet">•</span>`;
+      row.innerHTML = marker +
+        `<span class="legend-name">${name} <span style="color:#666">(${ov.members.length})</span></span>`;
+      row.onclick = () => pinOverlay(ov.key, row);
+      body.appendChild(row);
+    });
+    panel.appendChild(head);
+    panel.appendChild(body);
+  });
+}
+buildOverlayPanel();
+
+// Sigma v3 click events — clickNode toggles popup on same node (re-clicking
+// the selected one closes it), switches on different node, clickStage
+// dismisses. The node doubles as its own close button.
+renderer.on('clickNode', ({ node }) => {
+  // While ANY overlay is pinned (path walk-through OR region lens incl.
+  // contradiction factions) the graph is a read-only stage — a node click
+  // would open that node's popup and break overlay exploration. Exit via
+  // panel × / ESC / re-clicking the row.
+  if (pinnedOverlayKey) return;
+  if (selectedNodeId === node && infoEl.classList.contains('open')) {
+    closePopup();
+  } else {
+    // Same ego-filter exit as navigateTo: selecting a node other than the
+    // current ego root clears local view so the newly-selected node's full
+    // neighborhood shows instead of staying clipped to the old ego hood.
+    // (No camera move here — a direct graph click is already at the node.)
+    if (egoRoot && egoRoot !== node) {
+      clearEgo();
+      serializeStateToUrl();
+    }
+    openPopup(node);
+  }
+});
+renderer.on('clickStage', () => { if (pinnedOverlayKey) return; closePopup(); });
+
+// --- Edge hover tooltip ---
+// Surfaces "why they're connected" for highlighted edges only — i.e., edges
+// incident to the currently-selected node. Without the gate, the dense
+// background of pre-composited dim edges would constantly trigger
+// tooltips. The visual contract is: select a node → its edges turn
+// brand-blue (edgeReducer) → hover one of those blue edges → see why.
+//
+// Content rules:
+//   EXTRACTED + extLabel  →  source-authored relationship description
+//                           (the text the human/LLM wrote next to the
+//                           [[wikilink]] in `## Connections`)
+//   EXTRACTED no label    →  fall back to "Direct link" (the connection
+//                           exists but the source omitted a description)
+//   INFERRED             →  shared-references list (the pages whose
+//                           ≥3-way overlap caused the inference engine
+//                           to add this implicit edge)
+const edgeTooltip = document.getElementById('edge-tooltip');
+const graphWrap = document.getElementById('graph-wrap');
+
+// Resolve a node id (e.g., "concepts/RAG.md") to its display label.
+// Falls back to the trailing path segment minus extension if the id
+// references a node that's not in the graph (shouldn't happen for
+// EXTRACTED/INFERRED edges, but defensive).
+function nodeDisplayLabel(id) {
+  if (graph.hasNode(id)) {
+    return graph.getNodeAttribute(id, 'label') || id;
+  }
+  const base = id.split('/').pop() || id;
+  return base.replace(/\.md$/, '');
+}
+
+function positionEdgeTooltip(clientX, clientY) {
+  const rect = graphWrap.getBoundingClientRect();
+  let x = clientX - rect.left + 14;
+  let y = clientY - rect.top + 14;
+  // Clamp to viewport so the tooltip never gets clipped at the right/bottom edge.
+  const tipRect = edgeTooltip.getBoundingClientRect();
+  if (x + tipRect.width > rect.width - 8) x = clientX - rect.left - tipRect.width - 14;
+  if (y + tipRect.height > rect.height - 8) y = clientY - rect.top - tipRect.height - 14;
+  edgeTooltip.style.left = x + 'px';
+  edgeTooltip.style.top = y + 'px';
+}
+
+function hideEdgeTooltip() {
+  edgeTooltip.style.display = 'none';
+  edgeTooltip.dataset.edge = '';
+}
+
+renderer.on('enterEdge', ({ edge }) => {
+  if (!selectedNodeId) return;
+  const [from, to] = graph.extremities(edge);
+  if (from !== selectedNodeId && to !== selectedNodeId) return;
+  const attr = graph.getEdgeAttributes(edge);
+  const other = from === selectedNodeId ? to : from;
+
+  edgeTooltip.replaceChildren();
+
+  const kindEl = document.createElement('div');
+  kindEl.className = 'et-kind';
+  if (attr.edgeType === 'INFERRED') {
+    const conf = attr.confidence != null ? ` · confidence ${attr.confidence.toFixed(2)}` : '';
+    kindEl.textContent = 'Inferred edge' + conf;
+  } else {
+    // Relation label — Hyper-G typed edges (2026-05-02). Split into 4 kinds by
+    // which H2 section of the source page the wikilink appeared in. Priority
+    // dedup exposes only the single strongest relation per (from→to) pair.
+    // If a Phase 2 evidence_grade (fact/analysis/forecast) is attached, it's
+    // appended to the label so the claim-quality dimension shows instantly on
+    // hover in the graph.
+    const relLabel =
+      attr.relation === 'contradicts' ? 'Direct link · Contradicts' :
+      attr.relation === 'defines'     ? 'Direct link · Defines' :
+      attr.relation === 'cites'       ? 'Direct link · Cites' :
+      attr.relation === 'references'  ? 'Direct link · References' :
+                                        'Direct link';
+    const grade = attr.evidenceGrade ? ` · ${attr.evidenceGrade}` : '';
+    kindEl.textContent = relLabel + grade;
+  }
+  edgeTooltip.appendChild(kindEl);
+
+  const pairEl = document.createElement('div');
+  pairEl.className = 'et-pair';
+  pairEl.textContent =
+    nodeDisplayLabel(selectedNodeId) + '  ↔  ' + nodeDisplayLabel(other);
+  edgeTooltip.appendChild(pairEl);
+
+  if (attr.edgeType === 'INFERRED') {
+    const sharedList = Array.isArray(attr.shared) ? attr.shared : [];
+    const summary = document.createElement('div');
+    summary.className = 'et-label';
+    summary.textContent =
+      sharedList.length > 0
+        ? `${sharedList.length} shared references`
+        : 'many shared references';
+    edgeTooltip.appendChild(summary);
+    if (sharedList.length > 0) {
+      const ul = document.createElement('ul');
+      ul.className = 'et-shared';
+      const SHOW = 6;
+      sharedList.slice(0, SHOW).forEach(s => {
+        const li = document.createElement('li');
+        li.textContent = nodeDisplayLabel(s);
+        ul.appendChild(li);
+      });
+      edgeTooltip.appendChild(ul);
+      if (sharedList.length > SHOW) {
+        const more = document.createElement('div');
+        more.className = 'et-shared-more';
+        more.textContent = `... +${sharedList.length - SHOW} more`;
+        edgeTooltip.appendChild(more);
+      }
+    }
+  } else if (attr.extLabel) {
+    const labelEl = document.createElement('div');
+    labelEl.className = 'et-label';
+    labelEl.textContent = attr.extLabel;
+    edgeTooltip.appendChild(labelEl);
+  }
+
+  edgeTooltip.dataset.edge = edge;
+  edgeTooltip.style.display = 'block';
+  // Initial position from last known cursor; mousemove handler keeps it
+  // tracking until leaveEdge fires.
+  positionEdgeTooltip(lastMouse.x, lastMouse.y);
+});
+
+renderer.on('leaveEdge', ({ edge }) => {
+  // Guard against late leave events for an already-replaced edge.
+  if (edgeTooltip.dataset.edge && edgeTooltip.dataset.edge !== edge) return;
+  hideEdgeTooltip();
+});
+
+// Track cursor for tooltip positioning. Sigma's enterEdge payload doesn't
+// always carry a usable viewport coord (varies by Sigma version), so a
+// DOM-level mousemove on the wrapper is the most reliable source.
+const lastMouse = { x: 0, y: 0 };
+graphWrap.addEventListener('mousemove', (ev) => {
+  lastMouse.x = ev.clientX;
+  lastMouse.y = ev.clientY;
+  if (edgeTooltip.style.display === 'block') positionEdgeTooltip(ev.clientX, ev.clientY);
+});
+
+// --- Ego (local-view) mode ---
+const egoPillEl = document.getElementById('ego-pill');
+const egoLabelEl = document.getElementById('ego-label');
+
+function applyEgoMode() {
+  if (!egoRoot || !graph.hasNode(egoRoot)) {
+    egoRoot = null; egoDepth = 0; egoHoodCache = null;
+    egoPillEl.classList.remove('visible');
+    return;
+  }
+  const hood = new Set([egoRoot]);
+  const byDepth = bfsByDepth(egoRoot, egoDepth);
+  for (let d = 1; d <= egoDepth; d++) {
+    (byDepth.get(d) || []).forEach(n => hood.add(n));
+  }
+  egoHoodCache = hood;
+  const rootLabel = graph.getNodeAttribute(egoRoot, 'label') || egoRoot;
+  let visibleInHood = 0;
+  hood.forEach(n => { if (visibleNodesCache.has(n)) visibleInHood++; });
+  egoLabelEl.textContent = `Local: ${rootLabel} (${egoDepth}-hop, ${visibleInHood} visible)`;
+  egoPillEl.classList.add('visible');
+}
+
+function clearEgo() {
+  egoRoot = null; egoDepth = 0; egoHoodCache = null;
+  egoPillEl.classList.remove('visible');
+  infoEl.querySelectorAll('.hop-btn').forEach(b => b.classList.remove('active'));
+  renderer.refresh();
+}
+
+// Hop-button delegation — set/toggle ego from the open popup.
+infoEl.addEventListener('click', (ev) => {
+  const btn = ev.target.closest('.hop-btn');
+  if (!btn) return;
+  const depth = parseInt(btn.dataset.depth, 10);
+  const nodeId = infoEl.dataset.nodeId;
+  if (!nodeId) return;
+  // Re-clicking active hop clears ego; otherwise re-root/depth.
+  if (egoRoot === nodeId && egoDepth === depth) {
+    egoRoot = null; egoDepth = 0;
+  } else {
+    egoRoot = nodeId; egoDepth = depth;
+  }
+  applyEgoMode();
+  renderer.refresh();
+  serializeStateToUrl();
+  infoEl.querySelectorAll('.hop-btn').forEach(b => {
+    const d = parseInt(b.dataset.depth, 10);
+    b.classList.toggle('active', egoRoot === nodeId && egoDepth === d);
+  });
+  // Re-render connection list — grouped view when this node is the ego
+  // root, flat 1-hop otherwise.
+  renderConnList(nodeId, (egoRoot === nodeId) ? egoDepth : null);
+});
+
+// Ego pill × button — hard clear.
+document.getElementById('ego-clear').onclick = () => {
+  const nid = infoEl.dataset.nodeId;
+  clearEgo();
+  serializeStateToUrl();
+  // If popup is open, refresh its list to the default flat 1-hop layout.
+  if (nid && infoEl.classList.contains('open')) renderConnList(nid, null);
+};
+
+// Close button + ESC dismiss. ESC precedence: popup first, else ego.
+document.getElementById('node-info-close').onclick = closePopup;
+document.addEventListener('keydown', (ev) => {
+  if (ev.key !== 'Escape') return;
+  if (infoEl.classList.contains('open')) {
+    closePopup();
+  } else if (egoRoot) {
+    clearEgo();
+    serializeStateToUrl();
+  }
+});
+
+// Mobile sidebar drawer toggle (button only shown under the @media breakpoint).
+// Toggling the .open class slides the drawer in/out; on desktop the class is
+// inert (the media query owns the transform), so this is harmless there.
+document.getElementById('sidebar-toggle').onclick = () => {
+  document.getElementById('sidebar').classList.toggle('open');
+};
+
+// --- Convex hull overlay (hover a sidebar cluster row to outline it) ---
+// A 2D canvas layered above Sigma's WebGL canvas. On legend row hover we
+// gather every visible node belonging to that cluster, convert graph
+// coords → viewport coords via renderer.graphToViewport, compute the
+// convex hull (Andrew monotone chain), and draw a padded filled polygon.
+// The overlay re-renders on every Sigma afterRender so it tracks camera
+// pan/zoom and physics-driven position changes. pointer-events:none on
+// the CSS keeps node clicks passing through to Sigma.
+const hullCanvas = document.getElementById('hull-overlay');         // below Sigma (z:0) — path connector
+const hullCtx = hullCanvas.getContext('2d');
+const hullTopCanvas = document.getElementById('hull-overlay-top');  // above Sigma (z:2) — region/cluster fill
+const hullTopCtx = hullTopCanvas.getContext('2d');
+let hoveredCluster = null;
+
+function resizeHullCanvas() {
+  const rect = hullCanvas.parentElement.getBoundingClientRect();
+  hullCanvas.width = rect.width;
+  hullCanvas.height = rect.height;
+  hullTopCanvas.width = rect.width;
+  hullTopCanvas.height = rect.height;
+  drawHull();
+}
+
+// Andrew monotone chain — returns the hull points in CCW order. Requires
+// ≥ 3 distinct input points; fewer → just return as-is (caller skips draw).
+function convexHull(pts) {
+  if (pts.length < 3) return pts;
+  const sorted = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cross = (O, A, B) => (A[0] - O[0]) * (B[1] - O[1]) - (A[1] - O[1]) * (B[0] - O[0]);
+  const lower = [];
+  for (const p of sorted) {
+    while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) lower.pop();
+    lower.push(p);
+  }
+  const upper = [];
+  for (let i = sorted.length - 1; i >= 0; i--) {
+    const p = sorted[i];
+    while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) upper.pop();
+    upper.push(p);
+  }
+  upper.pop(); lower.pop();
+  return lower.concat(upper);
+}
+
+// Draw one padded convex-hull polygon for the visible nodes matching `pred`.
+// Painted on the TOP canvas (above Sigma) so the region fill sits over the edge
+// mesh instead of being buried under it. A crisp boundary stroke demarcates the
+// region even where interior nodes/edges show through the low-alpha fill.
+function _paintHull(pred, color) {
+  const pts = [];
+  graph.forEachNode((node, attr) => {
+    if (!visibleNodesCache.has(node)) return;
+    if (!pred(node)) return;
+    const vp = renderer.graphToViewport({ x: attr.x, y: attr.y });
+    pts.push([vp.x, vp.y]);
+  });
+  if (pts.length < 3) return;
+  const hull = convexHull(pts);
+  const cx = hull.reduce((s, p) => s + p[0], 0) / hull.length;
+  const cy = hull.reduce((s, p) => s + p[1], 0) / hull.length;
+  const PAD = 20;
+  const padded = hull.map(p => {
+    const dx = p[0] - cx, dy = p[1] - cy;
+    const d = Math.sqrt(dx * dx + dy * dy) || 1;
+    return [p[0] + dx / d * PAD, p[1] + dy / d * PAD];
+  });
+  hullTopCtx.beginPath();
+  hullTopCtx.moveTo(padded[0][0], padded[0][1]);
+  for (let i = 1; i < padded.length; i++) hullTopCtx.lineTo(padded[i][0], padded[i][1]);
+  hullTopCtx.closePath();
+  hullTopCtx.fillStyle = color;
+  hullTopCtx.globalAlpha = 0.15;
+  hullTopCtx.fill();
+  hullTopCtx.globalAlpha = 0.9;
+  hullTopCtx.strokeStyle = color;
+  hullTopCtx.lineWidth = 1.5;
+  hullTopCtx.stroke();
+  hullTopCtx.globalAlpha = 1;
+}
+
+// Two canvases, opposite z-order (see #hull-overlay / #hull-overlay-top):
+//   TOP (above Sigma) — region/cluster hull FILL:
+//     1) cluster overview — hoveredCluster (transient) or selectedCluster (pinned)
+//     2) region overlay   — regionLens (a region overlay on hover or pin)
+//   BOTTOM (below Sigma) — the path connector (so it stays under labels).
+// Path-overlay node/edge highlighting is done by the reducers, not here.
+function drawHull() {
+  hullCtx.clearRect(0, 0, hullCanvas.width, hullCanvas.height);
+  hullTopCtx.clearRect(0, 0, hullTopCanvas.width, hullTopCanvas.height);
+  const cl = hoveredCluster || selectedCluster;
+  if (cl) _paintHull(n => CLUSTER_BY_NODE[n] === cl, CLUSTER_COLORS[cl]);
+  if (regionLens && regionLens.memberIds) {
+    _paintHull(n => regionLens.memberIds.has(n), regionLens.hullColor || regionLens.color || '#a48dff');
+  }
+  if (pathDraw) _paintPathConnector();
+}
+
+// Synthetic connector — an arrowed polyline through the ordered members in
+// their current FA2 positions. Trails are curated sequences whose steps rarely
+// share a real edge (measured); timelines run chronologically. Without this
+// drawn chain the "path" reads as scattered dots. Drawn for both; large
+// timelines (~94 members) zigzag since time-order ≠ spatial proximity.
+function _paintPathConnector() {
+  const ids = pathDraw.orderedIds.filter(id => graph.hasNode(id) && visibleNodesCache.has(id));
+  if (ids.length < 2) return;
+  const pts = ids.map(id => {
+    const a = graph.getNodeAttributes(id);
+    return renderer.graphToViewport({ x: a.x, y: a.y });
+  });
+  // Soften the chain while a single step is spotlighted so it reads as faint
+  // context rather than competing with the focused node.
+  const stepping = OVERLAY_HL && OVERLAY_HL.focusId;
+  hullCtx.strokeStyle = pathDraw.color;
+  hullCtx.globalAlpha = stepping ? 0.3 : 0.85;
+  hullCtx.lineWidth = 2;
+  hullCtx.lineJoin = 'round';
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1], b = pts[i];
+    hullCtx.beginPath();
+    hullCtx.moveTo(a.x, a.y);
+    hullCtx.lineTo(b.x, b.y);
+    hullCtx.stroke();
+    // arrowhead at b
+    const ang = Math.atan2(b.y - a.y, b.x - a.x);
+    const h = 7;
+    hullCtx.beginPath();
+    hullCtx.moveTo(b.x, b.y);
+    hullCtx.lineTo(b.x - h * Math.cos(ang - 0.4), b.y - h * Math.sin(ang - 0.4));
+    hullCtx.lineTo(b.x - h * Math.cos(ang + 0.4), b.y - h * Math.sin(ang + 0.4));
+    hullCtx.closePath();
+    hullCtx.fillStyle = pathDraw.color;
+    hullCtx.fill();
+  }
+  hullCtx.globalAlpha = 1;
+}
+
+resizeHullCanvas();
+window.addEventListener('resize', resizeHullCanvas);
+// Keep hull in sync with camera pan/zoom + physics-driven position changes.
+renderer.on('afterRender', drawHull);
+
+// The dashed overlay was removed on 2026-05-03 — INFERRED edges now render as
+// WebGL solid lines just like the other relations, and on selection are
+// highlighted with the RELATION_HIGHLIGHT.inferred color (a single unified
+// edgeReducer branch). On 2026-06-18 inferred was demoted to achromatic grey
+// (#666) — being the weakest/virtual relation, its colour was dropped, freeing
+// the vacated violet hue for the cluster palette to use without clashing with
+// relation colours. A workaround canvas for unsupported setLineDash is still
+// unnecessary.
+
+// --- FPS meter (top-right pill, separate from sidebar) ---
+let frames = 0;
+let lastTick = performance.now();
+renderer.on('afterRender', () => { frames++; });
+setInterval(() => {
+  const now = performance.now();
+  const dt = (now - lastTick) / 1000;
+  const fps = dt > 0 ? Math.round(frames / dt) : 0;
+  const el = document.getElementById('fps-meter');
+  el.textContent = fps ? fps + ' fps' : '—';
+  el.className = fps >= 45 ? 'fps-good' : fps >= 20 ? 'fps-mid' : fps === 0 ? '' : 'fps-bad';
+  frames = 0;
+  lastTick = now;
+}, 1000);
+
+// --- Label overlap culling ---
+// Collision-based culling with priority tiers:
+//   Tier 2 — selected node's neighbors (inc. self). Claim label space
+//            first so the user sees who's connected at a glance.
+//   Tier 1 — regular visible nodes, sorted by degree desc.
+// Within a tier, greedy placement in screen-space AABB; lower-tier
+// nodes that would collide with already-placed labels get blanked.
+// Runs debounced on camera change + filter changes + selection change.
+// Selected node and search matches bypass in the reducer above so
+// they're always labeled regardless of the cull outcome.
+function cullLabels() {
+  // Selected-node neighborhood (inc. self) — becomes the priority tier.
+  // graph.neighbors excludes self so we add explicitly.
+  const selNeighbors = (selectedNodeId && graph.hasNode(selectedNodeId))
+    ? new Set([selectedNodeId, ...graph.neighbors(selectedNodeId)])
+    : null;
+
+  const candidates = [];
+  // Pinned path overlay, whole view: only members are bright (non-members are
+  // hidden/faded with no label), and they're mostly source nodes — which the
+  // normal pass skips. Cull among members instead so a 50+ member timeline
+  // thins to non-overlapping labels rather than forcing all of them. Label
+  // width counts the badge prefix (date/order) so the AABB is accurate.
+  if (OVERLAY_HL && !OVERLAY_HL.focusId) {
+    OVERLAY_HL.memberIds.forEach((node) => {
+      if (!graph.hasNode(node) || !visibleNodesCache.has(node)) return;
+      const attr = graph.getNodeAttributes(node);
+      if (!attr.label) return;
+      const badge = OVERLAY_HL.badgeById && OVERLAY_HL.badgeById.get(node);
+      const label = (badge ? badge + ' ' : '') + attr.label;
+      const vp = renderer.graphToViewport({ x: attr.x, y: attr.y });
+      candidates.push({ node, x: vp.x, y: vp.y, deg: degree[node] || 0, label });
+    });
+    candidates.sort((a, b) => b.deg - a.deg);
+  } else if (regionLens && regionLens.memberIds) {
+    // Pinned region overlay (synthesis/contradiction): cull among members so a
+    // dense region thins to non-overlapping labels instead of forcing every one
+    // (same treatment as the path-overlay member cull). Members can be source
+    // nodes — which the normal pass below skips — so seed from memberIds directly.
+    regionLens.memberIds.forEach((node) => {
+      if (!graph.hasNode(node) || !visibleNodesCache.has(node)) return;
+      const attr = graph.getNodeAttributes(node);
+      if (!attr.label) return;
+      // Contradiction prefixes the camp tag ("[Position A] ") onto the rendered
+      // label — count it so the AABB width matches what's drawn.
+      const tag = regionLens.sideByNode ? regionLens.sideByNode.get(node) : null;
+      const label = (tag ? '[' + tag + '] ' : '') + attr.label;
+      const vp = renderer.graphToViewport({ x: attr.x, y: attr.y });
+      candidates.push({ node, x: vp.x, y: vp.y, deg: degree[node] || 0, label });
+    });
+    candidates.sort((a, b) => b.deg - a.deg);
+  } else {
+    graph.forEachNode((node, attr) => {
+      if (!visibleNodesCache.has(node)) return;
+      if (attr.nodeType === 'source') return;
+      if (!attr.label) return;
+      const vp = renderer.graphToViewport({ x: attr.x, y: attr.y });
+      candidates.push({ node, x: vp.x, y: vp.y, deg: degree[node] || 0, label: attr.label });
+    });
+    // Priority tier first, then degree. Neighbors of the selected node claim
+    // AABB space before regular hubs can contest it.
+    candidates.sort((a, b) => {
+      const pa = selNeighbors && selNeighbors.has(a.node) ? 1 : 0;
+      const pb = selNeighbors && selNeighbors.has(b.node) ? 1 : 0;
+      if (pa !== pb) return pb - pa;
+      return b.deg - a.deg;
+    });
+  }
+
+  // Sigma v3 default labelSize is 14px, rendered at fixed screen size.
+  // Width factor 0.85 is wide-glyph-safe (a 0.6 English factor under-estimates
+  // CJK and other wide characters).
+  const LABEL_PX = 14;
+  const halfH = LABEL_PX / 2 + 2;
+  const placed = [];
+  const winners = new Set();
+
+  for (const c of candidates) {
+    const widthPx = c.label.length * LABEL_PX * 0.85;
+    const halfW = widthPx / 2 + 3;
+    let collides = false;
+    for (const p of placed) {
+      if (Math.abs(c.x - p.x) < halfW + p.halfW &&
+          Math.abs(c.y - p.y) < halfH + p.halfH) { collides = true; break; }
+    }
+    if (!collides) {
+      placed.push({ x: c.x, y: c.y, halfW, halfH });
+      winners.add(c.node);
+    }
+  }
+  labeledIds = winners;
+  renderer.refresh();
+}
+
+function scheduleCullLabels() {
+  if (!cullingReady) return;
+  if (cullTimer) clearTimeout(cullTimer);
+  cullTimer = setTimeout(cullLabels, 150);
+}
+
+// First cull after initial render (positions settled, renderer ready).
+renderer.once('afterRender', () => {
+  cullingReady = true;
+  cullLabels();
+});
+// Re-cull on camera changes (zoom / pan). Debounce handles continuous change.
+renderer.getCamera().on('updated', scheduleCullLabels);
+
+// --- Node drag with pin ---
+// graphology-layout-forceatlas2's worker caches the `fixed` flag at
+// start() time — runtime attribute changes are NOT synchronized to the
+// worker's internal matrix (see graphology discussion #375). That means
+// setting `fixed:true` during drag has no effect on the running worker,
+// and the worker keeps pulling the node back to equilibrium on mouseup.
+//
+// Workaround: stop the worker on drag start, restart on drop. start()
+// rebuilds the node matrix from current graph state, picking up the new
+// `fixed` flag and drop position. From that point the worker respects
+// the pin and only settles the node's neighbors around it.
+//
+// Side benefit: stopping during drag prevents the worker from fighting
+// the cursor (stale matrix trying to move the node back toward stale
+// equilibrium while mousemove overrides).
+let draggedNodeId = null;
+
+renderer.on('downNode', ({ node }) => {
+  draggedNodeId = node;
+  graph.setNodeAttribute(node, 'fixed', true);
+  fa2.stop();
+});
+
+renderer.getMouseCaptor().on('mousemovebody', (event) => {
+  if (!draggedNodeId) return;
+  const pos = renderer.viewportToGraph(event);
+  graph.setNodeAttribute(draggedNodeId, 'x', pos.x);
+  graph.setNodeAttribute(draggedNodeId, 'y', pos.y);
+  event.preventSigmaDefault();
+  event.original.preventDefault();
+  event.original.stopPropagation();
+});
+
+const releaseDrag = () => {
+  if (!draggedNodeId) return;
+  draggedNodeId = null;
+  // Restart worker to rebuild matrices from current graph state —
+  // this is how `fixed: true` actually takes effect. Physics is always
+  // on per the simplified UI, so no toggle check needed.
+  fa2.start();
+};
+renderer.getMouseCaptor().on('mouseup', releaseDrag);
+renderer.getMouseCaptor().on('mouseupbody', releaseDrag);
+
+// --- Continuous physics (FA2 worker on main graph — standard pattern) ---
+// Worker mutates graph node x/y attributes directly; Sigma listens to
+// graph events and auto-refreshes. No manual propagation needed.
+// Sync pass already settled visible nodes; worker continues from there
+// and settles hidden sources in the background too.
+const fa2 = new FA2Layout(graph, { settings: fa2Settings });
+
+// Always-on physics — the sidebar toggle was removed; simulation is the
+// default state of the graph. To pause, reload without physics (not
+// currently exposed in UI).
+fa2.start();
+
+// --- Auto-stop worker when positions settle (per-frame velocity gate) ---
+// graphology FA2 has no minVelocity floor (unlike vis-network) and its
+// worker exposes no convergence callback (public API: start/stop/kill/
+// isRunning only; `NODE_CONVERGENCE` metric stays inside the worker
+// matrix). So we implement minVelocity-equivalent ourselves.
+//
+// Per-frame comparison (via afterRender) captures velocity directly:
+// delta_per_frame == velocity × frame_time. Earlier 1Hz interval sampling
+// was fooled by high-frequency oscillation — nodes returning to start
+// within a second reported ~0 net delta despite visible jitter in
+// between. afterRender fires every time Sigma renders (which it does on
+// every graph mutation from the worker, ≈60 Hz while running), so we
+// catch every iteration's motion and can spot sustained oscillation.
+const MAX_FRAME_DELTA = 6.0;        // px/frame (freeze when all nodes move ≤ 6 px per frame)
+const CALM_FRAMES_NEEDED = 6;       // ~0.1 s of sustained calm before freeze
+// Typed-array snapshot reused frame to frame — avoids allocating a fresh
+// Map of 1,732 entries at 60 Hz (~100k Map.set/sec) which was the main
+// GC pressure source in the previous per-frame implementation. Node index
+// is stable because we never add/remove nodes at runtime; the order is
+// set once via graph.nodes() and reused.
+const autoStopNodeIds = graph.nodes();
+const prevX = new Float64Array(autoStopNodeIds.length);
+const prevY = new Float64Array(autoStopNodeIds.length);
+let snapshotSeeded = false;
+let calmFrameCount = 0;
+
+renderer.on('afterRender', () => {
+  if (!fa2.isRunning()) return;
+  let maxDeltaSq = 0;
+  if (snapshotSeeded) {
+    for (let i = 0; i < autoStopNodeIds.length; i++) {
+      const attr = graph.getNodeAttributes(autoStopNodeIds[i]);
+      const dx = attr.x - prevX[i], dy = attr.y - prevY[i];
+      const d = dx * dx + dy * dy;
+      if (d > maxDeltaSq) maxDeltaSq = d;
+    }
+  }
+  // Update snapshot in-place.
+  for (let i = 0; i < autoStopNodeIds.length; i++) {
+    const attr = graph.getNodeAttributes(autoStopNodeIds[i]);
+    prevX[i] = attr.x;
+    prevY[i] = attr.y;
+  }
+  snapshotSeeded = true;
+
+  // Compare squared magnitudes to avoid a per-frame sqrt.
+  if (maxDeltaSq < MAX_FRAME_DELTA * MAX_FRAME_DELTA) {
+    calmFrameCount++;
+    if (calmFrameCount >= CALM_FRAMES_NEEDED) {
+      fa2.stop();
+      calmFrameCount = 0;
+    }
+  } else {
+    calmFrameCount = 0;
+  }
+});
+
+// Terminate worker thread on unload — otherwise it leaks until the tab
+// fully closes. fa2.kill() destroys the Worker instance; a new one is
+// created on next page load.
+window.addEventListener('beforeunload', () => fa2.kill());
+
+// --- Initial URL application (ego focus) ---
+// Runs last so applyEgoMode has access to all DOM + Sigma state. Invalid
+// focus (stale or wrong node id) silently clears. Other URL params
+// (types/clusters/fragile) were already applied at state init.
+if (urlInit.focus && urlInit.depth >= 1) {
+  if (graph.hasNode(urlInit.focus)) {
+    egoRoot = urlInit.focus;
+    egoDepth = urlInit.depth;
+    applyEgoMode();
+    renderer.refresh();
+  } else {
+    // Stale focus — drop it and rewrite URL without the bad params.
+    serializeStateToUrl();
+  }
+}
+
+// --- Deep-link: open a node from the URL hash ---
+// Supports #node=<wiki-path> (exact) and #q=<slug-or-text> (idmap-resolved,
+// else fed to label+id search). This is the handoff target for RAG answer
+// links: a Claude.ai answer cites a source and links to
+//   <base>/<slug>.html#q=<source-slug>
+// so tapping it opens that node's original text here. hashchange covers
+// re-navigation when the tab is already open.
+async function openFromHash() {
+  const h = location.hash;
+  const eq = h.indexOf('=');
+  if (eq === -1) return;
+  const key = h.slice(1, eq);
+  let val;
+  try { val = decodeURIComponent(h.slice(eq + 1)); } catch { val = h.slice(eq + 1); }
+  val = val.trim();
+  if (!val) return;
+
+  if (key === 'node') {
+    if (graph.hasNode(val)) navigateTo(val);
+    return;
+  }
+  if (key === 'q') {
+    // idmap lives in the lazily-loaded pages bundle — ensure it before lookup.
+    await ensurePages();
+    // Exact slug/path → node id via the same idmap the edge builder uses.
+    const byId = PAGE_IDMAP[val];
+    if (byId && graph.hasNode(byId)) { navigateTo(byId); return; }
+    // Fallback: substring search over label+id (not visibility-restricted so
+    // a type-filtered target still resolves); open the first match.
+    const ql = val.toLowerCase();
+    const matches = [];
+    graph.forEachNode((node, attr) => {
+      const lbl = (attr.label || '').toLowerCase();
+      if (lbl.includes(ql) || node.toLowerCase().includes(ql)) matches.push(node);
+    });
+    if (matches.length >= 1) {
+      searchEl.value = val;
+      searchMatchIds = new Set(matches.slice(0, 10));
+      navigateTo(matches[0]);
+    }
+  }
+}
+openFromHash();
+window.addEventListener('hashchange', openFromHash);
+
+console.log(
+  `Graph ready — ${graph.order} nodes total, ${graph.size} edges` +
+  ` (dedup: ${dedupedEdges}, dropped: ${droppedEdges}), ` +
+  `${visibleNodesCache.size} visible at defaults, init ${Math.round(t1 - t0)}ms` +
+  (fragileState.pairCount ? `, ${fragileState.pairCount} fragile bridges` : '')
+);
+</script>
+</body>
+</html>

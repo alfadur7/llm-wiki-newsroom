@@ -1,0 +1,51 @@
+{
+  "skill": "consulting-writing",
+  "_note": "Management-consulting craft criteria. The measurement function is given by each `algorithm` field — MECE completeness (mece-axes·mece-clusters) uses `eval_*_aggregate_mece`; numeric density (numeric-density) uses `count_density_violations`. judge=M (SCR·bold-bullet·so-what·numeric precision — executive-summary narrative) keeps only definition + pass_condition and is reviewed qualitatively by desk. Authoring/review prose (with examples) is in SKILL.md. Shared parsing is orchestrator-injected. Any Korean literals are the wiki's actual section headers.",
+  "criteria": {
+    "con.scr": {
+      "name": "SCR structure", "dimension": "Executive Summary", "judge": "M",
+      "pass_condition": "The intro shows all three of Situation·Complication·Resolution.",
+      "legacy": {"overview-cluster": "C1", "overview-aggregate": "C1"},
+      "source": "How to Write an Executive Summary Like McKinsey — Slideworks", "source_url": "https://slideworks.io/resources/how-to-write-executive-summary"
+    },
+    "con.so-what": {
+      "name": "So-what upfront", "dimension": "Executive Summary", "judge": "M",
+      "pass_condition": "The intro leads with the conclusion (key implication) rather than dragging through description/preamble.",
+      "legacy": {"overview-cluster": "C3", "overview-aggregate": "C3"},
+      "source": "How to Write an Executive Summary Like McKinsey — Slideworks", "source_url": "https://slideworks.io/resources/how-to-write-executive-summary"
+    },
+    "con.bold-bullet": {
+      "name": "Bold-bullet pattern", "dimension": "Executive Summary", "judge": "M",
+      "pass_condition": "Metric runs are consistently built as a **bold key-claim heading** + supporting bullets.",
+      "legacy": {"overview-cluster": "C2", "overview-aggregate": "C2"},
+      "source": "Understanding BCG's Approach to Executive Summaries — Insight7", "source_url": "https://insight7.io/understanding-bcgs-approach-to-executive-summaries/"
+    },
+    "con.numeric-precision": {
+      "name": "Numeric precision", "dimension": "Executive Summary", "judge": "M",
+      "pass_condition": "Concrete numbers (amount·date·%·proper noun) support claims instead of vague quantifiers (e.g. 'a large amount'·'trillions').",
+      "legacy": {"overview-cluster": "S2", "overview-aggregate": "S2"},
+      "source": "How to Write an Executive Summary Like McKinsey — Slideworks", "source_url": "https://slideworks.io/resources/how-to-write-executive-summary"
+    },
+    "con.numeric-density": {
+      "name": "Numeric density (BCG isolation)", "dimension": "Executive Summary", "judge": "A",
+      "algorithm": "count_density_violations", "comparator": "<=", "default_threshold": 0,
+      "legacy": {"overview-cluster": "R2", "overview-aggregate": "R2"},
+      "source": "Understanding BCG's Approach to Executive Summaries — Insight7", "source_url": "https://insight7.io/understanding-bcgs-approach-to-executive-summaries/",
+      "note": "Number of paragraphs whose number-token count > max_per_para is ≤ threshold (0). Key numbers isolated in bold-bullets. max_per_para·threshold injected by manifest."
+    },
+    "con.mece-axes": {
+      "name": "Tension-axis grouping (MECE)", "dimension": "MECE", "judge": "A",
+      "algorithm": "eval_contradiction_aggregate_mece", "comparator": "range", "default_threshold": [2, 4],
+      "legacy": {"contradiction-aggregate": "D1"},
+      "source": "MECE principle — Barbara Minto·McKinsey Pyramid", "source_url": "https://en.wikipedia.org/wiki/MECE_principle",
+      "note": "2–4 ### <axis> subsections under ## Per-Theme Deep Analysis, every theme under ≥1 axis (the residual '기타'/other axis excluded). Collectively Exhaustive."
+    },
+    "con.mece-clusters": {
+      "name": "Cluster-section completeness (MECE)", "dimension": "MECE", "judge": "A",
+      "algorithm": "eval_overview_aggregate_mece", "comparator": "==", "default_threshold": "cluster_total",
+      "legacy": {"overview-aggregate": "D1"},
+      "source": "MECE principle — Barbara Minto·McKinsey Pyramid", "source_url": "https://en.wikipedia.org/wiki/MECE_principle",
+      "note": "Every cluster in graph/_clusters.json appears as a ## N. [[slug|alias]] section (Collectively Exhaustive)."
+    }
+  }
+}

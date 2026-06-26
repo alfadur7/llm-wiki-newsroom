@@ -1,0 +1,208 @@
+{
+  "method": "leiden",
+  "graph_fingerprint": "e40d8ca4ca0b9880",
+  "resolution": 1.0,
+  "seed": 42,
+  "source_weight_threshold": 0.3,
+  "coherence_threshold": 0.25,
+  "hysteresis_threshold": 0.5,
+  "stats": {
+    "hub_nodes": 11,
+    "hub_edges": 33,
+    "isolated_hubs": 0,
+    "cluster_count": 3,
+    "mixed_clusters": 0,
+    "unlabeled_clusters": 0,
+    "hysteresis_carried": 3,
+    "sources_assigned": 4,
+    "sources_unassigned": 0
+  },
+  "clusters": [
+    {
+      "id": 0,
+      "slug": "open-source-ai-definition",
+      "name": "Open-Source AI Definition",
+      "color": "#7FB3FF",
+      "matched_label_slug": "open-source-ai-definition",
+      "containment": 1.0,
+      "anchor_hits": 4,
+      "match_method": "hysteresis",
+      "hysteresis_jaccard": 1.0,
+      "size": 5,
+      "members": [
+        "concepts/OpenSourceAI.md",
+        "concepts/TrainingData.md",
+        "entities/FreeSoftwareFoundation.md",
+        "entities/Mozilla.md",
+        "entities/OpenSourceInitiative.md"
+      ],
+      "member_labels": [
+        "Open Source AI",
+        "Training Data",
+        "Free Software Foundation",
+        "Mozilla",
+        "Open Source Initiative"
+      ],
+      "top_tags": [
+        [
+          "open-source-ai",
+          5
+        ],
+        [
+          "licensing",
+          2
+        ],
+        [
+          "governance",
+          2
+        ],
+        [
+          "training-data",
+          2
+        ],
+        [
+          "OSAID",
+          1
+        ]
+      ],
+      "coherence": "single"
+    },
+    {
+      "id": 1,
+      "slug": "open-weights",
+      "name": "Open Weights",
+      "color": "#7FE0B0",
+      "matched_label_slug": "open-weights",
+      "containment": 1.0,
+      "anchor_hits": 3,
+      "match_method": "hysteresis",
+      "hysteresis_jaccard": 1.0,
+      "size": 3,
+      "members": [
+        "concepts/FineTuning.md",
+        "concepts/OpenWeights.md",
+        "entities/DeepSeek.md"
+      ],
+      "member_labels": [
+        "Fine-Tuning",
+        "Open Weights",
+        "DeepSeek"
+      ],
+      "top_tags": [
+        [
+          "open-weights",
+          3
+        ],
+        [
+          "model-weights",
+          3
+        ],
+        [
+          "fine-tuning",
+          2
+        ],
+        [
+          "licensing",
+          2
+        ],
+        [
+          "adaptation",
+          1
+        ]
+      ],
+      "coherence": "single"
+    },
+    {
+      "id": 2,
+      "slug": "licensing-open-washing",
+      "name": "Licensing & Open-Washing",
+      "color": "#FFC97F",
+      "matched_label_slug": "licensing-open-washing",
+      "containment": 1.0,
+      "anchor_hits": 3,
+      "match_method": "hysteresis",
+      "hysteresis_jaccard": 1.0,
+      "size": 3,
+      "members": [
+        "concepts/ModelLicensing.md",
+        "concepts/OpenWashing.md",
+        "entities/Meta.md"
+      ],
+      "member_labels": [
+        "Model Licensing",
+        "Open-Washing",
+        "Meta"
+      ],
+      "top_tags": [
+        [
+          "licensing",
+          3
+        ],
+        [
+          "open-source-ai",
+          2
+        ],
+        [
+          "governance",
+          1
+        ],
+        [
+          "copyleft",
+          1
+        ],
+        [
+          "open-washing",
+          1
+        ]
+      ],
+      "coherence": "single"
+    }
+  ],
+  "hub_assignments": {
+    "concepts/OpenSourceAI.md": "open-source-ai-definition",
+    "concepts/TrainingData.md": "open-source-ai-definition",
+    "entities/FreeSoftwareFoundation.md": "open-source-ai-definition",
+    "entities/Mozilla.md": "open-source-ai-definition",
+    "entities/OpenSourceInitiative.md": "open-source-ai-definition",
+    "concepts/FineTuning.md": "open-weights",
+    "concepts/OpenWeights.md": "open-weights",
+    "entities/DeepSeek.md": "open-weights",
+    "concepts/ModelLicensing.md": "licensing-open-washing",
+    "concepts/OpenWashing.md": "licensing-open-washing",
+    "entities/Meta.md": "licensing-open-washing"
+  },
+  "source_assignments": {
+    "sources/case-against-osaid.md": {
+      "primary": "open-source-ai-definition",
+      "weights": {
+        "open-source-ai-definition": 0.667,
+        "licensing-open-washing": 0.333
+      }
+    },
+    "sources/mozilla-celebrates-osaid.md": {
+      "primary": "open-source-ai-definition",
+      "weights": {
+        "open-source-ai-definition": 0.667,
+        "licensing-open-washing": 0.333
+      }
+    },
+    "sources/open-source-ai-models-how-open.md": {
+      "primary": "open-source-ai-definition",
+      "weights": {
+        "open-source-ai-definition": 0.429,
+        "open-weights": 0.429,
+        "licensing-open-washing": 0.143
+      }
+    },
+    "sources/osi-open-source-ai-definition.md": {
+      "primary": "open-source-ai-definition",
+      "weights": {
+        "open-source-ai-definition": 0.429,
+        "open-weights": 0.143,
+        "licensing-open-washing": 0.429
+      }
+    }
+  },
+  "isolated_hubs": [],
+  "unassigned_sources": []
+}

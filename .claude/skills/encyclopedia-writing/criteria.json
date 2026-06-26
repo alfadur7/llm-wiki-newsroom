@@ -1,0 +1,201 @@
+{
+  "skill": "encyclopedia-writing",
+  "_note": "Single SoT for neutral-reference craft criteria definition·comparator·source URL (applied to overview·contradiction·hub·source). IDs are skill-namespaced dots (enc.<slug>); old content-type-local IDs are back-referenced in `legacy`. judge=M (npov-asf·due-weight) keeps only definition + pass_condition and is reviewed qualitatively by desk. Content-type threshold VALUE and algorithm params (strip_auto·exempt_sections) are not owned by the craft skill (axis separation) — injected by manifest (layers/). The skill holds only craft-agnostic algorithm + default. Any Korean literals are matched tokens / the wiki's actual section headers.",
+  "criteria": {
+    "enc.link-density": {
+      "name": "Wikilink total",
+      "dimension": "Wikipedia MoS",
+      "judge": "A",
+      "algorithm": "count_wikilinks_in_editor_region",
+      "comparator": ">=",
+      "default_threshold": 150,
+      "legacy": {"overview-cluster": "W1", "overview-aggregate": "W1", "contradiction-theme": "W1", "contradiction-aggregate": "W1", "source": "W1"},
+      "source": "Wikipedia:Manual of Style/Linking",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Linking",
+      "note": "Count of [[wikilink]] in the EDITOR region. Threshold VALUE·strip_auto injected per content-type by manifest (overview-cluster=150 strip_auto=true·overview-aggregate=200 strip_auto=false·contradiction-theme=30·aggregate=50·source=5)."
+    },
+    "enc.first-mention": {
+      "name": "First-mention (minimize in-section duplicate links)",
+      "dimension": "Wikipedia MoS",
+      "judge": "A",
+      "algorithm": "count_duplicate_links",
+      "comparator": "<=",
+      "default_threshold": 0,
+      "legacy": {"overview-cluster": "W3", "overview-aggregate": "W3", "contradiction-theme": "W3"},
+      "source": "Wikipedia:Manual of Style/Linking",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Linking",
+      "note": "Per-section same-stem duplicates (n>1 → n-1 accumulated); dup_total<=0 PASS. exempt_sections·strip_auto injected by manifest. L2-4 absorbs algorithm variants (### subsection unit·drill-down exclusion) via params."
+    },
+    "enc.lead-body": {
+      "name": "Lead-body link density gradient",
+      "dimension": "Wikipedia MoS",
+      "judge": "A",
+      "comparator": ">=",
+      "default_threshold": 1.0,
+      "legacy": {"overview-cluster": "W2", "overview-aggregate": "W2"},
+      "source": "Wikipedia:Manual of Style/Linking",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Linking",
+      "note": "Lead-span per-paragraph link density ≥ body-section average (first contact is offered the choices). Measured by orchestrator (overview.py) since lead-section identification is content-type-bound — no skill checks.py."
+    },
+    "enc.broken-link": {
+      "name": "Broken wikilink (existing filename)",
+      "dimension": "Wikipedia MoS",
+      "judge": "A",
+      "comparator": "<=",
+      "default_threshold": 0,
+      "legacy": {"overview-cluster": "W4", "overview-aggregate": "W4", "contradiction-theme": "W4", "contradiction-aggregate": "W4"},
+      "source": "Wikipedia:Manual of Style/Linking",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Linking",
+      "note": "Every [[wikilink]] must resolve to an existing page (broken links = 0). Measured by orchestrator (`python tools/lint.py graph structure`) since broken-link resolution needs the wiki-global page index, not single-file content — no skill checks.py (same pattern as enc.lead-body). roster-required, but verified via the graph-structure pass rather than the per-content-type group lint."
+    },
+    "enc.verdict-restraint": {
+      "name": "Verdict restraint",
+      "dimension": "Wikipedia NPOV",
+      "judge": "A",
+      "algorithm": "find_verdict_hits",
+      "comparator": "<=",
+      "default_threshold": 2,
+      "legacy": {"overview-cluster": "B1", "overview-aggregate": "B1", "contradiction-theme": "N5", "contradiction-aggregate": "N5"},
+      "source": "Wikipedia:Neutral point of view",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Neutral_point_of_view",
+      "note": "Count of verdict sentences ('is reasonable'·'has the most explanatory power'·'is consistent with', etc.) ≤ threshold (loose). Over → hedging/attribution needed. Threshold injected by manifest. For contradiction, measured only in the Interpretation Direction (theme) / Implications (aggregate) section. NOTE the underlying matcher (find_verdict_hits) keys on Korean verb endings and is dormant on English prose — see checks.py FLAG."
+    },
+    "enc.npov-asf": {
+      "name": "ASF attribution",
+      "dimension": "Wikipedia NPOV",
+      "judge": "M",
+      "pass_condition": "A value-judgment/interpretation/claim sentence carries ≥2 of {named subject, source, figure/quote}; no weasel words ('some say'·'many people'·'as is known') (WP:ASF — Attribute Statements to Facts).",
+      "legacy": {"contradiction-theme": "N1", "contradiction-aggregate": "N1"},
+      "source": "Wikipedia:Manual of Style/Words to watch — WP:ASF",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Attribution"
+    },
+    "enc.due-weight": {
+      "name": "Due weight balance",
+      "dimension": "Wikipedia NPOV",
+      "judge": "M",
+      "pass_condition": "Opposing sides' length/evidence is proportionate, not skewed to one side (theme = A:B evidence-count ratio within 1:2, aggregate = even per-theme summary length); a minority view carries an explicit balancing statement (WP:DUE).",
+      "legacy": {"contradiction-theme": "N2", "contradiction-aggregate": "N2"},
+      "source": "Wikipedia:Neutral point of view — Due and undue weight",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Neutral_point_of_view#Due_and_undue_weight"
+    },
+    "enc.label-neutral": {
+      "name": "Faction-label neutrality",
+      "dimension": "Wikipedia NPOV",
+      "judge": "A",
+      "algorithm": "evaluate_contradiction_npov",
+      "comparator": "==",
+      "default_threshold": 0,
+      "legacy": {"contradiction-theme": "N7", "contradiction-aggregate": "N7"},
+      "source": "Wikipedia:Manual of Style/Words to watch — WP:ASF",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Attribution",
+      "note": "If a value-laden word ('myth'·'empirical proof'·'skepticism'·'innovation', etc.) appears on only one side of the faction bold labels (theme) or tension-axis titles (aggregate), skew=1 FAIL. Both must be an equivalent vocabulary set. Measured by evaluate_contradiction_npov (theme)·evaluate_contradiction_aggregate (aggregate axis-skew). NOTE the value-word lexicon (LABEL_VALUE_WORDS) is Korean and dormant on English prose — see checks.py FLAG."
+    },
+    "enc.slug-alias": {
+      "name": "Slug Korean alias",
+      "dimension": "Wikipedia MoS",
+      "judge": "A",
+      "algorithm": "find_unaliased_slugs",
+      "comparator": "<=",
+      "default_threshold": 0,
+      "legacy": {"overview-cluster": "L1", "overview-aggregate": "L1", "contradiction-theme": "L1"},
+      "source": "Wikipedia:Manual of Style/Linking",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Linking",
+      "note": "Count of kebab-case slugs ≥min_len exposed as bare [[slug]] (no alias) ≤ threshold. min_len·threshold injected by manifest. contradiction L1 uses a different detector (RAW_KEBAB_SLUG_RE in evaluate_contradiction_npov). Aliases are human-readable display text."
+    },
+    "enc.abbr-gloss": {
+      "name": "Abbreviation glossing",
+      "dimension": "Wikipedia MoS",
+      "judge": "A",
+      "algorithm": "find_abbr_violations",
+      "comparator": "<=",
+      "default_threshold": 3,
+      "legacy": {"overview-cluster": "L3", "overview-aggregate": "L3"},
+      "source": "Wikipedia:Manual of Style/Abbreviations",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Abbreviations",
+      "note": "Count of 2–5-char uppercase acronyms whose first occurrence lacks a parenthetical gloss ≤ threshold (global brands·wikilinked abbreviations allowlisted). Threshold injected by manifest."
+    },
+    "enc.summary-style": {
+      "name": "Drill-down link (Summary style)",
+      "dimension": "Wikipedia Summary style",
+      "judge": "A",
+      "algorithm": "evaluate_overview_aggregate",
+      "comparator": "==",
+      "default_threshold": "section_count",
+      "legacy": {"overview-aggregate": "D2", "contradiction-aggregate": "D2"},
+      "source": "Wikipedia:Summary style · Template:Main",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Summary_style",
+      "note": "Each subsection of a roll-up carries an entry-point link (self slug alias) to its detail page (WP {{Main}} hatnote). overview = cluster sections, contradiction aggregate = theme drill-down [[slug|한글]] pipe alias. Measured by evaluate_overview_aggregate (overview)·evaluate_contradiction_aggregate (contradiction) bundle."
+    },
+    "enc.back-reference": {
+      "name": "Landscape back-reference",
+      "dimension": "Wikipedia Summary style",
+      "judge": "A",
+      "algorithm": "evaluate_contradiction_npov",
+      "comparator": ">=",
+      "default_threshold": 1,
+      "legacy": {"contradiction-theme": "X2"},
+      "source": "Wikipedia:Summary style · Template:Main",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Summary_style",
+      "note": "A theme piece provides ≥1 entry point up to its related cluster overview as a [[<cluster-slug>|한글]] pipe alias (reader's issue→field landscape back-route). Measured by evaluate_contradiction_npov (cluster_slugs orchestrator-injected)."
+    },
+    "enc.coatrack": {
+      "name": "Coatrack avoidance (block tangential)",
+      "dimension": "Wikipedia Coatrack",
+      "judge": "A",
+      "algorithm": "evaluate_overview_aggregate",
+      "comparator": "==",
+      "default_threshold": 0,
+      "legacy": {"overview-aggregate": "F1", "contradiction-aggregate": "F1"},
+      "source": "Wikipedia:Coatrack articles · Wikipedia:Scope",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Coatrack_articles",
+      "note": "0 references to another axis so the roll-up's nominal subject is not obscured by a tangential subject. Measured by evaluate_overview_aggregate (overview)·evaluate_contradiction_aggregate (contradiction blocks landscape cluster refs) bundle (all_links·other-axis stems orchestrator-injected)."
+    },
+    "enc.due-balance": {
+      "name": "Axis balance (due impartiality)",
+      "dimension": "Wikipedia NPOV",
+      "judge": "A",
+      "algorithm": "evaluate_contradiction_aggregate",
+      "comparator": "<=",
+      "default_threshold": 4.0,
+      "legacy": {"contradiction-aggregate": "D3"},
+      "source": "Wikipedia:Neutral point of view — Balancing aspects",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Neutral_point_of_view#Balancing_aspects_of_an_article",
+      "note": "Max/min per-axis theme-count ratio ≤ threshold (prevent over-skew to one axis, WP balancing aspects). Natural skew possible → advisory (human review). Measured by evaluate_contradiction_aggregate bundle."
+    },
+    "enc.encyclopedic-tone": {
+      "name": "Encyclopedic tone (no editorial self-reference)",
+      "dimension": "Wikipedia Self-reference",
+      "judge": "A",
+      "comparator": "==",
+      "default_threshold": 0,
+      "legacy": {"hub": "voice"},
+      "source": "Wikipedia:Manual of Style/Self-references to avoid",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Self-references_to_avoid",
+      "note": "The body does not self-reference editorial artifacts/decisions (e.g. 'this hub treats … as'·'is organized separately'·'here we keep only …'; violations = 0). General encyclopedic register, but measurement currently only via hub voice lint (orchestrator, hub_*.py regex)."
+    },
+    "enc.nav-anchor-density": {
+      "name": "Navigational-anchor body density",
+      "dimension": "Wikipedia Summary style",
+      "judge": "A",
+      "algorithm": "evaluate_hub_body",
+      "comparator": "<=",
+      "default_threshold": 12000,
+      "legacy": {"hub": "body"},
+      "source": "Wikipedia:Summary style",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Summary_style",
+      "note": "When a navigational-anchor page's body prose exceeds the advisory ceiling, delegate the deep-dive to a sub-hub (spinoff). A central anchor (entity or inbound≥threshold) is legitimately content-rich and exempt — central_anchor·threshold injected by orchestrator (hub_body.py). advisory."
+    },
+    "enc.connection-grouping": {
+      "name": "Connection-list grouping",
+      "dimension": "Wikipedia MoS",
+      "judge": "A",
+      "algorithm": "evaluate_hub_body",
+      "comparator": "<=",
+      "default_threshold": 50,
+      "legacy": {"hub": "yeongyeol"},
+      "source": "Wikipedia:Manual of Style/Layout",
+      "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Layout",
+      "note": "When a connection list's flat links exceed the advisory ceiling, group into sub-categories (### Category headings). A grouped list passes regardless of count. Threshold orchestrator-injected. advisory."
+    }
+  }
+}
