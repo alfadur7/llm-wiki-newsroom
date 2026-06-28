@@ -30,6 +30,8 @@ git clone https://github.com/alfadur7/llm-wiki-newsroom.git
 cd llm-wiki-newsroom
 ```
 
+> Or click **["Use this template"](https://github.com/alfadur7/llm-wiki-newsroom/generate)** to create your own wiki repo from this scaffold. To start from a clean slate, delete the example documents under `raw/` and the example pages under `wiki/` (keep the folders and `graph/cluster_labels.json`), then ingest your own sources with `/wiki-ingest`.
+
 This project assumes an environment where the AI agent reads and edits files and invokes tools on its own. Support levels by agent:
 
 | Agent | Config file | Support level |
