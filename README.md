@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**An open-source, local-first AI knowledge base — no API keys, no cloud, no vendor lock-in.** Drop articles, documents, and PDFs into the `raw/` folder, type a single command, and an AI agent like Claude Code reads them, extracts entities, concepts, and relationships, and organizes everything into a fully cross-referenced wiki — a structured, persistent alternative to RAG. Every new document you add also enriches the existing pages. This repo ships with a small example corpus — the open-source-AI ecosystem (the debate over what "open source" means for AI) — under `wiki/`, but the framework is domain-agnostic.
+**A multi-agent AI knowledge base run by a five-role "newsroom" — open-source, local-first, no API keys, no vendor lock-in.** Drop articles, documents, and PDFs into the `raw/` folder, type a single command, and the newsroom — powered by an agent like Claude Code — reads them, extracts entities, concepts, and relationships, and organizes everything into a fully cross-referenced wiki, a structured and persistent alternative to RAG. Unlike most takes on the idea, the agent that *writes* a page is never the one that *reviews* it, and the authoring guidelines evolve themselves over time. Every new document you add also enriches the existing pages. This repo ships with a small example corpus — the debate over what "open source" means for AI — under `wiki/`, but the framework is domain-agnostic.
 
 > Most knowledge tools leave the *finding* to you. This project **makes the AI read and understand** your collected documents first, then organizes them into a wiki — with cross-references between pages, automatic flagging of conflicting claims, and per-topic synthesis built in from the start, so later retrieval is fast.
 
@@ -10,16 +10,30 @@
 
 <sub>The interactive knowledge graph (`graph/graph.html`) — every page a node, every wikilink an edge, color-coded by auto-detected cluster, with a live physics layout and filter/search built in. Shown here on a larger private deployment (~2,300 nodes) to convey how it scales; **this repo ships a deliberately small 15-node example corpus** you can browse the exact same way. (Interface shown in the optional Korean `WIKI_LANG=ko` mode.)</sub>
 
-**Why "Newsroom"?** Because the framework is run not by a single do-everything assistant but by a **newsroom staff** — five specialized roles, each a distinct AI agent: a **reporter** drafts source pages and entity/concept stubs, a **columnist** writes the deep cross-source analysis, a **section editor (desk)** reviews that prose with fresh eyes, a **copy editor** runs the deterministic checks, and an **editor-in-chief** routes the work and gates publication. That division of labor is the project's defining strength:
+## What makes this different
 
-- **Authoring and review live in different hands.** The agent that *writes* a page and the agent that *re-reads and critiques* it are separate instances, exactly as a reporter's copy goes to a different desk — which curbs the self-bias you get when one model grades its own work.
-- **Quality is held to an editorial standard, not a single model's say-so.** Pages are judged against a rubric drawn from real editorial craft (journalism, consulting, and encyclopedic forms), so a different person — or a different AI session — reproduces the same bar.
-- **A two-sided publish gate.** Deterministic linting (links, citations, structure) and qualitative human-style review (bias, argument, narrative) must *both* pass; clearing one side never excuses the other.
-- **The newsroom learns from its own mistakes.** When the same review failure keeps recurring, the system drafts a fix to the *authoring guidelines themselves* and adopts it only after a blind, measured comparison proves it actually helps.
+There are plenty of takes on Karpathy's [LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) idea now. After reading the popular implementations, two things here are genuinely rare:
 
-In short, "Newsroom" is the editorial discipline of a real publication — beat reporting, fact-checking, copy desk, and an editor-in-chief — applied to an AI that maintains your knowledge base.
+**1. Authoring guidelines that evolve themselves — something I haven't found in the other implementations.** When the same review failure keeps recurring, the system drafts a fix to its *own writing rules* and keeps it only if a blind A/B against a regression set shows it actually helped — an idea borrowed from [Self-Harness](https://arxiv.org/abs/2606.09498) and [Microsoft SkillOpt](https://github.com/microsoft/SkillOpt). So it isn't only the wiki that improves over time, but the rules that build it. *(This loop is still experimental — I'm measuring whether it earns its keep rather than claiming it's solved.)*
 
-*Want to see how it differs from RAG first? → [§How it differs from RAG](#how-it-differs-from-rag) comparison table*
+**2. A full newsroom, not just "an agent."** Plenty of tools wrap one agent around your notes, and a few add a verifier. Here the work is split across five roles — a **reporter** drafts source pages and entity/concept stubs, a **columnist** writes the deep cross-source analysis, a **desk** editor reviews it with fresh eyes, a **copy editor** runs the deterministic checks, and an **editor-in-chief** gates publication — and the agent that *writes* a page is never the one that *reviews* it. That review is held to an editorial rubric drawn from real craft (journalism, consulting, encyclopedic forms), so a different person or session reproduces the same bar, and a two-sided gate means the deterministic lint and the qualitative review must *both* pass.
+
+It also leans on **Memex-style associative discovery** — saved reading trails and "unexpected connection" surfacing — that the other implementations don't carry.
+
+The rest — the knowledge graph, contradiction tracking, cascading updates, plain-markdown/Obsidian output — many LLM-wiki tools have in some form. The self-evolving guidelines, the five-role newsroom with its editorial rubric, and the Memex discovery are the bet.
+
+---
+
+## Highlights
+
+- **Persistent, plain-markdown knowledge base** — your "second brain" as version-controlled `.md` files, not a vendor silo. Doubles as an [Obsidian](https://obsidian.md) vault for personal knowledge management (PKM).
+- **Cascading updates** — ingesting one document refreshes ~10–15 related existing pages automatically.
+- **Contradiction tracking** — conflicting claims between sources are flagged at ingest time, not at query time.
+- **Interactive knowledge graph** — every page a node, every link an edge, auto-clustered and browsable.
+- **Associative discovery (Memex)** — follow connected concepts to surface unexpected relationships.
+- **Local-first, no API keys** — the Python tools (graph, lint, search) run entirely on your machine.
+
+See [Key Features](#key-features) below for how each one works.
 
 ---
 
@@ -102,6 +116,9 @@ The Layer 2 wiki is further formalized into **four sub-layers**. Knowing which s
 
 For example, ingesting one article with `/wiki-ingest` creates L2-1 and L2-2 at the same time. When `/wiki-graph` later recomputes clusters, the relevant per-domain overviews (L2-3) are automatically affected, and Claude rewrites them against the evaluation rubric as needed. The global overview (L2-4) is rewritten periodically once the per-domain overviews stabilize, keeping it current. Each sub-layer is responsible only for its own axis (**per-domain overview** or **issue/contradiction**), so editing one page leaves the other axis's files untouched.
 
+<details>
+<summary><strong>Full directory layout</strong> — where every file lives. <em>Skim only if you want the exact on-disk structure.</em></summary>
+
 ```
 raw/                       # Layer 1: original sources (immutable)
   NewsScrap/               #   HTML article clippings (Obsidian Web Clipper-compatible md)
@@ -145,6 +162,11 @@ lint-report.md             # health-check results (auto-generated)
 tools/                     # Python tools (no API key required)
 ```
 
+</details>
+
+<details>
+<summary><strong>File naming, placement &amp; page-schema conventions</strong> — reference details. <em>Not needed to get started.</em></summary>
+
 ### File naming convention
 
 | Type | Prefix | Examples |
@@ -168,6 +190,8 @@ The `wiki/` root meta files (`index`, `overview`, `contradiction`) start directl
 ### Language & page schema
 
 The framework's documentation, prose, and **wiki page schema tokens are all in English**. The tools grep for these exact strings, so they are part of the data format rather than display text: section headers such as `## Summary`, `## Connections`, `## Overview`, and `## Timeline`, and inline evidence/relation tags such as `[fact]`, `[analysis]`, and `[forecast]`. Full internationalization of the page schema — making these tokens configurable per language — is a future direction.
+
+</details>
 
 <details>
 <summary><strong>Per-slash-command pipeline</strong> — which scripts each command invokes internally and which files it produces. <em>You don't need to expand this on first use; skim it only if you're curious about the internals or want to contribute.</em></summary>
@@ -370,6 +394,21 @@ list   : list the trails under wiki/trails/
 
 ---
 
+## How it differs from RAG
+
+If you're weighing this against retrieval rather than against other wiki tools: RAG (Retrieval-Augmented Generation) retrieves source chunks per query and injects them into the answer context. This project instead takes the direction of **structuring and accumulating the wiki in advance**.
+
+| | RAG | LLM Wiki Newsroom |
+|---|---|---|
+| Knowledge state | re-extracted per query | organized once and continuously updated |
+| Retrieval unit | source chunk | structured wiki page |
+| Cross-reference | none | wikilinks + backlink index |
+| Contradiction handling | may surface at query time | flagged at ingest time + DB tracked |
+| Accumulation effect | none | new sources enrich existing pages |
+| Exploration | keyword search | graph traversal + associative trails (Memex) |
+
+---
+
 ## Python tools
 
 The scripts that work behind the slash commands. They **run locally** with no external API keys, and you can call them directly to run just part of the functionality.
@@ -380,6 +419,7 @@ The scripts that work behind the slash commands. They **run locally** with no ex
 | `lint.py` | Group checks: `graph` (page structure · document↔entity references · cluster health) / `hub` (quoted speakers · new-page candidates · L2-2 hub frontmatter) / `meta` (CLAUDE.md internal links · header convention · Rubric sync) / `overview` (landscape-axis overview file Rubric · Freshness) / `contradiction` (conflict-axis per-theme analysis) / `source` (L2-1 source page schema) / plus auxiliary groups `synthesis`·`trail`·`timeline`·`staleness`. Also suggests "new page candidates worth creating" at the end of the report. `python tools/lint.py graph orphans --fix` auto-connects orphan documents; `python tools/lint.py overview <target> --fix` produces a single per-domain overview skeleton + rewrite instructions |
 | `query.py` | Search/traversal CLI — `graph` subcommand for graph traversal (`path A B`·`explain N`·`neighbors N`), `qmd` subcommand for body search (`hybrid`·`search`·`vsearch`). `--budget` to reduce response size and `--json` for machine parsing |
 | `discover.py` | Rank pages that bridge clusters (`surprising`) — combine shortest-path frequency · neighbor cluster diversity · over-degree penalty to auto-surface "centers of unexpected connection" |
+
 ---
 
 ## Key Features
@@ -414,7 +454,7 @@ To avoid re-ingesting the same article, it **double-indexes by URL and file path
 When a new document conflicts with existing claims, it's auto-recorded at ingest time. Readers drill down three levels using `wiki/index.md` as the entry point.
 
 1. **`wiki/contradiction.md`** — global aggregation of contradictions. The editor's tension-axis narrative + theme summaries.
-2. **`wiki/contradictions/<theme>.md`** — per-theme deep analysis (e.g., the AI-coding-productivity debate, agentic-AI expectation vs. evidence, etc.). Which themes exist and which raw issues belong to which theme is defined by `_contradictions_themes.json` as the mapping SoT.
+2. **`wiki/contradictions/<theme>.md`** — per-theme deep analysis (e.g., whether an "open source" model must release its training data). Which themes exist and which raw issues belong to which theme is defined by `_contradictions_themes.json` as the mapping SoT.
 3. **`wiki/contradictions/_contradictions.json`** — source DB of auto-detected individual issues.
 
 It's designed in `macro summary → theme interpretation → raw evidence` order, so wherever a reader stops, that layer reads as self-contained. `wiki/overview.md` covers only per-domain overviews and includes no contradiction references — the common entry point for both axes is `wiki/index.md`.
@@ -477,7 +517,8 @@ Instead of a human assigning every entity/concept page to a category by hand, it
 
 > Leiden is the successor to the better-known Louvain algorithm, solving Louvain's limitation (the modularity-local-maxima trap) where cluster boundaries swing wildly under small graph changes, via a refinement stage and connectivity guarantees. In the larger corpus this engine was built for, as the wiki grew to ~470 hubs Louvain hit an unstable regime where adding just 7 new sources would make the cluster count jump from 7 to 10; after adopting Leiden, the same change was measured to stay stable at 8→8. (The small example corpus shipped here has only 3 clusters, so the instability doesn't show up — but the algorithm choice still matters as a wiki grows.)
 
-#### ✍️ `graph/cluster_labels.json` — editing cluster labels
+<details>
+<summary>✍️ <strong>Editing cluster labels (<code>graph/cluster_labels.json</code>)</strong> — the one config you hand-edit. <em>Operator detail.</em></summary>
 
 The algorithm only finds clusters; it can't name them. `graph/cluster_labels.json` is a small config file that attaches a **human-understandable name** ("cyber security," "cloud native," etc.) to each automatically found cluster. This file is nearly the only config in this project that the operator opens and edits directly; everything else is auto-generated.
 
@@ -503,6 +544,8 @@ When a new topic cluster is discovered and needs a label, `/wiki-lint` tells you
 
 After editing, re-run `python tools/build.py` and the new name is reflected in every catalog and the index.
 
+</details>
+
 ### Wiki-based latest-news search
 `/wiki-news` builds keyword combinations from the entities/concepts accumulated in the wiki and **selects only the latest articles** from the web. For example, specifying the `open-source-ai-definition` cluster generates search terms combining that cluster's major hubs ("OpenSourceInitiative," "OSAID," "training data"). It dedups against existing source titles and recommends only new articles as ingest candidates. It fetches the body even on sites with strong bot blocking by behaving like a browser. When a particular topic is empty, it follows the links in related articles to find further candidates to fill that gap.
 
@@ -526,21 +569,6 @@ Specifying an entity and a year like `/wiki-timeline Meta 2024` generates a **st
 
 ### Two-level index
 Once the wiki exceeds 1,000 documents, a single list file becomes hard to navigate. This project lists only entities/concepts/analyses in the main index (`wiki/index.md`) and **splits documents into per-cluster sub-catalogs**. A document spanning multiple clusters is listed in all relevant catalogs. All lists — entities, concepts, analyses — are uniformly sorted A–Z (under `WIKI_LANG=ko`, Hangul-titled pages sort first in ga-na-da order, then A–Z).
-
----
-
-## How it differs from RAG
-
-RAG (Retrieval-Augmented Generation) retrieves source chunks per query and injects them into the answer context. This project instead takes the direction of **structuring and accumulating the wiki in advance**.
-
-| | RAG | LLM Wiki Newsroom |
-|---|---|---|
-| Knowledge state | re-extracted per query | organized once and continuously updated |
-| Retrieval unit | source chunk | structured wiki page |
-| Cross-reference | none | wikilinks + backlink index |
-| Contradiction handling | may surface at query time | flagged at ingest time + DB tracked |
-| Accumulation effect | none | new sources enrich existing pages |
-| Exploration | keyword search | graph traversal + associative trails (Memex) |
 
 ---
 
@@ -626,7 +654,7 @@ On Windows, after installing Node.js, running the patch script above prepares th
 - Use `/wiki-trail create <topic>` to build a knowledge path for a topic of interest and share it with your team.
 - Saving good query answers to `wiki/syntheses/` accumulates them like ingested sources.
 - Periodically re-analyzing the contradiction theme summaries (`wiki/contradiction.md` and `wiki/contradictions/<theme>.md`) lets you track how the tension axes of the wiki's whole discourse evolve.
-- You can schedule a weekly briefing — summarizing the past week's collected articles into 6 domains — to auto-generate every Monday, recapping a week's flow on a single page.
+- You can schedule a weekly briefing — summarizing the past week's collected articles by domain cluster — to auto-generate every Monday, recapping a week's flow on a single page.
 
 ---
 
@@ -635,7 +663,7 @@ On Windows, after installing Node.js, running the patch script above prepares th
 - [Andrej Karpathy's LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) — three-layer architecture, stateful knowledge accumulation, cascading updates
 - [Vannevar Bush's Memex (1945)](https://en.wikipedia.org/wiki/Memex) — associative trails, serendipity, augmenting human thought
 - [Self-Harness (arXiv:2606.09498)](https://arxiv.org/abs/2606.09498) — self-improvement loop. A 3-stage structure that finds weakness patterns in failure records, fixes the authoring guidelines, and adopts only after passing regression verification
-- [Microsoft SkillOpt (arXiv:2605.23904)](https://github.com/microsoft/SkillOpt) — a verification gate that doesn't apply a proposal immediately but accepts it only when the score actually rises on a held-out check task
+- [Microsoft SkillOpt](https://github.com/microsoft/SkillOpt) (arXiv:2605.23904) — a verification gate that doesn't apply a proposal immediately but accepts it only when the score actually rises on a held-out check task
 - [SamurAIGPT/llm-wiki-agent](https://github.com/SamurAIGPT/llm-wiki-agent) — the original project
 
 ## License
