@@ -16,7 +16,8 @@ commit noise. One batch → low noise.
 
 Two record kinds (`kind`):
 - defect:     {date, layer, target, caught_at, check, mechanism, severity, addressable, run}
-- transition: {date, cluster, surface, change, held_in_delta, held_out_delta, decision, commit}
+- transition: {date, cluster, surface, change, held_in_delta, held_out_delta, decision, commit,
+               held_in_sampled, held_out_sampled}  # fresh-sampled page lists (audit · anti-cherry-pick)
 
 caught_at has the form `<stage>:<detail>` (e.g. `lint:source`, `desk:density`) — the
 leading segment (lint/desk) carries which rung of the verification ladder it escaped
