@@ -19,7 +19,7 @@ A Claude with no prior knowledge must be able to read this SoT alone and reprodu
 - Apply the 6 review lenses (bias/trust·information density·repetition·argument quality·narrative flow·fine readability)
 - Qualitatively assess the self-acknowledged limitations of camps A and B (is the limitation self-acknowledged by that camp, or merely a re-citation of the opposing camp's evidence — Authoring Guide rule T3)
 - Prescription strength (ratio of categorical sentences·due impartiality)
-- Spot check (1–2 items) that quoted attribution precisely matches the claim
+- Spot check (1–2 items) that quoted attribution precisely matches the claim. **Synthesis is the exception** — the claims surfaced by lint `[Join]` are verified not by sampling but exhaustively via span comparison (`struct.join-grounded`, grounded in lens 4)
 - Reader-persona embodiment — fresh-eyes assessment
 - When a defect is found, report it in the form lens·severity·location·specific_issue·suggested_fix·evidence
 - Identify recurring observed patterns as Rubric-promotion candidates (meta responsibility)
@@ -36,7 +36,7 @@ A Claude with no prior knowledge must be able to read this SoT alone and reprodu
 **Input** (Cognition principle 1 — full-context Read is mandatory):
 - The target file (the Columnist's APPLY output)
 - The guide for that content type (`.claude/layers/<source|hub|overview|contradiction>.md`) — authoring standard + identifies the quantitative Rubric territory that has already PASSED
-- (If needed) 1–2 spot-check targets from the target's frontmatter `sources:` list
+- (If needed) 1–2 spot-check targets from the target's frontmatter `sources:` list. **For a synthesis**, the source span of each component of every join claim surfaced by lint `[Join]`
 
 **Output**: answer only in the following form.
 
@@ -194,6 +194,7 @@ Each lens is composed of "embodiment question + representative flag conditions +
 - An imbalance where 2 of 3 quotes come only from the same camp
 - Two mutually opposing metrics came from one source, but the body does not point out that meta-contradiction
 - **The "limitation·tension axis" section of a vendor·government·own-entity hub is filled only with external-criticism quotes** — there is no self-acknowledged-limitation attribution for the same event (an official apology·post-hoc commit·self-diagnosis in an own report). Reinforce with 1+ self-acknowledged utterance, or surface the absence explicitly with wording like "no official comment has been reported"
+- **(synthesis) a claim fusing two sources fabricates, at the seam, a fact present in neither span (conflation)** — compare the lint `[Join]` surface point against each component span to verify the join is actually derived from the union. Each half is true, so a spot check·per-source check won't catch it; you must read the spans together (`struct.join-grounded`)
 - **When the entire set of limitation items is ≥ 80% external re-citation**, consider renaming the section title (honestly surfacing it as "external assessment·market risk," etc.)
 
 **Boundary with the Rubric**: Rubric T1·T3 look only at presence/absence. The "substantiveness" of a Toulmin rebuttal can be judged only by the desk.

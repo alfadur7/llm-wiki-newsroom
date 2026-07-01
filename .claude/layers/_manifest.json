@@ -420,13 +420,14 @@
     }
   },
   "synthesis": {
-    "_note": "L2-3 Q-A synthesis (wiki/syntheses/<slug>.md). Craft-selection rationale (compared against the exemplar ai-coding-evolution): summary = jrn.lede · con.scr (a conclusion-first SCR for the question) · jrn.page (tension framing) · analysis section = jrn.explainer · con.bold-bullet · inline source attribution in the body = cit.grounding (a synthesis uses no typed prefixes, so cit.cite-consistency does not apply) · the per-axis `## Connections` roster = enc.connection-grouping · notation and neutrality = enc.*. Structural criteria with no external craft source (schema-sections, source-coverage, source-exists, through-line) and house-style criteria live in the structural section of synthesis.md. Automatic measurement is limited to the structural criteria + enc.slug-alias (synthesis.py); the craft criteria are manual (Desk VERIFY₂). roster = completion count.",
+    "_note": "L2-3 Q-A synthesis (wiki/syntheses/<slug>.md). Craft-selection rationale (compared against the exemplar ai-coding-evolution): summary = jrn.lede · con.scr (a conclusion-first SCR for the question) · jrn.page (tension framing) · analysis section = jrn.explainer · con.bold-bullet · inline source attribution in the body = cit.grounding (a synthesis uses no typed prefixes, so cit.cite-consistency does not apply) · the per-axis `## Connections` roster = enc.connection-grouping · notation and neutrality = enc.*. Structural criteria with no external craft source (schema-sections, source-coverage, source-exists, through-line, join-grounded) and house-style criteria live in the structural section of synthesis.md. Automatic measurement is limited to the structural criteria (except join-grounded) + enc.slug-alias (synthesis.py); the craft criteria and join-grounded are manual (Desk VERIFY₂ — a span-by-span comparison of the synthesis-specific conflation surface). roster = completion count.",
     "roster": {
       "required": [
         "struct.schema-sections",
         "struct.source-coverage",
         "struct.source-exists",
         "struct.through-line",
+        "struct.join-grounded",
         "enc.broken-link",
         "jrn.lede",
         "con.scr",

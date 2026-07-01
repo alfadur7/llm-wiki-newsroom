@@ -95,12 +95,13 @@ Craft principles, criteria, and thresholds are the SoT in the craft skills' `cri
 - **Conclusion up front** (`con.so-what`): `## Summary` answers the question conclusion-first. Don't lay out background first and defer the conclusion.
 - **Inline-attribution obligation** (`cit.grounding`): every key claim·number in the body is attributed to its source via `[[source-slug]]`. The narrator does not assert without a source (`enc.verdict-restraint`).
 - **Integration value**: a synthesis is **a through-running analysis laid on top of** its underlying hubs·sources, not a repetition of their detail. If it's a mere summary, an overview·hub suffices.
+- **Join grounding** (`struct.join-grounded`): when fusing two sources into one claim, don't fabricate at the seam a fact present in neither source. Write a fused claim only after confirming each component in its own source span — a conflation where each half is true but only the combination is false is the synthesis-specific risk.
 - **Slug alias** (`enc.slug-alias`): no raw exposure of kebab-case slugs ≥ 10 chars — `[[ai-coding-10x-productivity-myth|METR 19% productivity myth]]`.
 - **Numeric precision** (`con.numeric-precision`): comparison numbers state unit·basis·point-in-time.
 
 ### Feedback loop (iterate until Rubric conditions met)
 
-Iterate and improve until the synthesis meets the completion condition (roster `synthesis.roster` — 8 required PASS + 25+/27 total PASS).
+Iterate and improve until the synthesis meets the completion condition (roster `synthesis.roster` — 9 required PASS + 26+/28 total PASS).
 
 1. **Iteration 1 (draft)**: author per the execution order above.
 2. **Evaluation**: the `[Rubric]` line (automatic metrics) in `python tools/lint.py synthesis <slug>` output + a body review against the mapping-table M criteria.
@@ -115,10 +116,10 @@ This Rubric pairs with "how to write" (Authoring) to judge "how well it was writ
 
 **Judgment method**:
 - Each criterion is 3-tier: **PASS / PARTIAL / FAIL** (PARTIAL is excluded from the completion count).
-- **Automatic (A)** = metrics from `python tools/lint.py synthesis [<slug>]` output. What synthesis lint measures automatically is only **structural (schema-sections·source-coverage·source-exists) + enc.slug-alias (L1)** + advisories (W1·F1·Placement).
+- **Automatic (A)** = metrics from `python tools/lint.py synthesis [<slug>]` output. What synthesis lint measures automatically is only **structural (schema-sections·source-coverage·source-exists) + enc.slug-alias (L1)** + advisories (W1·F1·Placement·J1). J1 is **not the verdict metric for `struct.join-grounded` but a surfacing metric** — it counts only the join locations; whether each holds is judged by the desk (M).
 - **Manual (M)** = judged by Claude·Desk reading the body (most of the craft mapping-table dotted IDs — `jrn.*`·`con.*`·`cit.grounding`·`enc.connection-grouping`, etc.).
 
-**Criteria SoT**: the criterion roster·required are `_manifest.json` `synthesis.roster` (27 criteria); craft definitions·PASS conditions are the mapping-table skills' `criteria.json`·SKILL.md. Structural criteria with no external craft source are in the section below.
+**Criteria SoT**: the criterion roster·required are `_manifest.json` `synthesis.roster` (28 criteria); craft definitions·PASS conditions are the mapping-table skills' `criteria.json`·SKILL.md. Structural criteria with no external craft source are in the section below.
 
 #### Structural criteria (not craft — held solely by layers)
 
@@ -127,10 +128,11 @@ This Rubric pairs with "how to write" (Authoring) to judge "how well it was writ
 | `struct.schema-sections` | Required sections complete | `## Summary` + `## Connections` present AND ≥ 1 numbered `## N.` analysis section | A | ✅ |
 | `struct.source-coverage` | Sources reappear in body | of frontmatter `sources:`, the share reappearing as `[[slug]]` in the body ≥ 70% | A | ✅ |
 | `struct.through-line` | Through-running narrative | a single question·tension threading the sections is stated (not a mere topic listing) | M | ✅ |
+| `struct.join-grounded` | Integration join verified | a claim fusing ≥2 sources is verified by span comparison of each component — no fact fabricated at the seam | M | ✅ |
 
-**Completion conditions** (roster `synthesis.roster` — 27 criteria):
-- All 8 required (roster `required`: struct.schema-sections·struct.source-coverage·struct.source-exists·struct.through-line·enc.broken-link·jrn.lede·con.scr·cit.grounding) PASS
-- **25 or more of the 27 total PASS** (= total−2, computed by `_manifest_counts` · PARTIAL excluded)
+**Completion conditions** (roster `synthesis.roster` — 28 criteria):
+- All 9 required (roster `required`: struct.schema-sections·struct.source-coverage·struct.source-exists·struct.through-line·struct.join-grounded·enc.broken-link·jrn.lede·con.scr·cit.grounding) PASS
+- **26 or more of the 28 total PASS** (= total−2, computed by `_manifest_counts` · PARTIAL excluded)
 - `enc.slug-alias` (L1) is **optional (advisory)** for synthesis — inline source citations and cross-layer links legitimately expose long kebab slugs, so it is not a hard gate (report only)
 - `python tools/lint.py synthesis <slug> --fix` rewrite block computes the completion-condition string from the roster
 
@@ -138,7 +140,8 @@ This Rubric pairs with "how to write" (Authoring) to judge "how well it was writ
 
 ```
 syntheses/<slug>.md:
-  [Rubric] S1 sections=2/2+num✓ ✅  SrcCov=15/17 (88%) ✅  SrcExist=✅  L1 raw_slugs=0 ✅  W1 links=N ✅  F1 last_updated=✅
+  [Rubric] S1 sections=2/2+num✓ ✅  SrcCov=15/17 (88%) ✅  SrcExist=✅  L1 raw_slugs=0 ✅  J1 joins=2  W1 links=N ✅  F1 last_updated=✅
+  [Join] 2 conflation surface(s) (claims joining ≥2 sources) — desk must verify span-by-span (no spot check)
 ```
 
 - **✅ = PASS**, **⚠️ = FAIL**
@@ -146,6 +149,7 @@ syntheses/<slug>.md:
 - **SrcCov**: of frontmatter `sources:`, the share reappearing as `[[slug]]` in the body ≥ 70% (exempt with `—` when no sources declared)
 - **SrcExist**: each slug in frontmatter `sources:` is a real file at `wiki/sources/<slug>.md` (hallucination guard — surfaces ⚠️ + the slug list if missing)
 - **L1**: 0 raw kebab slugs ≥ 10 chars (without alias) exposed in the body
+- **J1** (advisory): count of claim lines (before `## Connections`) fusing ≥2 declared sources. No exit effect — the desk judges each join via `struct.join-grounded`; mis-filed news/briefing excluded ([Placement])
 - **W1** (advisory): body wikilinks ≥ 10
 - **F1** (advisory): frontmatter `last_updated` present
 - broken-link (enc.broken-link, required) is delegated to `python tools/lint.py graph structure`

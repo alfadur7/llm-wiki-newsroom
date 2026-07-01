@@ -12,7 +12,10 @@ Three structural (layers-owned, craft-free) criteria are auto-measured here:
   * struct.source-exists   — every declared `sources:` slug is a real wiki/sources/ file
   * enc.slug-alias (L1)     — no raw ≥10-char kebab slug exposed without pipe alias
 Plus advisory W1 (link density) · F1 (last_updated) · [Placement] (mis-filed
-news/briefing detection — advisory only, never gates exit code).
+news/briefing detection) · J1 (conflation surface — claim lines joining ≥2
+declared sources, so the desk verifies each span-by-span rather than spot-
+checking 1–2; lint surfaces WHERE, the join's validity stays desk-judged). All
+advisory only, never gate the exit code.
 
 Craft criteria (jrn.lede·con.scr·cit.* etc.) in the manifest roster are
 manual (M) — judged by desk VERIFY₂, not auto-measured here (same split as
@@ -75,6 +78,11 @@ L1_RAW_SLUG_RE = re.compile(r"\[\[([a-z][a-z0-9\-]{" + str(L1_MIN_SLUG_LEN - 1) 
 # gates the exit code. Filename signal is the primary, robust marker.
 NEWS_FILENAME_RE = re.compile(r"^(news-|weekly-briefing-)")
 
+# `## Connections` roster heading — the J1 join scan stops here. Roster lines
+# legitimately co-locate many links (cluster·trail·concept·entity·theme) but are
+# not claims, so they must not count as conflation surface.
+CONNECT_HEADING_RE = re.compile(r"^##\s+Connections\s*$", re.MULTILINE)
+
 
 def _sources_list(fm: dict) -> list[str]:
     """Frontmatter `sources:` as a clean stem list (handles list or scalar)."""
@@ -134,6 +142,28 @@ def _evaluate(rel: str, slug: str, content: str) -> dict:
     src_missing = [s for s in src if not (SOURCES_DIR / f"{s}.md").is_file()]
     source_exists_pass = not src_missing
 
+    # J1 (advisory) — conflation surface. A synthesis is the one page type that
+    # joins ≥2 sources into one claim, so a fabricated seam (a single assertion
+    # fusing two sources but present in neither span) passes every per-source
+    # check: each half is anchored to a real span, only the join is invented.
+    # Nothing deterministic can judge whether the join holds (semantic — desk
+    # VERIFY₂), but lint CAN surface WHERE the joins are so the desk verifies each
+    # span-by-span instead of spot-checking 1–2. Scan claim lines (before the
+    # `## Connections` roster) for those citing ≥2 distinct declared sources. Skip
+    # mis-filed news/briefing files: a triage table row lists many sources per
+    # line but is not a synthesis claim, so J1 would fire in bulk on a briefing
+    # and bury the genuine-synthesis signal. Those files are operator-triage.
+    misfile = _is_news_misfile(slug, fm)
+    join_units = []
+    if not misfile:
+        m_connect = CONNECT_HEADING_RE.search(body)
+        claim_region = body[: m_connect.start()] if m_connect else body
+        src_set = set(src)
+        for line in claim_region.splitlines():
+            hits = {t for m in WIKILINK_RE.finditer(line) if (t := m.group(1).strip().split("/")[-1]) in src_set}
+            if len(hits) >= 2:
+                join_units.append((line.strip()[:70], sorted(hits)))
+
     # enc.slug-alias (L1) — raw ≥10-char kebab slug exposure.
     l1_raw = L1_RAW_SLUG_RE.findall(body)
     slug_alias_pass = len(l1_raw) == 0
@@ -159,12 +189,13 @@ def _evaluate(rel: str, slug: str, content: str) -> dict:
     return {
         "rel": rel,
         "slug": slug,
-        "misfile": _is_news_misfile(slug, fm),
+        "misfile": misfile,
         "schema": (schema_pass, len(sections_present), len(REQUIRED_SECTIONS), has_numbered),
         "fm_missing": fm_missing,
         "source_coverage": (coverage_pass, covered, len(src), coverage_ratio),
         "source_exists": (source_exists_pass, src_missing),
         "slug_alias": (slug_alias_pass, l1_raw[:5]),
+        "join": (len(join_units), join_units[:5]),
         "w1": (w1_pass, w1_links),
         "f1": (f1_pass,),
         "markup": (markup_pass, markup_leaks[:5]),
@@ -176,6 +207,7 @@ def _print_per_file(r: dict) -> None:
     cov_pass, cov_n, cov_total, cov_ratio = r["source_coverage"]
     exists_pass, src_missing = r["source_exists"]
     sa_pass, sa_samples = r["slug_alias"]
+    join_n, join_samples = r["join"]
     w1_pass, w1_n = r["w1"]
     (f1_pass,) = r["f1"]
     markup_pass, markup_samples = r["markup"]
@@ -192,10 +224,15 @@ def _print_per_file(r: dict) -> None:
         f"SrcCov={cov_str} {_mark(cov_pass)}  "
         f"SrcExist={_mark(exists_pass)}  "
         f"L1 raw_slugs={len(sa_samples)} {_mark(sa_pass)}  "
+        f"J1 joins={join_n}  "
         f"W1 links={w1_n} {_mark(w1_pass)}  "
         f"F1 last_updated={_mark(f1_pass)}  "
         f"MarkupLeak={len(markup_samples)} {_mark(markup_pass)}"
     )
+    if join_n:
+        print(f"  [Join] {join_n} conflation surface(s) (claims joining ≥2 sources) — desk must verify span-by-span (no spot check):")
+        for text, slugs in join_samples:
+            print(f"    {slugs} · {text}")
     if not markup_pass:
         print(f"  [BLOCKER] tool-call markup leak (do not publish): {markup_samples}")
     if src_missing:
