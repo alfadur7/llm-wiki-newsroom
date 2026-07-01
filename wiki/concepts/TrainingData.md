@@ -2,8 +2,8 @@
 title: "Training Data"
 type: concept
 tags: [training-data, open-source-ai, transparency, reproducibility]
-sources: [case-against-osaid, osi-open-source-ai-definition, open-source-ai-models-how-open]
-last_updated: 2026-06-26
+sources: [case-against-osaid, osi-open-source-ai-definition, open-source-ai-models-how-open, mozilla-celebrates-osaid]
+last_updated: 2026-07-01
 ---
 
 ## Overview

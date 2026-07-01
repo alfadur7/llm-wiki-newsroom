@@ -30,4 +30,5 @@ For the full source list see the [source catalog](sources/_catalog.md), or brows
 - [Open-Washing](concepts/OpenWashing.md) — Open-washing is the practice of promoting an AI model as "open source" while releasing only some of its components or attaching restrictive license terms, so the model gains the open-source brand without contributing to the commons.
 - [Training Data](concepts/TrainingData.md) — Training data is the corpus a model learns from, and whether it must be released is the central dispute in the OpenSourceAI debate.
 
-## Analyses (0)
+## Analyses (1)
+- [What Counts as Open Source AI Under Every Camp's Standard](syntheses/open-source-ai-every-camp-standard.md) — To count as OpenSourceAI under *every* camp in this debate, a model has to clear the **stricter** of two bars — the open-data camp's, which strictly contains the OpenSourceInitiative's.

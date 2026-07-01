@@ -2,7 +2,7 @@
   "_meta": {
     "phase": "dependencies",
     "note": "layer-cascade upstream index — page → {upstream pages it derives from, newest upstream date}. Consumed by tools/_lint/staleness.py (uniform staleness rule). Additive; no existing behavior changed.",
-    "page_count": 22
+    "page_count": 23
   },
   "pages": {
     "sources/case-against-osaid.md": {
@@ -94,11 +94,12 @@
       "upstream_max_date": "2026-06-26"
     },
     "concepts/OpenWashing.md": {
-      "last_updated": "2026-06-26",
+      "last_updated": "2026-07-01",
       "upstream": [
         "sources/mozilla-celebrates-osaid.md",
         "sources/osi-open-source-ai-definition.md",
-        "sources/open-source-ai-models-how-open.md"
+        "sources/open-source-ai-models-how-open.md",
+        "sources/case-against-osaid.md"
       ],
       "upstream_max_date": "2026-06-26"
     },
@@ -111,11 +112,12 @@
       "upstream_max_date": "2026-06-26"
     },
     "concepts/TrainingData.md": {
-      "last_updated": "2026-06-26",
+      "last_updated": "2026-07-01",
       "upstream": [
         "sources/case-against-osaid.md",
         "sources/osi-open-source-ai-definition.md",
-        "sources/open-source-ai-models-how-open.md"
+        "sources/open-source-ai-models-how-open.md",
+        "sources/mozilla-celebrates-osaid.md"
       ],
       "upstream_max_date": "2026-06-26"
     },
@@ -126,7 +128,7 @@
         "concepts/OpenWashing.md",
         "entities/Meta.md"
       ],
-      "upstream_max_date": "2026-06-26"
+      "upstream_max_date": "2026-07-01"
     },
     "overviews/open-source-ai-definition.md": {
       "last_updated": "2026-06-26",
@@ -137,7 +139,7 @@
         "entities/Mozilla.md",
         "entities/OpenSourceInitiative.md"
       ],
-      "upstream_max_date": "2026-06-26"
+      "upstream_max_date": "2026-07-01"
     },
     "overviews/open-weights.md": {
       "last_updated": "2026-06-26",
@@ -159,6 +161,16 @@
       "last_updated": "2026-06-26",
       "upstream": [],
       "upstream_max_date": null
+    },
+    "syntheses/open-source-ai-every-camp-standard.md": {
+      "last_updated": "2026-07-01",
+      "upstream": [
+        "sources/osi-open-source-ai-definition.md",
+        "sources/case-against-osaid.md",
+        "sources/mozilla-celebrates-osaid.md",
+        "sources/open-source-ai-models-how-open.md"
+      ],
+      "upstream_max_date": "2026-06-26"
     },
     "overview.md": {
       "last_updated": null,

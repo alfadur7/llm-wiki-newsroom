@@ -1,6 +1,53 @@
 {
   "overlays": [
     {
+      "type": "synthesis",
+      "slug": "open-source-ai-every-camp-standard",
+      "title": "What Counts as Open Source AI Under Every Camp's Standard",
+      "flavor": "region",
+      "members": [
+        {
+          "id": "sources/osi-open-source-ai-definition.md"
+        },
+        {
+          "id": "sources/case-against-osaid.md"
+        },
+        {
+          "id": "sources/mozilla-celebrates-osaid.md"
+        },
+        {
+          "id": "sources/open-source-ai-models-how-open.md"
+        },
+        {
+          "id": "concepts/OpenSourceAI.md"
+        },
+        {
+          "id": "concepts/TrainingData.md"
+        },
+        {
+          "id": "concepts/OpenWeights.md"
+        },
+        {
+          "id": "concepts/OpenWashing.md"
+        },
+        {
+          "id": "entities/OpenSourceInitiative.md"
+        },
+        {
+          "id": "entities/FreeSoftwareFoundation.md"
+        },
+        {
+          "id": "entities/Mozilla.md"
+        },
+        {
+          "id": "entities/Meta.md"
+        },
+        {
+          "id": "entities/DeepSeek.md"
+        }
+      ]
+    },
+    {
       "type": "contradiction",
       "slug": "open-training-data-requirement",
       "title": "OSAID Definition vs Open Training-Data Requirement",
@@ -16,18 +63,105 @@
     }
   ],
   "node_overlays": {
+    "sources/osi-open-source-ai-definition.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
     "sources/case-against-osaid.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      },
       {
         "type": "contradiction",
         "slug": "open-training-data-requirement",
         "title": "OSAID Definition vs Open Training-Data Requirement"
       }
     ],
+    "sources/mozilla-celebrates-osaid.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "sources/open-source-ai-models-how-open.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
     "concepts/OpenSourceAI.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      },
       {
         "type": "contradiction",
         "slug": "open-training-data-requirement",
         "title": "OSAID Definition vs Open Training-Data Requirement"
+      }
+    ],
+    "concepts/TrainingData.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "concepts/OpenWeights.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "concepts/OpenWashing.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "entities/OpenSourceInitiative.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "entities/FreeSoftwareFoundation.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "entities/Mozilla.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "entities/Meta.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "entities/DeepSeek.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
       }
     ]
   }
