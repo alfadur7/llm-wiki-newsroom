@@ -43,6 +43,12 @@ __pycache__/
 # Operator-local handoff note (must not be committed to the public mirror)
 HANDOFF.md
 
+# Operator-local GitHub Wiki export — a personal project-management convenience
+# (converter script + its flattened, frontmatter-stripped output), not part of
+# the published corpus. Regenerate anytime with the script below.
+tools/export_github_wiki.py
+wiki-export/github-wiki/
+
 # OS
 .DS_Store
 Thumbs.db
