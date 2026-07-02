@@ -115,6 +115,23 @@ def test_guideline_edit_advisory(capsys):
     assert "[minimality-advisory] GUIDELINE EDIT" in _payload(capsys)
 
 
+def test_proposal_validation_advisory_craft_prose(capsys):
+    # layers file + desk/reporter/columnist agents fire the reflex (merges with the
+    # guideline minimality advisory since layers ⊂ GUIDE_DIRS).
+    for p in ("/r/.claude/layers/hub.md", "/r/.claude/agents/desk.md",
+              "/r/.claude/agents/reporter.md", "/r/.claude/agents/columnist.md"):
+        dispatch.run_pre(_input("Edit", p, new_string="- a"))
+        assert "[proposal-validation-advisory]" in _payload(capsys), p
+
+
+def test_proposal_validation_advisory_scope(capsys):
+    # editor-in-chief (routing)·copyeditor (lint)·README (matrix) are deliberately out.
+    for p in ("/r/.claude/agents/editor-in-chief.md", "/r/.claude/agents/copyeditor.md",
+              "/r/.claude/agents/README.md"):
+        dispatch.run_pre(_input("Edit", p, new_string="- a"))
+        assert "[proposal-validation-advisory]" not in _payload(capsys), p
+
+
 def test_plan_file_advisory(capsys):
     dispatch.run_pre(_input("Write", "/r/plans/x.md", content="plan"))
     assert "5-step self-check" in _payload(capsys)

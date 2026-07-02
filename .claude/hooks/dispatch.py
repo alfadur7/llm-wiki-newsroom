@@ -60,6 +60,13 @@ SCRATCH_EXTS = {".py", ".sh", ".tmp", ".scratch", ".ipynb"}
 GUIDE_DIRS = ("/.claude/agents/", "/.claude/commands/", "/.claude/layers/",
               "/.claude/policies/", "/.claude/operations/")
 
+# Subset of GUIDE surfaces that is desk-judged wiki-content authoring/review craft
+# (NOT lint-scored) — edits here trigger the proposal-validation reflex (2b). Allowlist
+# of the content standards + authoring/review roles; editor-in-chief (routing)·
+# copyeditor (lint)·README (matrix)·skills (lint-scored path) are deliberately out.
+CRAFT_PROSE_DIRS = ("/.claude/layers/",)
+CRAFT_PROSE_FILES = ("/agents/desk.md", "/agents/reporter.md", "/agents/columnist.md")
+
 # Auto-generated / immutable targets — hand edits via Write|Edit are silently
 # overwritten by the next build or corrupt an immutable SoT. lint --fix and
 # build.py reach these through the CLI (not Write|Edit), so they are unaffected.
@@ -144,6 +151,28 @@ length/depth comparison, per-item findings) is presented in the reply — a bare
 Move violating phrasings to log.md + remove them from the body.
 
 Reference: editor-in-chief.md § Voice Pass + policies/claude-guideline-voice.md."""
+
+PROPOSAL_VALIDATION_MSG = """[proposal-validation-advisory] DESK-JUDGED PROSE GUIDELINE EDIT DETECTED
+
+If this edit is a **prose-rule change** affecting wiki content authoring/review quality
+(layers authoring standards·rubric prose·desk lenses·reporter·columnist authoring craft),
+proposal-validation measurement is required before adoption — fire it as a self-harness
+reflex even without an explicit instruction:
+
+  Inject the Control (current passage)·Treatment (strengthening) text into the agent prompt
+  (measure with the file unedited)
+  → held-in same-mechanism blind raw re-author + held-out over-fire canary
+  → desk N≥2 blind scoring → accept = held-in ≥1 improvement ∧ no slice regresses.
+  Only on acceptance make the confirmed edit to this file + log the transition (log_defect kind:transition).
+
+Exception (no blind-desk batch needed): lint.py-scored rules (skills craft criteria.json·
+quantitative rubric·policies lint) go through the single lint measurement path (separate)·
+typo·slimming·structural/editorial·cross-reference fixes·routing·gate rules.
+
+Same applies regardless of origin (evolve session·desk surfacing mid-cycle·self-proposal).
+
+Reference: .claude/operations/proposal-validation-runbook.md "When to Run" +
+           .claude/agents/editor-in-chief.md self-evolution workflow steps 6-7."""
 
 SCRATCH_MSG_TMPL = """[scratch-location-advisory] PROJECT ROOT SCRIPT WRITE — {basename}
 
@@ -317,6 +346,13 @@ def run_pre(data: dict) -> int:
         if depth:
             msg = msg + "\n\n" + depth
         messages.append(msg)
+
+    # 2b) proposal-validation reflex — desk-judged content craft (see CRAFT_PROSE_*).
+    if path.endswith(".md") and (
+        any(d in path for d in CRAFT_PROSE_DIRS)
+        or path.endswith(CRAFT_PROSE_FILES)
+    ):
+        messages.append(PROPOSAL_VALIDATION_MSG)
 
     # 3) scratch-location advisory — Write only, project-root script files.
     if data.get("tool_name") == "Write" and path:

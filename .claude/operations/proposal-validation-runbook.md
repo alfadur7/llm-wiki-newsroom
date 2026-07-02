@@ -4,7 +4,7 @@ Instructions for measuring whether an edit to a **desk-judged guideline** (the l
 
 ## When to Run
 
-When the editor-in-chief's stage 1 proposes a prose-guideline strengthening for a mechanism cluster and its effect must be measured before adoption. The held-in target is the defect pages where that mechanism manifested, drawn from the corpus (`tools/_defect-log.jsonl`, written locally by `tools/log_defect.py`).
+**Always before adoption** of desk-judged craft prose that governs wiki content authoring/review (layers authoring standards·rubric prose·desk lenses·reporter·columnist authoring craft) — regardless of origin. It fires not only in an evolve session (editor-in-chief stage 1 proposal) but equally for a strengthening the desk surfaces mid-cycle or a self-proposal, as a self-harness reflex without an explicit instruction (editing `.claude/layers/*.md`·`agents/{desk,reporter,columnist}.md` triggers the `dispatch.py` proposal-validation advisory as a file-event reminder). The held-in target is the defect pages where that mechanism manifested, drawn from the corpus (`tools/_defect-log.jsonl`, written locally by `tools/log_defect.py`). The exception is § Out of Scope (lint-scored guidance such as skills craft goes through the lint measurement path·structural/editorial·routing rules).
 
 ## Measure Without Editing the File
 
