@@ -3,13 +3,16 @@
 Inbox-time dedup only looks at the original URL. fetch_one re-checks the *final*
 URL resolved after redirects (r.url for PDF-via-redirect, _final_url for HTML)
 against dedup_index, so a different short URL pointing at the same target is not
-saved twice. Network functions are monkeypatched."""
+saved twice. Network functions are monkeypatched — the PDF sniff lives in
+fetch_article.sniff_and_save_pdf (shared with fetch_article.main), so its
+network/save calls are patched in the fetch_article namespace."""
 import sys
 from pathlib import Path
 
 # conftest puts tools/ on sys.path, but fetch_inbox lives under _ingest/.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
 
+from _ingest import fetch_article as A  # noqa: E402
 from _ingest import fetch_inbox as F  # noqa: E402
 
 
@@ -33,7 +36,8 @@ class _FakeStream:
 def test_html_final_url_dedup_skips(monkeypatch):
     monkeypatch.setattr(F, "unwrap_share_wrapper", lambda u: u)
     monkeypatch.setattr(F, "is_pdf_url", lambda *a, **k: False)
-    monkeypatch.setattr(F, "safe_get_stream", lambda *a, **k: _FakeStream("https://x.com/a"))
+    monkeypatch.setattr(A, "is_pdf_url", lambda *a, **k: False)
+    monkeypatch.setattr(A, "safe_get_stream", lambda *a, **k: _FakeStream("https://x.com/a"))
     monkeypatch.setattr(
         F, "fetch_html",
         lambda url, timeout=15: ("https://final.com/article?utm_source=x", "T", "D", "x" * 200),
@@ -49,11 +53,12 @@ def test_pdf_redirect_dedup_skips(monkeypatch):
     monkeypatch.setattr(F, "unwrap_share_wrapper", lambda u: u)
     # direct-url is_pdf_url(url) → False; redirect is_pdf_url(r.url, ctype) → True.
     monkeypatch.setattr(F, "is_pdf_url", lambda u, ctype="": ctype == "application/pdf")
+    monkeypatch.setattr(A, "is_pdf_url", lambda u, ctype="": ctype == "application/pdf")
     monkeypatch.setattr(
-        F, "safe_get_stream",
+        A, "safe_get_stream",
         lambda *a, **k: _FakeStream("https://cdn.com/file.pdf", "application/pdf"),
     )
-    monkeypatch.setattr(F, "save_pdf", lambda *a, **k: _fail_on_save())
+    monkeypatch.setattr(A, "save_pdf", lambda *a, **k: _fail_on_save())
     idx = {F.canonicalize_url("https://cdn.com/file.pdf"): "existing-pdf"}
     status, path = F.fetch_one("https://short.link/pdf", dedup_index=idx)
     assert status == "SKIPPED:duplicate-of-existing-pdf"
@@ -64,7 +69,8 @@ def test_html_no_false_skip_when_final_url_novel(monkeypatch):
     saved = Path("raw/NewsScrap/new.md")
     monkeypatch.setattr(F, "unwrap_share_wrapper", lambda u: u)
     monkeypatch.setattr(F, "is_pdf_url", lambda *a, **k: False)
-    monkeypatch.setattr(F, "safe_get_stream", lambda *a, **k: _FakeStream("https://x.com/a"))
+    monkeypatch.setattr(A, "is_pdf_url", lambda *a, **k: False)
+    monkeypatch.setattr(A, "safe_get_stream", lambda *a, **k: _FakeStream("https://x.com/a"))
     monkeypatch.setattr(
         F, "fetch_html",
         lambda url, timeout=15: ("https://final.com/novel", "T", "D", "x" * 200),

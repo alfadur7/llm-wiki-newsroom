@@ -29,14 +29,23 @@ calibration. Mirrors the `source.py` rollout precedent.
 """
 from __future__ import annotations
 
+import importlib.util
 import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, WIKILINK_RE, WIKILINK_ANY_RE, MARKUP_LEAK_RE, atomic_write_text, parse_frontmatter, read_text_cached, strip_code, strip_frontmatter  # noqa: E402
+from _lib import WIKI, WIKILINK_STEM_RE, WIKILINK_ANY_RE, MARKUP_LEAK_RE, atomic_write_text, parse_frontmatter, read_text_cached, safe_slug_path, strip_code, strip_frontmatter  # noqa: E402
 sys.path.insert(0, str(Path(__file__).parent))  # tools/_lint/ — for _manifest_counts (sibling)
-from _advisory_common import iter_md, mark as _mark, print_rewrite_block  # noqa: E402
+from _advisory_common import L1_MIN_SLUG_LEN, iter_md, mark as _mark, print_rewrite_block  # noqa: E402
+
+# enc.slug-alias(L1) measurement is owned by the encyclopedia-writing skill;
+# reuse the same implementation overview.py uses (MOVE-not-COPY) rather than a
+# local regex that drifts from the skill's kebab-only·subdir-stripping semantics.
+_ENC_CHECKS_PATH = Path(__file__).resolve().parents[2] / ".claude" / "skills" / "encyclopedia-writing" / "checks.py"
+_enc_spec = importlib.util.spec_from_file_location("enc_checks_syn", _ENC_CHECKS_PATH)
+enc_skill = importlib.util.module_from_spec(_enc_spec)
+_enc_spec.loader.exec_module(enc_skill)
 
 SYNTHESES_DIR = WIKI / "syntheses"
 SOURCES_DIR = WIKI / "sources"
@@ -50,7 +59,6 @@ REQUIRED_FRONTMATTER = {"title", "type", "sources", "last_updated"}
 REQUIRED_SECTIONS = ("## Summary", "## Connections")
 SOURCE_COVERAGE_MIN = 0.7  # fraction of frontmatter sources that re-appear as body [[links]]
 W1_MIN_LINKS = 10
-L1_MIN_SLUG_LEN = 10
 
 # Auto-measured required criteria — a FAIL on these gates the exit code
 # (subject to ADVISORY_MODE). Manual roster criteria are desk-verified.
@@ -69,8 +77,6 @@ REQUIRED_KEYS = ("schema", "source_coverage", "source_exists")
 
 # Numbered analytic section: `## 1. ...`, `## 12. ...`
 NUMBERED_SECTION_RE = re.compile(r"^##\s+\d+\.\s+", re.MULTILINE)
-# L1 raw kebab slug exposure (no pipe alias) — mirrors source.py L1.
-L1_RAW_SLUG_RE = re.compile(r"\[\[([a-z][a-z0-9\-]{" + str(L1_MIN_SLUG_LEN - 1) + r",})\]\]")
 
 # Mis-filed news/briefing heuristic — a `/wiki-news` triage report is NOT a
 # synthesis (no `sources:`, body is a triage table). Placement is advisory
@@ -128,7 +134,7 @@ def _evaluate(rel: str, slug: str, content: str) -> dict:
 
     # struct.source-coverage — frontmatter sources that re-appear as body links.
     src = _sources_list(fm)
-    body_stems = {m.group(1).strip().split("/")[-1] for m in WIKILINK_RE.finditer(body)}
+    body_stems = {m.group(1).strip().split("/")[-1] for m in WIKILINK_STEM_RE.finditer(body)}
     if src:
         covered = sum(1 for s in src if s in body_stems)
         coverage_ratio = covered / len(src)
@@ -160,12 +166,12 @@ def _evaluate(rel: str, slug: str, content: str) -> dict:
         claim_region = body[: m_connect.start()] if m_connect else body
         src_set = set(src)
         for line in claim_region.splitlines():
-            hits = {t for m in WIKILINK_RE.finditer(line) if (t := m.group(1).strip().split("/")[-1]) in src_set}
+            hits = {t for m in WIKILINK_STEM_RE.finditer(line) if (t := m.group(1).strip().split("/")[-1]) in src_set}
             if len(hits) >= 2:
                 join_units.append((line.strip()[:70], sorted(hits)))
 
-    # enc.slug-alias (L1) — raw ≥10-char kebab slug exposure.
-    l1_raw = L1_RAW_SLUG_RE.findall(body)
+    # enc.slug-alias (L1) — raw ≥10-char kebab slug exposure (owning skill impl).
+    l1_raw = enc_skill.find_unaliased_slugs(body, min_len=L1_MIN_SLUG_LEN)
     slug_alias_pass = len(l1_raw) == 0
 
     # W1 (advisory) — wikilink density.
@@ -194,11 +200,11 @@ def _evaluate(rel: str, slug: str, content: str) -> dict:
         "fm_missing": fm_missing,
         "source_coverage": (coverage_pass, covered, len(src), coverage_ratio),
         "source_exists": (source_exists_pass, src_missing),
-        "slug_alias": (slug_alias_pass, l1_raw[:5]),
+        "slug_alias": (slug_alias_pass, len(l1_raw), l1_raw[:5]),
         "join": (len(join_units), join_units[:5]),
         "w1": (w1_pass, w1_links),
         "f1": (f1_pass,),
-        "markup": (markup_pass, markup_leaks[:5]),
+        "markup": (markup_pass, len(markup_leaks), markup_leaks[:5]),
     }
 
 
@@ -206,11 +212,11 @@ def _print_per_file(r: dict) -> None:
     schema_pass, s_n, s_total, has_num = r["schema"]
     cov_pass, cov_n, cov_total, cov_ratio = r["source_coverage"]
     exists_pass, src_missing = r["source_exists"]
-    sa_pass, sa_samples = r["slug_alias"]
+    sa_pass, sa_count, sa_samples = r["slug_alias"]
     join_n, join_samples = r["join"]
     w1_pass, w1_n = r["w1"]
     (f1_pass,) = r["f1"]
-    markup_pass, markup_samples = r["markup"]
+    markup_pass, markup_count, markup_samples = r["markup"]
 
     cov_str = "—" if cov_ratio < 0 else f"{cov_n}/{cov_total} ({int(cov_ratio * 100)}%)"
     print(f"{r['rel']}:")
@@ -223,11 +229,11 @@ def _print_per_file(r: dict) -> None:
         f"  [Rubric] S1 sections={s_n}/{s_total}+num{'✓' if has_num else '✗'} {_mark(schema_pass)}  "
         f"SrcCov={cov_str} {_mark(cov_pass)}  "
         f"SrcExist={_mark(exists_pass)}  "
-        f"L1 raw_slugs={len(sa_samples)} {_mark(sa_pass)}  "
+        f"L1 raw_slugs={sa_count} {_mark(sa_pass)}  "
         f"J1 joins={join_n}  "
         f"W1 links={w1_n} {_mark(w1_pass)}  "
         f"F1 last_updated={_mark(f1_pass)}  "
-        f"MarkupLeak={len(markup_samples)} {_mark(markup_pass)}"
+        f"MarkupLeak={markup_count} {_mark(markup_pass)}"
     )
     if join_n:
         print(f"  [Join] {join_n} conflation surface(s) (claims joining ≥2 sources) — desk must verify span-by-span (no spot check):")
@@ -319,6 +325,11 @@ def run(target: str | None = None, fix: bool = False, **_kwargs) -> int:
         slug = target.removesuffix(".md")
         path = SYNTHESES_DIR / f"{slug}.md"
         if fix and not path.is_file():
+            try:
+                path = safe_slug_path(SYNTHESES_DIR, slug)  # gate slug→path before write
+            except ValueError as exc:
+                print(f"ERROR: {exc}", file=sys.stderr)
+                return 2
             atomic_write_text(path, _skeleton(slug))
             print(f"Created skeleton: {path.as_posix()}")
             _print_rewrite_block(slug, path, exists=False)

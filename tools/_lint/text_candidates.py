@@ -7,12 +7,14 @@ potential wiki pages that don't yet exist; this module scans TEXT
 
 Heuristics:
   - Latin TitleCase phrases: 1-3 capitalised tokens
-  - Korean noun-like tokens: 4+ Hangul characters in a single run
+  - Korean noun-like tokens: 4+ Hangul characters in a single run (WIKI_LANG=ko only)
 
 Strict filters:
   - body text only (frontmatter, code blocks, inline code stripped)
   - existing entity/concept/source stems excluded (after normalisation)
   - minimum mentions and minimum page count thresholds
+  - the KOREAN_ALIAS/Korean-BLOCKLIST private-corpus curation applies only under
+    korean_mode() (WIKI_LANG=ko), so it never suppresses/remaps English tokens
 """
 from __future__ import annotations
 
@@ -24,6 +26,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from _lib import (  # noqa: E402
+    korean_mode,
     read_text_cached,
     WIKI,
     WIKILINK_RE,
@@ -190,9 +193,32 @@ def _candidates(*,
     instead of emitting a second concatenated JSON object on stdout.
     """
     stems, norm_map = _index_existing_pages()
+    ko_mode = korean_mode()
 
     mentions: Counter = Counter()
     page_set: dict[str, set[str]] = defaultdict(set)
+
+    def _account(token: str, page_id: str) -> None:
+        """Shared filter + tally for a mined token (used by both mining loops).
+
+        The KOREAN_ALIAS curation (Korean-alias resolution + `None`-token
+        suppression) is private-corpus editorial judgement, so it applies only
+        under korean_mode(); on the English-native default it is skipped so
+        English tokens (Amazon, PaaS, ICT, MS) are neither remapped nor
+        suppressed. BLOCKLIST stays active — its English entries are generic
+        noise and its Korean entries never match a Latin token."""
+        if token in BLOCKLIST:
+            return
+        check_token = token
+        if ko_mode:
+            aliased = KOREAN_ALIAS.get(token)
+            if aliased is None and token in KOREAN_ALIAS:
+                return
+            check_token = aliased or token
+        if _normalise(check_token) in norm_map:
+            return
+        mentions[token] += 1
+        page_set[token].add(page_id)
 
     for sub in ("sources", "entities", "concepts", "syntheses", "trails", "timelines"):
         d = WIKI / sub
@@ -206,31 +232,16 @@ def _candidates(*,
             page_id = f"{sub}/{p.stem}"
 
             for m in LATIN_RE.findall(text):
-                token = m.strip()
-                if token in BLOCKLIST:
-                    continue
-                aliased = KOREAN_ALIAS.get(token)
-                if aliased is None and token in KOREAN_ALIAS:
-                    continue
-                check_token = aliased or token
-                if _normalise(check_token) in norm_map:
-                    continue
-                mentions[token] += 1
-                page_set[token].add(page_id)
-            for m in KOREAN_RE.findall(text):
-                token = m.strip()
-                if token in BLOCKLIST:
-                    continue
-                if _is_conjugated_korean(token):
-                    continue
-                aliased = KOREAN_ALIAS.get(token)
-                if aliased is None and token in KOREAN_ALIAS:
-                    continue
-                check_token = aliased or token
-                if _normalise(check_token) in norm_map:
-                    continue
-                mentions[token] += 1
-                page_set[token].add(page_id)
+                _account(m.strip(), page_id)
+            # Korean noun mining is a WIKI_LANG=ko capability — its tokens and
+            # tail-noise/alias tables are dead weight (and skew) on an English
+            # corpus, so gate the whole branch behind korean_mode().
+            if ko_mode:
+                for m in KOREAN_RE.findall(text):
+                    token = m.strip()
+                    if _is_conjugated_korean(token):
+                        continue
+                    _account(token, page_id)
 
     candidates = []
     for token, n in mentions.most_common():

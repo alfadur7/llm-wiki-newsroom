@@ -40,35 +40,23 @@ import sys
 from datetime import date, datetime
 from pathlib import Path
 
-# On a Windows cp949 console, printing Korean / en-dash etc. raises
-# UnicodeEncodeError, so reconfigure stdout/stderr to UTF-8. This is a Python
-# 3.7+ feature, safe on the standard interpreter.
-for _stream in (sys.stdout, sys.stderr):
-    if hasattr(_stream, "reconfigure"):
-        try:
-            _stream.reconfigure(encoding="utf-8")
-        except Exception:  # noqa: BLE001
-            pass
-
 import requests
 
 sys.path.insert(0, str(Path(__file__).parent.parent))  # _ingest/ → tools/ root (shared modules)
-from _lib import atomic_write_text, canonicalize_url  # noqa: E402
-from _net import safe_get_stream, BLOCKED_STATUSES, UnsafeURLError  # noqa: E402
+# _lib import also reconfigures stdout/stderr to UTF-8 (Windows cp949 console).
+from _lib import REPO_ROOT, atomic_write_text, canonicalize_url  # noqa: E402
+from _net import UnsafeURLError  # noqa: E402
 from _ingest.fetch_article import (  # noqa: E402
-    HEADERS,
     fetch_html,
     fetch_pdf,
     is_pdf_url,
     save_markdown,
     save_pdf,
+    sniff_and_save_pdf,
     unwrap_share_wrapper,
-    _pdf_title_from_response,
-    _stream_pdf_body,
 )
 
 
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent  # tools/_ingest/ → repo root
 INBOX = REPO_ROOT / "raw" / "_inbox.md"
 ARCHIVE = REPO_ROOT / "raw" / "_archive.md"
 SOURCE_MAP = REPO_ROOT / "wiki" / "sources" / "_source_map.json"
@@ -112,10 +100,13 @@ def load_source_map() -> dict:
     return json.loads(SOURCE_MAP.read_text(encoding="utf-8"))
 
 
-# Inline metadata format: URL, then two spaces + `#`, then `key=value` pairs.
-# The two-space prefix prevents URL fragments (`https://x/y#anchor`) from being
-# mis-parsed as metadata. Quoted values (`query="..."`) preserve embedded spaces.
-_INLINE_META_RE = re.compile(r"^(\S+)  #\s*(.*)$")
+# Inline metadata format: URL, then whitespace + `#`, then `key=value` pairs.
+# The canonical form (format_entry emits it, the header documents it) is two
+# spaces, but any run of whitespace is accepted so a hand- or template-spaced
+# line isn't silently folded into the URL. A URL fragment (`https://x/y#anchor`)
+# has no preceding space, so it stays part of the URL. Quoted values
+# (`query="..."`) preserve embedded spaces.
+_INLINE_META_RE = re.compile(r"^(\S+)\s+#\s*(.*)$")
 _META_KV_RE = re.compile(r'(\w+)=(?:"([^"]*)"|(\S+))')
 
 
@@ -261,34 +252,30 @@ def fetch_one(
     dedup_index = dedup_index or {}
     try:
         if is_pdf_url(url):
+            # Re-check the (post-unwrap) URL against dedup_index — main()'s
+            # inbox-time dedup only saw the pre-unwrap wrapper URL, and the
+            # sniffed-PDF / HTML paths below both re-check. PDFs especially
+            # need this (no frontmatter URL for a later pass to dedup by).
+            dup = dedup_index.get(canonicalize_url(url))
+            if dup:
+                return f"SKIPPED:duplicate-of-{dup}", None
             body, title = fetch_pdf(url)
             path = save_pdf(url, body, title)
             return "OK", path
 
-        # Streaming GET first to sniff for PDF-via-redirect (Content-Type).
-        # `with` releases the connection (and its session, chained onto
-        # close in _net) on every exit path — the PDF return, an exception,
-        # or the HTML fall-through — instead of leaking it on all but the
-        # HTML path. The block also closes before fetch_html re-fetches.
-        try:
-            with safe_get_stream(url, headers=HEADERS, timeout=15) as r:
-                r.raise_for_status()
-                ctype = r.headers.get("Content-Type", "")
-                if is_pdf_url(r.url, ctype):
-                    dup = dedup_index.get(canonicalize_url(r.url))
-                    if dup:
-                        return f"SKIPPED:duplicate-of-{dup}", None
-                    body = _stream_pdf_body(r)
-                    title = _pdf_title_from_response(r)
-                    path = save_pdf(r.url, body, title)
-                    return "OK", path
-        except requests.exceptions.HTTPError as e:
-            # A WAF block on the PDF-sniff GET means we cannot sniff — fall
-            # through to fetch_html, which retries via curl / Wayback before
-            # giving up. Non-block HTTP errors stay fatal (handled below).
-            status = e.response.status_code if e.response is not None else None
-            if status not in BLOCKED_STATUSES:
-                raise
+        # PDF-via-redirect sniff, shared with fetch_article.main. The dedup
+        # hook re-checks the redirect-resolved final URL before the body
+        # downloads. None = HTML fall-through (a WAF-blocked sniff included —
+        # fetch_html retries via curl / Wayback before giving up).
+        sniffed = sniff_and_save_pdf(
+            url,
+            timeout=15,
+            dedup_check=lambda final: dedup_index.get(canonicalize_url(final)),
+        )
+        if sniffed is not None:
+            if sniffed[0] == "duplicate":
+                return f"SKIPPED:duplicate-of-{sniffed[1]}", None
+            return "OK", sniffed[1]
 
         _final_url, title, description, content = fetch_html(url, timeout=15)
         dup = dedup_index.get(canonicalize_url(_final_url))

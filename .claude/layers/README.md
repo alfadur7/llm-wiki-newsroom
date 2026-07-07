@@ -57,6 +57,8 @@ last_updated: YYYY-MM-DD
 
 Per-layer additional fields (L2-1 source's `source_url`·`source_file`·`date`, L2-3 cluster overview's `cluster`, etc.) are defined by each content file (`source.md`·`overview.md`, etc.).
 
+**Two per-type exceptions** (the content file is the SoT): a **trail** carries `created` only — no `sources:`·`last_updated:` ([trail.md](trail.md)); a **timeline** omits `sources:` ([timeline.md](timeline.md)).
+
 ## Root Meta Files Exception
 
 The meta files at the `wiki/` root (`index.md`·`overview.md`·`contradiction.md`·`log.md`·`lint-report.md`) start directly with `# Title`, **without frontmatter**.
@@ -87,7 +89,7 @@ Per-file H2 structure (navigable):
 | File | H2 structure |
 |---|---|
 | [source.md](source.md) | `## Page Format` → `## Authoring` → `## Evaluation Rubric` |
-| [hub.md](hub.md) | `## Page Format` → `## Body Structure` (L2-2 entity·concept stubs are an area held back from Desk qualitative review, so page format + body structure are combined without separate `## Authoring`·`## Evaluation Rubric` sections) |
+| [hub.md](hub.md) | `## Page Format` → `## Body Structure` (hub authoring craft has its SoT in the dotted-ID craft skills — applied to stub and full alike — so page format + body structure are combined without separate `## Authoring`·`## Evaluation Rubric` sections; stubs still receive Desk VERIFY₂ limited to format·attribution·tone) |
 | [timeline.md](timeline.md) | `## Page Format` → `## Authoring` → `## Evaluation Rubric` |
 | [overview.md](overview.md) | `## Authoring` (`### Part 1`·`### Part 2`) → `## Evaluation Rubric` (`### Part 1`·`### Part 2`) |
 | [contradiction.md](contradiction.md) | `## Authoring` (`### Part 1`·`### Part 2`) → `## Evaluation Rubric` (`### Part 1`·`### Part 2`) |

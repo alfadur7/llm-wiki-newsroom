@@ -39,8 +39,7 @@ Flags:
   dry_run=True  — compute + print distribution, but write nothing.
 
 Runnable standalone: `python tools/build.py contradictions [--dry-run]`.
-Also invoked from _build/index.py:run() at end so `build.py index` keeps its
-existing contract of refreshing _contradictions.json.
+Runs as its own pipeline phase before index (tools/build.py PIPELINE).
 """
 from __future__ import annotations
 
@@ -54,7 +53,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI as wiki, atomic_write_if_changed, source_date_from_text  # noqa: E402
+from _lib import GRADE_MARKER_RE, WIKI as wiki, atomic_write_if_changed, source_date_from_text  # noqa: E402
 
 TOOLS = Path(__file__).parent.parent
 RULES_PATH = TOOLS / "_contradiction_rules.json"
@@ -102,8 +101,8 @@ _FIRST_WIKILINK_RE = re.compile(
     r"\[\[([^\]|#]+?)(?:#([^\]|]+?))?(?:\|([^\]]+?))?\]\]"
 )
 
-# Grade marker on `## Key Claims` claim lines (Phase 2 atomic unit prefix)
-_GRADE_MARKER_RE = re.compile(r"^\s*-\s*\[(fact|analysis|forecast)\]", re.MULTILINE)
+# Grade marker on `## Key Claims` claim lines (Phase 2 atomic unit prefix):
+# shared GRADE_MARKER_RE from _lib (single definition with graph.py).
 
 # `## Key Claims` section body extraction
 _CLAIMS_SECTION_RE = re.compile(
@@ -223,7 +222,7 @@ def _build_source_metadata_cache() -> dict[str, dict]:
         primary_ratio = 0.0
         section_m = _CLAIMS_SECTION_RE.search(text)
         if section_m:
-            grades = _GRADE_MARKER_RE.findall(section_m.group(1))
+            grades = GRADE_MARKER_RE.findall(section_m.group(1))
             if grades:
                 primary = sum(1 for g in grades if g == "fact")
                 primary_ratio = primary / len(grades)

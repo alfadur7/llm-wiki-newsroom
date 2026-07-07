@@ -43,7 +43,7 @@ GUIDE_PATH = Path(".claude/commands/wiki-lint.md")
 
 SLUG_RE = re.compile(r"^[a-z0-9-]+$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-RESERVED_SLUGS = {"theme"}  # subcommand collision in `/wiki-lint contradiction <slug>`
+RESERVED_SLUGS = {"theme", "aggregate"}  # reserved targets in `/wiki-lint contradiction <slug>` — both dispatch to non-theme branches (theme subcommand · L2-4 aggregate), so a same-named theme MD would be unreachable
 
 PHASE2_THEME_CAP = 15  # soft recommendation — exceeding it enters the dual approval gate (`.claude/commands/wiki-lint.md` § Dual Approval Gate)
 PHASE2_LOWER_BOUND = 5
@@ -424,6 +424,17 @@ def run(fix: bool = False) -> int:
     }
 
     schema_issues = _check_schema(themes_doc)
+
+    # Normalize null/mistyped `themes`/`unassigned` to their empty defaults so the
+    # id/coverage checks and the summary line below emit the clean exit-1 diagnostic
+    # instead of crashing (_check_schema above already recorded the shape violation).
+    # dict.get returns a stored `null` as-is, so an explicit isinstance guard — not a
+    # default arg — is required.
+    if not isinstance(themes_doc.get("themes"), dict):
+        themes_doc["themes"] = {}
+    if not isinstance(themes_doc.get("unassigned"), list):
+        themes_doc["unassigned"] = []
+
     id_issues = _check_ids(themes_doc, claim_ids_in_db)
     coverage_issues = _check_coverage(themes_doc, claim_ids_in_db)
     phase2_issues, phase2_warnings = _check_phase2(themes_doc)

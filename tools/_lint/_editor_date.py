@@ -47,17 +47,24 @@ def git_head_text(path: Path) -> str | None:
         )
         if r.returncode != 0:
             return None
-        return (r.stdout or b"").decode("utf-8", errors="replace")
+        # Normalize CRLF→LF so a CRLF HEAD blob hashes identically to the
+        # universal-newline reads it gets compared against (_hash_at, read_text).
+        return (r.stdout or b"").decode("utf-8", errors="replace").replace("\r\n", "\n")
     except (subprocess.SubprocessError, FileNotFoundError, OSError):
         return None
 
 
 def last_commit_date(path: Path) -> str | None:
     """YYYY-MM-DD of the most recent commit touching `path`, or None if git is
-    unavailable or the file is untracked."""
+    unavailable or the file is untracked. Resolves via `_git_repo_rel` so the
+    result is independent of the caller's cwd (like the other helpers here)."""
+    rr = _git_repo_rel(path)
+    if rr is None:
+        return None
+    toplevel, rel = rr
     try:
         r = subprocess.run(
-            ["git", "log", "-1", "--format=%cs", "--", str(path)],
+            ["git", "-C", toplevel, "log", "-1", "--format=%cs", "--", rel],
             capture_output=True, text=True, timeout=5, check=False,
             encoding="utf-8", errors="replace",
         )

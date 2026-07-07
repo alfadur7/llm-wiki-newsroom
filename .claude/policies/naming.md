@@ -59,7 +59,7 @@ An entity stub is created **only for a core entity that is cited multiple times 
 - Accepted: SK Shieldus (3 citations + ZETIA consortium leader) · Kim Yong-beom (5 sources accumulated) · AhnLab (multiple citations + the CloudMate acquisition narrative mainstay)
 - Rejected: TmaxCloud (1 one-off citation) · Webcash (1–2 citations, mere enumeration) · M-DAQ Global (1 citation, peripheral layer) · one-off people · one-off companies/outlets
 
-The operational-policy SoT is kept consistent with `.claude/projects/.../memory/feedback_no_single_source_stub.md` (local memory) — when this policy changes, update that memory too.
+If a local memory note mirroring this policy exists under `.claude/memory/`, keep it consistent — update it too when this policy changes.
 
 ## Threshold for Adding a Concept (concepts, techniques, phenomena, standards)
 

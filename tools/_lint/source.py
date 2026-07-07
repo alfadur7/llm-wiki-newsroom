@@ -18,9 +18,9 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, WIKILINK_ANY_RE, parse_frontmatter, read_text_cached, real_source_files, strip_code, strip_frontmatter  # noqa: E402
+from _lib import FRONTMATTER_BLOCK_RE, REPO_ROOT, WIKI, WIKILINK_ANY_RE, parse_frontmatter, read_text_cached, real_source_files, strip_code, strip_frontmatter  # noqa: E402
 sys.path.insert(0, str(Path(__file__).parent))
-from _advisory_common import mark  # noqa: E402
+from _advisory_common import L1_MIN_SLUG_LEN, L1_RAW_SLUG_RE, mark  # noqa: E402
 
 import importlib.util as _ilu  # noqa: E402
 import json as _json  # noqa: E402
@@ -29,12 +29,11 @@ import json as _json  # noqa: E402
 # skill. The call configuration is the manifest SoT (`source.bundles`).
 # Wiki-global state (page_index·section title) is injected by the orchestrator
 # code; the threshold (c2) comes from manifest params.
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-_MANIFEST = _json.loads((_REPO_ROOT / ".claude" / "layers" / "_manifest.json").read_text(encoding="utf-8"))
+_MANIFEST = _json.loads((REPO_ROOT / ".claude" / "layers" / "_manifest.json").read_text(encoding="utf-8"))
 _cit_skill_name = "scholarly-citation"
 _cit_bundle_cfg = _MANIFEST["source"]["bundles"][_cit_skill_name]
 _cit_spec = _ilu.spec_from_file_location(
-    "cit_checks", _REPO_ROOT / ".claude" / "skills" / _cit_skill_name / "checks.py"
+    "cit_checks", REPO_ROOT / ".claude" / "skills" / _cit_skill_name / "checks.py"
 )
 cit_skill = _ilu.module_from_spec(_cit_spec)
 _cit_spec.loader.exec_module(cit_skill)
@@ -131,91 +130,8 @@ ACCEPTABLE_FAILS = 10
 # entity stub creation and source-schema claimant fixability).
 # Adding a slug here MUST cite the policy clause that justifies permanent
 # residual status (single-cite claim source · generic-noun form · no multi-cluster appearance).
-INTRINSICALLY_UNFIXABLE_SOURCES: set[str] = {
-    # Sprint 5 residual single-cite claimants (accumulated 2026-05-07~05-10):
-    "subquadratic-subq-1m-preview-12m-token-context",       # G4: [[Subquadratic]] self-cites 5 times · multi-cluster 0
-    "toss-large-conglomerate-designation-2026",             # G2: DowKiwoom·DB·Daishin·Minister Choi single-cite
-    "namyangju-wangsuk-3rd-newtown-site-2026-06",           # G2: construction industry·government generic nouns
-    "moreh-tenstorrent-llm-inference-dgx-class",            # G2: Tenstorrent single-cite
-    "goldman-quantum-computing-pullback-2026",              # G2: Rigetti·Deloitte·Korea Center for International Finance·Subodh Kulgarni single-cite
-    "bigtech-ai-security-redesign-2026",                    # G2: Trend Micro single-cite
-    # Track A baseline-31 full sweep (2026-05-19~05-20 cleanup) residual single-cite entities:
-    "mythos-korea-structural-vulnerability-kim-seungjoo",   # G4: Kim Seung-joo (Korea University Graduate School of Information Security) single-cite · multi-cluster 0
-    "lee-jaebum-claude-code-personal-agent-sol-tina",       # G4: Lee Jae-beom (Kakao co-founder · Three Body Partners) single-cite · multi-cluster 0
-    "openai-recurring-crisis-narrative-history",            # A2: Gary Marcus·MarketWatch single-cite speakers (A2 advisory level)
-    # Namesake split (2026-05-24): the [[Lee Sang-geun]] entity is the DGB Daegu Bank ICT Group deputy president (3 sources).
-    # The Lee Sang-geun in this source (director of the Korea University AI Security Research Center) is a namesake with only 2 distinct sources →
-    # below stub threshold (≥3), kept as a plain-text claimant per feedback_no_single_source_stub policy →
-    # intrinsically not G2-wikilinkable (cannot mislink a namesake to the [[Lee Sang-geun]] deputy-president entity).
-    "mythos-shock-7-month-golden-time",                     # G2: Lee Sang-geun, director of Korea University AI Security Research Center, namesake plain text (4 claim lines)
-    # Demotion sweep (2026-05-26, confirmed at desk 2nd gate): hub demotion·absorption left the entity
-    # intentionally hub-less → claimant ends as plain text (not G2-wikilinkable unless re-promoted).
-    # feedback_no_single_source_stub: subjects desk-confirmed and demoted as stub-ineligible because single-cite·isolated.
-    "ai-dev-42-percent-speed-boost",                        # G2: Kim Tae-yang (SK Planet CTO) deleted and demoted → plain text
-    "hyundaicard-ai-data-science-global",                   # G2: Bae Kyung-hwa (Hyundai Card digital division head) deleted and demoted → plain text
-    "kb-securities-ai-wm-1q-130percent",                    # G2: Seoul Economic Daily (news outlet) deleted and demoted → plain text
-    "kiwoong-info-efta-non-face-identity-verification",     # G2: Kiwoong Information & Communication (single-cite DSP) deleted and demoted → plain text
-    "skt-ceo-yu-apac-ai-computing-2030",                    # G2: Yoo Young-sang (former SKT CEO) absorbed into SK Telecom and demoted → plain text
-    # Demotion sweep (2026-06-24, confirmed at desk 2nd gate): single-cite·isolated entity hub demotion·deletion
-    # left the claimant as plain text. Below feedback_no_single_source_stub threshold (≥3 cites·multi-cluster).
-    "oasis-route-mini-ai-checkout",                         # G2: Oasis Market (grocery distribution, out-of-domain single-cite) deleted and demoted → plain text
-    "lablup-amax-ai-infra-global",                          # G2: Shin Jeong-kyu (Lablup CEO) demoted → plain text
-    "lablup-nvidia-ai-summit-japan",                        # G2: Shin Jeong-kyu (Lablup CEO) demoted → plain text
-    "datadog-gpu-monitoring-launch",                        # G2: Datadog (single-cite identity) demoted → plain text
-    "darkweb-phishing-kit-financial-cybercrime-kaspersky-2026",  # G2: Kaspersky (single-cite) demoted → plain text
-    # G2 advisory triage (2026-06-24, operator judgment): suspected multi-source claimants, but
-    # actual source tallies (excluding catalog/source_map) all came in below threshold (≥3 sources·multi-cluster).
-    "germany-bfv-palantir-replace-chapsvision",            # G2: BfV (German Federal Office for the Protection of the Constitution) foreign agency, 1 source
-    "kor-govt-openai-tac-mythos-shield",                   # G2: Choi Woo-hyuk (Ministry of Science and ICT) single-cite + reporter generic noun
-    "openai-daybreak-cyber-defense-vision",                # G2: The Verge (outlet) — an outlet cannot be a claimant entity
-    "ms-mdash-mythos-rival-kim-taesoo",                    # G2: Kim Tae-soo (MS security VP) 2 sources·single cluster, below threshold (external standing is clear but operator-whitelisted)
-    "tci-fund-microsoft-divest-ai-disruption",             # G2: TCI/Christopher Hohn (activist fund) 2 sources, peripheral mention
-    # ingest 2026-05-26: single-cite (1 source) · person Human Reviewer Gate claimants — below stub threshold
-    # (≥3 distinct sources), so handled as plain text. On reaching ≥3, missing-entity detection
-    # re-surfaces → at that point create the entity and remove from the whitelist (feedback_no_single_source_stub).
-    "cerebras-kimi-k26-gpu-speed",                          # G2: Cerebras (single-cite AI chip vendor) plain text
-    "akb-dnotitia-agent-knowledgebase",                     # G2: Dnotitia (single-cite developer) plain text
-    "geohot-eternal-sloptember",                            # G2: George Hotz (single-cite · person gate) plain text
-    # ingest 2026-06-07: single-cite (1 source) claimants — below stub threshold (≥3 distinct sources),
-    # ending as plain text. On reaching ≥3, missing-entity re-surfaces → create the entity and remove.
-    "samsung-electro-mechanics-silicon-capacitor-1-5t",     # G2: Samsung Electro-Mechanics (single-cite component maker) plain text
-    "nh-agilesoda-acquisition",                             # G2: AgileSoda (single-cite acquired AI firm) plain text
-    "china-datacenter-pe-exit",                             # G2: PDG·Warburg Pincus·Bain·Carlyle·Blackstone (single-cite foreign PE) plain text
-    "quiet-ace-leaves-company",                             # G2: Unicorn Jungle (single-cite outlet) · low-relevance org-theory column plain text
-    # ingest 2026-06-10 (inbox/NewsScrap): single-cite (1 source) claimants — below stub threshold (≥3 distinct
-    # sources + ≥2 clusters), ending as plain text. Confirmed at desk VERIFY₂. On reaching ≥3,
-    # missing-entity re-surfaces → create the entity and remove (feedback_no_single_source_stub).
-    "a2sys-lee-dongsoo-seed-160bn",                         # G2: A2SYS (new startup) · Lee Dong-soo (founder) single-cite · multi-cluster 0 plain text
-    # ingest 2026-06-12 (inbox 14 + NewsScrap 4): single-cite (1 source) claimants — below stub threshold
-    # (≥3 distinct sources + ≥2 clusters), ending as plain text. On reaching ≥3,
-    # missing-entity re-surfaces → create the entity and remove (feedback_no_single_source_stub).
-    "xiaomi-mimo-ultraspeed-1000-tokens",                   # G2: Xiaomi·Artificial Analysis·Decrypt (foreign press) single-cite plain text (Xiaomi is borderline — gate on hold)
-    "nds-aws-digital-service-iaas-registration",            # G2: NDS (single-cite AWS partner MSP) · Kim Jung-won (CEO) single-cite · multi-cluster 0 plain text
-    "insignary-ai-code-opensource-license-risk",            # G2: Mike Pittenger (Insignary CSO) single-cite · multi-cluster 0 plain text
-    # ingest 2026-06-14 (NewsScrap): single-cite (1 source) claimants — below stub threshold (≥3 distinct
-    # sources + ≥2 clusters), ending as plain text. On reaching ≥3, missing-entity re-surfaces →
-    # create the entity and remove (feedback_no_single_source_stub).
-    "github-credential-leak-db-access-tving-dayone",         # G2: News1 (press)·TVING·Day1 Company (self-reporting breach party)·Kim Myung-joo (Seoul Women's University professor) single-cite · multi-cluster 0 plain text claimant
-    "bytec-system-qilin-ransomware-breach",                  # G2: Bytec System (victim company)·Qilin (ransomware actor) single-cite · multi-cluster 0 plain text claimant
-    "xiaomi-mimo-code-claude-code",                          # G2: Xiaomi claimant has 3 cumulative sources but all in a single LLM cluster (multi-cluster 0) — same gate-on-hold as xiaomi-mimo-ultraspeed; the org stub is operator judgment
-    # ingest 2026-06-16 (NewsScrap, crawl supplement): single-cite (1 source) analyst claimants —
-    # below stub threshold (≥3 distinct sources + ≥2 clusters), ending as plain text. Per desk ADAPT₂
-    # instruction (attribution accuracy > G2 wikilink ratio), the [[Amazon]] misattribution was corrected to the actual speaker as plain text.
-    # On reaching ≥3, missing-entity re-surfaces → create the entity and remove (feedback_no_single_source_stub).
-    "aws-datacenter-water-efficiency",                       # G2: Matt Kimball (Moor Insights & Strategy) · Sanchit Vir Gogia (Greyhound Research) single-cite · multi-cluster 0 plain text claimant
-    # ingest 2026-06-17 (inbox 19 + NewsScrap cumulative, 50-source batch): single-cite (1 source)
-    # claimants — below stub threshold (≥3 distinct sources + ≥2 clusters), ending as plain text.
-    # Strong candidates (McKinsey·Korea Investment & Securities·SpaceX·Coinone) were resolved with new entities in this batch.
-    # Below are the residual single-cites. On reaching ≥3, missing-entity re-surfaces → create the entity and remove
-    # (feedback_no_single_source_stub).
-    "newcore-ai-agent-identity-seed-funding",                # G4: Newcore (new agent-identity-management firm, 2 sources) · Zohar Alon (CEO) single-cite · multi-cluster 0 plain text claimant
-    "bigtech-asia-aidc-2year-buildout-korea-excluded",       # G4: Lee Hae-min (Rebuilding Korea Party lawmaker) · Korea Data Center Council single-cite · multi-cluster 0 plain text claimant
-    "heat-pump-ai-datacenter-waste-heat-kimm",               # G4: Korea Institute of Machinery and Materials (the report's own author) · Park Jong-bae et al. single-cite · multi-cluster 0 plain text claimant
-    "kisa-security-advisory-surge-ai-vulnerability",         # G4: CVE (generic noun) · Lee Yong-jun (Far East University professor) single-cite · multi-cluster 0 plain text claimant
-    "metro-transmission-grid-7year-delay-4gw-blocked",       # G4: Park Jong-bae (Konkuk University professor) · Hanam City single-cite · multi-cluster 0 plain text claimant
-    "work-ai-index-uk-2026-botsitting-productivity",         # G4: Glean · Jeong Heung-jun (Seoul National University of Science and Technology professor) single-cite · multi-cluster 0 plain text claimant
-    "stt-gdc-seoul1-first-korea-datacenter-open",            # G4: STT GDC Korea (STT GDC · Hyosung Heavy Industries 60-40 joint venture) — same STT Seoul 1 facility event, 2 sources (paired with hyosung-stt-seoul1-datacenter-2026) · multi-cluster 0 plain text claimant
-}
+# Empty in this distribution — entries accumulate as the operated corpus does.
+INTRINSICALLY_UNFIXABLE_SOURCES: set[str] = set()
 
 # Required Rubric criteria — any FAIL on these
 # keys causes a non-zero exit (subject to ACCEPTABLE_FAILS at corpus level).
@@ -226,13 +142,10 @@ REQUIRED_KEYS = ("g1", "g2", "g4", "c1", "c3", "s1", "l1")
 
 REQUIRED_SECTIONS = ("## Summary", "## Key Claims", "## Connections")
 W1_MIN_LINKS = 5
-L1_MIN_SLUG_LEN = 10
 
 # The cit.* measurement regexes (grade·claimant·citation prefix·quote·composite·anchor)
 # were moved verbatim to scholarly-citation/checks.py. This file measures only S1·W1·L1·desk.
-
-# L1 — raw kebab-case slug exposure (no pipe alias).
-L1_RAW_SLUG_RE = re.compile(r"\[\[([a-z][a-z0-9\-]{" + str(L1_MIN_SLUG_LEN - 1) + r",})\]\]")
+# L1 (raw kebab-case slug exposure) constants live in _advisory_common (shared with synthesis·trail).
 
 # Section header detector.
 H2_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
@@ -270,8 +183,8 @@ def _evaluate(rel: str, content: str) -> dict:
     # this field don't retroactively break ACCEPTABLE_FAILS. New ingest
     # path stamps last_updated automatically; this check surfaces gaps for
     # batch fix without blocking lint.
-    _fm_end = content.find("\n---", 4)
-    _fm_head = content[: _fm_end + 4] if _fm_end != -1 else content[:600]
+    _fm_m = FRONTMATTER_BLOCK_RE.match(content)
+    _fm_head = _fm_m.group(1) if _fm_m else ""
     f1_pass = bool(F1_DATE_RE.search(_fm_head))
 
     # S1 — required sections.
@@ -503,7 +416,7 @@ def run(target: str | None = None, fix: bool = False, **_kwargs) -> int:
         if not path.is_file():
             print(f"ERROR: source file not found: {path}", file=sys.stderr)
             return 2
-        content = path.read_text(encoding="utf-8", errors="replace")
+        content = read_text_cached(path)
         rel = f"sources/{slug}.md"
         result = _evaluate(rel, content)
         _print_per_file(result)
@@ -539,7 +452,7 @@ def run(target: str | None = None, fix: bool = False, **_kwargs) -> int:
     for path in real_source_files():
         if not SLUG_KEBAB_RE.match(path.name[:-3]):
             bad_filenames.append(path.name)
-        content = path.read_text(encoding="utf-8", errors="replace")
+        content = read_text_cached(path)
         rel = f"sources/{path.name}"
         results.append(_evaluate(rel, content))
 

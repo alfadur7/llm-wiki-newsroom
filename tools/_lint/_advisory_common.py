@@ -10,6 +10,7 @@ idioms are unified here.
 """
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -17,6 +18,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from _lib import read_text_cached  # noqa: E402
 sys.path.insert(0, str(Path(__file__).parent))
 from _manifest_counts import counts as _roster_counts, threshold_label  # noqa: E402
+
+# L1 (bare/un-aliased wikilink slug) detection — single definition shared by the
+# source·synthesis·trail content lints (was triple-defined). A `[[slug]]` whose
+# stem is >= L1_MIN_SLUG_LEN chars is machine-looking and should carry a display alias.
+L1_MIN_SLUG_LEN = 10
+L1_RAW_SLUG_RE = re.compile(r"\[\[([a-z][a-z0-9\-]{" + str(L1_MIN_SLUG_LEN - 1) + r",})\]\]")
 
 
 def mark(ok) -> str:

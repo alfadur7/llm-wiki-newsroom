@@ -6,7 +6,19 @@ root meta), staleness is judged against the git edit date of the EDITOR body, no
 frontmatter `last_updated`. Since the body date depends on git, it is injected directly into
 `_BODY_DATE_CACHE` so the branching logic can be verified without git.
 """
+import pytest
+
 import staleness
+
+
+@pytest.fixture(autouse=True)
+def _isolate_body_date_cache():
+    # _BODY_DATE_CACHE is module-level and process-lifetime; restore it so the
+    # fake dates seeded for real corpus rels don't leak into later tests.
+    saved = dict(staleness._BODY_DATE_CACHE)
+    yield
+    staleness._BODY_DATE_CACHE.clear()
+    staleness._BODY_DATE_CACHE.update(saved)
 
 
 def _seed_body(rel: str, date: str | None) -> None:

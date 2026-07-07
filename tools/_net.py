@@ -93,7 +93,10 @@ def _validate_url(url: str) -> None:
         raise UnsafeURLError(f"no host in URL: {url}")
     try:
         infos = socket.getaddrinfo(host, None)
-    except socket.gaierror as e:
+    except (socket.gaierror, UnicodeError) as e:
+        # UnicodeError covers IDNA-invalid hosts (e.g. a label >63 chars),
+        # which getaddrinfo raises instead of gaierror — fail closed like a
+        # DNS failure rather than letting it escape to the caller.
         raise UnsafeURLError(f"DNS resolution failed for {host}: {e}") from e
     for info in infos:
         addr = info[4][0]

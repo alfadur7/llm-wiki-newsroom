@@ -35,10 +35,18 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, normalize_quotes, read_text_cached  # noqa: E402
+from _lib import (  # noqa: E402
+    FRONTMATTER_BLOCK_RE,
+    REPO_ROOT,
+    WIKI,
+    atomic_write_text,
+    normalize_quotes,
+    parse_frontmatter,
+    read_text_cached,
+    real_source_files,
+)
 
-ROOT = Path(__file__).parent.parent.parent
-RAW = ROOT / "raw"
+RAW = REPO_ROOT / "raw"
 SOURCES = WIKI / "sources"
 
 _TYPOGRAPHIC_QUOTES = "‘’“”"
@@ -77,8 +85,10 @@ def _jaccard(a: set[str], b: set[str]) -> float:
     return len(a & b) / len(a | b)
 
 
-def _index_raw_tree() -> tuple[dict[str, str], dict[str, list[str]], list[tuple[str, set[str]]]]:
-    by_norm: dict[str, str] = {}
+def _index_raw_tree() -> tuple[dict[str, list[str]], dict[str, list[str]], list[tuple[str, set[str]]]]:
+    # Both indexes keep candidate LISTS: two raw files sharing a basename in
+    # different subdirs must route to the AMBIGUOUS bucket, not last-wins.
+    by_norm: dict[str, list[str]] = {}
     by_stripped: dict[str, list[str]] = {}
     by_tokens: list[tuple[str, set[str]]] = []
     if not RAW.exists():
@@ -87,8 +97,8 @@ def _index_raw_tree() -> tuple[dict[str, str], dict[str, list[str]], list[tuple[
         for f in files:
             if not (f.endswith(".md") or f.endswith(".pdf")):
                 continue
-            rel = Path(root, f).relative_to(ROOT).as_posix()
-            by_norm[normalize_quotes(f)] = rel
+            rel = Path(root, f).relative_to(REPO_ROOT).as_posix()
+            by_norm.setdefault(normalize_quotes(f), []).append(rel)
             by_stripped.setdefault(_quote_stripped(f), []).append(rel)
             by_tokens.append((rel, _tokens(f)))
     return by_norm, by_stripped, by_tokens
@@ -109,28 +119,24 @@ _SOURCE_FILE_RE = re.compile(r"^source_file:\s*(.+?)\s*$", re.MULTILINE)
 
 
 def _read_source_file(path: Path) -> str | None:
-    text = read_text_cached(path)
-    m = _SOURCE_FILE_RE.search(text)
-    if not m:
-        return None
-    raw = m.group(1).strip()
-    # Determine the YAML quoting style (if any) and unescape accordingly.
-    # Double-quoted scalars (YAML) honor `\"` and `\\` escapes; single-quoted
-    # scalars don't. Plain (unquoted) scalars never carry escapes.
-    if len(raw) >= 2 and raw[0] == '"' and raw[-1] == '"':
-        body = raw[1:-1]
-        return body.replace('\\"', '"').replace('\\\\', '\\')
-    if len(raw) >= 2 and raw[0] == "'" and raw[-1] == "'":
-        return raw[1:-1].replace("''", "'")
-    return raw
+    # Canonical frontmatter parser — handles YAML quoting/unescaping and only
+    # looks inside the frontmatter block (a body line starting `source_file:`
+    # is not a field).
+    val = parse_frontmatter(read_text_cached(path)).get("source_file")
+    return val if isinstance(val, str) and val else None
 
 
 def _replace_source_file(path: Path, new_value: str) -> None:
     text = read_text_cached(path)
-    new_text, n = _SOURCE_FILE_RE.subn(f"source_file: {new_value}", text, count=1)
+    fm = FRONTMATTER_BLOCK_RE.match(text)
+    if not fm:
+        raise RuntimeError(f"no frontmatter block in {path}")
+    # Substitute within the frontmatter only, so a body line that happens to
+    # start with `source_file:` is never rewritten.
+    new_fm, n = _SOURCE_FILE_RE.subn(f"source_file: {new_value}", fm.group(0), count=1)
     if n != 1:
         raise RuntimeError(f"could not replace source_file in {path}")
-    path.write_text(new_text, encoding="utf-8")
+    atomic_write_text(path, new_fm + text[fm.end():])
 
 
 def run(fix: bool = False, **_kwargs) -> int:
@@ -145,20 +151,21 @@ def run(fix: bool = False, **_kwargs) -> int:
     suggestions: list[tuple[str, str, str, float]] = []
     no_match: list[tuple[str, str]] = []
 
-    for p in sorted(SOURCES.glob("*.md")):
-        if p.name.startswith("_"):
-            continue
+    for p in real_source_files():
         sf = _read_source_file(p)
         if not sf:
             continue
-        if (ROOT / sf).is_file():
+        if (REPO_ROOT / sf).is_file():
             continue
         bn = os.path.basename(sf)
         bn_norm = normalize_quotes(bn)
         bn_stripped = _quote_stripped(bn)
         if bn_norm in by_norm:
-            target = by_norm[bn_norm]
-            fixable.append((p.name, sf, target))
+            cands = by_norm[bn_norm]
+            if len(cands) == 1:
+                fixable.append((p.name, sf, cands[0]))
+                continue
+            ambiguous.append((p.name, sf, cands))
             continue
         if bn_stripped in by_stripped:
             cands = by_stripped[bn_stripped]

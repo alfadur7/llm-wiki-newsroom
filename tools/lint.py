@@ -48,11 +48,11 @@ Usage:
   python tools/lint.py meta                         # meta schema (integrity + drift + language)
   python tools/lint.py meta schema
   python tools/lint.py overview                     # every overview (L2-3 + L2-4)
-  python tools/lint.py overview bank-it-modernization
+  python tools/lint.py overview open-weights
   python tools/lint.py overview aggregate
-  python tools/lint.py overview bank-it-modernization --fix   # rewrite instructions
+  python tools/lint.py overview open-weights --fix  # rewrite instructions
   python tools/lint.py contradiction                # every theme MD
-  python tools/lint.py contradiction ai-coding-productivity-debate
+  python tools/lint.py contradiction open-training-data-requirement
   python tools/lint.py contradiction --fix          # insert AUTO markers across themes
   python tools/lint.py contradiction theme          # _contradictions_themes.json ↔ MD consistency
   python tools/lint.py contradiction theme --fix    # Claude rewrite instructions for JSON regen
@@ -99,7 +99,8 @@ Usage:
 Exit codes:
   0 — every group passes
   1 — at least one group reports actionable issues
-  2 — argument/usage error
+  2 — argument/usage error, or chain-pending: an emitted contradiction
+      rewrite block must be executed before any other lint/build action
 """
 from __future__ import annotations
 
@@ -390,24 +391,43 @@ def _run_group(group: str, args: argparse.Namespace) -> int:
     """Run every subcommand under a normal (non-target) group."""
     summary: list[tuple[str, int]] = []
     overall = 0
+    original_fix = args.fix
     for sub in GROUPS[group]:
         # hub suggestions is informational — skip during group run, surface at end.
         if (group, sub) in INFORMATIONAL:
             continue
         if (group, sub) in OPT_IN:
             continue
+        # Force fix=False for entries whose --fix is reserved for explicit
+        # invocation (see EXPLICIT_FIX_ONLY) — same gating as _run_all.
+        args.fix = False if (group, sub) in EXPLICIT_FIX_ONLY else original_fix
         label, rc = _run_one(group, sub, args)
         summary.append((label, rc))
         if rc != 0:
             overall = 1
+    args.fix = original_fix
+
+    # Chain-pending elevation — mirror _run_all (see comment there). The
+    # stale-themes gate's own re-run instruction dispatches through this
+    # group runner, so the CHAIN mark + exit 2 must survive here too.
+    chain_reason = contradiction.chain_pending_reason()
 
     print("=" * 72)
     print(f"SUMMARY — group `{group}`")
     print("=" * 72)
     for label, rc in summary:
-        mark = "OK  " if rc == 0 else "FAIL"
+        if chain_reason and label == "Contradiction scope":
+            mark = "CHAIN"
+        else:
+            mark = "OK  " if rc == 0 else "FAIL"
         print(f"  [{mark}] {label}")
     print()
+    if chain_reason:
+        print("⚡ CHAIN PENDING — Claude must execute the emitted rewrite block above")
+        print(f"   (reason: {chain_reason})")
+        print("   before authoring lint-report.md or running other lint/build commands.")
+        print("   Overall: CHAIN-REQUIRED — exit code 2")
+        return 2
 
     # Surface informational subs under this group (currently only hub suggestions).
     for g, sub in INFORMATIONAL:

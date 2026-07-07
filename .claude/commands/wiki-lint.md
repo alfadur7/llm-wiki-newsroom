@@ -30,7 +30,7 @@ The [A]–[G] code definitions and the diagnostic output format for the Cluster 
 Usage: /wiki-lint [<group>] [<subcmd|target>] [--fix]
 
 Examples:
-  /wiki-lint                                        # full suite (graph · hub · meta · overview · contradiction + suggestions)
+  /wiki-lint                                        # full suite (all groups below + suggestions·promotion·demotion·staleness informational)
   /wiki-lint --fix                                  # full suite + each group's supported --fix in one pass
   /wiki-lint graph                                  # structure · orphans · clusters · raw-files · internal-refs in one pass
   /wiki-lint graph orphans --fix                    # single subcommand
@@ -49,7 +49,7 @@ Examples:
   /wiki-lint contradiction --fix --yes              # bypass confirmation prompt
 ```
 
-`--yes` (`-y`) bypasses the file create/delete confirmation prompt of `overview --fix`·`contradiction --fix`. In a non-TTY environment (Claude Code Bash·CI) the prompt cannot be answered, so the command aborts; add `--yes` only when you intend deliberate execution after review. The `--fix` body itself has no effect in other groups (`graph`·`hub`, etc.) — those perform only content edits and auto-enrichment, with no file creation or deletion.
+`--yes` (`-y`) bypasses the file create/delete confirmation prompt of `overview --fix`·`contradiction --fix`. In a non-TTY environment (Claude Code Bash·CI) the prompt cannot be answered, so the command aborts; add `--yes` only when you intend deliberate execution after review. `--yes` itself has no effect in other groups (`graph`·`hub`, etc.) — those perform only content edits and auto-enrichment, with no file creation or deletion.
 
 ### Chain Execution Obligation
 
@@ -91,19 +91,20 @@ The backend diagnostic tool is `tools/lint.py`, and you can call the same group/
 | `graph` | `drift` | Compares warm↔cold Leiden partition quality (modularity) — detects cluster-stability drift. **OPT-IN — not auto-run by `lint all`** (cost of cold Leiden recomputation) | Unsupported |
 | `hub` | `speakers` | **WIKI_LANG=ko only** (the byline matcher keys on Hangul names + Korean role nouns; a no-op on the English-native default — English attribution is covered by `cit.A2` + `count_mentions.py`). Among quoted speakers (the `> "..." — Name (role)` pattern), those that meet **both** conditions of **multiple quotes (≥3 total) AND appearing in multiple sources (≥3 distinct files)** while `entities/<name>.md` is missing. Thresholds adjustable via `--min-quotes`·`--min-sources` flags | Unsupported (current-role verification required; Claude must not auto-stub) |
 | `hub` | `suggestions` | Commonly-referenced but not-yet-created links + frequently-mentioned terms with no page (informational — no pass/fail impact) | Unsupported |
-| `hub` | `schema` | L2-2 hub frontmatter (entities/concepts/timelines all require `title·type·tags·sources·last_updated` + `type` value matches the directory) | **Auto-fill type + last_updated** (deterministic, based on directory · git log). title/tags/sources need semantic inference → report only |
-| `hub` | `voice` | L2-2 hub body self-meta voice antipatterns (`this hub …`·`covered separately`, etc. — and the ko-mode antipattern tokens `본 hub는`·`별도 정리한다` — violations of encyclopedic neutrality). FAIL → exit 1. Fenced code blocks are excluded from the check | Unsupported (rephrasing is the author's call; symmetric to `internal-refs`) |
+| `hub` | `schema` | L2-2 hub frontmatter + body structure — entities require `title·type·kind·tags·sources·last_updated`, concepts `title·type·tags·sources·last_updated`, timelines `title·type·tags·last_updated` (no `sources`) + `type` value matches the directory + the `## Overview`/`## Connections` required-section + ≥200-char body check | **Auto-fill type + last_updated** (deterministic, based on directory · git log). title/tags/sources need semantic inference → report only |
+| `hub` | `voice` | L2-2 hub body self-meta voice antipatterns (violations of encyclopedic neutrality). The automated regex detection runs **only under `WIKI_LANG=ko`** (the tokens `본 hub는`·`별도 정리한다`, etc.); on the English-native default the scan returns early, so the English self-meta ban (`this hub …`·`covered separately`) is enforced editorially by author/Desk (SoT: `.claude/layers/hub.md`). When it fires (ko-mode), FAIL → exit 1. Fenced code blocks are excluded from the check | Unsupported (rephrasing is the author's call; symmetric to `internal-refs`) |
 | `hub` | `body` | L2-2 hub body density advisory (body length · number of `## Connections` links — detects nav-anchor bloat; thresholds injected via `_manifest.json`). No pass/fail impact | Unsupported (delegating to a sub-hub is a semantic judgment) |
 | `hub` | `timeline` | L2-2 timeline `## Timeline` narrative advisory (quantitative-figure restatement · item formatting). No pass/fail impact | Unsupported |
 | `hub` | `promotion` | L2-2 hub promotion-candidate triage (stub → full hub, informational) | Unsupported (promotion is a Desk gate) |
 | `hub` | `demotion` | L2-2 hub demotion/deletion-candidate triage (one-off·isolated stub, informational) | Unsupported (demotion is a Desk gate + graph integrity) |
-| `meta` | `schema` | CLAUDE.md integrity (anchor·file-ref·slash-cmd) + L2-3 ↔ L2-4 Rubric drift + English-header section convention + flat-lint-path recurrence guard | **Unsupported** — substituting a non-English header → English is not a 1:1 deterministic mapping but requires a meaning-preserving wording decision (e.g., `## Mode Routing (query type → mode dispatch)` → deciding between `Mode Routing by Query Type` vs `Routing by Type`). Same semantic-inference area as graph structure broken links — the `## --fix Mode (2) Claude` area branch |
+| `meta` | `schema` | CLAUDE.md integrity (anchor·file-ref·slash-cmd·roster completeness) + craft-skill referential integrity (`_manifest.json`·`criteria.json`·`checks.py`) + stale cluster-slug literal guard + English-header section convention + flat-lint-path recurrence guard | **Unsupported** — substituting a non-English header → English is not a 1:1 deterministic mapping but requires a meaning-preserving wording decision (e.g., `## Mode Routing (query type → mode dispatch)` → deciding between `Mode Routing by Query Type` vs `Routing by Type`). Same semantic-inference area as graph structure broken links — the `## --fix Mode (2) Claude` area branch |
 | `overview` | — | `wiki/overviews/<cluster>.md` + `wiki/overview.md` — completeness · schema · Rubric metrics · Freshness + JSON↔MD slug 1:1 mapping (SoT is `graph/_clusters.json`) + **cluster name drift** (frontmatter `title`·body H1 vs `_clusters.json::clusters[].name`) + **frontmatter `cluster:` slug ↔ filename stem consistency** | **MD↔JSON sync** — JSON-only cluster slug → auto-generate skeleton, MD-only slug (orphan overview) → auto-delete. Both actions **run only after passing the confirmation prompt** (bypassable with `--yes`). Non-destructive repairs (alias-correcting un-aliased cluster links · inserting AUTO markers · **auto-syncing cluster name drift** — after a rename, batch-update frontmatter `title`·body H1 following the `cluster_labels.json` SoT · **correcting frontmatter `cluster:` slug** — in-place replacement based on filename stem) proceed without a prompt. **When a target is specified (=`<slug>` or `aggregate`)**: the above + an added Claude rewrite instruction block (no rewrite block is emitted on a target-less `all` call — explicit invocation via `/wiki-lint overview <target> --fix` is required) |
 | `contradiction` | — (target=theme slug) | `wiki/contradictions/<theme>.md` — frontmatter · 4 H2 sections (no AUTO block — by design) + JSON↔MD slug 1:1 mapping (SoT is `_contradictions_themes.json`) + frontmatter `sources:` ↔ JSON-implied sources drift (informational) + **detection of residual legacy AUTO blocks** (artifacts of a past build pipeline) | **MD↔JSON sync** — JSON-only slug → auto-generate skeleton (using JSON `name`), MD-only slug (orphan MD) → auto-delete. Both actions **run only after passing the confirmation prompt** (bypassable with `--yes`). Non-destructive repairs (inserting missing-H2 `_TODO` placeholders + **removing legacy AUTO blocks** — deleting `<!-- AUTO:CLAIMS/SOURCES BEGIN/END -->` and the inner/preceding `## Sources` header) proceed without a prompt. **SoT freshness chain** — when `_contradictions_themes.json` is stale (any one of: ① the `source_count` snapshot differs from `_contradictions.json`'s current record count — record-count drift, the most direct signal / ② `_contradictions.json` has uncommitted edits AND `derived_at < today` / ③ `_contradictions.json`'s last commit date > `derived_at`), this pass's MD mutation is skipped (preventing propagation of stale theme boundaries) and a theme rewrite block (Phase 1·2 instructions) is auto-emitted so Claude performs the chain: regenerate JSON → `python tools/build.py contradictions` → re-run `/wiki-lint contradiction --fix --yes` |
 | `contradiction` | `theme` | `wiki/contradictions/_contradictions_themes.json` integrity itself — JSON schema · claim-id validity · full coverage · Phase 2 conditions · Freshness against `_contradictions.json` | **Does not edit the JSON directly.** Emits only a Claude regeneration instruction block (the Guide's Phase 1→2 procedure) — the same block is emitted on the `contradiction --fix` stale gate to carry out the chain |
-| `source` | — (target=source slug) | `wiki/sources/<slug>.md` Phase 2 new schema (claim atomization · citation type · evidence grade) — the 10 automatic metrics of `.claude/layers/source.md` | Unsupported — schema conversion needs semantic analysis, so it is out of deterministic `--fix` scope (authoring is in `.claude/layers/source.md` § Authoring) |
+| `source` | — (target=source slug) | `wiki/sources/<slug>.md` Phase 2 new schema (claim atomization · citation type · evidence grade) — the automatic metrics of `.claude/layers/source.md` § Evaluation Rubric | Unsupported — schema conversion needs semantic analysis, so it is out of deterministic `--fix` scope (authoring is in `.claude/layers/source.md` § Authoring) |
 | `synthesis` | — (target=synthesis slug) | `wiki/syntheses/<slug>.md` — S1 required sections · source coverage · source existence · slug-alias (L2-3 Q&A synthesis schema). Included in `all` | **Generate skeleton** (if missing) + Claude rewrite instruction block — explicit invocation via `/wiki-lint synthesis <slug> --fix` |
-| `trail` | — (target=trail slug) | `wiki/trails/<slug>.md` — S1 required sections · `## Path` links · path length 4-12 · slug-alias (L2-3 associative-trail schema). Included in `all` | **Generate skeleton** (if missing) + Claude rewrite instruction block — explicit invocation via `/wiki-lint trail <slug> --fix` |
+| `trail` | — (target=trail slug) | `wiki/trails/<slug>.md` — S1 required sections · `## Path` links · path length 4-12 (a deliberate buffer below the authoring SoT's 5–12 in `.claude/layers/trail.md`) · slug-alias (L2-3 associative-trail schema). Included in `all` | **Generate skeleton** (if missing) + Claude rewrite instruction block — explicit invocation via `/wiki-lint trail <slug> --fix` |
+| `timeline` | — (target=timeline slug) | `wiki/timelines/<slug>.md` — S1 required sections (`## Flow Summary` + `### YYYY`) · source-indexed path classification (L2-2 standalone-timeline schema — separate from the hub-embedded `hub timeline` `## Timeline` advisory). Included in `all` (advisory mode) | **Generate skeleton** (if missing) + Claude rewrite instruction block — explicit invocation via `/wiki-lint timeline <slug> --fix` |
 | `staleness` | — (target) | Layer-cascade staleness — diagnoses pages whose upstream is newer than the page's authored date. For derived-narrative types (overview·contradiction·synthesis·trail·timeline + root meta), the basis is the **EDITOR-body git edit date** rather than frontmatter `last_updated`, preventing a partial edit from bumping only the date and masking body staleness (when inflated, marked as `body=…`). **Informational** (surfaced outside pass/fail in `all`) | Unsupported — re-grounding cannot be a deterministic `--fix` (needs cross-source synthesis · Desk gate). Surfaced pages are handled via Columnist→Desk→ADAPT (procedure: [`operations/staleness-reground-runbook.md`](../operations/staleness-reground-runbook.md)) |
 | `all` | — | Sequentially runs all groups above + suggestions·promotion·demotion·staleness informational | Runs every group's supported `--fix` (overview Claude EDITOR rewrite is **excluded** — invoke explicitly via `/wiki-lint overview <target> --fix`). `contradiction theme` JSON regeneration is included as a chain on stale detection — `--yes` acts as the explicit opt-in |
 
@@ -129,10 +130,10 @@ For target-based groups (`overview`·`contradiction`), the second positional arg
 6. **Cluster health** (`graph clusters`) — reports Leiden codes [A]–[G]. Code definitions · action guides are defined inline in the `graph clusters` row of the [`## Group Structure`](#group-structure) table above (single SoT — drift prevention).
 7. **Meta-doc schema** (`meta schema`) — a 4-axis bundle for meta documents:
    - **Integrity**: CLAUDE.md self-consistency — anchor-link targets exist, backtick file-path files exist, `/wiki-*` slash commands' definition files exist
-   - **Rubric drift**: L2-3 Rubric ↔ L2-4 Rubric common-criterion-row sync (`.claude/layers/overview.md`·`.claude/layers/contradiction.md` `## Evaluation Rubric` sections are SoT; the row count's single SoT is the guide table)
+   - **Craft-skill integrity + stale-slug guard**: craft skills' `_manifest.json` roster ↔ `criteria.json` ↔ `checks.py` referential consistency + detection of stale `_catalog-<slug>.md` cluster-slug literals no longer resolving in `graph/_clusters.json`
    - **Language Convention**: no Korean in CLAUDE.md + `.claude/commands/*.md` section headers
    - **Flat-path guard**: blocks the `python tools/lint.py <flat-subcmd>` form — enforces the group form (`python tools/lint.py <group> [<sub>]`)
-8. **L2-2 hub frontmatter** (`hub schema`) — every file in entities/ · concepts/ · timelines/ requires `title · type · tags · sources · last_updated` + `type` value matches the directory name (entity/concept/timeline).
+8. **L2-2 hub frontmatter** (`hub schema`) — entities require `title · type · kind · tags · sources · last_updated`; concepts `title · type · tags · sources · last_updated`; timelines `title · type · tags · last_updated` (no `sources`) + `type` value matches the directory name (entity/concept/timeline). Also checks the `## Overview`/`## Connections` required sections + ≥200-char body.
 9. **L2-3/L2-4 overview schema·Rubric** (`overview`) — `wiki/overviews/<slug>.md` completeness · frontmatter · H2 sections · AUTO markers · Rubric metrics (W1·W2·W3·X2) · Freshness + **cluster name drift** (frontmatter `title`·body H1 matches `_clusters.json::clusters[].name` SoT) + `wiki/overview.md` Rubric L2-4 (W1·W2·W3·D1·D2·D3·F1).
 10. **Theme contradiction MD schema·mapping** (`contradiction`) — `wiki/contradictions/<theme>.md` frontmatter · H2 sections (`## Opposing Positions`·`## Representative Evidence`·`## Derived Tensions & Generational Readings`·`## Interpretive Direction`) + slug 1:1 mapping with the `_contradictions_themes.json` SoT (JSON-only → MD not created / MD-only → orphan MD) + detection of residual legacy AUTO blocks (CLAIMS/SOURCES) and their removal via `--fix`.
 11. **Theme derivation JSON integrity** (`contradiction theme`) — `wiki/contradictions/_contradictions_themes.json` conforms to the `.claude/commands/wiki-lint.md` Output Schema, claim ids actually exist in `_contradictions.json`, full coverage (claim_ids ∪ unassigned == source_count), Phase 2 conditions (unassigned empty · theme ≤15 recommended — exceeding it enters the dual-approval gate for a new theme slug), claim-id lifecycle invariant (permanent · no reuse · no orphans), Freshness (whether re-derived after `_contradictions.json` was updated).
@@ -246,7 +247,7 @@ A routine dedicated to landscape-axis overview files. Integrates diagnosis and C
 
 | Argument | Scope | `--fix` behavior |
 |------|--------|-------------|
-| (none) | Diagnose all L2-3 clusters + all of L2-4 | ❌ `--fix` rejected (target-not-specified error) |
+| (none) | Diagnose all L2-3 clusters + all of L2-4 | ✅ MD↔JSON sync (skeleton create / orphan delete after the confirmation prompt, `--yes` bypass) + non-destructive repairs; no Claude rewrite block (a target is required for that) |
 | `<cluster-slug>` | That single L2-3 file | ✅ Output Part 1 rewrite instruction block |
 | `aggregate` | `wiki/overview.md` only | ✅ Output Part 2 rewrite instruction block |
 
@@ -300,7 +301,7 @@ A routine dedicated to conflict-axis issue files. Integrates diagnosis · MD↔J
 | `<theme-slug>` | That single theme MD | ✅ The above sync + **output Part 1 rewrite instruction block** |
 | `aggregate` | `wiki/contradiction.md` only | ✅ **Output Part 2 rewrite instruction block** |
 
-A theme slug is one of the `themes` keys of `_contradictions_themes.json` or a file stem of `wiki/contradictions/*.md` (regardless of MD existence). The reserved word `theme` dispatches first as a subcommand, so it must not be used as a theme slug.
+A theme slug is one of the `themes` keys of `_contradictions_themes.json` or a file stem of `wiki/contradictions/*.md` (regardless of MD existence). The reserved words `theme` (subcommand) and `aggregate` (L2-4 root target) both dispatch to non-theme branches, so neither may be used as a theme slug.
 
 ### Diagnosis Mode (no `--fix`)
 
@@ -333,7 +334,7 @@ In the same pattern as overview, the script **does not edit the EDITOR area dire
 - **`/wiki-lint --fix` (= `all --fix`)**: performs mechanical repair (MD↔JSON sync · schema `_TODO` placeholder insertion), and on theme-JSON stale detection emits a rewrite block instructing Claude to carry out the JSON-regeneration chain. EDITOR-body rewrite is not included — for per-target-file reasoning, invoke explicitly via `/wiki-lint overview <target> --fix`·`/wiki-lint contradiction <target> --fix`.
 - **`/wiki-lint contradiction theme --fix`**: Claude instruction to re-derive `_contradictions_themes.json` (Phase 1·2). See `.claude/commands/wiki-lint.md`.
 - **`/wiki-lint contradiction <theme-slug> --fix`**: the above mechanical repair limited to the target file + a Claude EDITOR rewrite instruction (Part 1 Rubric is SoT at [`.claude/layers/contradiction.md` → `## Evaluation Rubric`](../layers/contradiction.md#evaluation-rubric) Part 1).
-- **`/wiki-lint contradiction aggregate --fix`**: diagnoses `wiki/contradiction.md` against the L2-4 Rubric 15 criteria + a Claude rewrite instruction (Part 2). This aggregate path has N/A mechanical repair — the aggregate file has no skeleton · AUTO block.
+- **`/wiki-lint contradiction aggregate --fix`**: diagnoses `wiki/contradiction.md` against the L2-4 Rubric (19 criteria per `contradiction-aggregate.roster`) + a Claude rewrite instruction (Part 2). This aggregate path has N/A mechanical repair — the aggregate file has no skeleton · AUTO block.
 - **`python tools/build.py contradictions`** (independent pipeline): re-extracts the `_contradictions.json` raw DB (collects source `## Connections` `contradicts:` lines · classifies type). The build does not touch theme MDs (by-design no AUTO blocks). Auto-called by `/wiki-ingest`·`/wiki-lint --fix`.
 
 Append to log.md: `## [today's date] lint | contradiction <target> rewrite` (on Claude rewrite completion) + load this rewrite cycle's Desk VERIFY₂ actionable defects into the corpus via `log_defect` (bare diagnosis · mechanical `--fix` are excluded, being standing state — SoT: [`agents/editor-in-chief.md`](../agents/editor-in-chief.md) automatic channel).
@@ -349,7 +350,7 @@ A routine dedicated to diagnosing conformance to the Phase 2 new schema (claim a
 | Argument | Scope | `--fix` behavior |
 |------|--------|-------------|
 | (none) | Diagnose all sources — output only the count of Phase 2 schema conformance (per-file detail is advisory) | Unsupported (schema conversion needs semantic analysis — authoring is in source.md § Authoring) |
-| `<source-slug>` | That single source MD — output the 10 automatic metrics of `.claude/layers/source.md` per-file | Unsupported |
+| `<source-slug>` | That single source MD — output the automatic metrics of `.claude/layers/source.md` § Evaluation Rubric per-file | Unsupported |
 
 A slug is a file stem of `wiki/sources/*.md`.
 
@@ -381,7 +382,7 @@ This guide prescribes the procedure for reading all claims in `_contradictions.j
 A Claude with no prior knowledge must be able to read this guide alone and reproduce the same quality · structure.
 
 Read before working:
-- `CLAUDE.md` → "Contradictions Sync Rule" (SoT hierarchy · cross-assignment principle)
+- this file → [`## Sub-procedure: Conflict Axis Sync Rule`](#sub-procedure-conflict-axis-sync-rule) (SoT hierarchy · cross-assignment principle)
 - `wiki/contradictions/_contradictions.json` (main input — all claims; for structure see "Input Data Structure" below)
 - For Phase 2 only, `wiki/contradictions/_contradictions_themes.json` (carrying over the Phase 1 output)
 - As needed, `wiki/sources/<slug>.md` (source originals — Phase 2 Priority Read targets; for structure see "Source File Structure" below)
@@ -608,7 +609,7 @@ Exception application is **only when explicit argumentation is possible**. Do no
 - **slug**: `[a-z0-9-]+` (kebab-case English). 2–5 words. Suggests the contradiction axis
   - Good: `ai-coding-productivity-debate`, `stablecoin-cbdc-tension`
   - Avoid: `topic-1`, `ai`, `misc-issues`
-  - **Reserved word**: the bare slug `theme` is forbidden — it collides with the `/wiki-lint contradiction theme` subcommand. `tools/_lint/contradiction_theme.py`'s `RESERVED_SLUGS` outputs FAIL on violation.
+  - **Reserved word**: the bare slugs `theme` (collides with the `/wiki-lint contradiction theme` subcommand) and `aggregate` (collides with the L2-4 root target) are forbidden. `tools/_lint/contradiction_theme.py`'s `RESERVED_SLUGS` outputs FAIL on violation.
 - **name**: English by default (Korean under `WIKI_LANG=ko`), concise. Make the contradiction · tension · dispute apparent
   - Good: `Open weights alone vs full open-source AI`, `Open-washing vs genuine open licensing`
   - Avoid: `AI issues`, `licensing-related`
@@ -706,7 +707,7 @@ Before output, you must pass all of the below. If any one is short, fix and re-v
 - [ ] **Count match**: dedup count of all `claim_ids` across `themes` + count of `unassigned` == `source_count`
 - [ ] **id validity**: every element of `claim_ids`·`unassigned` is an id that actually exists in `_contradictions.json`
 - [ ] **Slug format**: every slug matches the `[a-z0-9-]+` pattern (kebab-case English)
-- [ ] **Slug reserved word**: no theme uses the bare slug `theme` (lint collision)
+- [ ] **Slug reserved word**: no theme uses the bare slug `theme` or `aggregate` (lint collision)
 - [ ] **Slug quality**: each slug is a 2–5-word structure suggesting the contradiction axis
 - [ ] **Name quality**: English by default (Korean under WIKI_LANG=ko), and whether the contradiction · tension · dispute is apparent
 - [ ] **Grouping reasonableness**: sample 1 claim from each theme and self-question its membership rationale — Core Principle 2 satisfied

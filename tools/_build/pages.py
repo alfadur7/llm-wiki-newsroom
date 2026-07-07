@@ -35,12 +35,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from _build.graph import ROOT_META  # noqa: E402
-from _lib import WIKI, atomic_write_text, _build_id_map  # noqa: E402
+from _lib import GRAPH, GRAPH_JSON, WIKI, atomic_write_text, _build_id_map  # noqa: E402
 
 
 def run() -> None:
-    graph_path = Path("graph/_graph.json")
-    graph_data = json.loads(graph_path.read_text(encoding="utf-8"))
+    graph_data = json.loads(GRAPH_JSON.read_text(encoding="utf-8"))
 
     # Node set mirrors _graph.json exactly (ROOT_META already excluded there,
     # but we guard again so a stale graph can't leak an aggregation file's
@@ -108,7 +107,7 @@ def run() -> None:
 
     pages_data = {"pages": pages, "idmap": idmap, "backlinks": backlinks,
                   "overviews": overviews, "meta_pages": meta_pages}
-    pages_path = Path("graph/_pages.json")
+    pages_path = GRAPH / "_pages.json"
     atomic_write_text(pages_path, json.dumps(pages_data, ensure_ascii=False))
 
     print(

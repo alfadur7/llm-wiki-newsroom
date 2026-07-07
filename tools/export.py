@@ -31,7 +31,7 @@ from collections import defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from _lib import BASE_URL, GRAPH, REPO_ROOT, STANDALONE_SLUG, WIKI, korean_mode, parse_page_meta  # noqa: E402
+from _lib import BASE_URL, GRAPH, REPO_ROOT, STANDALONE_SLUG, WIKI, deeplink_key, graph_deeplink_base, korean_mode, parse_page_meta  # noqa: E402
 from _export.site import stage_site  # noqa: E402
 
 OUT = REPO_ROOT / 'wiki-export'
@@ -65,7 +65,7 @@ def _deeplink_protocol() -> str:
     # Use the extension-less form (/slug) — Cloudflare Pages 308-redirects
     # /slug.html to /slug, and on mobile in-app web views a redirect risks
     # dropping the #q= fragment, which we want to avoid.
-    link = f'{BASE_URL.rstrip("/")}/{STANDALONE_SLUG}'
+    link = graph_deeplink_base()
     return (
         'Every entity, concept, and source is a node in the graph browser, and '
         f'the address `{link}#q=<key>` opens that node directly (`<key>` is used '
@@ -129,20 +129,17 @@ def _rewrite_links(text: str) -> str:
     itself the `#q=` key — so only the few references actually cited in an answer
     become deep-links. Flat listings (index.md) are the opposite case: one link
     per line, low noise, high value — those we convert here."""
-    link = f'{BASE_URL.rstrip("/")}/{STANDALONE_SLUG}' if BASE_URL else ''
+    link = graph_deeplink_base()
 
     def repl(m: re.Match) -> str:
         label, path = m.group(1), m.group(2)
+        if '://' in path:  # external URL ending in .md — leave the link intact
+            return m.group(0)
         segs = path.split('/')
         folder = segs[-2] if len(segs) >= 2 else ''
         stem = segs[-1][:-3]  # drop '.md'
         if link and folder in _NODE_FOLDERS and not stem.startswith('_'):
-            # Korean stays raw (graph.html decodeURIComponent handles the hash);
-            # encode only chars that would break the markdown link/URL — spaces
-            # and parens (e.g. 'LG AI연구원', 'KB금융(지주)').
-            key = stem.replace('%', '%25').replace(' ', '%20').replace(
-                '(', '%28').replace(')', '%29')
-            return f'[{label}]({link}#q={key})'
+            return f'[{label}]({link}#q={deeplink_key(stem)})'
         return label
 
     return _MD_LINK_RE.sub(repl, text)
@@ -483,8 +480,11 @@ def main() -> int:
     root_meta = _copy_root_meta()
     folder_results = [r for r in (_merge_folder(f, o) for f, o in FOLDER_MERGES) if r]
     index_name, index_count = _write_source_index()
-    keep = (set(ROOT_META) | {o for _, o in FOLDER_MERGES}
-            | {'all-sources-index.md', 'README.md'})
+    # Keep only what this run actually produced (a missing root-meta source or an
+    # emptied sub-folder yields no file), so a now-stale prior output is pruned.
+    # README.md is written after _prune_stale, so keep it by name.
+    keep = (set(root_meta) | {name for name, _ in folder_results}
+            | {index_name, 'README.md'})
     dropped = _prune_stale(keep)
 
     print('wiki-export/ regenerated')
@@ -509,7 +509,7 @@ def main() -> int:
     print(f'    core auto-selected: {", ".join(core)}')
 
     # Stage the hosted graph browser into _site/ with obscured filenames
-    # (HTML + the three JSONs graph.html fetches), from the same snapshot.
+    # (HTML + the four JSONs graph.html fetches), from the same snapshot.
     print('_site/ (deploy assets, obscured filenames):')
     for name, size in stage_site(REPO_ROOT / '_site', STANDALONE_SLUG):
         print(f'  {name}: {size / 1024 / 1024:.2f} MB')

@@ -8,7 +8,7 @@ output only.
 Usage:
     python tools/send_briefing.py --latest                  # send the latest briefing (env credentials)
     python tools/send_briefing.py --file <path>             # send a specific file
-    python tools/send_briefing.py --file <path> --dry-run   # save HTML to c:/tmp without sending
+    python tools/send_briefing.py --file <path> --dry-run   # save HTML to the system temp dir without sending
     python tools/send_briefing.py --latest --to me@x.com    # override recipients (testing)
 
 Credential/recipient env: GMAIL_USER · GMAIL_APP_PASSWORD · BRIEFING_RECIPIENTS (see mailer.py).
@@ -22,14 +22,8 @@ import sys
 import tempfile
 from pathlib import Path
 
-for _s in (sys.stdout, sys.stderr):  # safe Korean output on the Windows cp949 console
-    if hasattr(_s, "reconfigure"):
-        try:
-            _s.reconfigure(encoding="utf-8")
-        except Exception:
-            pass
-
 sys.path.insert(0, str(Path(__file__).resolve().parent))  # tools/ on path
+# _lib import also reconfigures stdout/stderr to UTF-8 (Windows cp949 console).
 from _lib import WIKI  # noqa: E402
 from _briefing import render as render_mod  # noqa: E402
 from _briefing import mailer  # noqa: E402
@@ -59,7 +53,7 @@ def main() -> int:
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--latest", action="store_true", help="send the latest weekly-briefing")
     g.add_argument("--file", type=str, help="path to the briefing .md to send")
-    ap.add_argument("--dry-run", action="store_true", help="save HTML to c:/tmp without sending")
+    ap.add_argument("--dry-run", action="store_true", help="save HTML to the system temp dir without sending")
     ap.add_argument("--to", type=str, help="override recipients (comma-separated, for testing)")
     args = ap.parse_args()
 
@@ -93,9 +87,10 @@ def main() -> int:
     )
     try:
         mailer.send(rendered["subject"], rendered["html"], rendered["text"], recipients)
-    except (smtplib.SMTPException, OSError) as e:
+    except (smtplib.SMTPException, OSError, ValueError) as e:
         # In the unattended pipeline (GH Actions), emit a diagnosable message + exit 1
-        # instead of a raw traceback — credential/network failures are identifiable
+        # instead of a raw traceback — credential/config/network failures (ValueError
+        # covers missing GMAIL_* secrets or empty recipients) are identifiable
         # straight from the log.
         print(f"[error] SMTP send failed: {type(e).__name__}: {e}", file=sys.stderr)
         return 1

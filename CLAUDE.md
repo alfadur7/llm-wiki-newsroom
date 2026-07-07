@@ -13,7 +13,7 @@ This project operates as a five-role multi-agent system modeled on the staff of 
 | **Editor-in-Chief** | Meta layer outside the matrix — entry, routing, gating, escalation, logging |
 | **Reporter** | Writes L2-1 / L2-2 stubs + broad external exploration (breadth-first parallel) |
 | **Columnist** | Writes L2-2 full / L2-3 / L2-4 (integrating its own GROUND, deep sequential) |
-| **Desk**[^desk] | Qualitative review of L2-3 / L2-4 (the areas the Rubric does not capture) — the pre-publish gate |
+| **Desk**[^desk] | Qualitative review of L2-2 full hub·stub / L2-3 / L2-4, plus L2-1 on its sub-trigger (the areas the Rubric does not capture — scope per `desk.md`) — the pre-publish gate |
 | **Copy Editor** | Deterministic quantitative checks across all Layers (`tools/lint.py`) |
 
 [^desk]: "Desk" is the newsroom desk — the senior editor who reviews a piece for quality and judgment before it runs (as in "copy desk" / "news desk"). Here it is the pre-publish qualitative-review gate. The five roles are modeled on a newspaper newsroom; the agent and its SoT file are both named `desk`.
@@ -30,7 +30,7 @@ Every workflow in this project maps onto a four-stage cycle — ingest, query, l
 |---|---|---|
 | **GROUND** | Read the relevant SoT (observe) | Reporter / Columnist read directly from their own context (avoiding the telephone game) |
 | **APPLY** | Write/edit following the observed pattern | Reporter / Columnist write the EDITOR block (preserving the AUTO block) |
-| **VERIFY** | Confirm lint/tools PASS (verification) | Copy Editor (quantitative) → (L2-3 / L2-4) Desk (qualitative), divided |
+| **VERIFY** | Confirm lint/tools PASS (verification) | Copy Editor (quantitative) → Desk (qualitative — scope per the `desk.md` matrix), divided |
 | **ADAPT** | On VERIFY failure, return to GROUND | Reporter / Columnist (no qualitative self-review) |
 
 **The 5 invariants** (APPLY stage): read first, follow the pattern, preserve policy, minimal change, stay in scope.
@@ -90,7 +90,7 @@ Each folder has a **single responsibility**; when adding a new instruction, use 
 **When read**: when the Reporter / Columnist enters the cycle + during Desk review.
 
 **Instructions located here**:
-- `source.md` (L2-1) · `hub.md` (L2-2) · `overview.md` (L2-3 cluster + L2-4 root) · `contradiction.md` (L2-3 theme + L2-4 aggregate) · `synthesis.md` (L2-3 synthesis) · `trail.md` (L2-3 trail)
+- `source.md` (L2-1) · `hub.md` (L2-2) · `timeline.md` (L2-2 standalone timeline) · `overview.md` (L2-3 cluster + L2-4 root) · `contradiction.md` (L2-3 theme + L2-4 aggregate) · `synthesis.md` (L2-3 synthesis) · `trail.md` (L2-3 trail)
 - `README.md` (Layer definitions, axis structure, common frontmatter, Root Meta Files Exception)
 
 **What does NOT belong here**:
@@ -162,6 +162,7 @@ Each folder has a **single responsibility**; when adding a new instruction, use 
   - advisory: after writing a stub, recommend `python tools/build.py` reconciliation + Desk VERIFY₂ (`wiki/entities·concepts·timelines/*.md` — structural prevention of the 2026-05-09 / 05-20 incidents)
   - advisory: after editing L2-2 full hub, timeline, L2-3, or L2-4, recommend target-scope `python tools/lint.py <group> <target>` self-VERIFY₀
   - advisory: for `*/plans/*.md`, the 5-step self-check, the 4 red-flag types + `.claude/` instruction SoT and CLAUDE.md Voice Pass + a diff bullet-depth check (helper `check_bullet_depth.py`)
+  - advisory: on editing a desk-judged prose-craft SoT (`.claude/layers/*.md`, `agents/desk|reporter|columnist.md`), recommend the proposal-validation measurement before adoption (SoT: `operations/proposal-validation-runbook.md` + `agents/editor-in-chief.md` step 6)
   - advisory: on Write of a script-like temporary file directly under the project root, recommend a temp directory (structural prevention of the 2026-05-08 incident)
   - advisory: on writing or modifying `tools/**/*.py`, recommend loading and applying the `ponytail-coding` skill (the authoring-time code-restraint reflex — the SoT is `skills/ponytail-coding/SKILL.md`; the rule body is not duplicated here)
 

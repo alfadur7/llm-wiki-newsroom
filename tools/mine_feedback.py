@@ -12,8 +12,8 @@ watermark (the last review-complete date), and once you finish a review pass you
 watermark to today with `--checkpoint`. The next run automatically targets only what came
 after. A run alone does not advance the watermark (to prevent permanently dropping unreviewed
 utterances) — the boundary is the step that explicitly marks review complete. The watermark
-lives in `tools/_feedback-review.json` (committed to the repo — being a date, it is
-machine-independent, so cloud and multiple machines share the same boundary). `--checkpoint`
+lives in `tools/_feedback-review.json` (operator-internal local state, gitignored — it holds
+transcript-derived review fingerprints, so it is not shared across machines). `--checkpoint`
 accumulates the date + `--note` + this cycle's CORRECTION fingerprint into the history, and
 computes the recurrence rate of already-treated patterns against the previous fingerprint
 (lower recurrence = feedback settled — a human-gate signal for measured self-improvement). The
@@ -56,8 +56,8 @@ def _default_transcript_dir() -> Path:
 
 
 DEFAULT_TRANSCRIPT_DIR = _default_transcript_dir()
-# Review-cycle boundary — a repo-committed file (fixed relative to __file__, independent of transcript --dir).
-# The watermark is a date, so it is machine-independent → keep it in git so cloud and multiple machines share the same boundary.
+# Review-cycle boundary — an operator-internal local file (fixed relative to __file__, independent of transcript --dir).
+# Gitignored (operator-internal self-improvement state; holds transcript-derived fingerprints), so it is not shared across machines.
 WATERMARK_PATH = Path(__file__).resolve().parent / "_feedback-review.json"
 
 
@@ -67,7 +67,7 @@ def read_watermark():
 
 
 def write_checkpoint(when: str, since, note: str, cc: dict | None = None) -> dict:
-    """Advance the review-complete boundary to today + append to the history (to be committed to the repo).
+    """Advance the review-complete boundary to today + append to the history (operator-internal local state, gitignored).
 
     When cc (this cycle's CORRECTION fingerprint) is provided, compute the recurrence rate of
     already-treated patterns against the previous fingerprint and record it in the history — the
@@ -280,11 +280,6 @@ def main():
                    help="confirm review complete — advance the watermark to today (or a given YYYY-MM-DD), no mining")
     p.add_argument("--note", default="", help="one-line review note to record in the history on --checkpoint")
     args = p.parse_args()
-    if hasattr(sys.stdout, "reconfigure"):
-        try:
-            sys.stdout.reconfigure(encoding="utf-8")
-        except Exception:
-            pass
     if args.checkpoint is not None:
         when = args.checkpoint or date.today().isoformat()
         prev_watermark = read_watermark()
@@ -292,8 +287,8 @@ def main():
         scan = _scan(args.dir, 0, prev_watermark)
         cc = correction_counts(scan["hits"]) if scan else None
         entry = write_checkpoint(when, prev_watermark, args.note, cc)
-        print(f"[watermark] review complete confirmed: {when} → {WATERMARK_PATH.name} (to be committed to the repo) — "
-              f"the next run surfaces only after this date. needs git add then commit.")
+        print(f"[watermark] review complete confirmed: {when} → {WATERMARK_PATH.name} (operator-internal local state, gitignored) — "
+              f"the next run surfaces only after this date.")
         if cc is not None:
             print(f"[self-improvement] this cycle's CORRECTION total {sum(cc.values())} / "
                   f"{len(cc)} pattern(s)")

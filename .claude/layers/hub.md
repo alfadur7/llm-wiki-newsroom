@@ -4,7 +4,7 @@ This guide defines the body structure of **L2-2 entity·concept hubs** (`wiki/en
 
 ## Body Structure
 
-The body **must** include the two H2 sections below (auto-verified by `/wiki-lint hub body`).
+The body **must** include the two H2 sections below (auto-verified by `/wiki-lint hub schema`; `hub body` is a separate density advisory with no pass/fail impact).
 
 ### Required Sections
 

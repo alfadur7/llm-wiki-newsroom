@@ -73,9 +73,16 @@ def expected_text(tool_input):
     try:
         with open(path, encoding="utf-8") as fh:
             disk = fh.read()
-    except OSError:
+    except (OSError, UnicodeDecodeError):
         return None, set()
-    full = disk.replace(old, new, 1) if old else disk
+    if old and old not in disk:  # Edit would fail — degrade to None, not stale disk
+        return None, set()
+    if not old:
+        full = disk
+    elif tool_input.get("replace_all"):
+        full = disk.replace(old, new)
+    else:
+        full = disk.replace(old, new, 1)
     changed = {b for _, _, b in parse_bullets(new)}
     return full, changed
 

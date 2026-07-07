@@ -98,7 +98,7 @@
       "algorithm": "evaluate_contradiction_citation", "comparator": "advisory", "default_threshold": null,
       "legacy": {"contradiction-theme": "L4"},
       "source": "Project Xanadu citation anchoring(Nelson 1965)", "source_url": "https://en.wikipedia.org/wiki/Project_Xanadu",
-      "note": "A representative-evidence citation bullet anchors its source wikilink to a source section such as #Key Quotes. 0% also PASS (advisory·migration). NOTE the allowed-section set is Korean (주요 인용/주요 주장/요약) — see checks.py FLAG."
+      "note": "A representative-evidence citation bullet anchors its source wikilink to a source section such as #Key Quotes. 0% also PASS (advisory·migration). NOTE the allowed-section set is the live English {Key Quotes, Key Claims, Summary}; the Korean section titles fire under WIKI_LANG=ko."
     },
     "cit.grade-meta": {
       "name": "Evidence-grade meta-use", "dimension": "Schema meta-use", "judge": "A",

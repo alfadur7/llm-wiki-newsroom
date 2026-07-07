@@ -41,47 +41,46 @@ from datetime import date as _date, datetime as _datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, WIKILINK_TARGET_RE, atomic_write_text, confirm_changes, parse_frontmatter, print_delete_cleanup_advisory, read_source_date, safe_slug_path, strip_frontmatter  # noqa: E402
+from _lib import AUTO_BLOCK_RE, CLUSTERS_JSON, REPO_ROOT, WIKI, WIKILINK_TARGET_RE, atomic_write_text, confirm_changes, parse_frontmatter, print_delete_cleanup_advisory, read_source_date, real_source_files, safe_slug_path, section_body, slug_only, strip_frontmatter  # noqa: E402
 from _advisory_common import mark  # noqa: E402
-from _manifest_counts import counts as _roster_counts, threshold_label  # noqa: E402
+from _manifest_counts import _load_manifest, counts as _roster_counts, threshold_label  # noqa: E402
 
 import importlib.util as _ilu  # noqa: E402
+
+
+def _load_skill_checks(name: str, alias: str):
+    """Load `.claude/skills/<name>/checks.py` as a standalone module.
+
+    Spec-loaded (not registered in sys.modules) — `alias` only namespaces
+    the spec so the four skill loads below cannot collide.
+    """
+    spec = _ilu.spec_from_file_location(
+        alias, REPO_ROOT / ".claude" / "skills" / name / "checks.py"
+    )
+    mod = _ilu.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+_MANIFEST = _load_manifest()
+
 # theme cit.* (L2·L3·L4) measurement is owned by the scholarly-citation skill.
 # Call configuration comes from the manifest SoT (`contradiction-theme.bundles`).
 # Wiki-wide (sources_dir) and shared parsing (claim_sources·evidence_slugs)
 # are injected by the orchestrator.
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-_MANIFEST = json.loads((_REPO_ROOT / ".claude" / "layers" / "_manifest.json").read_text(encoding="utf-8"))
-_cit_bundle_cfg = _MANIFEST["contradiction-theme"]["bundles"]["scholarly-citation"]
-_cit_spec = _ilu.spec_from_file_location(
-    "cit_checks_contra", _REPO_ROOT / ".claude" / "skills" / "scholarly-citation" / "checks.py"
-)
-cit_skill = _ilu.module_from_spec(_cit_spec)
-_cit_spec.loader.exec_module(cit_skill)
-_CIT_CONTRA_FN = _cit_bundle_cfg["fn"]
+cit_skill = _load_skill_checks("scholarly-citation", "cit_checks_contra")
+_CIT_CONTRA_FN = _MANIFEST["contradiction-theme"]["bundles"]["scholarly-citation"]["fn"]
 
 # theme enc.* (N4·N5·N6·N7·W1·L1·X2) measurement is owned by the encyclopedia-writing skill.
-_enc_spec = _ilu.spec_from_file_location(
-    "enc_checks_contra", _REPO_ROOT / ".claude" / "skills" / "encyclopedia-writing" / "checks.py"
-)
-enc_skill = _ilu.module_from_spec(_enc_spec)
-_enc_spec.loader.exec_module(enc_skill)
+enc_skill = _load_skill_checks("encyclopedia-writing", "enc_checks_contra")
 _ENC_CONTRA_FN = _MANIFEST["contradiction-theme"]["bundles"]["encyclopedia-writing"]["fn"]
 
 # theme jrn.* (T4·D1·D5·D6 — Toulmin qualifier·Hegelian dialectic) measurement is owned by the journalism-writing skill.
-_jrn_spec = _ilu.spec_from_file_location(
-    "jrn_checks_contra", _REPO_ROOT / ".claude" / "skills" / "journalism-writing" / "checks.py"
-)
-jrn_skill = _ilu.module_from_spec(_jrn_spec)
-_jrn_spec.loader.exec_module(jrn_skill)
+jrn_skill = _load_skill_checks("journalism-writing", "jrn_checks_contra")
 _JRN_CONTRA_FN = _MANIFEST["contradiction-theme"]["bundles"]["journalism-writing"]["fn"]
 
 # aggregate MECE(D1) measurement is owned by the consulting-writing skill.
-_con_spec = _ilu.spec_from_file_location(
-    "con_checks_contra", _REPO_ROOT / ".claude" / "skills" / "consulting-writing" / "checks.py"
-)
-con_skill = _ilu.module_from_spec(_con_spec)
-_con_spec.loader.exec_module(con_skill)
+con_skill = _load_skill_checks("consulting-writing", "con_checks_contra")
 # aggregate bundle fn names (contradiction-aggregate content-type)
 _AGG = _MANIFEST["contradiction-aggregate"]["bundles"]
 _AGG_CON_FN = _AGG["consulting-writing"]["fn"]
@@ -92,6 +91,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from _editor_date import git_head_text  # noqa: E402
 from _schema_common import (  # noqa: E402
     check_frontmatter,
+    section_present as _section_present,
 )
 from contradiction_theme import (  # noqa: E402
     _print_rewrite_block as _print_theme_rewrite_block,
@@ -102,7 +102,8 @@ CONTRADICTIONS_DIR = WIKI / "contradictions"
 CONTRADICTIONS_MD_PATH = WIKI / "contradiction.md"
 THEMES_JSON = CONTRADICTIONS_DIR / "_contradictions_themes.json"
 CLAIMS_JSON = CONTRADICTIONS_DIR / "_contradictions.json"
-CLUSTERS_JSON = Path("graph/_clusters.json")
+# CLUSTERS_JSON (X2/F1 input) is imported from _lib — repo-root anchored, so
+# X2/F1 no longer silently degrade when lint runs from a non-root cwd.
 
 # Module-level chain-pending flag. Set when `run(fix=True)` detects that
 # `_contradictions_themes.json` is stale relative to `_contradictions.json`
@@ -151,7 +152,8 @@ N5_VERDICT_FAIL_MAX = 2
 N6_NUMBER_REUSE_MAX = 2
 S3_LEAD_NUMBERS_MAX = 4
 S3_LEAD_WIKILINKS_MAX = 5
-L1_MIN_SLUG_LEN = 10
+# L1 (raw-slug length) threshold lives with the L1 measurement in the
+# encyclopedia-writing skill's checks.py (L1_MIN_SLUG_LEN).
 
 # Rubric Part 2 (Aggregate) thresholds — `.claude/layers/contradiction.md` Part 2
 L24_W1_MIN = 50
@@ -200,18 +202,9 @@ DIALECTIC_LABEL_RE = re.compile(
 #
 # Time units (`년`·`월`·`일`·`시`·`분`·`초`) are deliberately excluded — these are
 # timestamps, not "core measurements". `시간` (duration) is included instead (`13시간 장애`).
-NUMBER_TOKEN_RE = re.compile(
-    r"\d+(?:,\d{3})*(?:\.\d+)?\s*"
-    r"(?:%|percent|"
-    r"billion|million|trillion|"  # English magnitude words (engine is English-native)
-    r"hours?|hrs?|people|users|cases?|points?|x|×|"
-    r"조|억|만|천억|백만|퍼센트|"
-    r"달러|위안|유로|파운드|엔|"
-    r"시간|배|명|건|개|대|기|점|"
-    r"GW|MW|TB|PB|GB|"
-    r"ppm|kg|km)"
-    r"(?:\s*원)?"  # "1,300억 원" → captures "1,300억 원" whole
-)
+# Single SoT: the enc skill owns the N6 number-token lexicon (was a drifted second
+# copy here); consume it directly so the two cannot diverge.
+NUMBER_TOKEN_RE = enc_skill.NUMBER_TOKEN_RE
 N6_MIN_TOKEN_LEN = 3  # A unit-bearing token of 2 chars or fewer is not meaningful. Safety guard.
 
 
@@ -230,22 +223,7 @@ _L24_G2_THRESHOLD = _MANIFEST["contradiction-aggregate"]["checks"]["cit.cite-typ
 WIKILINK_RE = WIKILINK_TARGET_RE  # captures the target (including #anchor) — _slug_only normalizes it
 
 
-def _slug_only(target: str) -> str:
-    """Drop-in replacement for the legacy `target.strip().split('/')[-1]`
-    pattern that also strips the `#section` anchor (Xanadu citation
-    anchoring, 2026-05-02). Preserves `.md` suffix when present so that
-    callers comparing against `source_slugs` (which holds bare stems
-    via `Path.stem`) and frontmatter `sources:` lists keep the same
-    behaviour they had before anchors were introduced.
-
-    Examples:
-      'entities/신한은행.md'                  → '신한은행.md'
-      'sources/foo.md#Key Claims'              → 'foo.md'
-      'ai-coding-myth#Key Quotes'              → 'ai-coding-myth'
-      'RAG'                                  → 'RAG'
-    """
-    bare = target.strip().split("/")[-1]
-    return bare.split("#", 1)[0]
+_slug_only = slug_only  # shared _lib helper (was a local copy — see WIKILINK_RE note above)
 
 # Match a full `<!-- AUTO:<NAME> BEGIN -->...<!-- AUTO:<NAME> END -->` block
 # for any NAME. Used to strip legacy blocks left over from the pre-2026-04-20
@@ -261,15 +239,18 @@ LEGACY_AUTO_BLOCK_RE = re.compile(
 # mid-file when LEGACY_AUTO_BLOCK_RE removed an AUTO:SOURCES block whose
 # next sibling was another H2. The regex now matches `## Sources` followed
 # only by whitespace through to the next H2 boundary or EOF.
+# No re.MULTILINE: with it, `$` in the lookahead matched before ANY newline,
+# so a populated `## Sources` heading followed by a blank line was silently
+# deleted during --fix. `\Z` keeps the match anchored to true EOF.
 LEGACY_SOURCES_HEADING_RE = re.compile(
-    r"\n##\s+Sources\s*\n+(?=##\s|\s*$)", re.MULTILINE
+    r"\n##\s+Sources\s*\n+(?=##\s|\s*\Z)"
 )
 
 # Per-section TODO placeholder inserted by --fix when a required H2 is
 # missing. Mirrors the overview.py skeleton pattern — body content
-# restoration remains a Claude/editor responsibility (Phase E per
-# ~/.claude/plans/layer2-followup.md). The placeholder keeps schema lint
-# passing while clearly flagging the content gap for later authoring.
+# restoration remains a Claude/editor responsibility. The placeholder
+# keeps schema lint passing while clearly flagging the content gap for
+# later authoring.
 SECTION_PLACEHOLDER = {
     "## Opposing Positions": "_TODO: 2-3 paragraphs. Describe which factions claim what and where they clash. Position A / Position B (+ optional mediating Position C)._",
     # Use backtick-wrapped `[[source-slug]]` so the structure lint treats it
@@ -412,11 +393,10 @@ def _load_source_slugs() -> set[str]:
     Used to filter N4 (reuse_max) and S2 (evidence slugs) so they only
     count citations of source pages. Entity/concept wikilinks recur
     naturally via attribution and are not what Rubric N4 targets.
+    Enumeration delegates to `_lib.real_source_files()` (the single SoT
+    for the `_`-prefix exclusion).
     """
-    src_dir = WIKI / "sources"
-    if not src_dir.exists():
-        return set()
-    return {p.stem for p in src_dir.glob("*.md") if not p.name.startswith("_")}
+    return {p.stem for p in real_source_files()}
 
 
 
@@ -426,15 +406,28 @@ def _extract_section(content: str, heading: str) -> str:
     Prefix match: the section line may carry a parenthetical subtitle
     (e.g. `## Per-Theme Deep Analysis (12 + 기타)`) — heading match requires
     only that the H2 line *starts* with `## <heading>` after whitespace.
+    Delegates to the shared `_lib.section_body` extractor.
     """
-    pattern = re.compile(
-        r"^##\s+" + re.escape(heading) + r".*?$(.*?)(?=^##\s|\Z)",
-        re.DOTALL | re.MULTILINE,
-    )
-    m = pattern.search(content)
-    return m.group(1) if m else ""
+    return section_body(content, heading, prefix=True)
 
 
+def _claims_by_id(claims: list[dict]) -> dict[str, dict]:
+    """Claim-record index keyed by `id` — single definition for the sites
+    that resolve claim_ids against `_contradictions.json` records."""
+    return {c["id"]: c for c in claims if isinstance(c, dict) and "id" in c}
+
+
+def _sources_for_claim_ids(claim_ids: list, by_id: dict[str, dict]) -> set[str]:
+    """Resolve claim ids to the unique source stems their records cite."""
+    stems: set[str] = set()
+    for cid in claim_ids:
+        rec = by_id.get(cid)
+        if not rec:
+            continue
+        stem = rec.get("source", "").removeprefix("sources/").removesuffix(".md")
+        if stem:
+            stems.add(stem)
+    return stems
 
 
 def _source_coverage(
@@ -464,16 +457,7 @@ def _source_coverage(
         return 0, 0, set()
     claim_ids = theme_obj.get("claim_ids") or []
 
-    by_id = {c["id"]: c for c in claims if isinstance(c, dict) and "id" in c}
-    claim_sources: set[str] = set()
-    for cid in claim_ids:
-        rec = by_id.get(cid)
-        if not rec:
-            continue
-        src = rec.get("source", "")
-        stem = src.removeprefix("sources/").removesuffix(".md")
-        if stem:
-            claim_sources.add(stem)
+    claim_sources = _sources_for_claim_ids(claim_ids, _claims_by_id(claims))
 
     total = len(claim_sources)
     if total == 0:
@@ -703,8 +687,8 @@ def _claims_drift_line(
     jaccard = len(new_ids & old_ids) / len(union) if union else 1.0
 
     # Source sets resolved from claims
-    new_by_id = {c["id"]: c for c in current_claims if isinstance(c, dict) and "id" in c}
-    old_by_id = {c["id"]: c for c in head_claims if isinstance(c, dict) and "id" in c}
+    new_by_id = _claims_by_id(current_claims)
+    old_by_id = _claims_by_id(head_claims)
 
     new_sources = {new_by_id[i]["source"] for i in new_ids if i in new_by_id and new_by_id[i].get("source")}
     old_sources = {old_by_id[i]["source"] for i in old_ids if i in old_by_id and old_by_id[i].get("source")}
@@ -749,7 +733,7 @@ def _claims_staleness_line(
     claim_ids = themes_doc.get("themes", {}).get(theme_slug, {}).get("claim_ids", [])
     if not claim_ids:
         return None
-    claims_by_id = {c["id"]: c for c in claims_list if isinstance(c, dict) and "id" in c}
+    claims_by_id = _claims_by_id(claims_list)
     newest = ""
     for cid in claim_ids:
         c = claims_by_id.get(cid)
@@ -1112,8 +1096,10 @@ def _check_contradictions_md(
         f"F2 stats={'drift' if f2_drift else 'ok'} {ok(f2_ok)}"
     )
     # G1·G2 — Phase 2 source schema meta-use (advisory, dimension 6 aggregate).
-    # Applies to the entire EDITOR region of the aggregate body, outside the AUTO:STATS block.
-    aggregate_editor = re.sub(r"<!--\s*AUTO:STATS\s*BEGIN\s*-->.*?<!--\s*AUTO:STATS\s*END\s*-->", "", content, flags=re.DOTALL)
+    # Applies to the entire EDITOR region of the aggregate body, outside any AUTO
+    # block (AUTO_BLOCK_RE is the single SoT — see _lib; the aggregate currently
+    # carries none, so this is a defensive strip).
+    aggregate_editor = AUTO_BLOCK_RE.sub("", content)
     g1_grade_meta = cit_skill.count_grade_meta(aggregate_editor)
     g2_cite_type_meta = cit_skill.count_cite_type_meta(aggregate_editor)
     g1_ok = g1_grade_meta >= _L24_G1_THRESHOLD
@@ -1159,19 +1145,18 @@ def _emit_rewrite_block_aggregate(claim_count: int, theme_count: int) -> None:
     print(f"Current JSON SoT: claims={claim_count} · themes={theme_count} (non-fragmentary + other-fragmentary)")
     print()
     print("Execution order (Claude):")
-    print("  1. Read .claude/layers/contradiction.md → Part 2 (Aggregate)")
-    print("  2. Read .claude/layers/contradiction.md → Part 2 (10 common + 5 L2-4-only = 15 criteria)")
-    print("  3. Read wiki/contradictions/_contradictions_themes.json → all theme slug·name·claim_ids")
-    print("  4. Read wiki/contradictions/_contradictions.json → total claim count·type distribution")
-    print("  5. Read wiki/contradiction.md (current state — to capture reusable implications and tension-axis naming)")
-    print("  6. Read all 11 theme MDs (`wiki/contradictions/<theme>.md`) — gather bottom-up consolidation material centered on each `## Opposing Positions`·`## Interpretive Direction`")
-    print("  7. Decide whether to keep the tension axes — keep the current 3 axes (expectation vs. evidence·innovation vs. regulation·concentration vs. resilience) by default. Only check whether the 11 themes can be placed, and redesign the axes only when 2+ themes don't fit the existing axes")
-    print("  8. Authoring Guide Part 2 → perform execution step 6 (rewrite the whole file with the Write tool · no frontmatter, starting from `# Contradictions by Topic`)")
-    print("  9. Match head-matter statistics to SoT: `**N source-to-source contradictions**`·`M topic clusters` (F2 criterion · use the current JSON claims/themes values as-is)")
-    print(" 10. Re-run `python tools/lint.py contradiction aggregate` → check Rubric L2-4 metrics")
+    print("  1. Read .claude/layers/contradiction.md → Part 2 (Aggregate Rubric)")
+    print("  2. Read wiki/contradictions/_contradictions_themes.json → all theme slug·name·claim_ids")
+    print("  3. Read wiki/contradictions/_contradictions.json → total claim count·type distribution")
+    print("  4. Read wiki/contradiction.md (current state — to capture reusable implications and tension-axis naming)")
+    print(f"  5. Read all {theme_count} theme MDs (`wiki/contradictions/<theme>.md`) — gather bottom-up consolidation material centered on each `## Opposing Positions`·`## Interpretive Direction`")
+    print("  6. Decide whether to keep the tension axes — keep the current axes named in `## Per-Theme Deep Analysis` by default. Only check whether the themes can be placed, and redesign the axes only when 2+ themes don't fit the existing axes")
+    print("  7. Authoring Guide Part 2 → perform execution step 6 (rewrite the whole file with the Write tool · no frontmatter, starting from `# Contradictions by Topic`)")
+    print("  8. Match head-matter statistics to SoT: `**N source-to-source contradictions**`·`M topic clusters` (F2 criterion · use the current JSON claims/themes values as-is)")
+    print("  9. Re-run `python tools/lint.py contradiction aggregate` → check Rubric L2-4 metrics")
     p2 = _roster_counts("contradiction-aggregate")
-    print(f" 11. Iterate until {threshold_label(p2)} is achieved")
-    print(" 12. When done, append one line `## [YYYY-MM-DD] lint | contradictions aggregate rewrite` to `log.md`")
+    print(f" 10. Iterate until {threshold_label(p2)} is achieved")
+    print(" 11. When done, append one line `## [YYYY-MM-DD] lint | contradictions aggregate rewrite` to `log.md`")
 
 
 def _emit_rewrite_block(theme_slug: str, themes_doc: dict) -> None:
@@ -1210,23 +1195,22 @@ def _emit_rewrite_block(theme_slug: str, themes_doc: dict) -> None:
     print()
     print("Execution order (Claude):")
     print("  1. Read .claude/layers/contradiction.md → Part 1 (Theme)")
-    print("  2. Read .claude/layers/contradiction.md → Part 1")
-    print(f"  3. Read wiki/contradictions/_contradictions_themes.json → themes.{theme_slug}")
-    print("  4. Read wiki/contradictions/_contradictions.json → resolve claim_ids (id → source/claim/type)")
-    print(f"  5. Read wiki/contradictions/{theme_slug}.md (current state)")
-    print("  6. Read through 3-6 representative source MDs for the core opposing axis, prioritizing type=real among claim_ids")
+    print(f"  2. Read wiki/contradictions/_contradictions_themes.json → themes.{theme_slug}")
+    print("  3. Read wiki/contradictions/_contradictions.json → resolve claim_ids (id → source/claim/type)")
+    print(f"  4. Read wiki/contradictions/{theme_slug}.md (current state)")
+    print("  5. Read through 3-6 representative source MDs for the core opposing axis, prioritizing type=real among claim_ids")
     print("     (extra) When selecting representative evidence, prefer the newest source `date:` frontmatter at equal relevance —")
     print("     but preserve at least 1 item from the middle/older part of the overall date distribution to keep evidence of the historical origin")
-    print("  7. Authoring Guide Part 1 → perform execution steps 6-7 (write the 4 H2 sections + update frontmatter sources/last_updated)")
-    print(f"  8. Re-run `python tools/lint.py contradiction {theme_slug}` → check Rubric metrics")
+    print("  6. Authoring Guide Part 1 → perform execution steps 6-7 (write the 4 H2 sections + update frontmatter sources/last_updated)")
+    print(f"  7. Re-run `python tools/lint.py contradiction {theme_slug}` → check Rubric metrics")
     p1 = _roster_counts("contradiction-theme")
     if is_fragmentary:
         # other-fragmentary is exempt from N2·D5·D6·S3 (consistent with the three lint `—` marks) —
         # total -4; for required, only N2 of those is required, so -1. Residual-bucket preservation exception.
-        print(f"  9. Iterate until {threshold_label(p1, exclude_total=4, exclude_required=1)} is achieved  (N2·D5·D6·S3 exempt)")
+        print(f"  8. Iterate until {threshold_label(p1, exclude_total=4, exclude_required=1)} is achieved  (N2·D5·D6·S3 exempt)")
     else:
-        print(f"  9. Iterate until {threshold_label(p1)} is achieved")
-    print(" 10. Check the external-reader perspective via the `.claude/agents/desk.md` procedure")
+        print(f"  8. Iterate until {threshold_label(p1)} is achieved")
+    print("  9. Check the external-reader perspective via the `.claude/agents/desk.md` procedure")
 
 
 def _check_one_md(path: Path, fix: bool) -> tuple[list[str], int]:
@@ -1263,12 +1247,8 @@ def _check_one_md(path: Path, fix: bool) -> tuple[list[str], int]:
                 f"longer use AUTO blocks; run `/wiki-lint contradiction --fix` to strip"
             )
 
-    # Section presence is line-anchored (header at line start), matching the
-    # advisory S1 metric in `_rubric_metrics`. A substring test would falsely
-    # satisfy this gate when a header string appears mid-prose.
-    def _section_present(c: str, s: str) -> bool:
-        return bool(re.search(rf"^{re.escape(s)}", c, re.MULTILINE))
-
+    # Section presence is line-anchored (header at line start) via the shared
+    # `_schema_common.section_present`, matching the advisory S1 metric.
     missing_sections = [s for s in CONTRADICTION_REQUIRED_SECTIONS if not _section_present(content, s)]
 
     if fix and missing_sections:
@@ -1370,7 +1350,7 @@ def _check_frontmatter_drift(themes_doc: dict, claims: list[dict], only_theme: s
     if not isinstance(themes, dict):
         return notes
 
-    by_id = {c["id"]: c for c in claims if isinstance(c, dict) and "id" in c}
+    by_id = _claims_by_id(claims)
 
     for slug, theme in themes.items():
         if only_theme is not None and slug != only_theme:
@@ -1387,15 +1367,7 @@ def _check_frontmatter_drift(themes_doc: dict, claims: list[dict], only_theme: s
             if isinstance(s, str)
         }
 
-        json_sources: set[str] = set()
-        for cid in theme.get("claim_ids", []) or []:
-            rec = by_id.get(cid)
-            if not rec:
-                continue
-            src = rec.get("source", "")
-            stem = src.removeprefix("sources/").removesuffix(".md")
-            if stem:
-                json_sources.add(stem)
+        json_sources = _sources_for_claim_ids(theme.get("claim_ids", []) or [], by_id)
 
         only_md = md_sources - json_sources
         only_json = json_sources - md_sources
@@ -1607,7 +1579,10 @@ def run(target: str | None = None, fix: bool = False, auto_yes: bool = False) ->
             )
             # Skip the advisory for skeleton-only files — S1 TODO placeholders
             # flood the output with FAILs that just repeat the schema warning.
-            if m["S1_todo"] > 0 and m["S1_sections"] < len(CONTRADICTION_REQUIRED_SECTIONS):
+            # A fresh skeleton (or one restored by _insert_missing_sections) has
+            # all required H2s present, so gating on S1_sections never fired;
+            # detect "still all placeholders" via the TODO count instead.
+            if m["S1_todo"] >= len(CONTRADICTION_REQUIRED_SECTIONS):
                 continue
             file_lines = _format_metrics_line(m, exempt=exempt)
             drift = _claims_drift_line(

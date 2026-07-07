@@ -6,24 +6,30 @@ the shipped open-source-AI example corpus. Re-curate both lists (and the
 Korean-summary convention below) per deployment; the selection mechanism is
 corpus-agnostic, only the domain inventory is corpus-specific.
 
-Two curated lists, selected at search time by the editor-in-chief:
+Two curated lists, selected at search time by the editor-in-chief. The engine
+is English-native (tools/_lib.py::korean_mode), so GLOBAL is the default for the
+shipped corpus; KOREAN applies only under WIKI_LANG=ko or a Korea-framed
+deployment (see wiki-news.md:46,63):
 
-  KOREAN_IT_FINANCE_NEWS  — default. Korean-entity / Korea-framed gaps.
-  GLOBAL_IT_FINANCE_NEWS  — global-entity / globally-framed gaps. Cluster-topic
-                            authority outlets covering AI coding, LLMs, banking
-                            tech, enterprise AI, cloud, data centers, security.
+  GLOBAL_IT_FINANCE_NEWS  — default. Global-entity / globally-framed gaps.
+                            Cluster-topic authority outlets covering AI coding,
+                            LLMs, banking tech, enterprise AI, cloud, data
+                            centers, security.
+  KOREAN_IT_FINANCE_NEWS  — WIKI_LANG=ko. Korean-entity / Korea-framed gaps.
 
 Selection heuristic (editor applies per gap target, no auto-detection — entity
 nationality is an NER problem, kept as editorial judgment):
   - Target entity is a non-Korean org/person, OR the topic is intrinsically
     global (e.g. global-bank AI-coding adoption, foundation-model releases) →
     GLOBAL set (or the KOREAN + GLOBAL union for broad sweeps).
-  - Target is a Korean entity / domestic-policy topic → KOREAN set (default).
+  - Target is a Korean entity / domestic-policy topic → KOREAN set (WIKI_LANG=ko).
 
-Both sets feed Korean-language source PAGES regardless of the raw's language:
-the reporter writes a Korean summary/translation of the foreign primary source
-(the long-standing pattern for WSJ/Reuters-cited items). This is distinct from
-ingesting a raw English vendor blog as-is, which stays out of auto-scope.
+Under WIKI_LANG=ko both sets feed Korean-language source PAGES regardless of the
+raw's language: the reporter writes a Korean summary/translation of the foreign
+primary source (the long-standing pattern for WSJ/Reuters-cited items). On the
+English-native default the reporter writes English summaries. Either way this is
+distinct from ingesting a raw English vendor blog as-is, which stays out of
+auto-scope.
 
 KOREAN list derived from `_source_map.json` 1,351 URL frequency (2026-05-15)
 intersected with crawler accessibility; Phase 2C validation (5 queries × 10
@@ -33,8 +39,8 @@ probes (2026-05-23): each domain returned results under `allowed_domains`
 without a crawler 400.
 
 Maintenance: re-measure `_source_map.json` top 20 once per quarter and adjust.
-See `.claude/operations/gap-detection-rollout.md` for the validation procedure
-and `memory/reference_korean_news_domains.md` for the exclusion rationale.
+See `.claude/operations/gap-detection-rollout.md` for the validation procedure;
+the exclusion rationale is inlined in the comment block at the bottom of this file.
 """
 from __future__ import annotations
 
@@ -94,7 +100,7 @@ GLOBAL_IT_FINANCE_NEWS: list[str] = [
 ]
 
 # Excluded from `allowed_domains` despite being high-frequency or otherwise
-# attractive — see `memory/reference_korean_news_domains.md`:
+# attractive — rationale per entry below:
 #
 #   bikorea.net (measured #1, 200)
 #     Outlet published by this wiki's operator — self-reference avoidance policy.

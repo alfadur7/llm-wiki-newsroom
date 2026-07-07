@@ -26,16 +26,23 @@ def has_auto_marker(content: str, name: str) -> bool:
 
 def check_frontmatter(fm: dict, required: set[str], path: Path) -> list[str]:
     issues: list[str] = []
-    for field in required:
+    for field in sorted(required):
         if field not in fm or not fm[field]:
             issues.append(f"  {path.name}: frontmatter missing `{field}`")
     return issues
 
 
+def section_present(content: str, heading: str) -> bool:
+    """Line-anchored required-section test — the heading must begin a line
+    (suffix variants on the heading line allowed). A plain substring test
+    falsely passes when the heading string appears mid-prose."""
+    return bool(re.search(rf"^{re.escape(heading)}", content, re.MULTILINE))
+
+
 def check_sections(content: str, required: tuple[str, ...], path: Path) -> list[str]:
     issues: list[str] = []
     for sec in required:
-        if sec not in content:
+        if not section_present(content, sec):
             issues.append(f"  {path.name}: section missing `{sec}`")
     return issues
 

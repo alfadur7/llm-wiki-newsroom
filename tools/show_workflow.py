@@ -29,11 +29,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-# Force UTF-8 (when possible) so Korean output isn't mangled on the Windows cp949 console.
-try:
-    sys.stdout.reconfigure(encoding="utf-8")
-except (AttributeError, ValueError):
-    pass
+import _lib  # noqa: F401  # reconfigures stdout/stderr to UTF-8 (Windows cp949 console)
 
 PROJECTS = Path.home() / ".claude" / "projects"
 # Identifying token common to this project's session folder names (default filter).

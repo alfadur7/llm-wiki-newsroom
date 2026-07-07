@@ -99,16 +99,21 @@ def atomic_write_if_changed(path: Path, content: str, *, encoding: str = "utf-8"
         try:
             if path.read_text(encoding=encoding) == content:
                 return False
-        except OSError:
-            pass  # fall through and rewrite
+        except (OSError, UnicodeDecodeError):
+            pass  # fall through and rewrite (unreadable/corrupt file gets replaced)
     atomic_write_text(path, content, encoding=encoding)
     return True
 
-if hasattr(sys.stdout, "reconfigure"):
-    try:
-        sys.stdout.reconfigure(encoding="utf-8")
-    except Exception:
-        pass
+# Windows cp949 console: printing Korean / en-dash etc. raises
+# UnicodeEncodeError, so reconfigure both stdio streams to UTF-8 at import.
+# Single definition — every tools/ entry point inherits it by importing _lib
+# (the per-script copies had drifted between stdout-only and stdout+stderr).
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        try:
+            _stream.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
 
 # Anchor on the repo root (tools/ → repo) rather than the process cwd. A
 # bare `Path("wiki")` only resolves when a script is launched from the repo
@@ -118,6 +123,24 @@ if hasattr(sys.stdout, "reconfigure"):
 REPO_ROOT = Path(__file__).resolve().parent.parent
 WIKI = REPO_ROOT / "wiki"
 GRAPH = REPO_ROOT / "graph"
+# Graph artefact paths — single definition. Consumers import these instead of
+# hand-rolling `Path("graph/...")` copies: the cwd-relative form only resolves
+# when a script is launched from the repo root (same bug class as above).
+GRAPH_JSON = GRAPH / "_graph.json"
+CLUSTERS_JSON = GRAPH / "_clusters.json"
+CLUSTER_LABELS_JSON = GRAPH / "cluster_labels.json"
+
+# Wiki-relative directory prefixes whose pages count as graph "hubs" — shared
+# by the build/lint/discover/news modules that gate on hub nodes.
+HUB_PREFIXES = ("entities/", "concepts/")
+
+# The 8 wiki content subdirectories (directory-layout.md order). Single SoT
+# for full-corpus page walks; a scan that deliberately covers a subset should
+# derive it from this tuple rather than re-enumerating.
+WIKI_SUBDIRS = (
+    "sources", "entities", "concepts", "timelines",
+    "overviews", "contradictions", "syntheses", "trails",
+)
 
 # --- Hosted graph browser deploy constants ---
 # BASE_URL/STANDALONE_SLUG drive the standalone output filename, the RAG
@@ -131,15 +154,105 @@ GRAPH = REPO_ROOT / "graph"
 BASE_URL = ''
 STANDALONE_SLUG = 'g-7f3a9c2e'
 
+
+def graph_deeplink_base() -> str:
+    """`<BASE_URL>/<STANDALONE_SLUG>` — the graph-browser deep-link base, or ''
+    when BASE_URL is unset (graph not publicly hosted). Single definition of the
+    composition shared by export.py and _briefing/render.py, for the same
+    anti-drift reason the constants above were hoisted."""
+    return f"{BASE_URL.rstrip('/')}/{STANDALONE_SLUG}" if BASE_URL else ""
+
+
+def deeplink_key(stem: str) -> str:
+    """`#q=` key encoding for graph deep links. Non-Latin stays raw
+    (graph.html's decodeURIComponent handles the hash); encode only the chars
+    that break a markdown link/URL — `%` first (so it never double-encodes),
+    then spaces and parens. Single definition shared by export.py
+    `_rewrite_links` and _briefing/render.py (previously parity-by-comment
+    copies)."""
+    return stem.replace("%", "%25").replace(" ", "%20").replace("(", "%28").replace(")", "%29")
+
 # Wikilink regex family — single definition (meta lint blocks redefinition):
 #   WIKILINK_RE        does not match anchored (`[[x#s]]`) links — stem of a non-anchor link
 #   WIKILINK_TARGET_RE captures the full target (including #anchor) — normalization is the comparison site's job
 #   WIKILINK_STEM_RE   consumes alias/anchor and captures only the bare stem
 #   WIKILINK_ANY_RE    link existence itself (no capture — for density counting)
+#   WIKILINK_INNER_RE  captures the raw inner text (`target|display#anchor` as one group) — for wholesale link rewriting
 WIKILINK_RE = re.compile(r"\[\[([^\]|#]+)(?:\|[^\]]*)?\]\]")
 WIKILINK_TARGET_RE = re.compile(r"\[\[([^\]|]+)(?:\|[^\]]*)?\]\]")
 WIKILINK_STEM_RE = re.compile(r"\[\[([^\]|#]+)(?:[|#][^\]]*)?\]\]")
 WIKILINK_ANY_RE = re.compile(r"\[\[[^\]]+\]\]")
+WIKILINK_INNER_RE = re.compile(r"\[\[([^\]]+)\]\]")
+
+
+def slug_only(target: str) -> str:
+    """Normalize a wikilink target to its bare page stem: drop the `entities/…`
+    path prefix and the `#section` anchor (Xanadu citation anchoring), preserving
+    the `.md` suffix when present so callers comparing against `Path.stem` /
+    frontmatter `sources:` lists keep pre-anchor behaviour. Single SoT — the lint
+    modules that compare link targets consume this (were divergent inline copies).
+
+      'entities/신한은행.md'        → '신한은행.md'
+      'sources/foo.md#Key Claims'   → 'foo.md'
+      'ai-coding-myth#Key Quotes'   → 'ai-coding-myth'
+      'RAG'                         → 'RAG'
+    """
+    return target.strip().split("/")[-1].split("#", 1)[0]
+
+
+def fm_sources(fm: dict) -> list[str]:
+    """Normalize a page's frontmatter `sources:` to a list of stripped strings.
+    Accepts both the list form (`sources: [a, b]`) and the scalar-string form
+    YAML may leave (`sources: a`, or a bare `[a, b]` string). Single SoT — the
+    build/lint modules that count or resolve sources consume this (were three
+    divergent inline normalizations; the list-only ones silently counted a
+    scalar `sources:` as zero)."""
+    srcs = fm.get("sources") or []
+    if isinstance(srcs, str):
+        srcs = [s.strip() for s in srcs.strip("[]").split(",") if s.strip()]
+    return [str(s).strip() for s in srcs if str(s).strip()]
+
+
+# Timeline dated-entry regex family — single definition shared by the overlay
+# builder (`_build/overlays.py`) and the timeline lint (`_lint/timeline.py`) so
+# the two cannot drift on which lines count as dated entries (the path/region
+# flavor decision the lint exists to mirror):
+#   TIMELINE_ENTRY_RE      "- **<bold>** rest" bullet, optional ★ marker —
+#                          group(1)=bold token, group(2)=rest of line
+#   TIMELINE_DATE_ONLY_RE  bold token that IS a date — digits + date separators
+#                          (Hangul 년/월/일 suffixes kept for WIKI_LANG=ko), with
+#                          an optional trailing parenthetical so the prescribed
+#                          future-anchor form `**YYYY (planned)**`
+#                          (.claude/layers/timeline.md) counts as dated, while
+#                          `## Flow Summary` range labels ("2019~2021 laying
+#                          the groundwork") are still rejected.
+TIMELINE_ENTRY_RE = re.compile(r"^\s*-\s*(?:★\s*)?\*\*\s*([^*]+?)\s*\*\*\s*(.*)$", re.MULTILINE)
+TIMELINE_DATE_ONLY_RE = re.compile(r"^\d{4}[\d\s\-.년월일]*(?:\s*\([^)]*\))?$")
+
+# Bare H2 header line — group(1)=heading text. Single definition for the
+# per-module copies of this idiom (graph/source/trail).
+H2_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
+
+
+def section_body(content: str, heading: str, *, prefix: bool = False) -> str:
+    """Body of the `## <heading>` section up to the next H2 (or EOF).
+
+    prefix=True tolerates trailing text on the heading line (e.g. a
+    parenthetical subtitle: `## Per-Theme Deep Analysis (12 + other)`);
+    the default requires the H2 line to be exactly the heading.
+    Returns "" when the section is absent. Single definition — per-module
+    extractors had diverged into exact-match vs prefix-match variants,
+    so the same section was visible to one tool and invisible to another.
+    """
+    # prefix tail is [^\n]* (not \s*.*): greedy \s* would cross the newline
+    # and swallow the first body line.
+    tail = r"[^\n]*$" if prefix else r"\s*$"
+    m = re.search(rf"^##\s+{re.escape(heading)}{tail}", content, re.MULTILINE)
+    if not m:
+        return ""
+    start = m.end()
+    nxt = re.search(r"^##\s", content[start:], re.MULTILINE)
+    return content[start:start + nxt.start()] if nxt else content[start:]
 
 
 def real_source_files() -> list[Path]:
@@ -180,6 +293,12 @@ BLOCKQUOTE_RE = re.compile(r"^\s*>.*$", re.MULTILINE)
 MARKUP_LEAK_RE = re.compile(
     r"</?(?:function_calls|invoke|parameter|content)>|<(?:invoke|parameter)\b|antml:"
 )
+
+# Evidence-grade marker on `## Key Claims` claim lines — `- [fact] …` /
+# `[analysis]` / `[forecast]` (Phase 2 evidence grade primitive). Single
+# definition shared by the graph/contradiction builders and count_mentions.
+# MULTILINE for findall over a multi-line section; a no-op for per-line `.match`.
+GRADE_MARKER_RE = re.compile(r"^\s*-\s*\[(fact|analysis|forecast)\]", re.MULTILINE)
 
 
 def strip_frontmatter(text: str) -> str:
@@ -576,24 +695,12 @@ def canonicalize_url(url: str) -> str:
     )
 
 
-# Display labels for create/delete actions inside the confirm_changes box.
-# English action keys are mapped to these labels at print time; unknown keys
-# fall back to upper().
-_CONFIRM_ACTION_LABELS = {
-    "create": "create",
-    "delete": "delete",
-    "update": "update",
-    "rename": "rename",
-}
-
-
 def confirm_changes(plan: dict, context: str = "", auto_yes: bool = False) -> bool:
     """Prompt for confirmation before executing a create/delete plan.
 
     plan: ordered dict-like mapping action label (e.g. "create", "delete")
           to lists of file paths affected. Empty values are skipped.
-          English action keys are mapped to display labels at print time
-          via _CONFIRM_ACTION_LABELS; unknown keys fall back to upper().
+          Action keys are printed as-is.
     context: short headline shown in the warning box (caller decides
              the wording of user-facing context lines).
     auto_yes: when True, skip the prompt and return True (used for the
@@ -625,8 +732,7 @@ def confirm_changes(plan: dict, context: str = "", auto_yes: bool = False) -> bo
     for action, items in plan.items():
         if not items:
             continue
-        label = _CONFIRM_ACTION_LABELS.get(action, action.upper())
-        print(f"⚠️  {label} ({len(items)}):")
+        print(f"⚠️  {action} ({len(items)}):")
         for item in items:
             print(f"⚠️    - {item}")
     print("⚠️  " + "=" * 70)
@@ -702,20 +808,18 @@ def print_delete_cleanup_advisory(
     if check_cluster_labels:
         try:
             import json
-            labels_path = GRAPH / "cluster_labels.json"
-            if labels_path.exists():
-                data = json.loads(labels_path.read_text(encoding="utf-8"))
+            if CLUSTER_LABELS_JSON.exists():
+                data = json.loads(CLUSTER_LABELS_JSON.read_text(encoding="utf-8"))
                 registry_slugs = {l.get("slug") for l in data.get("labels", [])}
                 orphan_labels = [s for s in deleted_slugs if s in registry_slugs]
         except (OSError, ValueError, KeyError):
             pass
 
-    # (2) wikilink references across wiki/**/*.md
+    # (2) wikilink references across wiki/**/*.md — shared stem regex so
+    # anchored links ([[slug#section]]) are counted too.
     ref_counts_by_file: dict[str, int] = {}
-    # Build one combined regex for all deleted slugs to scan in one pass
     if WIKI.exists():
-        escaped = [re.escape(s) for s in deleted_slugs]
-        combined = re.compile(r"\[\[(" + "|".join(escaped) + r")(\|[^\]]+)?\]\]")
+        deleted = set(deleted_slugs)
         for md_path in WIKI.rglob("*.md"):
             if md_path.name.startswith("_"):
                 continue
@@ -723,10 +827,10 @@ def print_delete_cleanup_advisory(
                 text = md_path.read_text(encoding="utf-8", errors="replace")
             except OSError:
                 continue
-            matches = combined.findall(text)
-            if matches:
+            n = sum(1 for m in WIKILINK_STEM_RE.finditer(text) if m.group(1) in deleted)
+            if n:
                 rel = md_path.relative_to(WIKI.parent).as_posix()
-                ref_counts_by_file[rel] = len(matches)
+                ref_counts_by_file[rel] = n
 
     total_refs = sum(ref_counts_by_file.values())
     if not orphan_labels and total_refs == 0:

@@ -5,9 +5,9 @@ The ingest entry point for the automatic defect-to-guideline improvement loop (t
 automatic channel of the SoT self-evolution workflow). At cycle close, the
 Editor-in-Chief loads that cycle's lint FAILs + Desk actionable defects in one batch,
 and records the accept/reject transitions of guideline edits into the same corpus. The
-corpus must measure longitudinal recurrence rates across local and cloud, so it is
-committed and machine-shared (the same category as `_feedback-review.json`; unlike
-graph/_health-log.jsonl, it is not gitignored). `mine_failures.py` reads this corpus
+corpus accumulates longitudinal recurrence rates locally; it is gitignored operator-local
+state (like `graph/_health-log.jsonl` and `_feedback-review.json`), so accumulated history
+and any operator notes stay out of the public mirror. `mine_failures.py` reads this corpus
 in aggregate.
 
 Why the ingest point is a single batch at the cycle gate rather than every lint run:
@@ -34,6 +34,8 @@ import json
 import sys
 from datetime import date
 from pathlib import Path
+
+import _lib  # noqa: F401  # reconfigures stdout/stderr to UTF-8 (Windows cp949 console)
 
 LOG_PATH = Path(__file__).resolve().parent / "_defect-log.jsonl"
 
@@ -95,12 +97,13 @@ def append_records(records: list[dict], path: Path = LOG_PATH) -> int:
 
 
 def main() -> int:
-    for stream in (sys.stdin, sys.stdout):  # Windows defaults to cp949 → force UTF-8 so non-ASCII record text round-trips
-        if hasattr(stream, "reconfigure"):
-            try:
-                stream.reconfigure(encoding="utf-8")
-            except Exception:
-                pass
+    # stdin is not covered by _lib's stdout/stderr reconfigure — force UTF-8
+    # here so non-ASCII record text round-trips on a cp949 Windows console.
+    if hasattr(sys.stdin, "reconfigure"):
+        try:
+            sys.stdin.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
     try:
         records = parse_records(sys.stdin.read())
     except ValueError as e:

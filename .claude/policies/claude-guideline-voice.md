@@ -1,6 +1,6 @@
 # Claude Guideline Voice Policy
 
-The voice conventions to follow when authoring `.claude/commands/*.md` · `.claude/agents/*.md` · `CLAUDE.md` (the Claude guideline SoT). Violations fail the voice pass of `python tools/lint.py meta`.
+The voice conventions to follow when authoring the `.claude/` guide SoTs — `.claude/commands/*.md` · `.claude/agents/*.md` · `.claude/policies/*.md` · `.claude/layers/*.md` · `.claude/operations/*.md` · `.claude/skills/*/SKILL.md` · `CLAUDE.md` (the full set is the Scope block below). Violations fail the voice pass of `python tools/lint.py meta`.
 
 ## Principle
 

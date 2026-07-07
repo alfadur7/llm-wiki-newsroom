@@ -33,7 +33,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))  # _ingest/ → tools/ root (shared modules)
 from _lib import (  # noqa: E402
     WIKI,
-    WIKILINK_RE,
+    WIKILINK_STEM_RE,
     strip_frontmatter,
     strip_code,
     strip_blockquotes,
@@ -77,23 +77,21 @@ def tiered_min_count(stem: str, base: int) -> int:
 
 
 def strip_wikilinks_keep_text(text: str) -> tuple[str, set[str]]:
-    """Replace `[[Stem]]` and `[[Stem|Display]]` with the Display text
-    (so we don't false-flag the visible Korean string as a missing link),
-    and return the set of stems that were already wikilinked."""
+    """Replace `[[Stem]]`, `[[Stem|Display]]` and anchored `[[Stem#Section]]`
+    links with the Display text (so we don't false-flag the visible Korean
+    string as a missing link), and return the set of bare stems that were
+    already wikilinked (anchor/alias stripped)."""
     linked: set[str] = set()
 
     def repl(m: re.Match) -> str:
-        full = m.group(0)
-        # split on | to keep Display text
-        body = full[2:-2]
-        if "|" in body:
-            target, display = body.split("|", 1)
-            linked.add(target.strip())
-            return display
-        linked.add(body.strip())
-        return ""  # drop the wikilink target text entirely
+        body = m.group(0)[2:-2]
+        # Bare stem = text before any #anchor or |alias. Register it as linked;
+        # keep only the |alias display text (drop the stem/anchor text entirely).
+        target = body.split("|", 1)[0].split("#", 1)[0]
+        linked.add(target.strip())
+        return body.split("|", 1)[1] if "|" in body else ""
 
-    new_text = WIKILINK_RE.sub(repl, text)
+    new_text = WIKILINK_STEM_RE.sub(repl, text)
     return new_text, linked
 
 
@@ -145,7 +143,10 @@ def _title_english_aliases(title: str, stem: str) -> list[str]:
     For ``title="Open Source AI"`` → ``["Open Source AI"]``.
     """
     clean = re.sub(r"\(.*?\)", "", title)
-    clean = re.split(r"\s*[—\-:·]\s*", clean)[0].strip()
+    # Split only on a *spaced* ASCII hyphen ("Title - Subtitle"), not a bare
+    # one, so hyphenated compounds ("Open-Weight Models") aren't truncated to
+    # their first token and lose their spaced alias.
+    clean = re.split(r"\s*[—:·]\s*|\s+-\s+", clean)[0].strip()
     if " " not in clean:                       # single token → stem pass covers it
         return []
     if not re.search(r"[A-Za-z]", clean) or KOREAN_CHAR_RE.search(clean):

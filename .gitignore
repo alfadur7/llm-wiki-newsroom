@@ -32,8 +32,12 @@ _site/
 tools/_categorize_raindrop.py
 tools/_raindrop_categories.json
 
-# Operator-internal self-improvement loop state (regenerated locally by mine_feedback.py)
+# Operator-internal self-improvement loop state — the defect-log corpus and the
+# review-cycle watermarks accumulate locally (and may carry operator working notes),
+# so they stay out of the public mirror. The regression_set.json canary IS committed.
 tools/_feedback-review.json
+tools/_failure-review.json
+tools/_defect-log.jsonl
 
 # Python bytecode cache
 __pycache__/

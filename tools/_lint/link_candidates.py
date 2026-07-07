@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from _lib import (  # noqa: E402
     read_text_cached,
     WIKI,
+    WIKI_SUBDIRS,
     WIKILINK_RE as LINK_RE,
     strip_code,
 )
@@ -38,8 +39,7 @@ def _index_pages() -> dict[str, Path]:
     for p in WIKI.glob("*.md"):
         if not p.name.startswith("_"):
             pages[p.stem] = p
-    for sub in ("entities", "concepts", "syntheses", "trails", "timelines",
-                "sources", "overviews", "contradictions"):
+    for sub in WIKI_SUBDIRS:
         d = WIKI / sub
         if not d.exists():
             continue

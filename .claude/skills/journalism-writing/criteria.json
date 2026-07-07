@@ -62,14 +62,14 @@
       "algorithm": "evaluate_contradiction_dialectic", "comparator": ">=", "default_threshold": 1,
       "legacy": {"contradiction-theme": "T4", "contradiction-aggregate": "T4"},
       "source": "Toulmin Argument — Purdue OWL", "source_url": "https://owl.purdue.edu/owl/general_writing/academic_writing/historical_perspectives_on_argumentation/toulmin_argument.html",
-      "note": "≥1 scope qualifier ('in the short term'·'on this metric'·'within N years', etc.) in the body. Every issue holds only conditionally (Toulmin Qualifier). For aggregate, limited to the Implications section. NOTE the qualifier matcher (QUALIFIER_PATTERNS) keys on Korean phrasings and is dormant on English prose — see checks.py FLAG."
+      "note": "≥1 scope qualifier ('in the short term'·'on this metric'·'within N years', etc.) in the body. Every issue holds only conditionally (Toulmin Qualifier). For aggregate, limited to the Implications section. NOTE QUALIFIER_PATTERNS includes English-native scope qualifiers ('in the short term'·'currently'·'as of YYYY', etc.); the Korean phrasings fire under WIKI_LANG=ko."
     },
     "jrn.thesis-antithesis": {
       "name": "Thesis-Antithesis clarity", "dimension": "Dialectic", "judge": "A",
       "algorithm": "evaluate_contradiction_dialectic", "comparator": ">=", "default_threshold": 2,
       "legacy": {"contradiction-theme": "D1"},
       "source": "Hegel's Dialectics — Stanford Encyclopedia of Philosophy", "source_url": "https://plato.stanford.edu/entries/hegel-dialectics/",
-      "note": "## Opposing Positions marks thesis/antithesis with **A Position**/**B Position** bold labels (≥2 label kinds). NOTE the label matcher (DIALECTIC_LABEL_RE) keys on the Korean subtitle words 입장/중재 and is dormant on English labels — see checks.py FLAG."
+      "note": "## Opposing Positions marks thesis/antithesis with **Position A**/**Position B** bold labels (≥2 label kinds). NOTE DIALECTIC_LABEL_RE matches the English '**Position A**' labels; the Korean subtitle forms (입장/중재) fire under WIKI_LANG=ko."
     },
     "jrn.c-section-size": {
       "name": "C-section size limit", "dimension": "Dialectic", "judge": "A",
@@ -83,7 +83,7 @@
       "algorithm": "evaluate_contradiction_dialectic", "comparator": "==", "default_threshold": 0,
       "legacy": {"contradiction-theme": "D6"},
       "source": "Hegel's Dialectics — Stanford Encyclopedia of Philosophy", "source_url": "https://plato.stanford.edu/entries/hegel-dialectics/",
-      "note": "The C label is allowed only when synthesis/mediating. If meta-critique keywords ('internal contradiction'·'both sides at once', etc.) appear, move the content to the Derived Tension section (0 violations). NOTE the keyword list (C_META_KEYWORDS) is Korean and dormant on English prose — see checks.py FLAG."
+      "note": "The C label is allowed only when synthesis/mediating. If meta-critique keywords ('internal contradiction'·'both sides at once', etc.) appear, move the content to the Derived Tension section (0 violations). NOTE C_META_KEYWORDS includes English-native keywords ('internal contradiction'·'both sides at once', etc.); the Korean forms fire under WIKI_LANG=ko."
     },
     "jrn.monitoring-balance": {
       "name": "Synthesis / monitoring balance", "dimension": "Dialectic", "judge": "M",

@@ -15,7 +15,9 @@ Usage:
     python tools/_ingest/prefilter_ingest.py raw/PDF --json
 
 Exit codes:
-    0  always (informational tool; never blocks). Stats go to stdout.
+    0  classification completed (dup counts never affect the exit code). Stats go to stdout.
+    1  _source_map.json missing (run `python tools/build.py index` first)
+    2  folder argument is not a directory
 
 Why URL-first: Obsidian Web Clipper re-scrapes the same URL into filename
 variants (typographic quote drift, parenthesis position changes). The
@@ -31,7 +33,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))  # _ingest/ → tools/ root (shared modules)
-from _lib import WIKI, canonicalize_url, normalize_quotes, parse_frontmatter  # noqa: E402
+from _lib import REPO_ROOT, WIKI, canonicalize_url, normalize_quotes, parse_frontmatter  # noqa: E402
 
 EXCLUDE_SEGMENT = "/Raindrop/"
 SCAN_EXTS = (".md", ".pdf")
@@ -85,7 +87,15 @@ def classify(folder: Path) -> dict:
         candidates.extend(folder.rglob(f"*{ext}"))
 
     for f in sorted(candidates):
-        rel = f.as_posix()
+        # by_path keys are repo-root-relative POSIX paths (built from
+        # source_file frontmatter), so normalize to that form — otherwise an
+        # absolute folder argument or a non-root cwd makes every by_path lookup
+        # miss and known path-dups get misreported as genuine new. Fall back to
+        # the raw posix path for anything outside the repo.
+        try:
+            rel = f.resolve().relative_to(REPO_ROOT).as_posix()
+        except ValueError:
+            rel = f.as_posix()
 
         if EXCLUDE_SEGMENT in rel:
             skipped_excluded.append(rel)

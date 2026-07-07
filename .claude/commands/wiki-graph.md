@@ -15,7 +15,7 @@ Outside the matrix — Meta layer (deterministic). The Editor-in-Chief calls `to
 
 ## Operation
 
-1. `python tools/build.py graph` — rebuild the graph only (`graph/_graph.json` + `graph/graph.html`). Does not trigger downstream phases.
+1. `python tools/build.py graph` — rebuild the graph only (`graph/_graph.json` only — `graph.html` is a committed static shell, see item 3). Does not trigger downstream phases.
 2. A full rebuild is `python tools/build.py` (auto-invoked by ingest and by lint --fix).
 3. `graph/graph.html` is a single committed Sigma.js v3 static shell — it loads `_graph.json`·`_clusters.json` (at init) + `_pages.json` (lazily on click) directly via `fetch()`. A rebuild only regenerates those JSON files (no separate JS wrapper or inline).
 4. After the build, `python tools/lint.py graph clusters` is recommended — checks for isolated hubs and unnamed groups.

@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import FRONTMATTER_BLOCK_RE, WIKI, parse_frontmatter  # noqa: E402
+from _lib import CLUSTERS_JSON, FRONTMATTER_BLOCK_RE, GRAPH_JSON, WIKI, fm_sources, parse_frontmatter  # noqa: E402
 
 ENTITIES_DIR = WIKI / "entities"
 CONCEPTS_DIR = WIKI / "concepts"
@@ -46,11 +46,10 @@ def load_graph() -> dict:
     global _GRAPH_CACHE
     if _GRAPH_CACHE is not None:
         return _GRAPH_CACHE
-    base = WIKI.parent / "graph"
     inbound: dict[str, list[str]] = {}
     node_cluster: dict[str, str] = {}
     try:
-        graph = json.loads((base / "_graph.json").read_text(encoding="utf-8"))
+        graph = json.loads(GRAPH_JSON.read_text(encoding="utf-8"))
         for edge in graph.get("edges", []):
             tgt, src = edge.get("to"), edge.get("from")
             if tgt and src:
@@ -58,7 +57,7 @@ def load_graph() -> dict:
     except (OSError, ValueError):
         pass
     try:
-        clusters = json.loads((base / "_clusters.json").read_text(encoding="utf-8"))
+        clusters = json.loads(CLUSTERS_JSON.read_text(encoding="utf-8"))
         node_cluster.update(clusters.get("hub_assignments", {}))
         for node, assign in clusters.get("source_assignments", {}).items():
             if isinstance(assign, dict) and assign.get("primary"):
@@ -91,8 +90,7 @@ def gate(content: str) -> str | None:
 
 
 def sources_count(content: str) -> int:
-    sources = parse_frontmatter(content).get("sources") or []
-    return len(sources) if isinstance(sources, list) else 0
+    return len(fm_sources(parse_frontmatter(content)))
 
 
 def kind(content: str) -> str | None:

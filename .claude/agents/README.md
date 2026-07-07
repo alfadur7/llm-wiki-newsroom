@@ -24,7 +24,7 @@ The project's essential design skeleton is a two-axis matrix of **content Layer 
 | L2-1 source | Reporter | Reporter | Copy Editor + Desk (sub-trigger) | Reporter |
 | L2-2 stub | Reporter | Reporter | Copy Editor + Desk | Reporter |
 | L2-2 full hub | Columnist | Columnist | Copy Editor + **Desk** | Columnist |
-| L2-2 timeline | Columnist | Columnist | Copy Editor + **Desk** | Columnist |
+| L2-2 timeline | Columnist | Columnist | Copy Editor + Desk | Columnist |
 | L2-3 cluster overview | Columnist | Columnist | Copy Editor + **Desk** | Columnist |
 | L2-3 theme contradiction | Columnist | Columnist | Copy Editor + **Desk** | Columnist |
 | L2-3 synthesis·trail | Columnist | Columnist | Copy Editor + Desk | Columnist |
@@ -110,7 +110,7 @@ Wiki content is the product of **dual automation** — humans do not type it dir
 | Layer | Role·tool | Function | Source of Truth | Escalation |
 |------|---------|------|----------------|------------|
 | **Deterministic automation** | `python tools/build.py` | Generates AUTO blocks (inside `<!-- AUTO:* BEGIN/END -->`) plus the `graph/_dependencies.json` cascade upstream index (the basis for uniform staleness). Deterministic over its inputs: entity·concept ranking, source lists, backlinks, per-page upstream, etc. | `graph/_clusters.json`·`_graph.json`·`_dependencies.json`·`wiki/_backlinks.json` | script bug → fix `tools/_build/*.py` |
-| **Probabilistic automation** | the 4 roles (Reporter·Columnist·Copy Editor·Desk) + Editor-in-Chief gate | Authors and reviews EDITOR blocks. Adherence to the Authoring Guide + self-verification of automated Rubric metrics + Desk qualitative review. Cycle stages are separated (GROUND·APPLY·ADAPT by Reporter·Columnist / quantitative VERIFY by Copy Editor / qualitative VERIFY by Desk) to avoid self-bias. | per-role capability·prompt: [`.claude/agents/`](./) · content standards·Rubric: [`.claude/layers/<source\|hub\|overview\|contradiction>.md`](../layers/) | persistent Rubric shortfall → the Guide·Rubric itself is re-reviewed by the human reviewer |
+| **Probabilistic automation** | the 4 roles (Reporter·Columnist·Copy Editor·Desk) + Editor-in-Chief gate | Authors and reviews EDITOR blocks. Adherence to the Authoring Guide + self-verification of automated Rubric metrics + Desk qualitative review. Cycle stages are separated (GROUND·APPLY·ADAPT by Reporter·Columnist / quantitative VERIFY by Copy Editor / qualitative VERIFY by Desk) to avoid self-bias. | per-role capability·prompt: [`.claude/agents/`](./) · content standards·Rubric: [`.claude/layers/<source\|hub\|overview\|contradiction\|synthesis\|trail\|timeline>.md`](../layers/) | persistent Rubric shortfall → the Guide·Rubric itself is re-reviewed by the human reviewer |
 | **Human reviewer** | the wiki operator | Direction-setting, Rubric·threshold·trade-off judgments, final acceptance. Detailed sentence-level proofreading is not the default job. | project memory·Plan files | top level |
 
 **Key implications**:
@@ -120,7 +120,7 @@ Wiki content is the product of **dual automation** — humans do not type it dir
 - **lint·Desk automated verification is the bridge**. Quantitative goes to the lint Rubric, qualitative to the Desk — the two mechanisms divide the labor and together form the self-bias-avoiding structure.
 - **Derived content is a single semi-automated contract**. Every derived type shares one skeleton of scaffolding → gap detection → rewrite-block → Verification Ladder, and the only per-type differences are the `role·lint group·roster·enforcement` parameters.
 
-**Scope**: Layer 2-2 full hub·timeline + Layer 2-3 cluster overview·theme contradiction·synthesis·trail + Layer 2-4 overview·contradiction. Layer 2-1 source and Layer 2-2 entity·concept stubs follow the same cycle, but Desk qualitative review is currently a held area for them (its introduction is to be decided after a separate PoC cycle).
+**Scope**: Layer 2-2 full hub·timeline + Layer 2-3 cluster overview·theme contradiction·synthesis·trail + Layer 2-4 overview·contradiction. Layer 2-1 source and Layer 2-2 entity·concept stubs follow the same cycle, including Desk qualitative review — unconditional for stubs (format·attribution·narrative tone), sub-trigger for L2-1 source (Verification Ladder above).
 
 ## Execution Mechanism (mechanism-invariant)
 
@@ -133,7 +133,7 @@ The matrix and ADAPT chain above are independent of the execution mechanism — 
 
 **Fallback triggers** (automatic switch — any one of): teammate spawn fails · `SendMessage` fails to resolve · the Teams tools (`TeamCreate`/`SendMessage`) are not loaded. If an infrastructure gate blocks Teams from coming up, the same chain runs as single-session sub-Agents unchanged (identical content quality — only the token savings from the author keeping context are not realized).
 
-In either the default or the fallback, the 4 principles in § Change Procedure (one author · reviewer reads the shared FS directly · `subagent_type` boundary · Editor-in-Chief ADAPT counter) are preserved identically. Desk VERIFY₂ is non-waivable under any mechanism — self-preference bias exists independent of mechanism, so an independent qualitative review is mandatory.
+In either the default or the fallback, the 4 principles in § Change Procedure (one author · reviewer reads the shared FS directly · `subagent_type` boundary · Editor-in-Chief ADAPT counter) are preserved identically. For the cells the desk.md matrix marks mandatory, Desk VERIFY₂ is non-waivable under any mechanism — self-preference bias exists independent of mechanism, so an independent qualitative review is mandatory.
 
 **Team lifecycle** (5 roles fixed): the team is **created once per session and reused** — do not repeat `TeamCreate`/`TeamDelete` for every task within a session. The team name (`wiki-newsroom`) and description are fixed values. **Role identity is determined by `subagent_type`**, and the **specific mission is briefed via `SendMessage`** (include the change SoT in GROUND) — do not bake the task into the spawn prompt. config.json is a session runtime product, so **do not reuse it across sessions or pre-populate members** (a member that no longer exists leaves a stale entry that blocks `TeamDelete` and causes name collisions) — a new session does a fresh `TeamCreate`. **Per-member decision**: **reusing an idle member is the default** (re-brief via `SendMessage`). **A new spawn** is limited to ① **parallel processing** of independent units, ② **independent qualitative review** that needs fresh eyes (to avoid self-bias·anchoring), and ③ **refresh** (accumulated context bloat·changed role guidance). A temporary parallel member whose role is done is cleaned up via **shutdown** to clear overhead. `TeamDelete` runs once, at session end.
 

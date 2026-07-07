@@ -47,12 +47,12 @@ from datetime import date, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import parse_frontmatter, WIKILINK_RE, WIKI, GRAPH  # noqa: E402
+from _lib import parse_frontmatter, read_text_cached, WIKILINK_RE, WIKI, CLUSTERS_JSON, GRAPH_JSON, HUB_PREFIXES, fm_sources  # noqa: E402
 
-GRAPH_PATH = GRAPH / "_graph.json"
-CLUSTERS_PATH = GRAPH / "_clusters.json"
-BACKLINKS_PATH = WIKI / "_backlinks.json"
+GRAPH_PATH = GRAPH_JSON
+CLUSTERS_PATH = CLUSTERS_JSON
 THEMES_PATH = WIKI / "contradictions/_contradictions_themes.json"
+CLAIMS_PATH = WIKI / "contradictions/_contradictions.json"
 THEMES_DIR = WIKI / "contradictions"
 HUB_DIRS = [WIKI / "entities", WIKI / "concepts"]
 SYNTHESES_DIR = WIKI / "syntheses"
@@ -95,7 +95,7 @@ TIMELINE_MIN_SECTION_EVENTS = 18     # year (20YY) mentions ≥ N inside the hub
 # body (accumulated dated events) matured enough to split into its own page? All 8
 # existing timelines were split off from a hub that carried this section. No cluster
 # allowlist needed (reads the hub's own structure, so it's robust to reorg).
-TIMELINE_SECTION_RE = re.compile(r"^##\s*.*(Timeline|시간축|연대기|타임라인)", re.MULTILINE)
+TIMELINE_SECTION_RE = re.compile(r"^##[^#\n]*(Timeline|시간축|연대기|타임라인)", re.MULTILINE)
 _YEAR_RE = re.compile(r"20\d{2}")
 
 
@@ -105,7 +105,7 @@ def _timeline_section_events(node_id: str) -> int:
     runs from its heading to the next `## ` heading (or EOF)."""
     p = WIKI / node_id
     try:
-        body = p.read_text(encoding="utf-8")
+        body = read_text_cached(p)
     except OSError:
         return 0
     m = TIMELINE_SECTION_RE.search(body)
@@ -138,15 +138,12 @@ def _load_hub_frontmatter() -> dict[str, dict]:
             continue
         for p in d.glob("*.md"):
             try:
-                fm = parse_frontmatter(p.read_text(encoding="utf-8"))
+                fm = parse_frontmatter(read_text_cached(p))
             except Exception:
                 continue
             hub_id = f"{d.name}/{p.name}"
-            srcs = fm.get("sources") or []
-            if isinstance(srcs, str):  # scalar `sources: x` → list (count elements, not chars)
-                srcs = [s.strip() for s in srcs.strip("[]").split(",") if s.strip()]
             out[hub_id] = {
-                "sources": srcs,
+                "sources": fm_sources(fm),
                 "last_updated": _parse_iso_date(fm.get("last_updated")),
                 "title": fm.get("title") or p.stem,
             }
@@ -159,7 +156,6 @@ def _build_hub_subgraph(graph: dict, clusters: dict) -> tuple[dict[str, set[str]
     Returns `(neighbors_by_hub, hub_to_cluster)`. Mirrors the hub subgraph
     construction in `_discover/surprising.compute()` so degree thresholds
     use the same denominator the operator already sees in `--surprising`."""
-    HUB_PREFIXES = ("entities/", "concepts/")
     hub_ids = {n["id"] for n in graph["nodes"] if n["id"].startswith(HUB_PREFIXES)}
     nbrs: dict[str, set[str]] = defaultdict(set)
     for e in graph["edges"]:
@@ -329,10 +325,28 @@ def detect_contradiction(themes_data: dict) -> dict:
 
     today = _today()
     themes = themes_data.get("themes", {})
+    # cap-theme counts `type: "real"` claims only (gap-detection-rollout.md:
+    # real_claim_count ≥ 30 — unlike the Track D synthesis floor, which uses the
+    # total claim_ids count). _contradictions.json is a top-level array of claim
+    # records carrying `id` + `type`. Unknown ids (or a missing/corrupt claims
+    # file) default to "real" so the signal degrades to the raw count instead of
+    # silently disabling cap-theme.
+    claim_type: dict[str, str] = {}
+    try:
+        claim_type = {
+            c.get("id"): c.get("type")
+            for c in json.loads(read_text_cached(CLAIMS_PATH))
+            if isinstance(c, dict)
+        }
+    except (OSError, ValueError):
+        pass
     # The same source recurs in the `sources:` of multiple themes — cache scoped to one call.
     _src_lu_cache: dict[str, object] = {}
     for slug, td in themes.items():
-        claim_count = len(td.get("claim_ids", []))
+        claim_count = sum(
+            1 for cid in td.get("claim_ids", [])
+            if claim_type.get(cid, "real") == "real"
+        )
         if claim_count >= CAP_THEME_CLAIM_FLOOR and slug not in CAP_THEME_EXEMPT_SLUGS:
             cap.append({
                 "slug": slug,
@@ -346,7 +360,7 @@ def detect_contradiction(themes_data: dict) -> dict:
         if not theme_md.exists():
             continue
         try:
-            fm = parse_frontmatter(theme_md.read_text(encoding="utf-8"))
+            fm = parse_frontmatter(read_text_cached(theme_md))
         except Exception:
             continue
         theme_lu = _parse_iso_date(fm.get("last_updated"))
@@ -359,14 +373,19 @@ def detect_contradiction(themes_data: dict) -> dict:
             if src_path in _src_lu_cache:
                 d = _src_lu_cache[src_path]
             else:
-                p = Path(src_path)
+                # Theme `sources:` frontmatter holds bare source slugs —
+                # wiki/sources/<slug>.md, same convention as
+                # _build/contradictions.py. Keep path forms as fallback.
+                p = WIKI / "sources" / f"{src_path}.md"
+                if not p.exists():
+                    p = Path(src_path)
                 if not p.exists():
                     p = WIKI / src_path
                 d = None
                 if p.exists():
                     try:
-                        src_fm = parse_frontmatter(p.read_text(encoding="utf-8"))
-                        d = _parse_iso_date(src_fm.get("last_updated") or src_fm.get("date"))
+                        src_fm = parse_frontmatter(read_text_cached(p))
+                        d = _parse_iso_date(src_fm.get("last_updated"))
                     except (OSError, ValueError):
                         pass
                 _src_lu_cache[src_path] = d
@@ -396,7 +415,7 @@ def _referenced_stems(dir_path: Path) -> set[str]:
         if fp.name.startswith("_"):
             continue
         try:
-            text = fp.read_text(encoding="utf-8")
+            text = read_text_cached(fp)
         except Exception:
             continue
         for m in WIKILINK_RE.finditer(text):
@@ -530,8 +549,14 @@ def run(*, json_out: bool = False,
     if THEMES_PATH.exists():
         try:
             themes_data = json.loads(THEMES_PATH.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            themes_data = {}
+        except json.JSONDecodeError as e:
+            # A corrupt SoT must not read as "no gaps": warn, and hard-fail when
+            # the caller explicitly asked for a themes-backed bucket. A *missing*
+            # file stays a legitimate pre-contradiction-cycle empty state.
+            print(f"WARN: {THEMES_PATH} is not valid JSON ({e}) — "
+                  f"Track C / synthesis skipped.", file=sys.stderr)
+            if gap_type in TRACK_C_SLUGS or gap_type == "synthesis":
+                return 1
 
     track_c: dict = {}
     if themes_data and (gap_type is None or gap_type in TRACK_C_SLUGS):

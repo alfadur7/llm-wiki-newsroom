@@ -27,12 +27,11 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))  # _ingest/ → tools/ root
-from _lib import WIKI, parse_frontmatter  # noqa: E402
+from _lib import WIKI, WIKILINK_STEM_RE, parse_frontmatter  # noqa: E402
 
 SOURCES = WIKI / "sources"
-# `## Connections` block wikilink targets, excluding source↔source links (lowercase
+# `## Connections` block wikilink targets exclude source↔source links (lowercase
 # kebab slugs like `nirs-innovation-isp`) — those aren't thematic tags.
-CONN_LINK_RE = re.compile(r"\[\[([^\]|#]+)")
 SOURCE_SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)+$")
 
 
@@ -41,7 +40,7 @@ def _connection_hubs(content: str) -> list[str]:
     m = re.search(r"^## Connections\s*$(.*?)(?=^## |\Z)", content, re.M | re.S)
     block = m.group(1) if m else ""
     out: list[str] = []
-    for name in CONN_LINK_RE.findall(block):
+    for name in WIKILINK_STEM_RE.findall(block):
         name = name.strip()
         if not name or name == "index":
             continue
@@ -61,7 +60,7 @@ def _suggest(path: Path) -> dict:
     content = path.read_text(encoding="utf-8", errors="replace")
     fm = parse_frontmatter(content)
     raw_title = fm.get("title", "")
-    title = raw_title.strip().strip('"') if isinstance(raw_title, str) else ""
+    title = raw_title.strip() if isinstance(raw_title, str) else ""
     return {
         "slug": path.name[:-3],
         "title": title,

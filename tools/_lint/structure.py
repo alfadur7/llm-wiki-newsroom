@@ -17,7 +17,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, MARKUP_LEAK_RE, WIKILINK_TARGET_RE as LINK_RE, korean_mode, parse_frontmatter, read_text_cached, real_source_files, strip_code  # noqa: E402
+from _lib import WIKI, WIKI_SUBDIRS, MARKUP_LEAK_RE, WIKILINK_TARGET_RE as LINK_RE, atomic_write_text, korean_mode, parse_frontmatter, read_text_cached, real_source_files, strip_code  # noqa: E402
 
 HEADING_RE = re.compile(r"^#{1,6}\s+(.+?)\s*$")
 
@@ -78,19 +78,17 @@ def _extract_title_alias(hub_path: Path) -> str | None:
 
     Cleanup rules:
       - Strip parenthetical annotations: "시트릭스(Citrix)" → "시트릭스"
-      - Strip quotes
       - Return None if empty after cleanup, or identical to the stem,
         or shorter than 2 chars
       - Return None when the alias is purely Latin (stem already covers it)
     """
     try:
-        head = read_text_cached(hub_path)[:400]
+        val = parse_frontmatter(read_text_cached(hub_path)).get("title")
     except OSError:
         return None
-    m = re.search(r'^title:\s*"?([^"\n]+?)"?\s*$', head, re.MULTILINE)
-    if not m:
+    if not isinstance(val, str):
         return None
-    title = m.group(1).strip()
+    title = val.strip()
     # Remove parenthetical content (Latin/Korean both handled).
     title = re.sub(r"\s*[\(（][^\)）]*[\)）]\s*", " ", title).strip()
     if not title or len(title) < 2:
@@ -150,7 +148,6 @@ def _reconnect_orphan_hubs(orphan_stems: list[str], fix: bool) -> dict[str, list
 
     for hub_stem in orphan_stems:
         has_hangul = bool(re.search(r"[가-힣]", hub_stem))
-        has_latin = bool(re.search(r"[a-zA-Z]", hub_stem))
         # Ambiguity guard: Korean 2-char names (e.g. 안랩·KT계열) are common
         # organization tokens, so allow length ≥2 when Hangul is present.
         # Latin stems stay at ≥3 to avoid catching acronyms like "SK"/"AI".
@@ -178,7 +175,9 @@ def _reconnect_orphan_hubs(orphan_stems: list[str], fix: bool) -> dict[str, list
         # — elsewhere-linked cases must still be re-added there so the
         # downstream orphans --fix step can populate the hub's `sources:`
         # frontmatter. (orphans --fix only scans `## Connections`.)
-        conn_re = re.compile(r"^## Connections\n(.*?)(?=^## |\Z)", re.MULTILINE | re.DOTALL)
+        # Heading pattern must stay in sync with the insertion locator below
+        # ([ \t]*\n in both) — a mismatch breaks --fix idempotency.
+        conn_re = re.compile(r"^## Connections[ \t]*\n(.*?)(?=^## |\Z)", re.MULTILINE | re.DOTALL)
         hits: list[tuple[str, bool]] = []  # (src_stem, use_alias_form)
         for src_stem, content in src_cache.items():
             conn_match = conn_re.search(content)
@@ -221,7 +220,7 @@ def _reconnect_orphan_hubs(orphan_stems: list[str], fix: bool) -> dict[str, list
             )
             new_line = f"- references: {link_text} — auto-linked based on body mention"
             content = src_cache[src_stem]
-            conn_match = re.search(r"(^## Connections\s*\n)", content, re.MULTILINE)
+            conn_match = re.search(r"(^## Connections[ \t]*\n)", content, re.MULTILINE)
             if conn_match:
                 start = conn_match.end()
                 next_h2 = re.search(r"^## ", content[start:], re.MULTILINE)
@@ -233,7 +232,7 @@ def _reconnect_orphan_hubs(orphan_stems: list[str], fix: bool) -> dict[str, list
                 # No `## Connections` section — append at end of file.
                 insertion = f"\n## Connections\n{new_line}\n\n"
                 new_content = content.rstrip() + "\n" + insertion
-            source_files[src_stem].write_text(new_content, encoding="utf-8")
+            atomic_write_text(source_files[src_stem], new_content)
             src_cache[src_stem] = new_content
 
     return results
@@ -247,7 +246,7 @@ def run(fix: bool = False) -> int:
             continue
         all_pages[p.stem] = p
 
-    for subdir in ("entities", "concepts", "syntheses", "trails", "timelines", "sources", "overviews", "contradictions"):
+    for subdir in WIKI_SUBDIRS:
         d = WIKI / subdir
         if not d.exists():
             continue

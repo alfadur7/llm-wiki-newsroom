@@ -6,9 +6,9 @@ while non-nodes (synthesis / contradiction theme / other briefings) are replaced
 alias. Node detection is done via a `graph/_pages.json::idmap` (slug stem → node id) lookup — only
 substance nodes appear in idmap, so a `.get(slug)` of None means it is not a node.
 
-The deep-link base/key encoding matches `tools/export.py` `_rewrite_links` (Korean raw, only spaces,
-parentheses, and `%` encoded). The base/slug constants are imported from _lib to avoid import side
-effects, and the env var `BRIEFING_GRAPH_BASE`, if set, takes precedence.
+The deep-link base/key encoding is shared with `tools/export.py` via `_lib.graph_deeplink_base` /
+`_lib.deeplink_key` (Korean raw, only spaces, parentheses, and `%` encoded), so the two channels
+cannot drift. The env var `BRIEFING_GRAPH_BASE`, if set, takes precedence over the base.
 """
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # _briefing/ → tools/
-from _lib import BASE_URL, GRAPH, REPO_ROOT, STANDALONE_SLUG, parse_frontmatter, strip_frontmatter  # noqa: E402
+from _lib import GRAPH, REPO_ROOT, deeplink_key, graph_deeplink_base, parse_frontmatter, strip_frontmatter  # noqa: E402
 
 import mistune  # noqa: E402
 
@@ -45,23 +45,14 @@ def load_idmap() -> dict:
 def graph_base() -> str:
     """Return the deep-link base (`<BASE_URL>/<STANDALONE_SLUG>`). '' if the graph is private.
 
-    Priority: env `BRIEFING_GRAPH_BASE` → the `_lib` deployment constants (shared with
+    Priority: env `BRIEFING_GRAPH_BASE` → `_lib.graph_deeplink_base()` (shared with
     export.py — the older approach of regex-extracting from the export.py source was a
     coupling that silently produced empty links whenever the quote style changed, so it
     was reduced to a plain import)."""
     env = os.environ.get("BRIEFING_GRAPH_BASE", "").strip()
     if env:
         return env.rstrip("/")
-    if BASE_URL and STANDALONE_SLUG:
-        return f"{BASE_URL.rstrip('/')}/{STANDALONE_SLUG}"
-    return ""
-
-
-def _deeplink_key(stem: str) -> str:
-    """Same encoding as export.py `_rewrite_links` — Korean raw, only spaces, parentheses, and `%`."""
-    return (
-        stem.replace("%", "%25").replace(" ", "%20").replace("(", "%28").replace(")", "%29")
-    )
+    return graph_deeplink_base()
 
 
 def _convert_wikilinks(body: str, idmap: dict, base: str) -> str:
@@ -72,7 +63,7 @@ def _convert_wikilinks(body: str, idmap: dict, base: str) -> str:
         slug = m.group(1).strip()
         alias = (m.group(2) or slug).strip()
         if base and idmap.get(slug):
-            return f"[{alias}]({base}#q={_deeplink_key(slug)})"
+            return f"[{alias}]({base}#q={deeplink_key(slug)})"
         return alias
 
     return _WIKILINK_RE.sub(repl, body)
@@ -107,7 +98,7 @@ def render(md_text: str) -> dict:
     subject = fm.get("title") if isinstance(fm.get("title"), str) else ""
     if not subject:
         h1 = re.search(r"^#\s+(.+)$", body, re.M)
-        subject = h1.group(1).strip() if h1 else "Weekly IT / Finance / AI Briefing"
+        subject = h1.group(1).strip() if h1 else "Weekly Wiki Briefing"
 
     idmap = load_idmap()
     base = graph_base()

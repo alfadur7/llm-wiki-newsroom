@@ -28,6 +28,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from _lib import (  # noqa: E402
+    CLUSTER_LABELS_JSON,
+    CLUSTERS_JSON,
+    GRAPH_JSON,
+    HUB_PREFIXES,
     WIKI,
     _build_id_map,
     atomic_write_if_changed,
@@ -36,13 +40,14 @@ from _lib import (  # noqa: E402
     parse_frontmatter,
     parse_page_meta,
     read_source_date,
+    real_source_files,
     safe_link_text,
     update_auto_block,
 )
 
-GRAPH_PATH = Path("graph/_graph.json")
-LABELS_PATH = Path("graph/cluster_labels.json")
-OUTPUT_PATH = Path("graph/_clusters.json")
+GRAPH_PATH = GRAPH_JSON
+LABELS_PATH = CLUSTER_LABELS_JSON
+OUTPUT_PATH = CLUSTERS_JSON
 
 RESOLUTION = 1.0  # Leiden RB-Configuration resolution (Louvain-equivalent default).
                   # Migrated from NetworkX Louvain to leidenalg/python-igraph
@@ -56,7 +61,6 @@ RESOLUTION = 1.0  # Leiden RB-Configuration resolution (Louvain-equivalent defau
                   # graph mutation while remaining deterministic for a
                   # fixed seed. Resolution semantics match Louvain.
 SEED = 42
-HUB_PREFIXES = ("entities/", "concepts/")
 SOURCE_WEIGHT_THRESHOLD = 0.3  # sources list under every cluster with weight >= this
 COHERENCE_THRESHOLD = 0.25      # top tag share required for "single"-tag coherence
                                 # (wiki tag vocabulary is deliberately broad;
@@ -326,6 +330,25 @@ def _auto_label(top_tags: list[tuple[str, int]], members: list[str], existing_sl
     return {"slug": candidate, "name": base, "matched_label_slug": None, "containment": None, "anchor_hits": 0}
 
 
+def to_igraph(G_nx):
+    """NetworkX weighted graph → igraph mirror, vertex order = sorted node ids.
+
+    Single definition of the vertex assignment shared by `_run_leiden` and the
+    warm-membership indexing in `_lint/cluster_drift` — the membership lists
+    are positional, so both sides must agree on vertex order and weights.
+    """
+    import igraph as ig
+
+    nodes = sorted(G_nx.nodes())
+    node_idx = {n: i for i, n in enumerate(nodes)}
+    edges = [(node_idx[u], node_idx[v]) for u, v in G_nx.edges()]
+    weights = [G_nx[u][v].get("weight", 1.0) for u, v in G_nx.edges()]
+
+    g_ig = ig.Graph(n=len(nodes), edges=edges, edge_attrs={"weight": weights})
+    g_ig.vs["name"] = nodes
+    return g_ig
+
+
 def _run_leiden(
     G_nx, resolution: float, seed: int,
     initial_membership: list[int] | None = None,
@@ -348,16 +371,9 @@ def _run_leiden(
     (alphabetical sort key change → vertex index reshuffle → cold-start
     Leiden lands at a different local optimum). Pass None for cold start.
     """
-    import igraph as ig
     import leidenalg
 
-    nodes = sorted(G_nx.nodes())
-    node_idx = {n: i for i, n in enumerate(nodes)}
-    edges = [(node_idx[u], node_idx[v]) for u, v in G_nx.edges()]
-    weights = [G_nx[u][v].get("weight", 1.0) for u, v in G_nx.edges()]
-
-    g_ig = ig.Graph(n=len(nodes), edges=edges, edge_attrs={"weight": weights})
-    g_ig.vs["name"] = nodes
+    g_ig = to_igraph(G_nx)
 
     kwargs = {
         "weights": "weight",
@@ -622,12 +638,8 @@ def _load_clusters_data() -> dict:
 def _scan_sources() -> list[tuple]:
     """Return list of (title, rel_path, desc, source_file, date, source_url) for wiki/sources/*.md."""
     out: list[tuple] = []
-    if not SOURCES_DIR.exists():
-        return out
-    for f in sorted(os.listdir(SOURCES_DIR)):
-        if not f.endswith(".md") or f.startswith("_catalog"):
-            continue
-        fp = SOURCES_DIR / f
+    for fp in real_source_files():
+        f = fp.name
         content = fp.read_text(encoding="utf-8", errors="replace")
         title, page_type, description, source_file, date, source_url = parse_page_meta(content, f)
         out.append((title, f"sources/{f}", description, source_file, date, source_url))
@@ -852,7 +864,13 @@ def _render_sources_block(cluster: dict, clusters_data: dict, top_n: int = 15) -
 
 
 def _skeleton_overview(cluster: dict) -> str:
-    """New-file template for wiki/overviews/<slug>.md (when missing)."""
+    """New-file template for wiki/overviews/<slug>.md (when missing).
+
+    Kept byte-identical to `_lint/overview.py:_skeleton_overview` — the lint's
+    MD↔JSON sync owns skeleton creation (wiki-lint.md), and its
+    OVERVIEW_REQUIRED_SECTIONS schema check fails any skeleton missing
+    `## Recent Changes` / `## Adjacent Domains & Scope`.
+    """
     today = _date.today().isoformat()
     return (
         f"---\n"
@@ -865,13 +883,18 @@ def _skeleton_overview(cluster: dict) -> str:
         f"---\n\n"
         f"# {cluster['name']}\n\n"
         f"## Overview\n\n"
-        f"_TODO: 2–4 paragraphs on what this field is, why it matters, and the scope accumulated in the wiki._\n\n"
+        f"_TODO: What this domain is and why it matters, plus the scope accumulated in the wiki, in 2–4 paragraphs._\n\n"
+        f"## Recent Changes\n\n"
+        f"_TODO: New events from the past ~3 months as 3–5 bullets with explicit dates (YYYY-MM[-DD]), in reverse chronological order (newest on top). "
+        f"This is the timeliness channel surfaced from the evergreen body — one line per bullet, one wikilink to a key hub._\n\n"
         f"## Key Entities & Concepts\n\n"
-        f"_TODO: Summarize the top members from the AUTO:MEMBERS block along with their roles and positions._\n\n"
+        f"_TODO: Reference the top members in the AUTO:MEMBERS block and describe them with a summary of their role·position._\n\n"
         f"## Subtopics\n\n"
-        f"_TODO: 2–4 sentences of commentary per subtopic + [[wikilinks]]._\n\n"
+        f"_TODO: A 2–4 sentence explanation per subtopic + [[wikilink]]._\n\n"
         f"## Key Trends & Figures\n\n"
-        f"_TODO: Major events, figures, and recent examples._\n\n"
+        f"_TODO: Major events·figures·recent examples._\n\n"
+        f"## Adjacent Domains & Scope\n\n"
+        f"_TODO: Reference adjacent cluster overviews as [[<slug>|<cluster name>]] (a display-name alias is required — CLAUDE.md 'Cluster slug alias') + a one-line description of each boundary (2–4 bullets)._\n\n"
         f"<!-- AUTO:MEMBERS BEGIN -->\n"
         f"<!-- AUTO:MEMBERS END -->\n\n"
         f"<!-- AUTO:SOURCES BEGIN -->\n"

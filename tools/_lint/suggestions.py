@@ -35,6 +35,11 @@ def run(*, json_out: bool = False,
         top: int | None = None) -> int:
     if json_out:
         cc_results = link_candidates._find(min_seeds=min_seeds)
+        if top is not None:
+            # --top caps results per signal (lint.py help) — text_candidates
+            # below already honors it; without this slice the JSON doc emitted
+            # the full uncapped link_candidates list.
+            cc_results = cc_results[:top]
         cc_payload = {"min_seeds": min_seeds, "results": cc_results}
         tc_payload, _ = text_candidates._candidates(
             min_mentions=min_mentions,

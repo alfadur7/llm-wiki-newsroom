@@ -39,14 +39,14 @@ from _net import (  # noqa: E402
     CurlUnavailable,
     UnsafeURLError,
 )
-from _lib import korean_mode  # noqa: E402
+from _lib import (  # noqa: E402
+    korean_mode,
+    REPO_ROOT as _REPO_ROOT,
+    atomic_write_bytes,
+    atomic_write_text,
+)
 
 # Browser-like headers to bypass simple bot detection
-# tools/_ingest/ → repo root. Removes the cwd dependence of save_*'s default
-# output path — files land in the raw/ tree even when run from outside the repo
-# (fetch_inbox holds the rel normalization).
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -506,6 +506,54 @@ def fetch_pdf(url: str, timeout: int = 30) -> tuple[bytes, str]:
     return body, title
 
 
+def sniff_and_save_pdf(
+    url: str,
+    timeout: int = 15,
+    dedup_check: Callable[[str], str | None] | None = None,
+) -> tuple | None:
+    """PDF-via-redirect detection — streaming GET to sniff the final Content-Type.
+
+    Some sites issue HTTP redirects from an apparently-HTML URL to a PDF binary;
+    those are routed into the PDF saver here. Single definition shared by
+    `main()` and `fetch_inbox.fetch_one` (the sniff + WAF fall-through used to
+    be copy-pasted between them). `with` releases the connection (and chained
+    session) on every exit path — PDF return, exception, or HTML fall-through —
+    and closes before the caller's fetch_html re-fetches.
+
+    `dedup_check` (optional) receives the redirect-resolved final URL *before*
+    the body downloads and returns an existing source slug or None.
+
+    Returns:
+      None                       — not a PDF, or a WAF block prevented sniffing
+                                   (caller proceeds to fetch_html, which retries
+                                   blocked statuses via curl / Wayback)
+      ("duplicate", slug)        — dedup_check matched; nothing downloaded
+      ("saved", pdf_path, title, n_bytes, final_url)
+
+    Non-blocked HTTPError propagates.
+    """
+    try:
+        with safe_get_stream(url, headers=HEADERS, timeout=timeout) as r:
+            r.raise_for_status()
+            ctype = r.headers.get("Content-Type", "")
+            if is_pdf_url(r.url, ctype):
+                if dedup_check is not None:
+                    dup = dedup_check(r.url)
+                    if dup:
+                        return ("duplicate", dup)
+                body = _stream_pdf_body(r)
+                title = _pdf_title_from_response(r)
+                pdf_path = save_pdf(r.url, body, title)
+                return ("saved", pdf_path, title, len(body), r.url)
+    except requests.exceptions.HTTPError as e:
+        # A WAF block on the PDF-sniff GET means we cannot sniff — fall
+        # through to fetch_html, which retries via curl / Wayback.
+        status = e.response.status_code if e.response is not None else None
+        if status not in BLOCKED_STATUSES:
+            raise
+    return None
+
+
 def save_pdf(url: str, body: bytes, title: str,
              output_dir: Path = _REPO_ROOT / "raw" / "PDF") -> Path:
     """Save the PDF binary only, under raw/PDF/<slug>.pdf.
@@ -522,7 +570,7 @@ def save_pdf(url: str, body: bytes, title: str,
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     pdf_path = _resolve_unique_path(title, url, output_dir, "pdf", "document")
-    pdf_path.write_bytes(body)
+    atomic_write_bytes(pdf_path, body)
     return pdf_path
 
 
@@ -564,7 +612,7 @@ description: "{_yaml_safe_string(description)}"
 
 {content}
 """
-    fpath.write_text(frontmatter, encoding="utf-8")
+    atomic_write_text(fpath, frontmatter)
     return fpath
 
 
@@ -595,35 +643,20 @@ def main():
         except requests.exceptions.RequestException as e:
             print(f"PDF fetch failed: {e}")
             sys.exit(2)
+        except ValueError as e:  # PDF_MAX_BYTES cap (UnsafeURLError already caught above)
+            print(f"PDF fetch failed: {e}")
+            sys.exit(2)
         pdf_path = save_pdf(url, body, title)
         _report_pdf(pdf_path, len(body), title, url)
         return
 
     try:
-        # PDF redirect detection — streaming HEAD-equivalent first to sniff
-        # the final Content-Type. Some sites issue HTTP redirects from an
-        # apparently-HTML URL to a PDF binary; we want to route those into
-        # the PDF saver too.
-        # `with` releases the connection (and chained session) on every exit
-        # path — PDF return, exception, or HTML fall-through — and closes
-        # before fetch_html re-fetches.
-        try:
-            with safe_get_stream(url, headers=HEADERS, timeout=15) as r:
-                r.raise_for_status()
-                ctype = r.headers.get("Content-Type", "")
-                if is_pdf_url(r.url, ctype):
-                    body = _stream_pdf_body(r)
-                    title = _pdf_title_from_response(r)
-                    pdf_path = save_pdf(r.url, body, title)
-                    print("(detected PDF via Content-Type after redirect)")
-                    _report_pdf(pdf_path, len(body), title, r.url)
-                    return
-        except requests.exceptions.HTTPError as e:
-            # A WAF block on the PDF-sniff GET means we cannot sniff — fall
-            # through to fetch_html, which retries via curl / Wayback.
-            status = e.response.status_code if e.response is not None else None
-            if status not in BLOCKED_STATUSES:
-                raise
+        sniffed = sniff_and_save_pdf(url, timeout=15)
+        if sniffed is not None:
+            _tag, pdf_path, title, n_bytes, final_url = sniffed
+            print("(detected PDF via Content-Type after redirect)")
+            _report_pdf(pdf_path, n_bytes, title, final_url)
+            return
 
         final_url, title, description, content = fetch_html(url, timeout=15)
         if final_url != url:
@@ -636,6 +669,9 @@ def main():
         sys.exit(2)
     except requests.exceptions.RequestException as e:
         print(f"Request failed: {e}")
+        sys.exit(2)
+    except ValueError as e:  # PDF_MAX_BYTES cap in sniff_and_save_pdf
+        print(f"PDF fetch failed: {e}")
         sys.exit(2)
 
     if not content or len(content) < 100:

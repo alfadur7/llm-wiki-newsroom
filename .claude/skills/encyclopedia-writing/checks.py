@@ -75,18 +75,17 @@ _ABBR_ALLOWLIST = {
     "AI", "API", "GPU", "CPU", "RAM", "SSD", "HDD", "LLM", "ML", "DC",
     "IT", "AX", "DX", "CX", "ROI", "KPI", "RTO", "RPO", "DR", "BCP",
     "VPN", "SSL", "TLS", "URL", "HTTP", "HTTPS", "JSON", "YAML", "XML",
-    "CSV", "PDF", "HTML", "CSS", "SaaS", "PaaS", "IaaS", "BaaS",
+    "CSV", "PDF", "HTML", "CSS",
     "ESG", "IPO", "CEO", "CTO", "CIO", "CFO", "COO",
-    "RAG", "NPU", "DPU", "SoC",
+    "RAG", "NPU", "DPU",
     "OS", "OT", "EU", "UK", "US", "KR", "JP", "CN", "UAE",
     "HBM", "DDR", "TSMC",
     "USD", "EUR", "JPY", "KRW", "CBDC", "USDC", "USDT",
-    "SDK", "IDE", "CLI", "GUI", "UI", "UX", "OAuth", "IAM",
-    "MVP", "POC", "PoC", "QA", "RnD",
-    "APT", "DDoS", "MFA", "ZTNA", "SASE", "SIEM", "SOC", "SOAR",
+    "SDK", "IDE", "CLI", "GUI", "UI", "UX", "IAM",
+    "MVP", "POC", "QA",
+    "APT", "MFA", "ZTNA", "SASE", "SIEM", "SOC", "SOAR",
     "EDR", "NDR", "XDR", "EPP", "CNAPP", "CSPM", "CWPP", "CIEM",
     "PPA", "SMR",
-    "K-AI", "K-IT", "K-DT",
 }
 
 
@@ -98,9 +97,9 @@ def find_abbr_violations(content: str) -> list:
     # appear as [[wikilink]]s). Exclude the frontmatter from glossing (same pattern
     # as _s6_long_sentences, content-type-agnostic).
     if content.startswith("---"):
-        fm_end = content.find("---", 3)
+        fm_end = content.find("\n---", 4)
         if fm_end > 0:
-            content = content[fm_end + 3:]
+            content = content[fm_end + 4:]
     clean = re.sub(r"\[\[[^\]]+\]\]", " ", content)
     clean = re.sub(r"```.*?```", "", clean, flags=re.DOTALL)
     clean = re.sub(r"`[^`]*`", "", clean)
@@ -217,13 +216,16 @@ VERDICT_FAIL_PATTERNS = [
     re.compile(r"명백히\s"),
     re.compile(r"(이|가)\s*[^.?!\n]{0,30}유일한\s*(해석|답|해결책)"),
 ]
-# (partly dormant: the unit alternation mixes Korean units 조|억|만|퍼센트|달러|원…
-#  with language-agnostic ones %|GW|MW|TB|PB|GB|ppm|kg|km. On English prose only the
-#  latter group fires, so number-token reuse (N6) is undercounted. An English
-#  equivalent would add $/£/€, "million"/"billion", "hours"/"cases", etc. See FLAG.)
+# English-native first: %|percent + magnitude words (billion|million|trillion) +
+# common counters (hours|people|users|cases|points|x|×) fire on the English corpus;
+# the Korean units (조|억|만|퍼센트|달러|시간|배|명…) fire under WIKI_LANG=ko. Single
+# SoT — `_lint/contradiction.py` consumes this exact regex (was a drifted second copy).
 NUMBER_TOKEN_RE = re.compile(
     r"\d+(?:,\d{3})*(?:\.\d+)?\s*"
-    r"(?:조|억|만|천억|백만|%|퍼센트|"
+    r"(?:%|percent|"
+    r"billion|million|trillion|"
+    r"hours?|hrs?|people|users|cases?|points?|x|×|"
+    r"조|억|만|천억|백만|퍼센트|"
     r"달러|위안|유로|파운드|엔|"
     r"시간|배|명|건|개|대|기|점|"
     r"GW|MW|TB|PB|GB|"
@@ -232,13 +234,18 @@ NUMBER_TOKEN_RE = re.compile(
 )
 N6_MIN_TOKEN_LEN = 3
 N6_NUMBER_REUSE_MAX = 2
-# (dormant: Korean transition keywords (before/after/generation/reversal/turning
-#  point/angle/timeline); none fire on English. See FLAG.)
+# The English keyword "Timeline" is live on English derived-tensions prose; the six
+# Korean transition keywords (before/after/generation/reversal/turning point/angle)
+# fire under WIKI_LANG=ko.
 N6_DERIVED_TRANSITION_KEYWORDS = ["이전", "이후", "세대", "반전", "전환점", "각도", "Timeline"]
-# A/B/C position label (N7). group(1) = the letter, captured whether it leads
-# (`**C — Mediation**`, Korean `**A 입장**`) or follows `Position ` (English
-# `**Position A**`, per contradiction.md). \b avoids matching ordinary bold words.
-DIALECTIC_LABEL_RE = re.compile(r"\*\*(?:Position\s+)?([ABC])\b[^*]*\*\*")
+# A/B/C position label (N7). The letter is captured in `p` when it follows
+# `Position ` (English `**Position A**`, per contradiction.md) or in `b` when it
+# leads (`**C — Mediation**`, Korean `**A 입장**`). The strict alternation mirrors
+# contradiction.py's DIALECTIC_LABEL_RE so ordinary bold phrases starting with a
+# bare A/B/C (`**A key caveat**`) are not matched.
+DIALECTIC_LABEL_RE = re.compile(
+    r"\*\*(?:Position\s+(?P<p>[ABC])\b|(?P<b>[ABC])\s*(?:[—-]|입장|중재|제3관점))[^*]*\*\*"
+)
 # Value-laden words used in a faction subtitle (N7 skew). English-native set first;
 # the Korean set fires under WIKI_LANG=ko. Matched case-insensitively in _value_hits.
 LABEL_VALUE_WORDS = {
@@ -328,10 +335,10 @@ def evaluate_contradiction_npov(
         if n > N6_NUMBER_REUSE_MAX and tok in derived_no_links:
             derived_reused_tokens.append(tok)
 
-    # N7 — value-word skew across the A·B labels (dormant Korean lexicon)
+    # N7 — value-word skew across the A·B labels (English-first LABEL_VALUE_WORDS; Korean set ko-mode)
     label_value_words: dict = {"A": [], "B": [], "C": []}
     for match in DIALECTIC_LABEL_RE.finditer(conflict_section):
-        label = match.group(1)
+        label = match.group("p") or match.group("b")
         full = match.group(0)
         paren = re.search(r"\(([^)]+)\)", full)
         subtitle = paren.group(1) if paren else ""
@@ -385,7 +392,7 @@ def evaluate_contradiction_aggregate(
         if any(p.search(sentence) for p in VERDICT_FAIL_PATTERNS):
             insights_verdict_fails += 1
 
-    # N7 — value-word skew in axis titles (axes_named comes from con D1; dormant lexicon)
+    # N7 — value-word skew in axis titles (axes_named comes from con D1; English-first lexicon, Korean set ko-mode)
     axis_skew_hits: list = []
     for axis_name in axes_named:
         # axis-title separators: 'vs'·'/'·'·' fire on English; '대' is the Korean
@@ -506,7 +513,6 @@ _HUB_HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 # Matches the `## Connections` hub section (the live English header, per hub.md);
 # the hub body / link-grouping checks scope to this section.
 _HUB_YEONGYEOL_RE = re.compile(r"^##\s+Connections\s*$(.*?)(?=^##\s|\Z)", re.MULTILINE | re.DOTALL)
-_HUB_WIKILINK_RE = re.compile(r"\[\[([^\]\|]+)(?:\|[^\]]+)?\]\]")
 
 
 def evaluate_hub_body(
@@ -536,7 +542,7 @@ def evaluate_hub_body(
     link_fires = False
     if section_match:
         section_body = section_match.group(1)
-        link_count = len(_HUB_WIKILINK_RE.findall(section_body))
+        link_count = len(WIKILINK_RE.findall(section_body))
         grouped = bool(re.search(r"^###\s+", section_body, re.MULTILINE))
         link_fires = link_count >= yeongyeol_link_advisory and not grouped
 

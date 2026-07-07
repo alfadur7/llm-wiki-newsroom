@@ -36,12 +36,17 @@ from _lib import (  # noqa: E402
     WIKI,
     FRONTMATTER_BLOCK_RE,
     WIKILINK_TARGET_RE as LINK_RE,
+    atomic_write_text,
     parse_frontmatter,
     read_text_cached,
     real_source_files,
 )
 
 SRC = WIKI / "sources"
+
+# Subdirs whose pages carry a `sources:` frontmatter list — shared by the
+# detector (run) and both fixers so they can't silently diverge.
+HUB_SUBDIRS = ("entities", "concepts", "syntheses", "trails", "timelines")
 
 SOURCES_KEY_RE = re.compile(r"^sources:")
 BLOCK_ITEM_RE = re.compile(r"^[ \t]*-\s+")
@@ -57,6 +62,19 @@ _SLUG_TOKEN_RE = re.compile(r"[-_]+")
 # and the human reviewer must confirm.
 _SLUG_FUZZY_HIGH = 0.5
 _SLUG_FUZZY_LOW = 0.25
+
+
+def _hub_paths() -> dict[str, Path]:
+    """Map `subdir/stem` page ids to paths across all HUB_SUBDIRS."""
+    paths: dict[str, Path] = {}
+    for subdir in HUB_SUBDIRS:
+        d = WIKI / subdir
+        if not d.exists():
+            continue
+        for p in d.glob("*.md"):
+            if not p.name.startswith("_"):
+                paths[f"{subdir}/{p.stem}"] = p
+    return paths
 
 
 def _slug_tokens(slug: str) -> set[str]:
@@ -178,7 +196,7 @@ def _apply_backfill() -> int:
         text = read_text_cached(p)
         existing = _hub_sources(text)
         merged = existing + [s for s in new_slugs if s not in existing]
-        p.write_text(_rewrite_sources(text, merged, today), encoding="utf-8")
+        atomic_write_text(p, _rewrite_sources(text, merged, today))
 
     total = sum(len(v) for v in additions.values())
     print(f"\n[--fix] Updated {len(additions)} hub files "
@@ -226,14 +244,7 @@ def _apply_typo_fixes(
 
     Returns (hubs_touched, slugs_fixed).
     """
-    hub_paths: dict[str, Path] = {}
-    for subdir in ("entities", "concepts", "syntheses", "trails", "timelines"):
-        d = WIKI / subdir
-        if not d.exists():
-            continue
-        for p in d.glob("*.md"):
-            if not p.name.startswith("_"):
-                hub_paths[f"{subdir}/{p.stem}"] = p
+    hub_paths = _hub_paths()
 
     today = date.today().isoformat()
     touched: set[str] = set()
@@ -252,7 +263,7 @@ def _apply_typo_fixes(
                 items = [s for s in items if s != slug]
             else:
                 items = [target if s == slug else s for s in items]
-            p.write_text(_rewrite_sources(text, items, today), encoding="utf-8")
+            atomic_write_text(p, _rewrite_sources(text, items, today))
             touched.add(page_id)
             fixed_slugs.add(slug)
 
@@ -265,14 +276,7 @@ def _apply_typo_fixes(
 def _apply_conn_source_backfill(conn_unregistered: dict[str, list[str]]) -> int:
     """Register each hub's own `## Connections` source links into its frontmatter
     `sources:` list. Returns the number of hub files updated."""
-    hub_paths: dict[str, Path] = {}
-    for subdir in ("entities", "concepts", "syntheses", "trails", "timelines"):
-        d = WIKI / subdir
-        if not d.exists():
-            continue
-        for p in d.glob("*.md"):
-            if not p.name.startswith("_"):
-                hub_paths[f"{subdir}/{p.stem}"] = p
+    hub_paths = _hub_paths()
 
     today = date.today().isoformat()
     touched = 0
@@ -283,7 +287,7 @@ def _apply_conn_source_backfill(conn_unregistered: dict[str, list[str]]) -> int:
         text = read_text_cached(p)
         existing = _hub_sources(text)
         merged = existing + [s for s in new_slugs if s not in existing]
-        p.write_text(_rewrite_sources(text, merged, today), encoding="utf-8")
+        atomic_write_text(p, _rewrite_sources(text, merged, today))
         touched += 1
     return touched
 
@@ -294,7 +298,7 @@ def run(*, json_out: bool = False, fix: bool = False) -> int:
     referenced: set[str] = set()
     declared_by: dict[str, list[str]] = {}
     conn_unregistered: dict[str, list[str]] = {}
-    for subdir in ("entities", "concepts", "syntheses", "trails", "timelines"):
+    for subdir in HUB_SUBDIRS:
         d = WIKI / subdir
         if not d.exists():
             continue
@@ -438,18 +442,31 @@ def run(*, json_out: bool = False, fix: bool = False) -> int:
 
     if fix:
         _apply_backfill()
+        slugs_n = 0
         if fixable:
             hubs_n, slugs_n = _apply_typo_fixes(fixable)
             print(
                 f"\n[--fix] Auto-corrected {slugs_n} declared-absent slug(s) "
                 f"across {hubs_n} hub file(s). Run `python tools/build.py index` next."
             )
+        conn_fixed = 0
         if conn_unregistered:
-            n = _apply_conn_source_backfill(conn_unregistered)
+            conn_fixed = _apply_conn_source_backfill(conn_unregistered)
             print(
                 f"\n[--fix] Registered {sum(len(v) for v in conn_unregistered.values())} "
-                f"`## Connections` source link(s) into {n} hub frontmatter(s). "
+                f"`## Connections` source link(s) into {conn_fixed} hub frontmatter(s). "
                 f"Run `python tools/build.py index` next."
             )
+        # Exit code reflects post-fix state (like raw_file_refs): recoverable
+        # orphans are un-orphaned by the backfill, fixable slugs renamed, conn
+        # links registered — only what still needs a human keeps the fail.
+        remaining = (
+            len(dead_end)
+            + len(suggestions)
+            + len(no_match)
+            + (len(fixable) - slugs_n)
+            + (len(conn_unregistered) - conn_fixed)
+        )
+        return 0 if remaining == 0 else 1
 
     return 0 if (not orphans and not declared_absent and not conn_unregistered) else 1

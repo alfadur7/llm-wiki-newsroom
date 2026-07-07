@@ -13,6 +13,7 @@ Exit codes: 0 advisory/no-op (stdout JSON additionalContext), 2 blocking
 import json
 import re
 import sys
+from pathlib import Path
 
 import check_bullet_depth
 
@@ -57,6 +58,9 @@ def _drift_group_counts(scan: str) -> tuple[int, int]:
     return ov, cn
 AUTO_MARKER_RE = re.compile(r"<!--\s*AUTO:")
 SCRATCH_EXTS = {".py", ".sh", ".tmp", ".scratch", ".ipynb"}
+# Repo root derived from this hook's own location (<root>/.claude/hooks/dispatch.py)
+# so the scratch advisory fires regardless of the clone directory name.
+_REPO_ROOT = Path(__file__).resolve().parents[2].as_posix().lower()
 GUIDE_DIRS = ("/.claude/agents/", "/.claude/commands/", "/.claude/layers/",
               "/.claude/policies/", "/.claude/operations/")
 
@@ -83,8 +87,8 @@ PROTECTED_GLOB = (
     re.compile(r"/wiki/sources/_catalog[a-z0-9-]*\.md$"),  # build.py catalog
 )
 # ---------------------------------------------------------------- messages
-# Message bodies are kept verbatim from the individual pre-consolidation hooks
-# (preserving incident history and SoT references).
+# Message bodies are carried over from the individual pre-consolidation hooks
+# (incident history preserved; references point at in-repo SoTs).
 
 LINT_REPORT_OV_ONLY = """[lint-report-guard] ASYMMETRY DETECTED
 
@@ -131,7 +135,7 @@ PLAN_MSG = """[minimality-advisory] PLAN FILE WRITE DETECTED
 T1 naming principle: new memory/policy/hook files default to a prescriptive
 `no_X`·`X_to_Y`·`X_not_Y` form. descriptive forms (`*_voice`·`*_posture`) weaken recall.
 
-Reference: .claude/policies/no-plan-bloat.md + memory feedback_no_plan_bloat."""
+Reference: .claude/policies/no-plan-bloat.md."""
 
 GUIDE_MSG = """[minimality-advisory] GUIDELINE EDIT DETECTED
 
@@ -180,13 +184,13 @@ Project root should only host repo-managed files (README, CLAUDE.md,
 .gitignore, settings, requirements). Script-like one-off files belong in:
 
   - c:/tmp/ or an OS temp directory       (temp scratch)
-  - llm-wiki-newsroom/tools/               (when formally adopted — verb-form naming)
+  - <project root>/tools/                  (when formally adopted — verb-form naming)
 
-If permanent project tool, move under tools/ (memory feedback_verb_tool_names).
+If permanent project tool, move under tools/ (verb-form naming).
 If one-off scratch, retarget the temp directory.
 
 Reference: 2026-05-08 incident — temp .py at project root;
-memory feedback_no_bandaids requires structural prevention."""
+this advisory is the structural prevention."""
 
 STUB_MSG_TMPL = """[stub-advisory] STUB MUTATION DETECTED — {rel}
 
@@ -219,8 +223,8 @@ Target: {reason} — editing it directly means the next build·lint overwrites i
     _contradictions.json): fix the input (source·hub) and regenerate via `python tools/build.py`
   - raw/ originals: immutable — write analysis·interpretation on a wiki/ page
 
-Reference: ops-wiki-agent protected-path-guard back-port + memory
-           feedback_close_enforcement_gap_not_instance (pre-block gate)."""
+Reference: CLAUDE.md ".claude/hooks/" (protected-path guard) +
+           .claude/policies/directory-layout.md (auto-generated vs. human-edited split)."""
 
 INCR_LINT_MSG_TMPL = """[incremental-lint-advisory] {scope_label} EDIT DETECTED — {rel}
 
@@ -267,7 +271,7 @@ def _protected_path(path: str) -> str | None:
     """Return a reason string if `path` is an auto-generated/immutable target
     that must not be hand-edited via Write|Edit, else None. `path` is slash-
     normalized."""
-    if any(path.endswith(p) for p in PROTECTED_EXACT):
+    if any(("/" + path).endswith("/" + p) for p in PROTECTED_EXACT):
         return "build artifact"
     if any(rx.search(path) for rx in PROTECTED_GLOB):
         return "build artifact"
@@ -313,8 +317,10 @@ def run_pre(data: dict) -> int:
         print(PROTECTED_MSG_TMPL.format(rel=_rel_wiki(path), reason=reason), file=sys.stderr)
         return 2
 
-    # 1) lint-report.md asymmetry guard — blocking (exit 2).
-    if path.endswith("lint-report.md") and content:
+    # 1) lint-report.md asymmetry guard — blocking (exit 2). Gate on key
+    #    presence, not truthiness — a deletion Edit (new_string="") can strip one
+    #    group from a symmetric file and must still be counted.
+    if path.endswith("lint-report.md") and ("content" in tool_input or "new_string" in tool_input):
         # Count drift groups over the reconstructed post-edit *full file*, not the
         # raw Edit fragment — a partial Edit touching one group on an already-
         # symmetric file would otherwise be miscounted as asymmetric and falsely
@@ -359,7 +365,7 @@ def run_pre(data: dict) -> int:
         parent = path.rsplit("/", 1)[0] if "/" in path else ""
         basename = path.rsplit("/", 1)[-1]
         ext = ("." + basename.rsplit(".", 1)[-1]).lower() if "." in basename else ""
-        if parent.lower().endswith("llm-wiki-newsroom") and ext in SCRATCH_EXTS:
+        if parent.lower() == _REPO_ROOT and ext in SCRATCH_EXTS:
             messages.append(SCRATCH_MSG_TMPL.format(basename=basename))
 
     # 4) ponytail advisory — tools/ Python authoring (generation-time reflex).

@@ -25,15 +25,13 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from _lib import real_source_files, GRAPH  # noqa: E402
-
-_GRADE_LINE = re.compile(r"^- \[(?:fact|analysis|forecast)\]")
+from _lib import CLUSTERS_JSON, GRADE_MARKER_RE, real_source_files  # noqa: E402
 
 
 def _source_clusters() -> dict:
     """sources/<slug>.md → primary cluster (graph/_clusters.json)."""
     try:
-        sa = json.loads((GRAPH / "_clusters.json").read_text(encoding="utf-8")).get("source_assignments", {})
+        sa = json.loads(CLUSTERS_JSON.read_text(encoding="utf-8")).get("source_assignments", {})
     except (OSError, ValueError):
         return {}
     return sa
@@ -50,7 +48,7 @@ def run(term: str, claimant_only: bool) -> int:
     for fp in real_source_files():
         text = fp.read_text(encoding="utf-8", errors="replace")
         if claimant_only:
-            matched = any(pat.search(ln) for ln in text.splitlines() if _GRADE_LINE.match(ln))
+            matched = any(pat.search(ln) for ln in text.splitlines() if GRADE_MARKER_RE.match(ln))
         else:
             matched = bool(pat.search(text))
         if matched:

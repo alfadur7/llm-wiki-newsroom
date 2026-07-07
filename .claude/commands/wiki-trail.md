@@ -20,7 +20,7 @@ Examples:
 
 ## Traversal Pattern
 
-L2-3 trail content. Trails have no separate layer guide; this command's SoT covers the page format and authoring procedure in a single file.
+L2-3 trail content. The page format, authoring standard, and Evaluation Rubric have their SoT in [`layers/trail.md`](../layers/trail.md); this command covers the create/follow/list mode routing.
 
 | Mode | Cycle | Owner |
 |---|---|---|
@@ -30,31 +30,13 @@ L2-3 trail content. Trails have no separate layer guide; this command's SoT cove
 
 ## Trail Page Format
 
-`wiki/trails/<slug>.md`:
-
-````markdown
----
-title: "Trail Title"
-type: trail
-tags: []
-created: YYYY-MM-DD
----
-
-## Path
-1. [[PageA]] — why we start from this page
-2. [[PageB]] — the context leading from PageA to PageB
-3. [[PageC]] — the point where a new perspective opens
-...
-
-## Commentary
-2-3 sentences on why this trail matters and what insight it offers.
-````
+The frontmatter, `## Path`, and `## Commentary` format is the SoT in [`layers/trail.md`](../layers/trail.md) → `## Page Format`. Author against that guide.
 
 ## Create Mode
 
 Columnist cycle:
 1. Explore `wiki/index.md` + `wiki/_backlinks.json` by topic keyword (own GROUND)
-2. Select a seed page + build a 5-10 page trail following the connections
+2. Select a seed page + build a 5-12 page trail following the connections
 3. Write the commentary on why each step connects
 4. Save `wiki/trails/<slug>.md`
 5. `log.md` append: `## [YYYY-MM-DD] trail | <title>`
@@ -72,5 +54,5 @@ All `.md` files in the `wiki/trails/` folder — show title·creation date·page
 
 ## Human Reviewer Gate
 
-- A create-mode trail that falls outside the 5-10 step range (too short or too long)
+- A create-mode trail that falls outside the 5-12 step range (too short or too long)
 - Desk qualitative-review defects of critical/high

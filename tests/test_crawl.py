@@ -5,17 +5,11 @@ pipeline (BFS, classify, ranking, caps, pre-inbox-append) without any network.
 
 These tests exercise the Korean-corpus behavior of crawl (2-char Hangul
 vocabulary terms etc.), so they run under WIKI_LANG=ko via an autouse fixture."""
-import sys
-from pathlib import Path
-
 import pytest
 
-# conftest already puts tools/ on sys.path, but crawl lives under _news/.
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
-
-from _ingest.fetch_article import extract_links  # noqa: E402
-from _news import crawl as C  # noqa: E402
-from bs4 import BeautifulSoup  # noqa: E402
+from _ingest.fetch_article import extract_links
+from _news import crawl as C
+from bs4 import BeautifulSoup
 
 
 @pytest.fixture(autouse=True)

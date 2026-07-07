@@ -51,12 +51,13 @@ import requests
 from bs4 import BeautifulSoup
 
 sys.path.insert(0, str(Path(__file__).parent.parent))  # _news/ → tools/ root
-from _lib import REPO_ROOT, WIKI, canonicalize_url, korean_mode  # noqa: E402
+from _lib import REPO_ROOT, WIKI, atomic_write_text, canonicalize_url, korean_mode  # noqa: E402
 from _net import safe_get_stream, UnsafeURLError  # noqa: E402
 from _news.domains import GLOBAL_IT_FINANCE_NEWS, KOREAN_IT_FINANCE_NEWS  # noqa: E402
-from _news.gap_queries import _load_hub_fm, load_gaps_json  # noqa: E402
-from _news.normalize import hub_korean_label, normalize_tags  # noqa: E402
-from _ingest.fetch_article import HEADERS, extract_links  # noqa: E402
+from _news.gap_queries import _hub_label, _load_hub_fm, load_gaps_json  # noqa: E402
+from _news.normalize import normalize_tags  # noqa: E402
+from _ingest.fetch_article import HEADERS, extract_links, _fix_encoding_inplace  # noqa: E402
+from _ingest.fetch_inbox import parse_inbox  # noqa: E402
 
 INBOX = REPO_ROOT / "raw" / "_inbox.md"
 SOURCE_MAP = WIKI / "sources" / "_source_map.json"
@@ -152,9 +153,7 @@ def build_vocabulary(hub_fm: dict[str, dict] | None = None) -> dict[str, int]:
         hub_fm = _load_hub_fm()
     vocab: dict[str, int] = {}
     for hub_id, fm in hub_fm.items():
-        t = fm.get("title")
-        raw = t if isinstance(t, str) and t else hub_id.split("/")[-1].removesuffix(".md")
-        label = hub_korean_label(raw).strip().lower()
+        label = _hub_label(hub_id, hub_fm).strip().lower()
         if _term_ok(label):
             vocab[label] = LABEL_WEIGHT
         for tag in normalize_tags(fm.get("tags") or []):
@@ -285,8 +284,7 @@ def _fetch_page(url: str, timeout: int = 15) -> tuple[str, str] | None:
                 return None
             if "html" not in r.headers.get("Content-Type", "").lower():
                 return None
-            if r.encoding and r.encoding.lower() in ("iso-8859-1", "latin-1"):
-                r.encoding = r.apparent_encoding or "utf-8"
+            _fix_encoding_inplace(r)
             return r.url, r.text
     except (requests.exceptions.RequestException, UnsafeURLError):
         return None
@@ -343,7 +341,8 @@ def crawl(seeds: list[str], *, vocab: dict[str, int], known: set[str],
                 c = {**c, "found_on": seed_host}
                 cand_by_url[lc] = c
             # Recurse into novel candidate pages when depth budget allows.
-            if depth < max_depth and lc not in fetched_canon:
+            # (lc is already known novel — the fetched_canon guard above continued.)
+            if depth < max_depth:
                 queue.append((link_url, depth + 1))
 
     candidates = _rank_and_cap(list(cand_by_url.values()), per_domain_cap)
@@ -397,18 +396,19 @@ def append_to_inbox(candidates: list[dict]) -> int:
     existing = INBOX.read_text(encoding="utf-8") if INBOX.exists() else "# Inbox\n"
     if not existing.endswith("\n"):
         existing += "\n"
-    INBOX.write_text(existing + "\n".join(lines) + "\n", encoding="utf-8")
+    atomic_write_text(INBOX, existing + "\n".join(lines) + "\n")
     return len(lines)
 
 
 def _inbox_queue_len() -> int:
-    """Count active URL lines in the inbox (non-empty, non-comment)."""
+    """Count active URL entries in the inbox via the sentinel-aware SoT parser.
+
+    Reuses `fetch_inbox.parse_inbox` so header example URLs (which sit above the
+    `<!-- URLs below this line -->` sentinel) are excluded, matching what the
+    ingest consumer actually drains."""
     if not INBOX.exists():
         return 0
-    return sum(
-        1 for ln in INBOX.read_text(encoding="utf-8").splitlines()
-        if ln.strip().startswith(("http://", "https://"))
-    )
+    return len(parse_inbox(INBOX.read_text(encoding="utf-8")))
 
 
 def render_report(result: dict) -> str:

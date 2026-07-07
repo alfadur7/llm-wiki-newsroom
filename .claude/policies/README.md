@@ -11,7 +11,7 @@ This folder gathers the project's **global conventions** — location, naming, l
 | [language.md](language.md) | English body text · English frontmatter keys + the Meta-Doc Language Convention (English headers) |
 | [platform.md](platform.md) | Platform conventions such as working around Windows Korean-filename encoding |
 | [index-log-format.md](index-log-format.md) | The two-tier structure of `wiki/index.md` + the append-at-bottom convention for `log.md` |
-| [claude-guideline-voice.md](claude-guideline-voice.md) | Voice conventions for authoring `.claude/commands/*.md` · `.claude/agents/*.md` · `CLAUDE.md` (no decision rationale, external references, or timestamps in the body) + automatic antipattern detection |
+| [claude-guideline-voice.md](claude-guideline-voice.md) | Voice conventions for authoring every `.claude/` guide SoT (commands · agents · policies · layers · operations · skills `SKILL.md` + `CLAUDE.md`) — no decision rationale, external references, or timestamps in the body + automatic antipattern detection |
 | [no-plan-bloat.md](no-plan-bloat.md) | The duty to avoid bloat and duplication in plan files — absorb into existing sections by default · 5-step self-check · red flags |
 
 ## Invocation Convention

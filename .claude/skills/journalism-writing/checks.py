@@ -36,11 +36,14 @@ QUALIFIER_PATTERNS = [
     re.compile(r"현재\s*기준"),
     re.compile(r"중장기"),
 ]
-# Hegelian dialectic A/B/C position label (D1/D5). group(1) = the A/B/C letter,
-# captured whether it leads (`**C — Mediation**`, Korean `**A 입장**`) or follows
-# `Position ` (English `**Position A**`, per contradiction.md). \b after the letter
-# avoids matching ordinary bold words like `**Apple**`.
-DIALECTIC_LABEL_RE = re.compile(r"\*\*(?:Position\s+)?([ABC])\b[^*]*\*\*")
+# Hegelian dialectic A/B/C position label (D1/D5). The letter is captured in `p`
+# when it follows `Position ` (English `**Position A**`, per contradiction.md) or
+# in `b` when it leads (`**C — Mediation**`, Korean `**A 입장**`). The strict
+# alternation mirrors contradiction.py's DIALECTIC_LABEL_RE so ordinary bold
+# phrases starting with a bare A/B/C (`**A key caveat**`) are not matched.
+DIALECTIC_LABEL_RE = re.compile(
+    r"\*\*(?:Position\s+(?P<p>[ABC])\b|(?P<b>[ABC])\s*(?:[—-]|입장|중재|제3관점))[^*]*\*\*"
+)
 C_LABEL_BROAD_RE = re.compile(r"\*\*C\s+[^*]+\*\*")  # language-agnostic (any **C …** label)
 # C-position meta-critique keywords (D6). English-native literals first; the Korean
 # forms fire under WIKI_LANG=ko.
@@ -64,7 +67,7 @@ def _dialectic_paragraph_words(conflict_section: str) -> dict:
     out = {"A": 0, "B": 0, "C": 0}
     label_iter = list(DIALECTIC_LABEL_RE.finditer(conflict_section))
     for i, match in enumerate(label_iter):
-        label = match.group(1)
+        label = match.group("p") or match.group("b")
         start = match.end()
         end = label_iter[i + 1].start() if i + 1 < len(label_iter) else len(conflict_section)
         body = conflict_section[start:end]
@@ -77,17 +80,19 @@ def evaluate_contradiction_dialectic(body: str, *, conflict_section: str) -> dic
     """Measure contradiction theme jrn.* (T4 Toulmin qualifier·D1·D5·D6 Hegelian
     dialectic). conflict_section is orchestrator-injected. The returned dict is
     byte-identical to the corresponding _rubric_metrics keys (verbatim port)."""
-    # T4 — qualifier tokens across the body (dormant Korean matcher)
+    # T4 — qualifier tokens across the body
     qualifiers = sum(len(p.findall(body)) for p in QUALIFIER_PATTERNS)
 
-    # D1 — number of distinct dialectic label kinds (dormant Korean label matcher)
-    labels = len({m.group(1) for m in DIALECTIC_LABEL_RE.finditer(conflict_section)})
+    # D1 — number of distinct dialectic label kinds
+    labels = len({
+        m.group("p") or m.group("b") for m in DIALECTIC_LABEL_RE.finditer(conflict_section)
+    })
 
     # D5 — A/B/C paragraph word counts
     paragraph_words = _dialectic_paragraph_words(conflict_section)
     a_w, b_w, c_w = paragraph_words["A"], paragraph_words["B"], paragraph_words["C"]
 
-    # D6 — C-stance meta-critique keywords (mostly dormant Korean keywords)
+    # D6 — C-stance meta-critique keywords
     c_meta_hits: list = []
     c_matches = list(C_LABEL_BROAD_RE.finditer(conflict_section))
     if c_matches:
@@ -115,8 +120,7 @@ def evaluate_contradiction_dialectic(body: str, *, conflict_section: str) -> dic
 
 def evaluate_contradiction_aggregate(*, insights_section: str) -> dict:
     """Measure contradiction aggregate jrn.* (T4 — `## Implications` qualifier).
-    insights_section is orchestrator-injected. Ported verbatim from contradiction.py.
-    (T4 uses the dormant Korean QUALIFIER_PATTERNS.)"""
+    insights_section is orchestrator-injected. Ported verbatim from contradiction.py."""
     t4_qualifiers = sum(len(p.findall(insights_section)) for p in QUALIFIER_PATTERNS)
     return {"t4_qualifiers": t4_qualifiers}
 

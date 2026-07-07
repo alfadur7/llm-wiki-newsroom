@@ -18,10 +18,10 @@ The copy editor's role is classified as an agent, but its execution is determini
 **O — what to do** (`tools/lint.py [<group>] [<subcmd|target>] [--fix]`, a single entry point):
 - **graph group** — clusters (isolated hub·too-small·mixed-topic·unnamed·unassigned source·orphan label·fragile bridge, 7 codes)·drift (opt-in cold-start comparison)
 - **hub group** — entity·concept body schema (`## Overview` + `## Connections`, 2 H2s · body ≥ 200 chars · begins with a concrete fact) · timeline schema
-- **meta group** — meta-doc schema (section headers in English·flat-path guard·Rubric drift·anchor·file-ref·slash-cmd integrity·Korean filename·log ordering)
+- **meta group** — meta-doc schema (section headers in English·flat-path guard·craft-skill integrity·anchor·file-ref·slash-cmd integrity·Korean filename·log ordering)
 - **overview group** — Layer 2-3 cluster overview·Layer 2-4 root overview Rubric (criteria per the `overview-cluster`·`overview-aggregate` roster in `.claude/layers/_manifest.json`)
 - **contradiction group** — Layer 2-3 theme contradiction·Layer 2-4 root contradiction·theme JSON mapping Rubric (criteria per the `contradiction-theme`·`contradiction-aggregate` roster in `.claude/layers/_manifest.json`)
-- **source group** — Layer 2-1 source page Rubric (T·X·N·F)
+- **source group** — Layer 2-1 source page Rubric (criteria per the `source` roster in `.claude/layers/_manifest.json`)
 - **synthesis group** — Layer 2-3 Q-A synthesis Rubric (S1 schema·source coverage·source existence·slug-alias, advisory)
 - **trail group** — Layer 2-3 associative trail Rubric (S1 schema·`## Path` (Path) links·path length 4-12·slug-alias, advisory)
 - **timeline group** — Layer 2-2 standalone timeline schema (`wiki/timelines/<slug>.md`, source-indexed→path flavor·region-regression guard; separate from the hub-embedded `## Timeline` check)
@@ -56,7 +56,7 @@ The copy editor's role is classified as an agent, but its execution is determini
 | Cell | Check |
 |---|---|
 | L2-1 source VERIFY | source-group Rubric (criteria per the `source` roster in `_manifest.json`) |
-| L2-2 stub VERIFY | hub group (`hub body`) |
+| L2-2 stub VERIFY | hub group (`hub schema` gate + `hub body` advisory) |
 | L2-2 full hub VERIFY | hub group + body length |
 | L2-2 timeline VERIFY | timeline group (standalone timeline schema·source-indexed·region-regression guard) |
 | L2-3 cluster overview VERIFY₁ | overview group (criteria per the `overview-cluster` roster) |
@@ -77,7 +77,7 @@ python tools/lint.py [<group>] [<subcmd|target>] [--fix] [--json]
 
 | When invoked | Command |
 |---|---|
-| post-ingest source·hub verification | `python tools/lint.py source <slug>` + `python tools/lint.py hub body` |
+| post-ingest source·hub verification | `python tools/lint.py source <slug>` + `python tools/lint.py hub schema` + `python tools/lint.py hub body` |
 | L2-3 contradiction VERIFY₁ | `python tools/lint.py contradiction <theme>` |
 | L2-3 overview VERIFY₁ | `python tools/lint.py overview <cluster>` |
 | L2-4 aggregate VERIFY₁ | `python tools/lint.py overview aggregate` or `contradiction aggregate` |
@@ -94,12 +94,12 @@ Trying to catch qualitative defects that dictionaries·thresholds cannot catch, 
 **Risk — ambiguous `--fix` auto-repair scope**:
 If repair reaches beyond the formattable area (whitespace·typo·section-name normalization) into meaning-affecting changes, the determinism guarantee breaks.
 
-**Mitigation**: `--fix` auto-repair is **deterministic transformations only**. The permitted scope is: section-name normalization (`## Connections` → `## Connections`)·anchor updates·wikilink-alias normalization (the Korean-alias-enforcement convention)·frontmatter-key normalization (inserting placeholders for missing keys·auto-setting `type` to match the directory)·smart-quote ↔ ASCII-quote normalization·token-set Jaccard candidate matching for a broken raw path in `source_file:`. Meaning-affecting body changes (restating a claim·restructuring a sentence·actionable rewrite of a defect) are handed off to the Columnist·Reporter.
+**Mitigation**: `--fix` auto-repair is **deterministic transformations only**. The permitted scope is: section-name normalization (legacy `## 위키 연결` → `## Connections`, WIKI_LANG=ko only)·anchor updates·wikilink-alias normalization (the slug-alias convention; Korean aliases only under WIKI_LANG=ko)·frontmatter-key normalization (inserting placeholders for missing keys·auto-setting `type` to match the directory)·smart-quote ↔ ASCII-quote normalization·token-set Jaccard candidate matching for a broken raw path in `source_file:`. Meaning-affecting body changes (restating a claim·restructuring a sentence·actionable rewrite of a defect) are handed off to the Columnist·Reporter.
 
-**Risk — Rubric drift (verification breaks when dictionaries·thresholds change)**:
-If the guide's Rubric definition and the threshold in the `tools/lint.py` code diverge, you get false PASS·false FAIL.
+**Risk — craft-skill drift (verification breaks when a guide references a craft criterion no skill defines)**:
+If a `.claude/layers/*.md` guide or the `_manifest.json` roster cites a craft dot-id (jrn/con/enc/cit) that no skill's `criteria.json`·`checks.py` defines, the dot-id silently drops and the Rubric under-checks.
 
-**Mitigation**: the `meta` group's Rubric-drift check is a self-diagnostic — it auto-detects on a guide change. Enforced via CI or a commit hook.
+**Mitigation**: the `meta` group's craft-skill integrity check keeps the craft chain (`_manifest.json` roster · layers dot-ids ↔ skills' `criteria.json`·`checks.py`) referentially closed, surfacing dangling dot-ids on `python tools/lint.py meta` (run manually or as part of the default all-groups run; there is no CI or commit hook).
 
 **Risk — ignoring the exit code**:
 If the Editor-in-Chief ignores a copy-editor FAIL exit code and proceeds to the next stage, integrity breaks.

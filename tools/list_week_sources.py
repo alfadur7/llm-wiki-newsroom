@@ -23,14 +23,8 @@ import sys
 from datetime import date, timedelta
 from pathlib import Path
 
-for _s in (sys.stdout, sys.stderr):
-    if hasattr(_s, "reconfigure"):
-        try:
-            _s.reconfigure(encoding="utf-8")
-        except Exception:
-            pass
-
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+# _lib import also reconfigures stdout/stderr to UTF-8 (Windows cp949 console).
 from _lib import WIKI, parse_frontmatter, real_source_files  # noqa: E402
 
 _WEEK_RE = re.compile(r"^(\d{4})-[Ww](\d{1,2})$")
@@ -85,7 +79,11 @@ def main() -> int:
     ap.add_argument("--slugs", action="store_true", help=argparse.SUPPRESS)
     args = ap.parse_args()
 
-    year, week = parse_week(args.week) if args.week else last_completed_week()
+    try:
+        year, week = parse_week(args.week) if args.week else last_completed_week()
+    except ValueError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        return 2
     slugs = slugs_in_week(year, week)
     print(f"[{year}-W{week:02d}] {len(slugs)} scraped sources", file=sys.stderr)
 

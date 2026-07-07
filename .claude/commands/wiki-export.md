@@ -32,7 +32,7 @@ Outside the matrix — Meta layer (deterministic). The Editor-in-Chief calls `to
 **Excluded**: `_`-prefixed files (auto-generated JSON, etc.). Stale artifacts dropped from FOLDER_MERGES (`all-entities.md`, etc.) are cleaned up by `_prune_stale` on every run.
 
 **Hosting deploy assets** (`_site/` — `<slug>.html` + `<slug>-{graph,clusters,overlays,pages}.json`)
-- `stage_site()` in `tools/_export/site.py` copies `graph/graph.html` (no inline, ~90KB) + `_graph.json`·`_clusters.json`·`_pages.json` into `_site/` **with a `<slug>-` prefix**, and injects `<meta robots noindex>` + `window.ASSET_PREFIX="<slug>-"` into the HTML. graph.html fetches the JSON from the obscure path with that prefix (graph/clusters at init, pages lazily on click). For hosting and viewing from a phone ([`operations/graph-hosting-setup.md`](../operations/graph-hosting-setup.md) SoT).
+- `stage_site()` in `tools/_export/site.py` copies `graph/graph.html` (no inline, ~90KB) + `_graph.json`·`_clusters.json`·`_overlays.json`·`_pages.json` into `_site/` **with a `<slug>-` prefix**, and injects `<meta robots noindex>` + `window.ASSET_PREFIX="<slug>-"` into the HTML. graph.html fetches the JSON from the obscure path with that prefix (graph/clusters at init, pages lazily on click). For hosting and viewing from a phone ([`operations/graph-hosting-setup.md`](../operations/graph-hosting-setup.md) SoT).
 - The filenames and RAG link template are determined by the `tools/_lib.py` constants `BASE_URL`·`STANDALONE_SLUG` (shared by export and briefing) (single SoT, drift-impossible). **The data JSON carries the same slug prefix**, so the path is unguessable → without the slug you cannot fetch the data either.
 
 **Deep-link convention (single SoT)**: when `BASE_URL` is set, `export.py`'s `_deeplink_protocol()` builds the convention text and embeds it into `README.md` (single channel for the instruction field). The convention directs **all entity·concept·source deep links**:
@@ -48,7 +48,7 @@ An English title resolves directly: `#q=Meta`. Because graph.html decodes the ha
 python tools/export.py
 ```
 
-The output automatically reports file sizes and total volume + RAG budget (Core/Optional estimated tokens) + stale prune + `_site/` deploy-asset volume. It needs `_graph.json`·`_clusters.json`·`_pages.json`, so run it after `python tools/build.py` (the Action is build→export in sequence).
+The output automatically reports file sizes and total volume + RAG budget (Core/Optional estimated tokens) + stale prune + `_site/` deploy-asset volume. It needs `_graph.json`·`_clusters.json`·`_overlays.json`·`_pages.json`, so run it after `python tools/build.py` (the Action is build→export in sequence).
 
 ## Human Reviewer Gate
 

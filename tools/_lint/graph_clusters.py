@@ -51,12 +51,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import _build_id_map  # noqa: E402
+from _lib import CLUSTER_LABELS_JSON, CLUSTERS_JSON, GRAPH, GRAPH_JSON, HUB_PREFIXES, _build_id_map  # noqa: E402
 
-CLUSTERS_PATH = Path("graph/_clusters.json")
-LABELS_PATH = Path("graph/cluster_labels.json")
-GRAPH_PATH = Path("graph/_graph.json")
-HEALTH_LOG_PATH = Path("graph/_health-log.jsonl")
+CLUSTERS_PATH = CLUSTERS_JSON
+LABELS_PATH = CLUSTER_LABELS_JSON
+GRAPH_PATH = GRAPH_JSON
+HEALTH_LOG_PATH = GRAPH / "_health-log.jsonl"
 
 MIN_SIZE = 3          # below this, cluster is over-split
 MIN_MIXED_SIZE = 10   # mixed clusters smaller than this are ignored (noise)
@@ -193,8 +193,7 @@ def _compute_health(graph_data: dict, clusters_data: dict, fragile_count: int) -
     # G3 M-1: INFERRED/EXTRACTED ratio + INFERRED weight share at hub-hub
     # level (the slice Leiden actually consumes, mirroring _build/clusters.py
     # weighting logic — keep these two in sync if the builder weighting changes).
-    hub_prefixes = ("entities/", "concepts/")
-    hub_ids = {n["id"] for n in nodes if n["id"].startswith(hub_prefixes)}
+    hub_ids = {n["id"] for n in nodes if n["id"].startswith(HUB_PREFIXES)}
     id_map = _build_id_map(nodes)
 
     ext_count = inf_count = 0

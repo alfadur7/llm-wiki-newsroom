@@ -26,9 +26,9 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, atomic_write_text, parse_frontmatter, read_text_cached, strip_code, strip_frontmatter  # noqa: E402
+from _lib import WIKI, atomic_write_text, parse_frontmatter, read_text_cached, section_body, strip_code, strip_frontmatter  # noqa: E402
 sys.path.insert(0, str(Path(__file__).parent))  # tools/_lint/ — sibling import
-from _advisory_common import iter_md, mark as _mark, print_rewrite_block  # noqa: E402
+from _advisory_common import L1_MIN_SLUG_LEN, L1_RAW_SLUG_RE, iter_md, mark as _mark, print_rewrite_block  # noqa: E402
 
 TRAILS_DIR = WIKI / "trails"
 
@@ -37,26 +37,13 @@ ADVISORY_MODE = True
 REQUIRED_FRONTMATTER = {"title", "type", "created"}
 REQUIRED_SECTIONS = ("## Path", "## Commentary")
 PATH_MIN, PATH_MAX = 4, 12
-L1_MIN_SLUG_LEN = 10
 
 REQUIRED_KEYS = ("schema", "path_links", "path_length", "slug_alias")
 
-H2_SPLIT_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
 # A `## Path` numbered list item: `1. ...`, `12. ...`
 PATH_ITEM_RE = re.compile(r"^\s*\d+\.\s+(.*)$", re.MULTILINE)
 # Item must begin with a wikilink (allowing bold/pipe alias): `N. [[Hub]] — ...`
 PATH_ITEM_LINKED_RE = re.compile(r"^\s*\d+\.\s+\*{0,2}\[\[")
-L1_RAW_SLUG_RE = re.compile(r"\[\[([a-z][a-z0-9\-]{" + str(L1_MIN_SLUG_LEN - 1) + r",})\]\]")
-
-
-def _section_body(content: str, header: str) -> str:
-    """Return the text between `header` and the next H2 (or EOF)."""
-    m = re.search(rf"^{re.escape(header)}\s*$", content, re.MULTILINE)
-    if not m:
-        return ""
-    start = m.end()
-    nxt = H2_SPLIT_RE.search(content, start)
-    return content[start:nxt.start()] if nxt else content[start:]
 
 
 def _evaluate(rel: str, slug: str, content: str) -> dict:
@@ -68,7 +55,7 @@ def _evaluate(rel: str, slug: str, content: str) -> dict:
     fm_missing = sorted(f for f in REQUIRED_FRONTMATTER if not fm.get(f))
 
     # Path items in the `## Path` section.
-    gyeongno = _section_body(body, "## Path")
+    gyeongno = section_body(body, "Path")
     items = PATH_ITEM_RE.findall(gyeongno)
     linked = [ln for ln in gyeongno.splitlines() if PATH_ITEM_LINKED_RE.match(ln)]
     n_items = len(items)

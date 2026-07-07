@@ -29,23 +29,17 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, read_text_cached  # noqa: E402
+from _lib import FRONTMATTER_BLOCK_RE, read_text_cached  # noqa: E402
 sys.path.insert(0, str(Path(__file__).parent))
-from _hub_common import body_text, iter_hub_files  # noqa: E402
+from _hub_common import HTML_COMMENT_RE, HUB_SPECS, iter_hub_files  # noqa: E402
 
-ENTITIES_DIR = WIKI / "entities"
-CONCEPTS_DIR = WIKI / "concepts"
-
-HUB_SPECS = [
-    (ENTITIES_DIR, "entities"),
-    (CONCEPTS_DIR, "concepts"),
-]
-
-# Matches a `## Timeline narrative` or `## Timeline` section. The module applies
+# Matches a `## Timeline narrative` or `## Timeline` section — or the Korean
+# `## 타임라인 (서사 (골격))` heading family for WIKI_LANG=ko corpora (the module
+# keeps ko support like POINTER_RE / VERDICT_NUM_RE below). The module applies
 # only to hubs that have a timeline section; hubs without one are out of scope
 # (many good hubs don't have a timeline section at all).
 TIMELINE_SECTION_RE = re.compile(
-    r"^##\s+Timeline(?:\s+narrative)?\s*(?:골격)?\s*$(.*?)(?=^##\s|\Z)",
+    r"^##\s+(?:Timeline(?:\s+narrative)?|타임라인(?:\s+서사)?(?:\s+골격)?)\s*$(.*?)(?=^##\s|\Z)",
     re.MULTILINE | re.DOTALL,
 )
 # Timeline item: starts with `- **` or `* **` then `YYYY년 M월 (D일)?` or
@@ -92,7 +86,15 @@ def _date_key(year: str, month: str | None, day: str | None) -> tuple[int, int, 
 
 def _check_timeline(content: str, path: Path, dir_label: str) -> list[str]:
     issues: list[str] = []
-    body = body_text(content)
+    # Newline-preserving equivalent of _hub_common.body_text: keep the
+    # frontmatter line count as `base` and replace HTML comments by their own
+    # newlines, so reported `:{line_no}:` values map to source-file lines.
+    fm = FRONTMATTER_BLOCK_RE.match(content)
+    base = content[: fm.end()].count("\n") if fm else 0
+    body = HTML_COMMENT_RE.sub(
+        lambda m: "\n" * m.group(0).count("\n"),
+        content[fm.end():] if fm else content,
+    )
     section_match = TIMELINE_SECTION_RE.search(body)
     if not section_match:
         return issues
@@ -166,8 +168,9 @@ def _check_timeline(content: str, path: Path, dir_label: str) -> list[str]:
         if not TIMELINE_ITEM_RE.match(raw_line):
             continue
         if VERDICT_NUM_RE.search(raw_line):
-            # Compute 1-based line number from offset (cheap pass).
-            line_no = body.count("\n", 0, line_offset - len(raw_line)) + 1
+            # Compute 1-based file line number from offset (cheap pass) —
+            # `base` re-adds the stripped frontmatter lines.
+            line_no = base + body.count("\n", 0, line_offset - len(raw_line)) + 1
             issues.append(
                 f"  {dir_label}/{path.name}:{line_no}: quantitative figure restated "
                 f"in a timeline item's body — hub.md forbidden pattern "

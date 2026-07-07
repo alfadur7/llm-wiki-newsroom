@@ -306,7 +306,6 @@ _QUOTE_IN_BULLET_RE = re.compile(
     r'["“”][^"“”\n]{3,}?["“”]|[「『][^」』\n]{3,}?[」』]|^>\s*["“]',
     re.MULTILINE,
 )
-_ANCHORED_LINK_RE = re.compile(r"\[\[([^#\]|]+)#([^|\]]+)(?:\|[^\]]+)?\]\]")
 # The live English anchor-target section titles (an anchored bullet points to one
 # of these source.md sections).
 _ANCHOR_ALLOWED_SECTIONS = {"Key Quotes", "Key Claims", "Summary"}
@@ -332,7 +331,7 @@ def _normalize_for_match(s: str) -> str:
 
 def _extract_source_evidence_items(source_md_path) -> list:
     try:
-        text = source_md_path.read_text(encoding="utf-8")
+        text = source_md_path.read_text(encoding="utf-8", errors="replace")
     except OSError:
         return []
     items: list[str] = []
@@ -401,7 +400,7 @@ def _evidence_anchor_check(body: str, source_slugs: set):
             continue
         quoted_total += 1
         bullet_anchored = False
-        for m in _ANCHORED_LINK_RE.finditer(bullet):
+        for m in ANCHOR_LINK_RE.finditer(bullet):
             stem = m.group(1).strip().split("/")[-1].removesuffix(".md")
             section = m.group(2).strip()
             if section not in _ANCHOR_ALLOWED_SECTIONS:

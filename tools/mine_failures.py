@@ -75,7 +75,7 @@ def analyze(records: list[dict], since: str | None):
     """Group defects by mechanism, sorted by (recurrence, support). addressable=false is split out."""
     fixed = fixed_mechanisms(records)
     clusters: dict[str, dict] = defaultdict(
-        lambda: {"count": 0, "stages": Counter(), "targets": [], "addressable": True})
+        lambda: {"count": 0, "stages": Counter(), "targets": []})
     blocked: Counter = Counter()  # addressable=false mechanism → count
     in_window = 0
     for r in records:
@@ -147,11 +147,6 @@ def main() -> int:
                    help="confirm review complete — advance the watermark to today (or a given YYYY-MM-DD)")
     p.add_argument("--note", default="", help="review note to record in the history on --checkpoint")
     args = p.parse_args()
-    if hasattr(sys.stdout, "reconfigure"):
-        try:
-            sys.stdout.reconfigure(encoding="utf-8")
-        except Exception:
-            pass
     if args.checkpoint is not None:
         when = args.checkpoint or date.today().isoformat()
         prev = read_watermark()

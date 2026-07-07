@@ -36,7 +36,7 @@ NAME_PARSE_RE = re.compile(
     # corrected by _clean_name via INSTITUTION_SUFFIXES)
     r"[가-힣]{2,5}\s+[가-힣]{2,5}"
     # Korean name with a one-syllable surname + 2-syllable given name (split form like "박 은솔")
-    r"|[가-힣]{2,5}\s+[김이박최정황조강윤장한오서신권송안전홍고문양손배백허유남심노]"
+    r"|[김이박최정황조강윤장한오서신권송안전홍고문양손배백허유남심노]\s+[가-힣]{2,5}"
     # English multi-word name (for Western names)
     r"|[A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+){1,2}"
     # Korean name alone

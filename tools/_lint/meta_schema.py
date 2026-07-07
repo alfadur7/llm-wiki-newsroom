@@ -16,14 +16,6 @@ Concerns bundled here because all target meta-docs, all are read-only
     3. Every `/wiki-<name>` slash command mentioned in CLAUDE.md has a
        matching `.claude/commands/wiki-<name>.md` definition file.
 
-  RUBRIC DRIFT — Part 1 (L2-3) ↔ Part 2 (L2-4) shared criteria alignment
-                 within each axis's Rubric guide file. Catches silent drift
-                 where a shared criterion's `name` or `source` footnote is
-                 edited on one Part but not the other.
-    Source files:
-      - `.claude/layers/overview.md`
-      - `.claude/layers/contradiction.md`
-
   LANGUAGE — meta-doc section headers must be English (CLAUDE.md +
              .claude/commands/*.md).
     Rule rationale: Korean section headers weaken the "write the body in Korean"
@@ -54,20 +46,20 @@ Concerns bundled here because all target meta-docs, all are read-only
                      token. Windows shells cannot execute a bare `.sh` path,
                      so a hook registered without the `bash ` prefix silently
                      no-ops and its guard/advisory never fires — an invisible
-                     failure mode. See .claude/policies/platform.md "Hook 실행 환경".
+                     failure mode. See .claude/policies/platform.md "Hook Execution Environment (Windows)".
 
   HOOK ADVISORY CHANNEL — a non-blocking hook (no `exit 2` path) that writes
                      its message to stderr never reaches Claude: stderr on
                      exit 0 is shown to the user only. Advisories must emit the
                      message as stdout JSON `hookSpecificOutput.additionalContext`.
                      Blocking guards (with an `exit 2` path) are exempt — exit-2
-                     stderr IS delivered to Claude. See platform.md "Hook 실행 환경".
+                     stderr IS delivered to Claude. See platform.md "Hook Execution Environment (Windows)".
 
   HOOK PYTHON UTF-8 — every hook `python3` invocation must force UTF-8 mode
                      (`PYTHONUTF8=1`). On Windows python3 decodes stdin/stdout
                      as cp949, mangling a hook's Korean output into lone
                      surrogates that poison the session JSON (400) — an
-                     unrecoverable crash. See platform.md "Hook 실행 환경".
+                     unrecoverable crash. See platform.md "Hook Execution Environment (Windows)".
 
   CRAFT-SKILL INTEGRITY — the craft skill chain (`.claude/skills/<skill>/`
                      {criteria.json, checks.py} + `.claude/layers/_manifest.json`
@@ -108,11 +100,12 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from _lib import CLUSTERS_JSON, REPO_ROOT as ROOT, WIKI as WIKI_DIR, read_text_cached  # noqa: E402
+
 CLAUDE_MD = ROOT / "CLAUDE.md"
 COMMANDS_DIR = ROOT / ".claude" / "commands"
 LOG_MD = ROOT / "log.md"
-WIKI_DIR = ROOT / "wiki"
 SETTINGS_FILES = (
     ROOT / ".claude" / "settings.json",
     ROOT / ".claude" / "settings.local.json",
@@ -347,7 +340,7 @@ def _check_roster_completeness(claude_text: str) -> list[str]:
                 issues.append(f"  .claude/{folder}/README.md: missing (index file expected)")
                 continue
             readme_listed = _md_basenames(
-                readme.read_text(encoding="utf-8", errors="replace")
+                read_text_cached(readme)
             )
             for name in sorted(disk - readme_listed):
                 issues.append(
@@ -380,11 +373,10 @@ def _check_stale_cluster_slugs() -> list[str]:
     Index Format template in CLAUDE.md doesn't false-positive.
     """
     issues: list[str] = []
-    clusters_path = ROOT / "graph" / "_clusters.json"
-    if not clusters_path.exists():
+    if not CLUSTERS_JSON.exists():
         return issues
     try:
-        data = json.loads(clusters_path.read_text(encoding="utf-8"))
+        data = json.loads(CLUSTERS_JSON.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return issues
     current = {c.get("slug") for c in data.get("clusters", []) if c.get("slug")}
@@ -398,14 +390,14 @@ def _check_stale_cluster_slugs() -> list[str]:
     pat = re.compile(r"_catalog-([a-z][a-z0-9-]+)\.md")
     for path in targets:
         try:
-            text = path.read_text(encoding="utf-8", errors="replace")
+            text = read_text_cached(path)
         except OSError:
             continue
         for m in pat.finditer(text):
             slug = m.group(1)
-            # Skip placeholder forms — these are template literals, not
-            # references to a real cluster.
-            if slug.startswith("<") or slug == "slug":
+            # Skip the `_catalog-slug.md` template literal — `<...>`
+            # placeholders never match the regex ([a-z] first char).
+            if slug == "slug":
                 continue
             if slug not in current:
                 line = text[:m.start()].count("\n") + 1
@@ -419,15 +411,8 @@ def _check_stale_cluster_slugs() -> list[str]:
 
 def _check_language_in_file(path: Path) -> list[tuple[int, str]]:
     violations: list[tuple[int, str]] = []
-    in_fence = False
-    text = path.read_text(encoding="utf-8", errors="replace")
-    for i, line in enumerate(text.splitlines(), start=1):
-        stripped = line.lstrip()
-        if stripped.startswith("```"):
-            in_fence = not in_fence
-            continue
-        if in_fence:
-            continue
+    text = read_text_cached(path)
+    for i, line in _iter_non_fenced_lines(text):
         m = HEADING_RE.match(line)
         if not m:
             continue
@@ -487,17 +472,10 @@ def _check_claude_voice_violations() -> list[str]:
         if rel in CLAUDE_VOICE_SELF_SKIP:
             continue
         try:
-            text = path.read_text(encoding="utf-8", errors="replace")
+            text = read_text_cached(path)
         except OSError:
             continue
-        in_fence = False
-        for i, line in enumerate(text.splitlines(), start=1):
-            stripped = line.lstrip()
-            if stripped.startswith("```"):
-                in_fence = not in_fence
-                continue
-            if in_fence:
-                continue
+        for i, line in _iter_non_fenced_lines(text):
             for label, pat in CLAUDE_VOICE_PATTERNS:
                 m = pat.search(line)
                 if m:
@@ -535,7 +513,7 @@ def _check_flat_lint_paths() -> list[str]:
         if path.resolve() == self_path:
             continue  # don't flag the regex declaration in this file itself
         try:
-            text = path.read_text(encoding="utf-8", errors="replace")
+            text = read_text_cached(path)
         except OSError:
             continue
         for i, line in enumerate(text.splitlines(), start=1):
@@ -614,7 +592,7 @@ def _check_hook_advisory_channel() -> list[str]:
     if not HOOKS_DIR.exists():
         return violations
     for path in sorted(HOOKS_DIR.glob("*.sh")) + sorted(HOOKS_DIR.glob("*.py")):
-        text = path.read_text(encoding="utf-8", errors="replace")
+        text = read_text_cached(path)
         rel = path.relative_to(ROOT).as_posix()
         if path.suffix == ".sh":
             has_stderr_msg = ">&2" in text
@@ -652,7 +630,7 @@ def _check_hook_python_utf8() -> list[str]:
     for path in sorted(HOOKS_DIR.glob("*.sh")):
         rel = path.relative_to(ROOT).as_posix()
         for lineno, line in enumerate(
-            path.read_text(encoding="utf-8", errors="replace").splitlines(), 1
+            read_text_cached(path).splitlines(), 1
         ):
             if "python3" not in line:
                 continue
@@ -689,7 +667,7 @@ def _check_shared_regex_hoisting() -> list[str]:
             continue
         rel = path.relative_to(ROOT).as_posix()
         for lineno, line in enumerate(
-            path.read_text(encoding="utf-8", errors="replace").splitlines(), 1
+            read_text_cached(path).splitlines(), 1
         ):
             if _SHARED_REGEX_DEF_RE.match(line):
                 violations.append(
@@ -787,7 +765,7 @@ def _check_craft_skill_integrity() -> list[str]:
 
     for p in sorted(LAYERS_DIR.glob("*.md")):
         try:
-            text = p.read_text(encoding="utf-8", errors="replace")
+            text = read_text_cached(p)
         except OSError:
             continue
         rel = p.relative_to(ROOT).as_posix()
@@ -820,7 +798,7 @@ def _check_stale_guide_refs() -> list[str]:
         if path.resolve() == self_path:
             continue  # the regex declaration in this file is not a real reference
         try:
-            text = path.read_text(encoding="utf-8", errors="replace")
+            text = read_text_cached(path)
         except OSError:
             continue
         rel = path.relative_to(ROOT).as_posix()
@@ -857,7 +835,7 @@ def _check_obsidian_link_safety() -> list[str]:
 
     for path in targets:
         try:
-            text = path.read_text(encoding="utf-8", errors="replace")
+            text = read_text_cached(path)
         except OSError:
             continue
         rel = path.relative_to(ROOT).as_posix()
@@ -896,7 +874,7 @@ def _check_nested_wikilinks() -> list[str]:
         if md.name.startswith("_") or md.relative_to(WIKI_DIR).parts[0] in skip_dirs:
             continue
         try:
-            text = md.read_text(encoding="utf-8", errors="replace")
+            text = read_text_cached(md)
         except OSError:
             continue
         rel = md.relative_to(ROOT).as_posix()
@@ -919,10 +897,9 @@ def _check_reserved_filename_collisions() -> list[str]:
     Returns one violation string per offending path with a rename hint.
     """
     violations: list[str] = []
-    wiki_dir = ROOT / "wiki"
-    if not wiki_dir.exists():
+    if not WIKI_DIR.exists():
         return violations
-    for md in wiki_dir.rglob("*.md"):
+    for md in WIKI_DIR.rglob("*.md"):
         if md.name.lower() in RESERVED_META_FILENAMES:
             rel = md.relative_to(ROOT).as_posix()
             reserved = md.name.lower()
@@ -945,7 +922,7 @@ def _check_log_monotonicity() -> list[str]:
     if not LOG_MD.exists():
         return violations
     try:
-        text = LOG_MD.read_text(encoding="utf-8", errors="replace")
+        text = read_text_cached(LOG_MD)
     except OSError:
         return violations
     entries: list[tuple[str, int]] = []
@@ -971,7 +948,7 @@ def run() -> int:
         return 1
 
     # INTEGRITY pass
-    text = CLAUDE_MD.read_text(encoding="utf-8", errors="replace")
+    text = read_text_cached(CLAUDE_MD)
     broken_anchors = _check_anchors(text)
     missing_files = _check_file_refs(text)
     missing_cmds = _check_slash_commands(text)

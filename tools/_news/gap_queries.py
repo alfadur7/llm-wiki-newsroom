@@ -32,11 +32,11 @@ from typing import Any
 YEAR = str(datetime.now().year)  # recency token for generated search queries
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import GRAPH, REPO_ROOT, WIKI, korean_mode, parse_frontmatter  # noqa: E402
+from _lib import CLUSTERS_JSON, GRAPH_JSON, HUB_PREFIXES, REPO_ROOT, WIKI, korean_mode, parse_frontmatter  # noqa: E402
 from _news.normalize import hub_korean_label, normalize_tags  # noqa: E402
 
-GRAPH_PATH = GRAPH / "_graph.json"
-CLUSTERS_PATH = GRAPH / "_clusters.json"
+GRAPH_PATH = GRAPH_JSON
+CLUSTERS_PATH = CLUSTERS_JSON
 HUB_DIRS = [WIKI / "entities", WIKI / "concepts"]
 
 
@@ -81,9 +81,13 @@ def _load_hub_fm() -> dict[str, dict]:
 
 
 def _hub_label(hub_id: str, hub_fm: dict[str, dict]) -> str:
-    """Return the searchable Korean label for a hub id, falling back to its stem."""
-    fm = hub_fm.get(hub_id, {})
-    raw = fm.get("title") or hub_id.split("/")[-1].removesuffix(".md")
+    """Return the searchable label for a hub id, falling back to its stem.
+
+    Non-string titles (parse_frontmatter yields a list for inline/block-list
+    values) fall back to the stem too — hub_korean_label would TypeError on a
+    list. Single definition shared with `crawl.build_vocabulary`."""
+    t = hub_fm.get(hub_id, {}).get("title")
+    raw = t if isinstance(t, str) and t else hub_id.split("/")[-1].removesuffix(".md")
     return hub_korean_label(raw)
 
 
@@ -91,22 +95,23 @@ def _cluster_top_hubs(clusters: dict, graph: dict, hub_fm: dict[str, dict]) -> d
     """Compute degree-ranked hub labels per cluster (used for single-source context query).
 
     Mirrors `_lint/graph_gaps._build_hub_subgraph` adjacency for consistency
-    with the gap diagnosis output. Hubs without a frontmatter title fall back
-    to their filename stem so the caller never gets an empty string."""
-    HUB_PREFIX = ("entities/", "concepts/")
-    deg: Counter = Counter()
+    with the gap diagnosis output — degree is distinct-neighbor count, so
+    parallel hub-hub edges don't inflate the ranking. Hubs without a
+    frontmatter title fall back to their filename stem so the caller never
+    gets an empty string."""
+    nbrs: dict[str, set[str]] = defaultdict(set)
     for e in graph["edges"]:
         s, d = e.get("from"), e.get("to")
-        if s and d and s.startswith(HUB_PREFIX) and d.startswith(HUB_PREFIX) and s != d:
-            deg[s] += 1
-            deg[d] += 1
+        if s and d and s.startswith(HUB_PREFIXES) and d.startswith(HUB_PREFIXES) and s != d:
+            nbrs[s].add(d)
+            nbrs[d].add(s)
     hub_assign = clusters.get("hub_assignments", {})
     by_cluster: dict[str, list[str]] = defaultdict(list)
     for hub_id, slug in hub_assign.items():
         by_cluster[slug].append(hub_id)
     out: dict[str, list[str]] = {}
     for slug, members in by_cluster.items():
-        members.sort(key=lambda h: deg.get(h, 0), reverse=True)
+        members.sort(key=lambda h: len(nbrs.get(h, ())), reverse=True)
         out[slug] = [_hub_label(h, hub_fm) for h in members]
     return out
 

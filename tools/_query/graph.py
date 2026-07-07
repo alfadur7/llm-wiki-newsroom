@@ -1,14 +1,14 @@
 """Graph traversal handlers for `tools/query.py graph ...`.
 
 Registered as the `graph` subcommand group of the top-level query dispatcher.
-Queries the persistent graph (graph/_graph.json), cluster assignments
-(graph/_clusters.json), and backlinks (wiki/_backlinks.json) to answer
-focused structural questions without spinning up the full Claude synthesis
+Queries the persistent graph (graph/_graph.json) and cluster assignments
+(graph/_clusters.json) to answer focused structural questions without
+spinning up the full Claude synthesis
 pipeline. Each subcommand returns a compact, budget-aware report that an
 LLM can consume efficiently.
 
 Node names accept any of these forms and resolve to the canonical node id:
-  Meta, Meta.md, entities/Meta, entities/Meta.md
+  Meta, Meta.md, entities/Meta.md
 """
 from __future__ import annotations
 
@@ -17,21 +17,12 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-# On a Windows cp949 console, printing Korean / en-dash / em-dash raises a
-# UnicodeEncodeError, so reconfigure stdout/stderr to UTF-8.
-for _stream in (sys.stdout, sys.stderr):
-    if hasattr(_stream, "reconfigure"):
-        try:
-            _stream.reconfigure(encoding="utf-8")
-        except Exception:  # noqa: BLE001
-            pass
-
 sys.path.insert(0, str(Path(__file__).parent.parent))  # _query/ → tools/ root (shared modules)
-from _lib import GRAPH, WIKI, _build_id_map  # noqa: E402
+# _lib import also reconfigures stdout/stderr to UTF-8 (Windows cp949 console).
+from _lib import CLUSTERS_JSON, GRAPH_JSON, _build_id_map  # noqa: E402
 
-GRAPH_PATH = GRAPH / "_graph.json"
-CLUSTERS_PATH = GRAPH / "_clusters.json"
-BACKLINKS_PATH = WIKI / "_backlinks.json"
+GRAPH_PATH = GRAPH_JSON
+CLUSTERS_PATH = CLUSTERS_JSON
 
 DEFAULT_BUDGET = 60
 
@@ -49,7 +40,7 @@ def _parse_edge_filter(spec: str | None) -> set[str] | None:
     """
     if not spec:
         return None
-    allowed = {"contradicts", "defines", "cites", "references", "inferred"}
+    allowed = RELATION_KINDS | {"inferred"}
     requested = {t.strip().lower() for t in spec.split(",") if t.strip()}
     invalid = requested - allowed
     if invalid:
@@ -153,6 +144,14 @@ def _cluster_of(nid: str, clusters_data: dict) -> str:
            clusters_data.get("source_assignments", {}).get(nid, {}).get("primary", "")
 
 
+def _print_budgeted(lines: list[str], budget: int) -> None:
+    """Print up to `budget` lines, with a truncation note if more remain."""
+    for line in lines[:budget]:
+        print(line)
+    if len(lines) > budget:
+        print(f"... ({len(lines) - budget} more lines, raise --budget to see)")
+
+
 # ───────────────────────── subcommands ─────────────────────────
 
 def cmd_path(args) -> int:
@@ -165,8 +164,10 @@ def cmd_path(args) -> int:
     dst = _resolve(args.dst, id_map)
     edge_filter = _parse_edge_filter(getattr(args, "edge_type", None))
 
-    import networkx as nx
+    # _build_nx_graph first so its ImportError → friendly install-hint fires
+    # before the bare `import networkx` (needed below for NetworkXNoPath).
     G = _build_nx_graph(g_data["nodes"], g_data["edges"], id_map, edge_filter=edge_filter)
+    import networkx as nx
 
     if src not in G or dst not in G:
         raise SystemExit(f"Node missing from graph: {src if src not in G else dst}")
@@ -230,10 +231,7 @@ def cmd_path(args) -> int:
         if cl_from and cl_to and cl_from != cl_to:
             lines.append(f"     cluster: [{cl_from}] → [{cl_to}]  (cross-cluster bridge)")
 
-    for line in lines[:args.budget]:
-        print(line)
-    if len(lines) > args.budget:
-        print(f"... ({len(lines) - args.budget} more lines, raise --budget to see)")
+    _print_budgeted(lines, args.budget)
     return 0
 
 
@@ -349,10 +347,7 @@ def cmd_explain(args) -> int:
                 snippet = snippet[:87] + "…"
             lines.append(f"  {r['direction']} {r['label']}: {snippet}")
 
-    for line in lines[:args.budget]:
-        print(line)
-    if len(lines) > args.budget:
-        print(f"... ({len(lines) - args.budget} more lines, raise --budget to see)")
+    _print_budgeted(lines, args.budget)
     return 0
 
 
@@ -397,10 +392,7 @@ def cmd_neighbors(args) -> int:
         lines.append(f"\n[{cl}]  ({len(labels)})")
         for lbl in sorted(labels):
             lines.append(f"  {lbl}")
-    for line in lines[:args.budget]:
-        print(line)
-    if len(lines) > args.budget:
-        print(f"... ({len(lines) - args.budget} more lines, raise --budget to see)")
+    _print_budgeted(lines, args.budget)
     return 0
 
 

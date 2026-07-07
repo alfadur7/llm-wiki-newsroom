@@ -88,10 +88,10 @@
       "legacy": {"contradiction-theme": "N7", "contradiction-aggregate": "N7"},
       "source": "Wikipedia:Manual of Style/Words to watch — WP:ASF",
       "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Attribution",
-      "note": "If a value-laden word ('myth'·'empirical proof'·'skepticism'·'innovation', etc.) appears on only one side of the faction bold labels (theme) or tension-axis titles (aggregate), skew=1 FAIL. Both must be an equivalent vocabulary set. Measured by evaluate_contradiction_npov (theme)·evaluate_contradiction_aggregate (aggregate axis-skew). NOTE the value-word lexicon (LABEL_VALUE_WORDS) is Korean and dormant on English prose — see checks.py FLAG."
+      "note": "If a value-laden word ('myth'·'empirical proof'·'skepticism'·'innovation', etc.) appears on only one side of the faction bold labels (theme) or tension-axis titles (aggregate), skew=1 FAIL. Both must be an equivalent vocabulary set. Measured by evaluate_contradiction_npov (theme)·evaluate_contradiction_aggregate (aggregate axis-skew). NOTE the value-word lexicon (LABEL_VALUE_WORDS) is English-native ('myth'·'empirical'·'skepticism'·'innovation', etc.); the Korean equivalents fire under WIKI_LANG=ko."
     },
     "enc.slug-alias": {
-      "name": "Slug Korean alias",
+      "name": "Slug alias",
       "dimension": "Wikipedia MoS",
       "judge": "A",
       "algorithm": "find_unaliased_slugs",
@@ -124,7 +124,7 @@
       "legacy": {"overview-aggregate": "D2", "contradiction-aggregate": "D2"},
       "source": "Wikipedia:Summary style · Template:Main",
       "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Summary_style",
-      "note": "Each subsection of a roll-up carries an entry-point link (self slug alias) to its detail page (WP {{Main}} hatnote). overview = cluster sections, contradiction aggregate = theme drill-down [[slug|한글]] pipe alias. Measured by evaluate_overview_aggregate (overview)·evaluate_contradiction_aggregate (contradiction) bundle."
+      "note": "Each subsection of a roll-up carries an entry-point link (self slug alias) to its detail page (WP {{Main}} hatnote). overview = cluster sections, contradiction aggregate = theme drill-down [[slug|alias]] pipe alias. Measured by evaluate_overview_aggregate (overview)·evaluate_contradiction_aggregate (contradiction) bundle."
     },
     "enc.back-reference": {
       "name": "Landscape back-reference",
@@ -136,7 +136,7 @@
       "legacy": {"contradiction-theme": "X2"},
       "source": "Wikipedia:Summary style · Template:Main",
       "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Summary_style",
-      "note": "A theme piece provides ≥1 entry point up to its related cluster overview as a [[<cluster-slug>|한글]] pipe alias (reader's issue→field landscape back-route). Measured by evaluate_contradiction_npov (cluster_slugs orchestrator-injected)."
+      "note": "A theme piece provides ≥1 entry point up to its related cluster overview as a [[<cluster-slug>|alias]] pipe alias (reader's issue→field landscape back-route). Measured by evaluate_contradiction_npov (cluster_slugs orchestrator-injected)."
     },
     "enc.coatrack": {
       "name": "Coatrack avoidance (block tangential)",

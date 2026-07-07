@@ -25,8 +25,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent))
-from _lib import WIKI, read_text_cached  # noqa: E402
-from _hub_common import iter_hub_files, load_graph  # noqa: E402
+from _lib import read_text_cached  # noqa: E402
+from _hub_common import HUB_SPECS, iter_hub_files, load_graph  # noqa: E402
 
 import importlib.util as _ilu  # noqa: E402
 # Measuring hub body density and `## Connections` grouping (the encyclopedic
@@ -42,14 +42,6 @@ enc_skill = _ilu.module_from_spec(_enc_spec)
 _enc_spec.loader.exec_module(enc_skill)
 _HUB_FN = _HUB_BUNDLE["fn"]
 _HUB_PARAMS = _HUB_BUNDLE["params"]
-
-ENTITIES_DIR = WIKI / "entities"
-CONCEPTS_DIR = WIKI / "concepts"
-
-HUB_SPECS = [
-    (ENTITIES_DIR, "entities"),
-    (CONCEPTS_DIR, "concepts"),
-]
 
 # The regex and stripping for measuring body density and `## Connections`
 # grouping were moved into the encyclopedia-writing skill (evaluate_hub_body).

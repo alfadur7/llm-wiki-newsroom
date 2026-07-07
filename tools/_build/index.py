@@ -39,8 +39,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from _lib import (  # noqa: E402
     WIKI as wiki,
-    atomic_write_bytes,
+    CLUSTERS_JSON,
+    GRAPH_JSON,
+    WIKILINK_STEM_RE,
     atomic_write_if_changed,
+    atomic_write_text,
     graph_structure_fingerprint,
     normalize_quotes,
     parse_frontmatter,
@@ -158,7 +161,7 @@ def sync_source_urls() -> tuple[int, list[tuple[str, str, str]]]:
         raw_url = _extract_raw_url(source_file)
         new_content, action = _sync_source_url(content, source_url, raw_url or "")
         if action == "added":
-            atomic_write_bytes(fp, new_content.encode("utf-8"))
+            atomic_write_text(fp, new_content)
             added += 1
         elif action == "mismatch":
             mismatch.append((f.replace(".md", ""), source_url, raw_url or ""))
@@ -182,7 +185,7 @@ def run() -> None:
         if not d.exists():
             continue
         for f in sorted(os.listdir(d)):
-            if not f.endswith(".md") or f.startswith("_catalog") or f.startswith("_"):
+            if not f.endswith(".md") or f.startswith("_"):
                 continue
             fp = d / f
             content = fp.read_text(encoding="utf-8", errors="replace")
@@ -209,7 +212,7 @@ def run() -> None:
     analyses = [s for s in sections["syntheses"] if not Path(s[1]).stem.startswith("weekly-briefing-")]
     weekly.sort(key=lambda s: Path(s[1]).stem, reverse=True)  # newest ISO week first
 
-    clusters_path = Path("graph/_clusters.json")
+    clusters_path = CLUSTERS_JSON
     if not clusters_path.exists():
         raise SystemExit(
             "graph/_clusters.json not found. Run the pipeline in order:\n"
@@ -226,7 +229,7 @@ def run() -> None:
     # unreliable here — atomic_write_if_changed skips rewriting (no mtime bump)
     # when content is unchanged, so a label-only graph edit that leaves the
     # partition input untouched would falsely trip an mtime comparison.
-    graph_json = Path("graph/_graph.json")
+    graph_json = GRAPH_JSON
     recorded_fp = clusters_data.get("graph_fingerprint")
     if graph_json.exists() and recorded_fp is not None:
         current_fp = graph_structure_fingerprint(
@@ -406,7 +409,7 @@ def run() -> None:
         if not d.exists():
             continue
         for f in sorted(os.listdir(d)):
-            if not f.endswith(".md") or f.startswith("_catalog") or f.startswith("_"):
+            if not f.endswith(".md") or f.startswith("_"):
                 continue
             fp = d / f
             content = fp.read_text(encoding="utf-8", errors="replace")
@@ -422,7 +425,7 @@ def run() -> None:
             # references would scatter into separate `Hub#section` keys and
             # never aggregate to the hub itself, leaving real backlinks
             # invisible in the dedup map.
-            for m in re.finditer(r'\[\[([^\]|#]+)', content):
+            for m in WIKILINK_STEM_RE.finditer(content):
                 target = m.group(1).strip()
                 if target != page_name:
                     backlinks[target].append({"from": rel, "title": pg_title})

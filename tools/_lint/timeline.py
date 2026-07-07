@@ -32,7 +32,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, atomic_write_text, parse_frontmatter, read_text_cached, strip_code, strip_frontmatter  # noqa: E402
+from _lib import TIMELINE_DATE_ONLY_RE, TIMELINE_ENTRY_RE, WIKI, WIKILINK_STEM_RE, atomic_write_text, parse_frontmatter, read_text_cached, strip_code, strip_frontmatter  # noqa: E402
 sys.path.insert(0, str(Path(__file__).parent))  # tools/_lint/ — sibling import
 from _advisory_common import iter_md, mark as _mark, print_rewrite_block  # noqa: E402
 
@@ -48,13 +48,14 @@ REQUIRED_KEYS = ("schema", "source_indexed")
 
 # A dated `### YYYY` header (year section).
 YEAR_HEADER_RE = re.compile(r"^###\s+\d{4}\b", re.MULTILINE)
-# Timeline dated entry: "- **2026-05** ..." / "- ★ **2026년 5월 13일** — ...".
-TL_ENTRY_RE = re.compile(r"^\s*-\s*(?:★\s*)?\*\*\s*([^*]+?)\s*\*\*\s*(.*)$", re.MULTILINE)
-# A bold token that is a pure date (digits + date separators only), rejecting
-# `## Flow Summary` range-label bullets (e.g. "2019~2021 기반 다지기" / "laying the groundwork").
-DATE_ONLY_RE = re.compile(r"^\d{4}[\d\s\-.년월일]*$")
+# Timeline dated entry: "- **2026-05** ..." / "- ★ **2026-05-13** — ...".
+# Shared _lib definitions — the builder (_build/overlays.py) and this lint must
+# agree on which lines are dated entries, incl. the `**YYYY (planned)**` future
+# anchor, or the path/region flavor verdict diverges between lint and build.
+TL_ENTRY_RE = TIMELINE_ENTRY_RE
+DATE_ONLY_RE = TIMELINE_DATE_ONLY_RE
 # First wikilink in an entry body, stripping pipe alias / `#` anchor.
-ANY_LINK_RE = re.compile(r"\[\[([^\]|#]+)(?:[#|][^\]]*)?\]\]")
+ANY_LINK_RE = WIKILINK_STEM_RE
 
 
 def _is_source_link(target: str) -> bool:

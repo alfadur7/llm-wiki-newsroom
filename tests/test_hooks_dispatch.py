@@ -137,7 +137,10 @@ def test_plan_file_advisory(capsys):
     assert "5-step self-check" in _payload(capsys)
 
 
-def test_scratch_advisory_write_only(capsys):
+def test_scratch_advisory_write_only(capsys, monkeypatch):
+    # _REPO_ROOT is derived from the hook's own location, so pin it to the fake
+    # root here to test the exact-match regardless of the real clone directory.
+    monkeypatch.setattr(dispatch, "_REPO_ROOT", "/home/u/llm-wiki-newsroom")
     dispatch.run_pre(_input("Write", "/home/u/llm-wiki-newsroom/tmp.py", content="x"))
     assert "[scratch-location-advisory]" in _payload(capsys)
     # Edit does not trigger scratch (the legacy hook was limited to PreToolUse Write).

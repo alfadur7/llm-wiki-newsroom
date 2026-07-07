@@ -35,7 +35,7 @@ from datetime import date as _date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import FRONTMATTER_BLOCK_RE as FRONTMATTER_RE, WIKI, korean_mode, parse_frontmatter, read_text_cached  # noqa: E402
+from _lib import FRONTMATTER_BLOCK_RE as FRONTMATTER_RE, WIKI, atomic_write_text, korean_mode, parse_frontmatter, read_text_cached  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).parent))
 from _schema_common import check_frontmatter  # noqa: E402
@@ -81,9 +81,12 @@ HUB_SPECS = [
 # continuation). Prior to 2026-04-21 this silently removed 820 slugs across
 # 42 hub files from graph/backlinks/cluster assignment; a one-off recovery
 # restored them and this guard prevents regression: any reintroduction of
-# the hybrid pattern is a schema FAIL.
+# the hybrid pattern is a schema FAIL. `\s*` before the bullet: indented
+# orphan bullets (the block-list shape Obsidian emits) are dropped by the
+# parser exactly like column-0 ones, so both must trip the guard. A following
+# `key:` line breaks the match, so a legitimate next field never false-positives.
 HYBRID_FRONTMATTER_RE = re.compile(
-    r"^sources:\s*\[[^\]]*\]\s*\n-\s+",
+    r"^sources:\s*\[[^\]]*\]\s*\n\s*-\s+",
     re.MULTILINE,
 )
 
@@ -92,16 +95,17 @@ HYBRID_FRONTMATTER_RE = re.compile(
 # now that all 423 files were migrated to compliance in prior commits.
 SECTION_GAEYO_RE = re.compile(r"^##\s+Overview\s*$", re.MULTILINE)
 SECTION_YEONGYEOL_RE = re.compile(r"^##\s+Connections\s*$", re.MULTILINE)
-# Legacy section name from the pre-normalization corpus. CLAUDE.md mandates
-# `## Connections` (Connections) as the canonical form; `## 위키 Connections` (and prefix
-# variants like `## 위키 Connections 문서`/`## 위키 Connections 페이지`) are deprecated synonyms.
+# Legacy section name from the pre-normalization Korean corpus. CLAUDE.md
+# mandates `## Connections` as the canonical form; `## 위키 연결` (and prefix
+# variants like `## 위키 연결 문서`/`## 위키 연결 페이지`) are deprecated synonyms.
 # `--fix` rewrites the bare form in place; prefix variants (where the legacy
 # heading sits alongside a canonical `## Connections`, indicating a duplicate residual
 # section) are flagged for manual review since safe auto-removal would require
-# body diff judgment.
-SECTION_LEGACY_YEONGYEOL_RE = re.compile(r"^##\s+위키 Connections\s*$", re.MULTILINE)
+# body diff judgment. Gated behind korean_mode() like the Hangul-title check —
+# the legacy heading only occurs in WIKI_LANG=ko corpora.
+SECTION_LEGACY_YEONGYEOL_RE = re.compile(r"^##\s+위키 연결\s*$", re.MULTILINE)
 SECTION_LEGACY_YEONGYEOL_PREFIX_RE = re.compile(
-    r"^##\s+위키 Connections(?:\s+\S.*)?$", re.MULTILINE
+    r"^##\s+위키 연결(?:\s+\S.*)?$", re.MULTILINE
 )
 # Body length floor: ≥ 200 chars of non-frontmatter content. Conservative
 # vs the observed p10 (entities 297 · concepts 483) so early stubs aren't
@@ -175,15 +179,15 @@ def _apply_auto_fix(path: Path, fm: dict, expected_type: str) -> tuple[bool, lis
         new_content = _inject_or_set_field(new_content, "last_updated", commit_date)
         actions.append(f"last_updated=<missing> → {commit_date}")
 
-    # Legacy section heading: rewrite the legacy `## 위키 Connections` heading to the
-    # canonical Connections form (CLAUDE.md canonical form). Deterministic body
-    # fix — only affects the heading line; body content is preserved verbatim.
-    if SECTION_LEGACY_YEONGYEOL_RE.search(new_content):
+    # Legacy section heading (ko-mode): rewrite the legacy `## 위키 연결` heading
+    # to the canonical Connections form (CLAUDE.md canonical form). Deterministic
+    # body fix — only affects the heading line; body content is preserved verbatim.
+    if korean_mode() and SECTION_LEGACY_YEONGYEOL_RE.search(new_content):
         new_content = SECTION_LEGACY_YEONGYEOL_RE.sub("## Connections", new_content)
-        actions.append("## 위키 Connections → ## Connections (legacy heading normalized)")
+        actions.append("## 위키 연결 → ## Connections (legacy heading normalized)")
 
     if new_content != content:
-        path.write_text(new_content, encoding="utf-8")
+        atomic_write_text(path, new_content)
         return True, actions
     return False, actions
 
@@ -210,8 +214,8 @@ def _check_body(content: str, path: Path, expected_type: str, dir_label: str) ->
             f"(.claude/layers/hub.md)"
         )
     has_canonical = bool(SECTION_YEONGYEOL_RE.search(body))
-    has_legacy_bare = bool(SECTION_LEGACY_YEONGYEOL_RE.search(body))
-    has_legacy_prefix = bool(SECTION_LEGACY_YEONGYEOL_PREFIX_RE.search(body))
+    has_legacy_bare = korean_mode() and bool(SECTION_LEGACY_YEONGYEOL_RE.search(body))
+    has_legacy_prefix = korean_mode() and bool(SECTION_LEGACY_YEONGYEOL_PREFIX_RE.search(body))
     has_legacy_variant = has_legacy_prefix and not has_legacy_bare
     if not has_canonical and not has_legacy_bare:
         issues.append(
@@ -220,12 +224,12 @@ def _check_body(content: str, path: Path, expected_type: str, dir_label: str) ->
         )
     elif has_legacy_bare and not has_canonical:
         issues.append(
-            f"  {dir_label}/{path.name}: legacy `## 위키 Connections` heading — "
+            f"  {dir_label}/{path.name}: legacy `## 위키 연결` heading — "
             f"normalize to `## Connections` (run with --fix to auto-rewrite)"
         )
     if has_legacy_variant:
         issues.append(
-            f"  {dir_label}/{path.name}: legacy `## 위키 Connections …` prefix variant "
+            f"  {dir_label}/{path.name}: legacy `## 위키 연결 …` prefix variant "
             f"alongside canonical `## Connections` — duplicate residual section requires "
             f"manual merge or removal (auto-fix declined to avoid body data loss)"
         )

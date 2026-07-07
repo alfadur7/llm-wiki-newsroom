@@ -28,12 +28,10 @@ from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))  # _discover/ → tools/ root (shared modules)
-from _lib import GRAPH, _build_id_map  # noqa: E402
+from _lib import CLUSTERS_JSON, GRAPH_JSON, HUB_PREFIXES, _build_id_map  # noqa: E402
 
-GRAPH_PATH = GRAPH / "_graph.json"
-CLUSTERS_PATH = GRAPH / "_clusters.json"
-
-HUB_PREFIXES = ("entities/", "concepts/")
+GRAPH_PATH = GRAPH_JSON
+CLUSTERS_PATH = CLUSTERS_JSON
 
 DEFAULT_TOP = 15
 

@@ -5,8 +5,8 @@ source/entity/concept). This module re-reads the meta pages and emits, per
 overlay, the base-node members it spans plus order/flavor metadata, so
 graph.html can render them as lenses over the base graph.
 
-overview is NOT emitted here — it binds to the existing cluster legend/hull
-(plan §2). This module covers the other 4 types:
+overview is NOT emitted here — it binds to the existing cluster legend/hull.
+This module covers the other 4 types:
   - trail      → path  (ordered `## Path` items)
   - timeline   → path (source-indexed) | region (narrative) — classified per file
   - synthesis  → region (`## Connections`/`## Sources` wikilinks)
@@ -20,8 +20,6 @@ only to base nodes — meta→meta links are dropped, matching the graph.
 Output graph/_overlays.json:
   { "overlays": [ {type, slug, title, flavor, members:[{id, order?, date?, note?}]} ],
     "node_overlays": { "<node id>": [ {type, slug, title} ] } }
-
-See ~/.claude/plans/meta-overlay-graph.md.
 """
 from __future__ import annotations
 
@@ -31,9 +29,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, atomic_write_if_changed, parse_frontmatter as _parse_fm, _build_id_map  # noqa: E402
+from _lib import GRAPH, GRAPH_JSON, TIMELINE_DATE_ONLY_RE, TIMELINE_ENTRY_RE, WIKI, WIKILINK_STEM_RE, atomic_write_if_changed, parse_frontmatter as _parse_fm, section_body, _build_id_map  # noqa: E402
 
-GRAPH_JSON = Path("graph/_graph.json")
 CONTRA_CLAIMS = WIKI / "contradictions" / "_contradictions.json"
 CONTRA_THEMES = WIKI / "contradictions" / "_contradictions_themes.json"
 
@@ -48,28 +45,19 @@ CONTRADICTION_SKIP = {"other-fragmentary"}
 # stays single).
 _SIDE_RE = re.compile(r"^-\s*\*\*(.+?)\*\*\s*:?\s*(.*)$", re.MULTILINE)
 
-_ANY_LINK_RE = re.compile(r"\[\[([^\]|#]+)(?:[#|][^\]]*)?\]\]")
+# All wikilinks — stem only, alias/anchor consumed (shared _lib definition).
+_ANY_LINK_RE = WIKILINK_STEM_RE
 # Trail `## Path` numbered item: "1. [[Hub]] — note".
 _TRAIL_ITEM_RE = re.compile(
     r"^\s*\d+\.\s*\[\[([^\]|#]+)(?:[#|][^\]]*)?\]\]\s*(?:—|--)?\s*(.*)$", re.MULTILINE
 )
-# Timeline dated entry: "- **2026-04** ..." / "- ★ **May 13, 2026** — ...".
-_TL_ENTRY_RE = re.compile(r"^\s*-\s*(?:★\s*)?\*\*\s*([^*]+?)\s*\*\*\s*(.*)$", re.MULTILINE)
-# A bold token that is a date — digits + date separators, with an optional
-# trailing parenthetical qualifier so the prescribed future-anchor form
-# `**YYYY (planned)**` (timeline.md) is kept, while `## Flow Summary` range-label
-# bullets ("2019~2021 laying the groundwork") are still rejected.
-_DATE_ONLY_RE = re.compile(r"^\d{4}[\d\s\-.년월일]*(?:\s*\([^)]*\))?$")
-
-
-def _section(content: str, header: str) -> str:
-    """Body of the `## <header>` section up to the next H2 (or EOF)."""
-    m = re.search(rf"^##\s+{re.escape(header)}\s*$", content, re.MULTILINE)
-    if not m:
-        return ""
-    start = m.end()
-    nxt = re.search(r"^##\s+", content[start:], re.MULTILINE)
-    return content[start:start + nxt.start()] if nxt else content[start:]
+# Timeline dated entry: "- **2026-04** ..." / "- ★ **2026-05-13** — ...".
+_TL_ENTRY_RE = TIMELINE_ENTRY_RE
+# A bold token that is a date — keeps the prescribed `**YYYY (planned)**`
+# future anchor, rejects `## Flow Summary` range-label bullets ("2019~2021
+# laying the groundwork"). Shared _lib definition so the timeline lint's
+# path/region mirror cannot drift from this builder.
+_DATE_ONLY_RE = TIMELINE_DATE_ONLY_RE
 
 
 def _resolve(raw: str, id_map: dict[str, str]) -> str | None:
@@ -108,7 +96,7 @@ def _meta_files(subdir: str) -> list[tuple[str, str]]:
 
 
 def _trail_overlay(rel: str, content: str, id_map: dict) -> dict | None:
-    body = _section(content, "Path")
+    body = section_body(content, "Path")
     members = []
     order = 0
     for m in _TRAIL_ITEM_RE.finditer(body):
@@ -159,7 +147,7 @@ def _timeline_overlay(rel: str, content: str, id_map: dict) -> dict | None:
             seen.add(nid)
             members.append({"id": nid})
     if not members:
-        _collect(_section(content, "Flow Summary"), id_map, seen, members)
+        _collect(section_body(content, "Flow Summary"), id_map, seen, members)
     if not members:
         _collect(content, id_map, seen, members)
     if not members:
@@ -187,7 +175,7 @@ def _synthesis_overlay(rel: str, content: str, id_map: dict) -> dict | None:
         if nid and nid not in seen:
             seen.add(nid)
             members.append({"id": nid})
-    _collect(_section(content, "Connections") + "\n" + _section(content, "Sources"),
+    _collect(section_body(content, "Connections") + "\n" + section_body(content, "Sources"),
              id_map, seen, members)
     if not members:
         _collect(content, id_map, seen, members)  # briefing w/o sections
@@ -206,7 +194,7 @@ def _contradiction_sides(content: str, id_map: dict) -> list[dict]:
     labels per faction so the single region hull's members read as opposing
     camps. Returned only when ≥2 factions resolve members (else the single
     region stands alone)."""
-    body = _section(content, "Opposing Positions")
+    body = section_body(content, "Opposing Positions")
     if not body:
         return []
     sides = []
@@ -295,7 +283,7 @@ def run() -> None:
             node_overlays.setdefault(mem["id"], []).append(ref)
 
     data = {"overlays": overlays, "node_overlays": node_overlays}
-    atomic_write_if_changed(Path("graph/_overlays.json"),
+    atomic_write_if_changed(GRAPH / "_overlays.json",
                             json.dumps(data, ensure_ascii=False, indent=2))
 
     from collections import Counter

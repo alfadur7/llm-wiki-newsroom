@@ -56,7 +56,16 @@ from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, atomic_write_if_changed, parse_frontmatter as _parse_fm, _build_id_map  # noqa: E402
+from _lib import (  # noqa: E402
+    GRADE_MARKER_RE,
+    GRAPH_JSON,
+    HUB_PREFIXES,
+    WIKI,
+    WIKILINK_STEM_RE,
+    _build_id_map,
+    atomic_write_if_changed,
+    parse_frontmatter as _parse_fm,
+)
 
 
 ROOT_META = {
@@ -68,7 +77,7 @@ ROOT_META = {
 # graph nodes; they are rendered as overlays (overview via the cluster
 # legend, the other 4 via _overlays.json built by overlays.py). Excluding
 # them here drops both their nodes and their meta→member edges from
-# _graph.json. See ~/.claude/plans/meta-overlay-graph.md.
+# _graph.json.
 META_NODE_TYPES = {"overview", "contradiction", "synthesis", "timeline", "trail"}
 BASE_NODE_TYPES = {"source", "entity", "concept"}
 
@@ -83,7 +92,7 @@ def _title_and_type(content: str) -> tuple[str, str]:
 # anchored link like `[[slug#section]]` still resolves against id_map (keyed on slug).
 _LABELED_LINK_RE = re.compile(r"\[\[([^\]|#]+)(?:[#|][^\]]*)?\]\]\s*(?:—|--)\s*(.+?)(?:\n|$)")
 # All wikilinks (used for the second dedup-aware pass). Stem only, anchor stripped.
-_ANY_LINK_RE = re.compile(r"\[\[([^\]|#]+)(?:[#|][^\]]*)?\]\]")
+_ANY_LINK_RE = WIKILINK_STEM_RE
 
 # H2 section header at line start. Used to slice each file into
 # (start, end, section_title) spans so each wikilink can be tagged with
@@ -106,9 +115,8 @@ _CITATION_PREFIX_RE = re.compile(
     r"^\s*-\s*(cites|references|contradicts|defines)\s*:", re.MULTILINE
 )
 
-# Phase 2 — evidence grade marker on `## Key Claims` claim lines.
-# Format: `- [fact] [[claimant]] — ...` / `[analysis]` / `[forecast]`.
-_GRADE_MARKER_RE = re.compile(r"^\s*-\s*\[(fact|analysis|forecast)\]")
+# Phase 2 — evidence grade marker on `## Key Claims` claim lines: shared
+# GRADE_MARKER_RE from _lib (single definition with contradictions.py).
 
 
 def _section_to_relation(rel: str, section_title: str) -> str:
@@ -134,7 +142,7 @@ def _section_to_relation(rel: str, section_title: str) -> str:
     if section in ("Sources", "Source References"):
         return "cites"
     # Definition section only in entity/concept pages.
-    if rel.startswith(("entities/", "concepts/")) and section == "Overview":
+    if rel.startswith(HUB_PREFIXES) and section == "Overview":
         return "defines"
     # Default — generic in-body reference.
     return "references"
@@ -189,7 +197,7 @@ def _line_relation_override(line: str) -> str | None:
 def _line_grade(line: str) -> str | None:
     """Phase 2 — if the line starts with `[fact]`/`[analysis]`/`[forecast]`,
     return that grade; else None."""
-    m = _GRADE_MARKER_RE.match(line)
+    m = GRADE_MARKER_RE.match(line)
     if m:
         return m.group(1)
     return None
@@ -332,7 +340,6 @@ def run() -> None:
     for e in edges:
         page_links.setdefault(e["from"], set()).add(e["to"])
 
-    inferred: set[tuple[str, str]] = set()
     inferred_redundant_skipped = 0
     pages = list(page_links.keys())
     for i in range(len(pages)):
@@ -344,16 +351,13 @@ def run() -> None:
                     inferred_redundant_skipped += 1
                     continue
                 confidence = min(1.0, len(common) / 5.0)
-                key = (pages[i], pages[j])
-                if key not in inferred:
-                    inferred.add(key)
-                    edges.append({
-                        "from": pages[i],
-                        "to": pages[j],
-                        "type": "INFERRED",
-                        "confidence": round(confidence, 2),
-                        "shared": sorted(common)[:5],
-                    })
+                edges.append({
+                    "from": pages[i],
+                    "to": pages[j],
+                    "type": "INFERRED",
+                    "confidence": round(confidence, 2),
+                    "shared": sorted(common)[:5],
+                })
 
     type_counts = Counter(n["type"] for n in nodes)
     edge_type_counts = Counter(e["type"] for e in edges)
@@ -387,7 +391,6 @@ def run() -> None:
         for raw, cnt in orphan_targets.most_common(10):
             print(f"    {raw}: {cnt}")
 
-    os.makedirs("graph", exist_ok=True)
     graph_data = {
         "nodes": nodes,
         "edges": edges,
@@ -401,7 +404,7 @@ def run() -> None:
         },
     }
     atomic_write_if_changed(
-        Path("graph/_graph.json"),
+        GRAPH_JSON,
         json.dumps(graph_data, ensure_ascii=False, indent=2),
     )
     print("\nWrote graph/_graph.json")

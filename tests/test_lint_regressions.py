@@ -39,6 +39,30 @@ def test_paragraph_count_is_module_level_single_definition():
     assert overview._paragraph_count("") == 1  # minimum 1 (denominator protection)
 
 
+def test_skeleton_overview_copies_stay_in_lockstep():
+    """Audit regression — `_skeleton_overview` is deliberately duplicated between the
+    builder (`_build/clusters.py`, which writes the skeleton) and the lint SoT
+    (`_lint/overview.py`, which checks it). The two must emit byte-identical output or
+    the lint flags the builder's own product. This asserts the function bodies stay
+    identical (docstrings excluded) so a future edit to one copy fails loudly here."""
+    import ast
+
+    def _body(path):
+        src = path.read_text(encoding="utf-8")
+        for node in ast.walk(ast.parse(src)):
+            if isinstance(node, ast.FunctionDef) and node.name == "_skeleton_overview":
+                if node.body and isinstance(node.body[0], ast.Expr) and isinstance(
+                    getattr(node.body[0], "value", None), ast.Constant
+                ):
+                    node.body = node.body[1:]  # drop the docstring
+                return ast.dump(node)
+        raise AssertionError(f"_skeleton_overview not found in {path}")
+
+    build = _body(ROOT / "tools" / "_build" / "clusters.py")
+    lint = _body(ROOT / "tools" / "_lint" / "overview.py")
+    assert build == lint, "_skeleton_overview drifted between the builder and the lint SoT"
+
+
 def test_demotion_excludes_prose_embedded_hub(tmp_path):
     """measurement-root regression — a hub embedded only in overview/synthesis/timeline/trail
     must be treated as nav-inbound and excluded from demotion candidates even when it rides on no graph edge.
@@ -75,7 +99,7 @@ def test_meta_lint_regex_hoisting_check_active():
     and there is currently no redefinition in tools/."""
     proc = subprocess.run(
         [sys.executable, "tools/lint.py", "meta"],
-        capture_output=True, text=True, cwd=ROOT, timeout=300,
+        capture_output=True, text=True, encoding="utf-8", cwd=ROOT, timeout=300,
     )
     assert proc.returncode in (0, 1)  # 1 = clone-environment artifacts (.claude/memory/, etc.) allowed
     assert "OK - shared FRONTMATTER*/WIKILINK*/AUTO* regexes defined only in _lib" in proc.stdout

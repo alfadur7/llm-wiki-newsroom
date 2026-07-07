@@ -20,17 +20,9 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, korean_mode, read_text_cached  # noqa: E402
+from _lib import FRONTMATTER_BLOCK_RE, korean_mode, read_text_cached  # noqa: E402
 sys.path.insert(0, str(Path(__file__).parent))
-from _hub_common import body_text, iter_hub_files  # noqa: E402
-
-ENTITIES_DIR = WIKI / "entities"
-CONCEPTS_DIR = WIKI / "concepts"
-
-HUB_SPECS = [
-    (ENTITIES_DIR, "entities"),
-    (CONCEPTS_DIR, "concepts"),
-]
+from _hub_common import HTML_COMMENT_RE, HUB_SPECS, iter_hub_files  # noqa: E402
 
 
 # Self-meta voice antipatterns. The patterns mirror the explicit expressions in
@@ -75,12 +67,19 @@ def _check_body(content: str, path: Path, dir_label: str) -> list[str]:
         return issues
     # Frontmatter + HTML comments stripped (policy-meta zones, not body prose —
     # abbreviation declarations there must not false-positive on "본 hub").
-    body = body_text(content)
+    # Newline-preserving strip: the frontmatter line count is kept as `base`
+    # and HTML comments are replaced by their own newlines, so reported
+    # `:{line}:` numbers stay aligned with the source file.
+    fm = FRONTMATTER_BLOCK_RE.match(content)
+    base = content[: fm.end()].count("\n") if fm else 0
+    body = HTML_COMMENT_RE.sub(
+        lambda m: "\n" * m.group(0).count("\n"),
+        content[fm.end():] if fm else content,
+    )
 
     # Skip fenced code blocks so a code example illustrating an antipattern
     # (or a quoted command) cannot raise a FAIL on non-prose content. Toggle
-    # in place rather than stripping so reported `:{idx}:` line numbers stay
-    # aligned with the source file.
+    # in place rather than stripping so line numbering is preserved.
     lines = body.splitlines()
     in_fence = False
     for idx, line in enumerate(lines, start=1):
@@ -92,7 +91,7 @@ def _check_body(content: str, path: Path, dir_label: str) -> list[str]:
         for slug, pattern, label in VOICE_PATTERNS:
             for m in pattern.finditer(line):
                 issues.append(
-                    f"  {dir_label}/{path.name}:{idx}: {label} "
+                    f"  {dir_label}/{path.name}:{base + idx}: {label} "
                     f"— matched `{m.group(0)}` (.claude/layers/hub.md "
                     f"\"Self-meta voice ban\")"
                 )

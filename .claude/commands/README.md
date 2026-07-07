@@ -100,7 +100,7 @@ User (natural language or slash) → Editor-in-Chief → decide traversal patter
 
 ## Human Reviewer Gate Hierarchy
 
-The `## Human Reviewer Gate` section of each command file is interpreted as the **union of the CLAUDE.md global gates and this command's specific gates**. The global gates (`ADAPT 3rd FAIL on the same cause` · `new cluster slug` · `new person entity stub` · `L2-4 root publish` · `guide skeleton change` · `external commit·push` · `large-scale body rewrite`) have their single SoT in [`CLAUDE.md` "Human Reviewer Gate"](../../CLAUDE.md#human-reviewer-gate) — each command file does not re-list these gates and specifies **only the specific gates** that arise within its own trigger area.
+The `## Human Reviewer Gate` section of each command file is interpreted as the **union of the CLAUDE.md global gates and this command's specific gates**. The global gates (`ADAPT 3rd FAIL on the same cause` · `new cluster slug` · `new contradiction theme slug` · `new person entity stub` · `L2-4 root publish` · `guide skeleton change` · `external commit·push` · `large-scale body rewrite`) have their single SoT in [`CLAUDE.md` "Human Reviewer Gate"](../../CLAUDE.md#human-reviewer-gate) — each command file does not re-list these gates and specifies **only the specific gates** that arise within its own trigger area.
 
 Decision steps when adding a new command:
 1. Which Layer × which Cycle cell is the traversal?

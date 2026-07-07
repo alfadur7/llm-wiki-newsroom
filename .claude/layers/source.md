@@ -18,17 +18,17 @@ source_url: "https://..."  # URL SoT (HTML auto-enriched at ingest, PDF manual)
 last_updated: YYYY-MM-DD    # bump to today's date when the source MD is edited (auto-stamped at ingest)
 ---
 
-### Summary
+## Summary
 2–4 sentence summary.
 
-### Key Claims
+## Key Claims
 - [<grade>] [[claimant]] — content [[evidence-slug#section]]
   # grade: [fact] primary · [analysis] secondary · [forecast] tertiary
 
-### Key Quotes
+## Key Quotes
 > "quotation" — [[Speaker]]
 
-### Connections
+## Connections
 - <type>: [[Hub]] — one-line description
   # type: cites: · references: · contradicts: · defines:
 ```
@@ -77,7 +77,7 @@ The table below is the **mapping** of which craft criterion each part of a sourc
 
 ### Execution Order (step-by-step guide)
 
-This guide applies at step 4 (authoring the source page) of the 12-step procedure that `/wiki-ingest` runs. For the general procedure, see `.claude/commands/wiki-ingest.md`. (Existing source migration and iteration apply the same authoring order below.)
+This guide applies at step 4 (authoring the source page) of the 13-step procedure that `/wiki-ingest` runs. For the general procedure, see `.claude/commands/wiki-ingest.md`. (Existing source migration and iteration apply the same authoring order below.)
 
 1. **Read the raw document end to end** — identify key claims, quotations, figures, and the entities/concepts mentioned.
 2. **Write the frontmatter** — fill in title · type · tags · published · scraped · source_file · source_url (field meanings are in the schema comments above). If `tags` is empty, the source lint T1 hard gate blocks it (consumed as the node badge in the graph browser); candidates are suggested from the `## Connections` hubs by `python tools/_ingest/suggest_tags.py --file wiki/sources/<slug>.md`. The URL SoT convention is in .claude/layers/source.md.
@@ -217,7 +217,8 @@ When two atomic claims are juxtaposed on one line, split them:
 detection patterns:
   - English "and" (or "·") joining two [[hub]] links with their own predicates on one line
   - "[[A]] X · [[B]] Y" multiple [[hub]] + verb combination
-  (Korean-conjunctive-ending splitting — "…했고, …했다" / "…며, …다" — runs only under WIKI_LANG=ko)
+  (Only the Korean conjunction 와/및 · verb-ending 했고…했다 forms are machine-matched by G3/G5;
+   the English cues above are author-applied / Desk-reviewed, not lint-enforced.)
 
 handling:
   → split into two lines, attach a grade marker separately to each
@@ -295,7 +296,7 @@ When a cap is exceeded, a token recurs, or consistency is violated, an auxiliary
 - PASS condition per metric:
   - **G1**: `grade_marker = N/N` — among `## Key Claims` lines, those matching the grade-marker regex `^-\s*\[(fact|analysis|forecast)\]` (the English grade tokens `[fact]`/`[analysis]`/`[forecast]`) / all claim lines. N/N = 100% PASS; partial match FAILs.
   - **G2**: `claimant_wikilink = N/N` — among `## Key Claims` lines, those with a `[[<entity>]]` wikilink right after the grade marker / all claim lines. N/N = 100% PASS.
-  - **G3**: `atomic_violations = 0` — detects (heuristically) cases where two claims are juxtaposed on one line via split markers — English "and" / `+ ` joining two `[[hub]]` links (the Korean conjunction ` 와 ` is matched only under WIKI_LANG=ko). 0 = PASS.
+  - **G3**: `atomic_violations = 0` — the automated heuristic matches only the Korean conjunctions `와`/`및` joining two `[[hub]]` links (dormant on English prose; the English "and"/`+ ` composite split is author-applied / Desk-reviewed, not lint-enforced). 0 = PASS.
   - **C1**: `prefix = N/N` — among `## Connections` lines, those matching the `^- (cites|references|contradicts|defines):` regex / all lines. N/N = 100% PASS.
   - **C2**: `ref_ratio = N%` — the share of `references:` prefixes among `## Connections` lines. ≤ 95% PASS (over 95% is an advisory). Exempt (`—`) if there are fewer than 5 lines.
   - **A1**: `anchored = N/M` — among `## Key Claims` `[fact]`/`[analysis]` lines, those with a `[[<slug>#<section>]]` anchor pattern / all `[fact]`/`[analysis]` lines. Advisory — even 0% is PASS (same as Phase 1 Xanadu).

@@ -32,10 +32,11 @@ lint exists to catch. Using the EDITOR-body date as the baseline closes it; when
 the two diverge the report names both (`body=<git date>` vs `last_updated=<fm>`).
 
 Rollout: **advisory mode** — reports but does not gate the exit code (the
-138-stale backlog precludes gating until triaged). Coverage limits: L2-4 root
-meta files (overview.md/contradiction.md) and upstream-less pages have no
-frontmatter `last_updated` and are out of scope here — a git/log-based root
-timestamp is a future addition, not yet implemented.
+138-stale backlog precludes gating until triaged). Coverage limits: only pages
+with neither a frontmatter `last_updated` nor an EDITOR-body git date are out
+of scope. L2-4 root meta files (overview.md/contradiction.md) are in scope via
+the git EDITOR-body date (`_BODY_DATED_ROOTS`) and drop out only when git is
+unavailable.
 """
 from __future__ import annotations
 
@@ -118,7 +119,7 @@ def _newest_upstream(rec: dict, pages: dict) -> list[str]:
     return [u for u in rec.get("upstream", []) if pages.get(u, {}).get("last_updated") == um]
 
 
-def run(target: str | None = None, fix: bool = False, **_kwargs) -> int:
+def run(target: str | None = None, **_kwargs) -> int:
     pages = _load()
     if not pages:
         print(f"ERROR: {_DEPS_PATH} not found or empty — run `python tools/build.py dependencies` first.",
@@ -191,4 +192,5 @@ def run(target: str | None = None, fix: bool = False, **_kwargs) -> int:
     if ADVISORY_MODE:
         print("\n  [Advisory mode] orthogonal upstream-freshness signal — runs alongside the "
               "per-type freshness/drift checks (overview/contradiction), which stay authoritative. Exit 0.")
-    return 0
+        return 0
+    return 1 if stale else 0

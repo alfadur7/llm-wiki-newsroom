@@ -2,7 +2,7 @@
 
 Reads the current `graph/_clusters.json` (warm-start product) and runs a
 transient cold-start Leiden on the same graph to compute the quality gap.
-Cold > warm by more than QUALITY_THRESHOLD signals that warm-start is
+Cold > warm by more than DEFAULT_QUALITY_THRESHOLD signals that warm-start is
 stuck in a stale local optimum — operator should consider
 `python tools/build.py clusters --cold` to re-anchor.
 
@@ -18,6 +18,7 @@ CLI:
 Exit codes:
     0 — partition healthy (warm within threshold of cold optimum)
     1 — drift detected (cold optimum significantly better)
+    2 — missing dependency (leidenalg/igraph) or missing graph/_clusters.json
 """
 from __future__ import annotations
 
@@ -26,8 +27,8 @@ import os
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).parent.parent.parent
-CLUSTERS_PATH = ROOT / "graph" / "_clusters.json"
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from _lib import CLUSTERS_JSON as CLUSTERS_PATH  # noqa: E402
 
 # Relative quality gap threshold. RBConfiguration quality is unnormalised
 # (scales with edge count: ~3700 for the wiki's ~16K edges), so a fixed
@@ -57,13 +58,6 @@ def _resolved_threshold(cli_override: float | None) -> float:
     return DEFAULT_QUALITY_THRESHOLD
 
 
-# Backward-compatible alias for callers that may import the constant.
-QUALITY_THRESHOLD = DEFAULT_QUALITY_THRESHOLD
-
-SEED = 42  # mirrors tools/_build/clusters.py
-RESOLUTION = 1.0
-
-
 def run(json_out: bool = False, threshold: float | None = None) -> int:
     try:
         import leidenalg
@@ -76,18 +70,14 @@ def run(json_out: bool = False, threshold: float | None = None) -> int:
         print(f"ERROR: {CLUSTERS_PATH} not found. Run `python tools/build.py clusters` first.", file=sys.stderr)
         return 2
 
-    sys.path.insert(0, str(ROOT / "tools"))
-    from _build.clusters import build_hub_graph  # noqa: E402
+    from _build.clusters import RESOLUTION, SEED, build_hub_graph, to_igraph  # noqa: E402  (tools/ on sys.path at module top)
 
     G, _hub_labels, _data, _id_map, _isolated = build_hub_graph(verbose=False)
 
-    # Build igraph mirror of G (must match _run_leiden's vertex assignment).
-    nodes = sorted(G.nodes())
-    node_idx = {n: i for i, n in enumerate(nodes)}
-    edges = [(node_idx[u], node_idx[v]) for u, v in G.edges()]
-    weights = [G[u][v].get("weight", 1.0) for u, v in G.edges()]
-    g_ig = ig.Graph(n=len(nodes), edges=edges, edge_attrs={"weight": weights})
-    g_ig.vs["name"] = nodes
+    # igraph mirror of G — to_igraph is the same conversion _run_leiden uses,
+    # so the warm-membership indexing below shares its vertex assignment.
+    g_ig = to_igraph(G)
+    nodes = g_ig.vs["name"]
 
     # Warm partition — load membership from current _clusters.json.
     clusters_data = json.loads(CLUSTERS_PATH.read_text(encoding="utf-8"))

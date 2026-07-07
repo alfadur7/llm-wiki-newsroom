@@ -33,7 +33,7 @@ from datetime import date as _date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, WIKILINK_RE as _LIB_WIKILINK_RE, WIKILINK_TARGET_RE, atomic_write_text, confirm_changes, parse_frontmatter, print_delete_cleanup_advisory, safe_slug_path, strip_frontmatter  # noqa: E402
+from _lib import CLUSTER_LABELS_JSON, CLUSTERS_JSON, WIKI, WIKILINK_ANY_RE, WIKILINK_RE as _LIB_WIKILINK_RE, WIKILINK_TARGET_RE, atomic_write_text, confirm_changes, korean_mode, parse_frontmatter, print_delete_cleanup_advisory, read_text_cached, safe_slug_path, slug_only, strip_frontmatter  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).parent))
 from _advisory_common import mark  # noqa: E402
@@ -47,8 +47,6 @@ from _schema_common import (  # noqa: E402
     migrate_markers,
 )
 
-CLUSTERS_JSON = Path("graph/_clusters.json")
-CLUSTER_LABELS_JSON = Path("graph/cluster_labels.json")
 OVERVIEWS_DIR = WIKI / "overviews"
 CONTRADICTIONS_DIR = WIKI / "contradictions"
 OVERVIEW_MD_PATH = WIKI / "overview.md"
@@ -151,19 +149,26 @@ def _paragraph_count(text: str) -> int:
 # R1 (key figure·example repetition) — advisory when the same number+unit token
 # appears ≥3 times across the document. Date fragments (YYYY·YYYY-MM-DD·YYYY년 M월)
 # are masked beforehand since they are editorially meaningless repetition.
+# English magnitude/unit vocabulary is the native default; the Korean counter
+# set (and Korean date masking) fires only under WIKI_LANG=ko (korean_mode()).
 _DATE_YMD_RE = re.compile(r"\b\d{4}(?:[-./]\d{1,2}(?:[-./]\d{1,2})?)?\b")
 _DATE_KO_RE = re.compile(r"\d{4}\s*년(?:\s*\d{1,2}\s*월(?:\s*\d{1,2}\s*일)?)?")
-_NUM_UNIT_RE = re.compile(
+_NUM_UNIT_EN_RE = re.compile(
+    r"\d+(?:[,.]\d+)*\s*(?:%|(?:GB|TB|PB|GW|MW|million|billion|trillion|percent|points|tokens|parameters|users|models|employees|downloads)\b)"
+)
+_NUM_UNIT_KO_RE = re.compile(
     r"\d+(?:[,.]\d+)*\s*(?:조|억|천만|백만|만|%|GB|TB|PB|건|대|명|장|배|개월|개|호|층|년|번째|주|시간|분)"
 )
 
 def _r1_hot_tokens(content: str) -> list[tuple[str, int]]:
     """Return numeric+unit tokens appearing ≥3 times outside dates and wikilinks."""
     clean = _DATE_YMD_RE.sub(" ", content)
-    clean = _DATE_KO_RE.sub(" ", clean)
-    clean = re.sub(r"\[\[[^\]]+\]\]", " ", clean)  # drop wikilink targets (cluster slugs carry digits)
+    if korean_mode():
+        clean = _DATE_KO_RE.sub(" ", clean)
+    clean = WIKILINK_ANY_RE.sub(" ", clean)  # drop wikilink targets (cluster slugs carry digits)
+    num_unit_re = _NUM_UNIT_KO_RE if korean_mode() else _NUM_UNIT_EN_RE
     counts: dict[str, int] = {}
-    for m in _NUM_UNIT_RE.finditer(clean):
+    for m in num_unit_re.finditer(clean):
         tok = re.sub(r"\s+", " ", m.group(0).strip())
         counts[tok] = counts.get(tok, 0) + 1
     return sorted([(t, n) for t, n in counts.items() if n >= 3], key=lambda x: (-x[1], x[0]))
@@ -174,18 +179,34 @@ def _r1_hot_tokens(content: str) -> list[tuple[str, int]]:
 
 
 # L2 — date format standardization. Detect non-standard forms in body.
-_L2_NONSTD_RE = re.compile(
+# Standard is YYYY-MM-DD / YYYY-MM only. English month-name and slash dates are
+# the native default; Korean forms (YYYY년 M월 …) are flagged only under
+# WIKI_LANG=ko (korean_mode()) — the gating documented in .claude/layers/overview.md.
+_L2_NONSTD_EN_RE = re.compile(
+    r"\b(?:January|February|March|April|May|June|July|August|September|October|November|December)"
+    r"\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4}\b"
+    r"|\b\d{4}/\d{1,2}(?:/\d{1,2})?\b"
+)
+_L2_NONSTD_KO_RE = re.compile(
     r"\d{4}\s*년(?:\s*\d{1,2}\s*월(?:\s*\d{1,2}\s*일)?)?"
     r"|\d{4}\s+\d{1,2}\s*월"
     r"|\d{4}\s+\d{1,2}\s*~\s*\d{1,2}\s*월"
 )
 
 def _l2_date_violations(content: str) -> list[str]:
-    """Non-standard date forms (e.g. YYYY년 M월). Standard is YYYY-MM-DD / YYYY-MM only."""
+    """Non-standard date forms (e.g. 'June 13, 2026'; YYYY년 M월 under ko). Standard is YYYY-MM-DD / YYYY-MM only."""
     # Exclude content inside code blocks / inline code
     clean = re.sub(r"```.*?```", "", content, flags=re.DOTALL)
     clean = re.sub(r"`[^`]*`", "", clean)
-    return [m.group(0).strip() for m in _L2_NONSTD_RE.finditer(clean)]
+    hits = [m.group(0).strip() for m in _L2_NONSTD_EN_RE.finditer(clean)]
+    if korean_mode():
+        hits.extend(m.group(0).strip() for m in _L2_NONSTD_KO_RE.finditer(clean))
+    return hits
+
+
+# Wikilink → display text (alias if present, else target) — shared by the S6
+# visible-length helpers and the readable-prose size counter.
+_WIKILINK_DISPLAY_RE = re.compile(r"\[\[([^\]|]+\|)?([^\]]+)\]\]")
 
 
 # S6 — sentence length cap. Split on sentence-ending punctuation; flag >200 chars.
@@ -193,8 +214,10 @@ def _s6_long_sentences(content: str) -> list[int]:
     """Return list of (character_length) for sentences exceeding 200 chars."""
     # Strip code blocks and wikilinks (wikilinks are single tokens to the reader)
     clean = re.sub(r"```.*?```", "", strip_frontmatter(content), flags=re.DOTALL)
-    # Split into sentences by Korean·English terminators. Each newline also splits.
-    sentences = re.split(r"(?<=[.!?다])\s+|\n+", clean)
+    # Split into sentences by terminator (the Korean 다 terminator joins only
+    # under WIKI_LANG=ko). Each newline also splits.
+    term = r"(?<=[.!?다])\s+|\n+" if korean_mode() else r"(?<=[.!?])\s+|\n+"
+    sentences = re.split(term, clean)
     long_ones = []
     for s in sentences:
         s = s.strip()
@@ -202,7 +225,7 @@ def _s6_long_sentences(content: str) -> list[int]:
         if not s or s.startswith("#") or s.startswith("-") or s.startswith("|") or s.startswith(">"):
             continue
         # Remove wikilinks to count just visible chars
-        visible = re.sub(r"\[\[([^\]|]+\|)?([^\]]+)\]\]", r"\2", s)
+        visible = _WIKILINK_DISPLAY_RE.sub(r"\2", s)
         visible = re.sub(r"\*\*", "", visible)
         if len(visible) > 200:
             long_ones.append(len(visible))
@@ -228,9 +251,10 @@ def _s6_paragraph_no_period(content: str) -> list[tuple[int, int]]:
             for ln in non_empty
         ):
             continue
-        visible = re.sub(r"\[\[([^\]|]+\|)?([^\]]+)\]\]", r"\2", s)
+        visible = _WIKILINK_DISPLAY_RE.sub(r"\2", s)
         visible = re.sub(r"\*\*", "", visible)
-        if re.search(r"[.!?]", visible) or re.search(r"다(?=\s|$)", visible):
+        # The 다-terminator exemption is a Korean-corpus heuristic (WIKI_LANG=ko).
+        if re.search(r"[.!?]", visible) or (korean_mode() and re.search(r"다(?=\s|$)", visible)):
             continue
         if len(visible) >= 500:
             violations.append((i, len(visible)))
@@ -242,11 +266,17 @@ ADJACENCY_SECTION_RE = re.compile(
 )
 
 
-def _load_clusters() -> dict:
+def _load_clusters() -> dict | None:
+    # Prereq failure returns None (→ run() exits 2 via stderr) rather than
+    # raising SystemExit(str)(=exit 1): lint.py calls run() in-process, so a
+    # raise would abort the whole `lint all` before the remaining groups and
+    # the summary. Mirrors synthesis.py's stderr + return 2 convention.
     if not CLUSTERS_JSON.exists():
-        raise SystemExit(
-            f"{CLUSTERS_JSON} not found. Run `python tools/build.py clusters` first."
+        print(
+            f"ERROR: {CLUSTERS_JSON} not found. Run `python tools/build.py clusters` first.",
+            file=sys.stderr,
         )
+        return None
     return json.loads(CLUSTERS_JSON.read_text(encoding="utf-8"))
 
 
@@ -338,7 +368,7 @@ def _check_cluster_name_drift(
         if fix:
             new_content = re.sub(
                 r'^title:\s*.*$',
-                f'title: "{expected_name}"',
+                lambda _m: f'title: "{expected_name}"',  # literal repl — name may hold \g/\1
                 new_content,
                 count=1,
                 flags=re.MULTILINE,
@@ -357,7 +387,7 @@ def _check_cluster_name_drift(
             if fix:
                 new_content = re.sub(
                     r"^# .+?$",
-                    f"# {expected_name}",
+                    lambda _m: f"# {expected_name}",  # literal repl — name may hold \g/\1
                     new_content,
                     count=1,
                     flags=re.MULTILINE,
@@ -436,7 +466,7 @@ def _link_metrics(content: str) -> dict:
     for target in all_links:
         # Strip subdir prefix AND any `#anchor` (Xanadu citation anchoring) so
         # `[[contradictions/foo#section]]` resolves to the bare theme stem.
-        stem = target.strip().split("/")[-1].split("#", 1)[0]
+        stem = slug_only(target)
         if stem in theme_stems:
             contradiction_refs += 1
 
@@ -758,7 +788,7 @@ def _anchor_invasion_line(
     for target in WIKILINK_RE.findall(narrative):
         # Strip subdir prefix AND any `#anchor` (Xanadu citation anchoring) so
         # an anchored hub ref still matches its anchor_member stem.
-        stem = target.strip().split("/")[-1].split("#", 1)[0]
+        stem = slug_only(target)
         if stem in seen:
             continue
         seen.add(stem)
@@ -803,9 +833,6 @@ def _anchor_invasion_line(
     )
 
 
-_PROSE_FM_RE = re.compile(r"^---.*?\n---\n", re.DOTALL)
-
-
 def _readable_prose_chars(content: str) -> int:
     """EDITOR readable-prose character count (excluding whitespace·markdown symbols·wikilink markers).
 
@@ -813,9 +840,9 @@ def _readable_prose_chars(content: str) -> int:
     frontmatter·AUTO blocks are excluded (auto-generated·meta, so not subject to
     the bloat verdict). Wikilinks keep only their display text.
     """
-    text = _PROSE_FM_RE.sub("", content)
+    text = strip_frontmatter(content)
     text = AUTO_BLOCK_RE.sub("", text)
-    text = re.sub(r"\[\[([^\]|]+\|)?([^\]]+)\]\]", r"\2", text)  # wikilink → display text
+    text = _WIKILINK_DISPLAY_RE.sub(r"\2", text)  # wikilink → display text
     text = re.sub(r"[#*\-|>`]", "", text)
     text = re.sub(r"\s+", "", text)
     return len(text)
@@ -1117,7 +1144,7 @@ def _check_overviews(clusters_data: dict, fix: bool, only_slug: str | None = Non
             continue
         if only_slug is not None and path.stem != only_slug:
             continue
-        content = path.read_text(encoding="utf-8")
+        content = read_text_cached(path)
         fm = parse_frontmatter(content)
         issues.extend(check_frontmatter(fm, OVERVIEW_REQUIRED_FRONTMATTER, path))
         if fm.get("type") and fm["type"] != "overview":
@@ -1157,7 +1184,7 @@ def _check_overviews(clusters_data: dict, fix: bool, only_slug: str | None = Non
             if rewritten:
                 alias_fixes += len(rewritten)
                 print(f"  ~ overviews/{path.name}: aliased {', '.join(rewritten)}")
-                content = path.read_text(encoding="utf-8")
+                content = read_text_cached(path)
         issues.extend(_check_adjacency_aliases(content, set(cluster_by_slug.keys()), path))
 
         missing_markers = check_auto_markers(content, OVERVIEW_AUTO_MARKERS, path)
@@ -1219,7 +1246,7 @@ def _check_overview_md(cluster_slugs: set[str]) -> tuple[list[str], list[str]]:
         issues.append("  wiki/overview.md missing")
         return issues, metrics_lines
 
-    content = OVERVIEW_MD_PATH.read_text(encoding="utf-8")
+    content = read_text_cached(OVERVIEW_MD_PATH)
 
     lead_buffer: list[str] = []
     body_sections: dict[str, str] = {}
@@ -1437,6 +1464,8 @@ def run(target: str | None = None, fix: bool = False, auto_yes: bool = False) ->
         Use only after reviewing the planned changes upstream.
     """
     clusters_data = _load_clusters()
+    if clusters_data is None:
+        return 2
     cluster_slugs: set[str] = {c["slug"] for c in clusters_data.get("clusters", [])}
 
     if target is None:

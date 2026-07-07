@@ -79,7 +79,8 @@ def _check_directory(directory: Path, dir_label: str, graph: dict) -> tuple[list
         if nsrc < SOURCES_MIN:
             continue
         node_id = f"{dir_label}/{path.name}"
-        froms = graph["inbound"].get(node_id, [])
+        # _archive-path inbound is dead — excluded from all counts (mirrors hub_demotion.py)
+        froms = [f for f in graph["inbound"].get(node_id, []) if "_archive" not in f]
         inbound = len(froms)
         clusters = {
             graph["cluster"][f] for f in froms if f in graph["cluster"]

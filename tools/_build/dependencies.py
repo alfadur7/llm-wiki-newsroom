@@ -54,9 +54,8 @@ from pathlib import Path
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, GRAPH, WIKILINK_RE, parse_frontmatter, strip_code, strip_frontmatter, atomic_write_text  # noqa: E402
+from _lib import WIKI, WIKI_SUBDIRS, GRAPH, CLUSTERS_JSON, WIKILINK_RE, parse_frontmatter, strip_code, strip_frontmatter, atomic_write_if_changed, fm_sources  # noqa: E402
 
-_SUBDIRS = ("sources", "entities", "concepts", "timelines", "overviews", "contradictions", "syntheses", "trails")
 _GYEONGNO_RE = re.compile(r"^##\s+Path\s*$.*?(?=^##\s|\Z)", re.MULTILINE | re.DOTALL)
 
 
@@ -93,7 +92,7 @@ def _scan_pages() -> tuple[dict, dict]:
     """
     meta: dict = {}
     stem_to_rel: dict = {}
-    for sub in _SUBDIRS:
+    for sub in WIKI_SUBDIRS:
         d = WIKI / sub
         if not d.is_dir():
             continue
@@ -103,10 +102,7 @@ def _scan_pages() -> tuple[dict, dict]:
             rel = f"{sub}/{fp.name}"
             content = fp.read_text(encoding="utf-8", errors="replace")
             fm = parse_frontmatter(content)
-            srcs = fm.get("sources") or []
-            if isinstance(srcs, str):
-                srcs = [s.strip() for s in srcs.strip("[]").split(",") if s.strip()]
-            srcs = [str(s).strip().strip("'\"").removesuffix(".md") for s in srcs if str(s).strip()]
+            srcs = [s.strip("'\"").removesuffix(".md") for s in fm_sources(fm)]
             ptype = fm.get("type", "unknown")
             page_date = _source_content_date(fm) if ptype == "source" else _page_date(fm)
             meta[rel] = {
@@ -173,7 +169,7 @@ def run() -> None:
     meta, stem_to_rel = _scan_pages()
 
     # Cluster members → overview upstream. clusters[i].members are rel paths.
-    clusters = _load_json(GRAPH / "_clusters.json") or {}
+    clusters = _load_json(CLUSTERS_JSON) or {}
     cluster_members: dict[str, list[str]] = {}
     for c in clusters.get("clusters", []):
         slug = c.get("slug")
@@ -238,7 +234,7 @@ def run() -> None:
         },
         "pages": deps,
     }
-    atomic_write_text(GRAPH / "_dependencies.json", json.dumps(out, ensure_ascii=False, indent=2) + "\n")
+    atomic_write_if_changed(GRAPH / "_dependencies.json", json.dumps(out, ensure_ascii=False, indent=2) + "\n")
     stale_now = sum(
         1 for d in deps.values()
         if d["last_updated"] and d["upstream_max_date"] and d["upstream_max_date"] > d["last_updated"]
