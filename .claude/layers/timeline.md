@@ -2,7 +2,7 @@
 
 ## Page Format
 
-A standalone timeline page (`wiki/timelines/<slug>.md`) is a **source-indexed chronology** — an index that strings together the sources covering one topic in date order, plus the through-running narrative of that trajectory. It is a **path overlay** (ordered members) like a trail, but where a trail strings hubs into a learning path, a timeline strings **sources in chronological order**. Unlike the `## Timeline` (Timeline) summary section in a hub body (pointer-style, [hub.md](hub.md)), a standalone timeline page's purpose is for **each entry to directly index a source**.
+A standalone timeline page (`wiki/timelines/<slug>.md`) is a **source-indexed chronology** — an index that strings together the sources covering one topic in date order, plus the through-running narrative of that trajectory. It is a **path overlay** (ordered members) like a trail, but where a trail strings hubs into an associative path, a timeline strings **sources in chronological order**. Unlike the `## Timeline` (Timeline) summary section in a hub body (pointer-style, [hub.md](hub.md)), a standalone timeline page's purpose is for **each entry to directly index a source**.
 
 ### Standard structure
 

@@ -438,6 +438,15 @@ CLAUDE_VOICE_PATTERNS = [
         re.IGNORECASE | re.MULTILINE,
     )),
     ("recurrence prevention narrative", re.compile(r"재발\s*(방지|회피)")),
+    # A trail is a Memex associative path (layers/trail.md), not a graded
+    # curriculum. Bilingual: the English gloss fires on this corpus; the Korean
+    # literals are carried over. Benign "learner"/"learning order" don't match
+    # (path/course required after "learning"). Canonical: "associative path".
+    ("trail curriculum misframe", re.compile(
+        r"학습\s*(?:경로|코스)|난이도\s*곡선|커리큘럼"
+        r"|learning[\s-]*(?:path|course)|difficulty\s*curve|curriculum",
+        re.IGNORECASE,
+    )),
 ]
 
 # Self-skip — the policy files list antipatterns by example, not as violations.

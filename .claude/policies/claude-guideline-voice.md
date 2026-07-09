@@ -25,6 +25,7 @@ The principle is self-contained meaning: a third party should be able to read it
 | Benchmark absorption narrative | `외부 벤치마크\s*\d+/\d+` | "외부 벤치마크 5/6 흡수" ("absorbed 5/6 of the external benchmark") | Move to log.md |
 | Changelog section header | `^#{2,4}\s*(Changelog\|변경\s*이력\|변경\s*사항\|Change\s*Log)\s*$` | a `## Changelog` section | Move to log.md |
 | Recurrence prevention narrative | `재발\s*(방지\|회피)` | "이전 사례 재발 방지" ("preventing a recurrence of an earlier case") | Move to log.md |
+| Trail curriculum misframe | `학습\s*(경로\|코스)\|난이도\s*곡선\|커리큘럼\|learning[\s-]*(path\|course)\|difficulty\s*curve\|curriculum` | "a trail as a learning path" (misframes the Memex associative path) | Rephrase to "associative path" (trail.md canonical) |
 
 **Scope**: `.claude/commands/*.md` · `.claude/agents/*.md` · `.claude/policies/*.md` · `.claude/layers/*.md` · `.claude/operations/*.md` · `.claude/skills/*/SKILL.md` · `CLAUDE.md`. wiki/ and tools/ are out of scope.
 

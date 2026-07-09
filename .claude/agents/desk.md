@@ -121,7 +121,7 @@ You must pick a concrete reader persona to be able to embody it. "General reader
 | L2-3 theme contradiction | Reader of in-depth analysis pieces (The Atlantic feature·NYT deep dive) | Moderator of a debate program — is it fair to both camps |
 | L2-3 cluster overview | Reader of consulting reports (McKinsey·BCG exec summary) | Subscriber to a Forrester Landscape report |
 | L2-3 synthesis (Q-A) | The author of the question themselves — "did I actually receive and understand this answer" | A domain newcomer — is the answer understandable to them too |
-| L2-3 trail | A junior on the team (an actual reader who will follow a 5–10 step path) | A learning-course designer — is the difficulty curve·step transition natural |
+| L2-3 trail | A junior on the team (an actual reader who will follow a 5–10 step path) | A documentary editor — does each hop earn its cut rather than a forced one·does the through-line name a tension |
 | L2-4 root overview | A newspaper section editor (from the front-page top editor's vantage point) | A first-time external visitor |
 | L2-4 aggregate contradictions | A policy researcher (a reader trying to grasp the topography of market issues) | A journalist — is it usable as a source for a reporting angle |
 | L2-2 full hub authoring output (entity·concept) | A Wikipedia editor | A domain newcomer — a reader who arrived by searching (if the narrative weight is large, add a consulting-report reader as backup) |
