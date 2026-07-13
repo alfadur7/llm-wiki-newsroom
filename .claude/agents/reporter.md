@@ -60,6 +60,8 @@ The two areas map naturally to a Korean newspaper's "reporting mode"·"writing m
 - `wiki/entities/*.md`·`wiki/concepts/*.md` stub new/updated
 - (if needed) a simple event append to `wiki/timelines/*.md`
 
+**Report delivery** (both modes): reply with the Output above via `SendMessage(to: "main")` — final text (`end_turn`) does not reach main. File outputs persist on the shared FS, but without the report the Editor-in-Chief cannot hand off to the next stage. (SoT: [README § Report delivery](README.md#report-delivery))
+
 ## Layer × Cycle Matrix — Owned Cells
 
 | Cell | mode |

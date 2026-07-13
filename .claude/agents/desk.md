@@ -76,6 +76,8 @@ Estimated input·output tokens
 
 If 0 defects are found, give 2–3 sentences of rationale for "why it was judged defect-free."
 
+**Report delivery**: reply with the report above via `SendMessage(to: "main")` — final text (`end_turn`) does not reach main. The defect list is the sole output, so an unsent report is a hole in the VERIFY₂ gate. (SoT: [README § Report delivery](README.md#report-delivery))
+
 ## Layer × Cycle Matrix — Owned Cells
 
 | Cell | Application strength |

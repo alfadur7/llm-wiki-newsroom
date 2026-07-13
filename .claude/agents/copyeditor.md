@@ -51,6 +51,8 @@ The copy editor's role is classified as an agent, but its execution is determini
 - (with the --json option) JSON output (for automation·pipelines)
 - (with --fix) auto-repair changes to wiki/* files
 
+**Report delivery**: reply with the PASS/FAIL verdict and defect summary via `SendMessage(to: "main")` — final text (`end_turn`) does not reach main. `lint-report.md` persists on the shared FS, but without the report the Editor-in-Chief cannot run the ADAPT counter. (SoT: [README § Report delivery](README.md#report-delivery))
+
 ## Layer × Cycle Matrix — owned cells
 
 | Cell | Check |

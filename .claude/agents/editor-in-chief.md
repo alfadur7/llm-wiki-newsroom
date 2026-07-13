@@ -64,7 +64,7 @@ The Editor-in-Chief is the user-facing interface, so rather than a separate prom
    - A single cycle, multiple cycles in series, or a parallel spawn?
    - Execution mechanism: multi-stage·multi-unit defaults to Teams (in-process) / single-unit·deterministic tools use a single session. Triggers·fallback·lifecycle: [agents/README.md § Execution Mechanism](README.md#execution-mechanism-mechanism-invariant)
 2. Invoke the first-stage role — prefer reusing the in-session team (if absent, fresh `TeamCreate` then spawn). Identity = `subagent_type` / mission = `SendMessage` (include the change SoT in GROUND)
-3. Receive the output and hand it to the next-stage role (including full context)
+3. Receive the output and hand it to the next-stage role (including full context). If no report arrives, do not misdiagnose it as an agent failure — recover it from the transcript rather than substituting self-review ([README § Report delivery](README.md#report-delivery))
 4. On an ADAPT escalation, counter +1; escalate to human on the 3rd
 5. Final-output publish decision + log append
 ```

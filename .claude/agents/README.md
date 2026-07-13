@@ -129,9 +129,17 @@ The matrix and ADAPT chain above are independent of the execution mechanism — 
 | Mechanism | Status | Behavior |
 |---|---|---|
 | Agent Teams (in-process) | **default (primary)** | The Editor-in-Chief runs `TeamCreate`, spawns persistent teammates, and orchestrates serially via `SendMessage`. Reviewers read files directly from the shared FS. The author keeps context across ADAPT (minimal re-reads); reviewers are spawned in parallel. |
-| Single-session sub-Agent | **fallback** | The parent session invokes a role once via `Agent` and reports back via the final message. Each ADAPT is a fresh re-invocation (re-reading context). |
+| Single-session sub-Agent | **fallback** | The parent session invokes a role once via `Agent`. **The report reaches main only via `SendMessage(to: "main")`** (see Report delivery below). Each ADAPT is a fresh re-invocation (re-reading context). |
 
 **Fallback triggers** (automatic switch — any one of): teammate spawn fails · `SendMessage` fails to resolve · the Teams tools (`TeamCreate`/`SendMessage`) are not loaded. If an infrastructure gate blocks Teams from coming up, the same chain runs as single-session sub-Agents unchanged (identical content quality — only the token savings from the author keeping context are not realized).
+
+### Report delivery
+
+A background sub-Agent's **final text (`end_turn`) does not reach main** — main receives only an idle notification, and delivery happens only when the agent calls `SendMessage(to: "main")`. Left to model discretion, that call is skipped non-deterministically.
+
+1. **Contract** — the **Report delivery** clause in each role SoT's § I/O Contract carries the reply obligation. A role SoT loads as the sub-Agent's system prompt, so it is not restated in the invocation prompt.
+2. **Recovery** — a report that never arrives is unsent, not lost. It remains in the transcript: `.claude/projects/<proj>/<session>/subagents/agent-a<name>-*.jsonl` → the `text` of the last `assistant` entry.
+3. **Gate** — a missing report is not an agent failure. Do not substitute a single-session fallback (author self-review) — recover it via 2 above. Self-review cannot stand in for Desk VERIFY₂ because of self-preference bias (§ Verification Ladder).
 
 In either the default or the fallback, the 4 principles in § Change Procedure (one author · reviewer reads the shared FS directly · `subagent_type` boundary · Editor-in-Chief ADAPT counter) are preserved identically. For the cells the desk.md matrix marks mandatory, Desk VERIFY₂ is non-waivable under any mechanism — self-preference bias exists independent of mechanism, so an independent qualitative review is mandatory.
 

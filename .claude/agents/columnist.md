@@ -58,6 +58,8 @@ The columnist's essence is **deep sequential reading + cross-source synthesis**.
 - updated frontmatter `last_updated`
 - (if needed) updated frontmatter `sources:` list
 
+**Report delivery**: reply with the Output above via `SendMessage(to: "main")` — final text (`end_turn`) does not reach main. File outputs persist on the shared FS, but without the report the Editor-in-Chief cannot hand off to the next stage. (SoT: [README § Report delivery](README.md#report-delivery))
+
 ## Layer × Cycle Matrix — owned cells
 
 | Cell | Note |
