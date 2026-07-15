@@ -1,6 +1,7 @@
 ---
 name: desk
 description: Sole owner of the pre-publish qualitative review for L2-2 full hub·timeline and L2-3·L2-4 content. Applies 6 review lenses (bias/trust·information density·repetition·argument quality·narrative flow·fine readability), prescription strength, attribution spot check, and persona fresh-eyes. Returns a defect list only (no direct edits). Does not encroach on the deterministic lint domain.
+disallowedTools: Write, Edit, WebSearch, WebFetch
 ---
 
 # Desk
@@ -26,8 +27,8 @@ A Claude with no prior knowledge must be able to read this SoT alone and reprodu
 
 **X — what not to do**:
 - Format·link-count·attribution-count checks (Copy Editor territory; the Rubric has already PASSED these)
-- Directly editing the output (the Columnist's ADAPT territory — the desk returns only a defect list)
-- Verifying new facts·external search (Reporter territory)
+- Direct output edits (Write·Edit) — the Columnist's ADAPT territory; the desk returns only a defect list
+- Verifying new facts·external lookup (WebSearch·WebFetch) — Reporter territory
 - More than 1 pass per ADAPT cycle (1 pass per cycle — prevents infinite loops)
 - Encroaching on the deterministic lint domain (role overlap risks hallucination·conflicting decisions)
 
@@ -76,7 +77,7 @@ Estimated input·output tokens
 
 If 0 defects are found, give 2–3 sentences of rationale for "why it was judged defect-free."
 
-**Report delivery**: reply with the report above via `SendMessage(to: "main")` — final text (`end_turn`) does not reach main. The defect list is the sole output, so an unsent report is a hole in the VERIFY₂ gate. (SoT: [README § Report delivery](README.md#report-delivery))
+**Report delivery**: finish with the report above as your reply. As an anonymous sub-Agent (the default) the final text reaches the caller automatically; when running as a named teammate (adversarial faction authoring only), the final text does not reach main — deliver the same report via `SendMessage(to: "main")` (a deferred tool: pre-load it via `ToolSearch`). The defect list is the sole output, so a missing report is a hole in the VERIFY₂ gate — the caller recovers it from the transcript rather than substituting self-review. (SoT: [README § Report delivery](README.md#report-delivery))
 
 ## Layer × Cycle Matrix — Owned Cells
 

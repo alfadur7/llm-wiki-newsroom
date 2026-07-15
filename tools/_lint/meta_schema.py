@@ -101,7 +101,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import CLUSTERS_JSON, REPO_ROOT as ROOT, WIKI as WIKI_DIR, read_text_cached  # noqa: E402
+from _lib import CLUSTERS_JSON, REPO_ROOT as ROOT, WIKI as WIKI_DIR, parse_frontmatter, read_text_cached  # noqa: E402
 
 CLAUDE_MD = ROOT / "CLAUDE.md"
 COMMANDS_DIR = ROOT / ".claude" / "commands"
@@ -919,6 +919,75 @@ def _check_reserved_filename_collisions() -> list[str]:
     return violations
 
 
+# AGENT TOOL PERMISSIONS — X-list ↔ frontmatter `disallowedTools` parity.
+# Governed candidate set is fixed and small (FP-averse): only tool names the
+# role SoTs actually legislate about. A bare word like "editing"/"search" in an
+# X-list bullet never matches — only the exact tool token with word boundaries.
+AGENT_TOOL_CANDIDATES = ("WebSearch", "WebFetch", "Write", "Edit")
+AGENTS_DIR = ROOT / ".claude" / "agents"
+# Own-artifacts exception (agents/README.md § Tool permissions, exception 1):
+# a role that produces its artifacts through a CLI path may mention these tools
+# in restriction prose without disallowing them.
+_AUTHORS_OWN_FILES = {"copyeditor": {"Write", "Edit"}}
+_XLIST_START_RE = re.compile(r"^\*\*X — ", re.MULTILINE)
+
+
+def check_agent_tool_permissions(name: str, disallowed: list[str],
+                                 xlist_text: str) -> list[str]:
+    """Pure parity check for one role — returns violation strings.
+
+    Bidirectional: a candidate tool named in the X-list must appear in
+    `disallowedTools` (missing), and every `disallowedTools` entry must be
+    named by an X-list item (unjustified). Candidates = the fixed governed
+    set + whatever the frontmatter lists (so an unknown frontmatter entry is
+    still checked for justification rather than silently ignored).
+    """
+    violations: list[str] = []
+    candidates = set(AGENT_TOOL_CANDIDATES) | set(disallowed)
+    mentioned = {t for t in candidates
+                 if re.search(rf"\b{re.escape(t)}\b", xlist_text)}
+    excused = _AUTHORS_OWN_FILES.get(name, set())
+    for tool in sorted(mentioned - set(disallowed) - excused):
+        violations.append(
+            f"{name}: X-list names `{tool}` but frontmatter "
+            f"disallowedTools omits it"
+        )
+    for tool in sorted(set(disallowed) - mentioned):
+        violations.append(
+            f"{name}: disallowedTools lists `{tool}` but no X-list "
+            f"entry names it"
+        )
+    return violations
+
+
+def _check_agent_tool_permissions() -> list[str]:
+    """Disk wrapper — parity check across every role SoT in .claude/agents/.
+
+    Files without an X-list section (README.md) are skipped. The X-list scan
+    window runs from the `**X — ` marker to the next `## ` heading, so tool
+    mentions in prompt templates / risk sections never count.
+    """
+    violations: list[str] = []
+    if not AGENTS_DIR.exists():
+        return violations
+    for path in sorted(AGENTS_DIR.glob("*.md")):
+        try:
+            text = read_text_cached(path)
+        except OSError:
+            continue
+        m_x = _XLIST_START_RE.search(text)
+        if not m_x:
+            continue
+        end = text.find("\n## ", m_x.end())
+        xlist = text[m_x.end():end if end != -1 else len(text)]
+        raw = parse_frontmatter(text).get("disallowedTools", "")
+        disallowed = (raw if isinstance(raw, list)
+                      else [t.strip() for t in raw.split(",") if t.strip()])
+        violations.extend(
+            check_agent_tool_permissions(path.stem, disallowed, xlist))
+    return violations
+
+
 def _check_log_monotonicity() -> list[str]:
     """Verify log.md headers are chronologically ascending.
 
@@ -1085,6 +1154,20 @@ def run() -> int:
     else:
         print("OK - log.md entries are chronologically ordered")
 
+    # AGENT TOOL-PERMISSION pass — X-list ↔ frontmatter disallowedTools parity.
+    tool_perm_issues = _check_agent_tool_permissions()
+    if tool_perm_issues:
+        print(f"\n[Agent tool-permission parity violations: {len(tool_perm_issues)}]")
+        for v in tool_perm_issues:
+            print(v)
+        print(
+            "Rule: a tool named in a role SoT's X-list must appear in that "
+            "file's frontmatter `disallowedTools`, and vice versa. "
+            "See .claude/agents/README.md \"Tool permissions\"."
+        )
+    else:
+        print("OK - agent X-list <-> disallowedTools parity holds")
+
     # HOOK BASH-PREFIX pass — settings.json hook `.sh` commands must lead with `bash`.
     hook_prefix_issues = _check_hook_bash_prefix()
     if hook_prefix_issues:
@@ -1202,7 +1285,7 @@ def run() -> int:
     else:
         print("OK - no nested wikilinks in authored content aliases")
 
-    total = integrity_total + language_total + total_drift + len(flat_issues) + len(reserved_issues) + len(log_issues) + len(voice_issues) + len(hook_prefix_issues) + len(hook_channel_issues) + len(hook_utf8_issues) + len(regex_hoist_issues) + len(craft_issues) + len(stale_guide_issues) + len(link_issues) + len(nested_issues)
+    total = integrity_total + language_total + total_drift + len(flat_issues) + len(reserved_issues) + len(log_issues) + len(voice_issues) + len(tool_perm_issues) + len(hook_prefix_issues) + len(hook_channel_issues) + len(hook_utf8_issues) + len(regex_hoist_issues) + len(craft_issues) + len(stale_guide_issues) + len(link_issues) + len(nested_issues)
     if total == 0:
         return 0
     print(f"\nFAIL - {total} meta-schema issue(s)")

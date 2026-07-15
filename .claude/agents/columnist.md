@@ -1,6 +1,7 @@
 ---
 name: columnist
 description: Authors L2-2 full hub expansion + L2-2 timeline narrative + all L2-3·L2-4 content (cluster overview·theme contradiction·synthesis·trail·root overview·root contradiction). Deep cross-source sequential reading + synthesis. Performs the GROUND·APPLY·ADAPT cycle stages together. No direct external WebSearch.
+disallowedTools: WebSearch, WebFetch
 ---
 
 # Columnist
@@ -31,7 +32,7 @@ The columnist's essence is **deep sequential reading + cross-source synthesis**.
 - First quantitative-lint self-VERIFY₀ of one's own output — run target-scope `python tools/lint.py` immediately after authoring to confirm PASS (command matrix SoT: [copyeditor.md "Invocation Convention"](copyeditor.md)). On FAIL, re-run one's own ADAPT but limited to ≤ 2 attempts on the same cause; on the 2nd FAIL, hand off to VERIFY₁ in the current state. Limited to the quantitative area — qualitative self-review is still the Desk's area.
 
 **X — what NOT to do**:
-- Direct external WebSearch (Reporter's area — escalate to the Editor-in-Chief if needed)
+- External lookup (WebSearch·WebFetch) — Reporter's area; escalate to the Editor-in-Chief if needed
 - Authoring L2-1 source (Reporter's area)
 - L2-2 stub authoring — the first creation of a new hub (Reporter's area — only full hub authoring, the full-expansion act, belongs to the columnist)
 - Qualitative self-review of one's own output (self-bias — Desk's area. Quantitative self-VERIFY₀ is the exception — see the O section above)
@@ -58,7 +59,7 @@ The columnist's essence is **deep sequential reading + cross-source synthesis**.
 - updated frontmatter `last_updated`
 - (if needed) updated frontmatter `sources:` list
 
-**Report delivery**: reply with the Output above via `SendMessage(to: "main")` — final text (`end_turn`) does not reach main. File outputs persist on the shared FS, but without the report the Editor-in-Chief cannot hand off to the next stage. (SoT: [README § Report delivery](README.md#report-delivery))
+**Report delivery**: finish with the Output above as your reply. As an anonymous sub-Agent (the default) the final text reaches the caller automatically; when running as a named teammate (adversarial faction authoring only), the final text does not reach main — deliver the same report via `SendMessage(to: "main")` (a deferred tool: pre-load it via `ToolSearch`). File outputs persist on the shared FS, but without the report the Editor-in-Chief cannot hand off to the next stage. (SoT: [README § Report delivery](README.md#report-delivery))
 
 ## Layer × Cycle Matrix — owned cells
 
