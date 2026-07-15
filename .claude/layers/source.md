@@ -150,12 +150,12 @@ Following these rules in ambiguous cases achieves both consistency across new in
 ```
 hub is an entity?
   ├─ utterance/figure/quote attribution?    → cites:
-  ├─ explicit opposing stance?              → contradicts:
+  ├─ contradiction signal (any of the 3 branches below)? → contradicts:
   └─ otherwise                              → references:
 
 hub is a concept?
   ├─ presents definition/scope?             → defines:
-  ├─ explicit opposition to this source's stance? → contradicts:
+  ├─ contradiction signal (any of the 3 branches below)? → contradicts:
   └─ otherwise (mere application/context)   → references:
 
 judgment ambiguous                          → references: (default safe)
@@ -163,7 +163,12 @@ judgment ambiguous                          → references: (default safe)
 
 **Decision-keyword dictionary**:
 - `cites:` signals — "announced · stated · mentioned · quoted · replied · said · disclosed · commented", or specific figures (`%` · `$100M` · `10,000 people`). But only when this source directly quotes the hub's announcement, figure, or quotation in the body. If the hub merely appears as a comparison target in the body, downgrade to `references:`.
-- `contradicts:` signals — "oppose · conflict · rebut · negate · object · the opposite". However, **evolution vocabulary** ("pivot · evolve · shift in view · change of direction · paradigm shift") is NOT `contradicts:` — classify it as `references:` (it describes a stage change or evolution of view, not a rebuttal or negation).
+- `contradicts:` signals — **3 branches, any one suffices**:
+  1. **Stance opposition** — "oppose · conflict · rebut · negate · object · the opposite" (explicit opposing-position vocabulary).
+  2. **Action opposition** — one side takes a hostile formal action against the other (a lawsuit, an antitrust complaint, a regulatory corrective order, an appeal against a ruling). The action itself is the contradiction — no opposition vocabulary is required in the sentence.
+  3. **Factual counterexample** — the source reports a concrete fact that contradicts the hub's claim (a promised release that did not ship, a measured figure refuting a stated one). The factual clash is the contradiction — again, no opposition vocabulary required.
+
+  However, **evolution vocabulary** ("pivot · evolve · shift in view · change of direction · paradigm shift") is NOT `contradicts:` — classify it as `references:` (it describes a stage change or evolution of view, not a rebuttal or negation).
 - `defines:` signals — "definition · concept · scope · is defined as"
 - everything else → `references:`
 

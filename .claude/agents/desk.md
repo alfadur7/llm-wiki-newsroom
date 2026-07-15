@@ -38,6 +38,7 @@ A Claude with no prior knowledge must be able to read this SoT alone and reprodu
 - The target file (the Columnist's APPLY output)
 - The guide for that content type (`.claude/layers/<source|hub|overview|contradiction|synthesis|trail|timeline>.md`) — authoring standard + identifies the quantitative Rubric territory that has already PASSED
 - (If needed) 1–2 spot-check targets from the target's frontmatter `sources:` list. **For a synthesis**, the source span of each component of every join claim surfaced by lint `[Join]`
+- **For an L2-1 source on its sub-trigger**: the `raw/` original (the `source_file:` path) for full-text cross-checking of quotes and attribution — the wiki page paraphrase is not sufficient ground. **When the raw exceeds 40KB, do not Read the full text** — extract only the quotation spans and speaker sentences (the `python -c open().read()` path bypasses the harness read cap, so the cap here is this contract, not the tool). Scope note: the sub-trigger fires on under 5% of sources, so this cross-check stays a tail cost, not a per-ingest one
 
 **Output**: answer only in the following form.
 
