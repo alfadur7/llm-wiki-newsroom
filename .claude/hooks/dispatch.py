@@ -68,6 +68,10 @@ GUIDE_DIRS = ("/.claude/agents/", "/.claude/commands/", "/.claude/layers/",
 # (NOT lint-scored) — edits here trigger the proposal-validation reflex (2b). Allowlist
 # of the content standards + authoring/review roles; editor-in-chief (routing)·
 # copyeditor (lint)·README (matrix)·skills (lint-scored path) are deliberately out.
+# Behavioral-rule surfaces are also absent on purpose: whether an edit is
+# substantive vs formal cannot be told from a file event — that classification
+# belongs to the ladder's blind-review rung, which routes substantive behavioral
+# changes to the runbook's probe-task variant.
 CRAFT_PROSE_DIRS = ("/.claude/layers/",)
 CRAFT_PROSE_FILES = ("/agents/desk.md", "/agents/reporter.md", "/agents/columnist.md")
 
@@ -139,24 +143,23 @@ Reference: .claude/skills/guideline-writing/SKILL.md (Bloat control)."""
 
 GUIDE_MSG = """[minimality-advisory] GUIDELINE EDIT DETECTED
 
-Claude-guideline-change Voice Pass required just before commit
-(SoT: .claude/agents/editor-in-chief.md § Claude guideline-change Voice Pass):
+Guideline Verification Ladder required just before commit
+(SoT: .claude/agents/editor-in-chief.md § Guideline Verification Ladder):
 
-  1. python tools/lint.py meta — voice group PASS (regex antipattern detection:
-     decision option names·reinforcement round·introduction timestamp·external reference·absorption narrative)
-  2. Slimming check — remove redundancy·decorative sentences·self-evident grounds, absorb into existing sections by default,
-     keep surrounding bullet voice·depth consistent (no verbose additions)
-  3. Qualitative — table-row restatement·self-containment (meaning clear without knowing other docs)·residual decision narrative
-     + a blind review pass (diff-only reviewer, substantive/invariant classification —
-     skill SoT: .claude/skills/guideline-writing/SKILL.md, Blind review protocol)
+  1. Quantitative lint — python tools/lint.py meta PASS (guideline-writing skill
+     deliberation-narrative detectors + project voice patterns)
+  2. Minimal-edit self-check — skill § Pruning + Bloat control; keep sibling
+     voice/depth; present the check evidence (a bare "passed" is incomplete)
+  3. Blind review (mandatory) — diff-only reviewer, substantive/invariant
+     classification per hunk + gdl.* defects. Severity rule: critical/high fix
+     now + re-pass; medium/low carry to the corpus (log_defect batch)
+  4. Effect-measurement gate — substantive ∧ measurement-obligated type →
+     an accept transition must exist before commit (runbook 3 variants)
 
-Steps 2 and 3 are complete only when the check evidence (edit↔sibling bullet
-length/depth comparison, per-item findings) is presented in the reply — a bare
-"passed" declaration is incomplete.
+Deliberation narrative moves to log.md; the body keeps operative rules only.
 
-Move violating phrasings to log.md + remove them from the body.
-
-Reference: editor-in-chief.md § Voice Pass + skills/guideline-writing/SKILL.md."""
+Reference: editor-in-chief.md § Guideline Verification Ladder +
+           skills/guideline-writing/SKILL.md."""
 
 PROPOSAL_VALIDATION_MSG = """[proposal-validation-advisory] DESK-JUDGED PROSE GUIDELINE EDIT DETECTED
 
@@ -171,9 +174,10 @@ reflex even without an explicit instruction:
   → desk N≥2 blind scoring → accept = held-in ≥1 improvement ∧ no slice regresses.
   Only on acceptance make the confirmed edit to this file + log the transition (log_defect kind:transition).
 
-Exception (no blind-desk batch needed): lint.py-scored rules (skills craft criteria.json·
-quantitative rubric·policies lint) go through the single lint measurement path (separate)·
-typo·slimming·structural/editorial·cross-reference fixes·routing·gate rules.
+Measurement variant by guideline type (runbook): desk-judged prose → the blind batch
+above · behavioral rule → probe task · lint-scored rule → deterministic before/after.
+Exempt (no measurement): typo·slimming·structural/editorial·cross-reference fixes —
+the ladder's blind-review rung classifies these invariant.
 
 Same applies regardless of origin (evolve session·desk surfacing mid-cycle·self-proposal).
 
@@ -214,8 +218,8 @@ L2-2 stub created/edited. Two follow-up obligations:
    2026-05-20 incident: desk VERIFY₂ of 5 byproduct stubs was missed → 11 defects found after the fact.
    Stubs bypassed by explicit wiki-operator approval fall below the quantitative threshold, so review them at the Desk more strictly.
 
-Reference: .claude/agents/README.md "Authoring Responsibilities"·"Verification
-Ladder" stage 3·"Standard ADAPT chain" + .claude/layers/hub.md "stub authoring"."""
+Reference: .claude/agents/README.md "Authoring Responsibilities"·"Content
+Verification Ladder" stage 3·"Standard ADAPT chain" + .claude/layers/hub.md "stub authoring"."""
 
 PROTECTED_MSG_TMPL = """[protected-path-guard] BLOCKED — {rel}
 

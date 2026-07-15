@@ -57,7 +57,7 @@ Absorb into an existing section, table, or matrix by default; create something n
 
 ## Blind Review Protocol
 
-A guideline edit is reviewed by a reader who did not write it and does not know the deliberation behind it:
+A guideline edit is reviewed by a reader who did not write it and does not know the deliberation behind it. In this project it runs as rung 3 of the Guideline Verification Ladder (`.claude/agents/editor-in-chief.md`); the protocol itself is project-agnostic:
 
 1. **Input = the diff only** — no chat context, no rationale memo. The reviewer sees exactly what a future executor will see.
 2. **Classification reply is mandatory**: the reviewer returns, per hunk, a two-way verdict — **substantive** (an executor would act differently after this change) or **invariant** (wording/structure only, behavior unchanged) — plus any defects found against this skill's criteria.

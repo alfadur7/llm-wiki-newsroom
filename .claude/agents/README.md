@@ -37,9 +37,9 @@ For Layer definitions and content formats, see [`.claude/layers/README.md`](../l
 
 The **essential definitions of the four Universal Cycle stages** (what each of GROUND·APPLY·VERIFY·ADAPT is) are the single SoT in [`CLAUDE.md` "Universal Cycle"](../../CLAUDE.md#universal-cycle). This matrix orthogonalizes those four stages against the Layer axis and shows **only the role mapping** — the fact that GROUND·APPLY·ADAPT repeat in the same role cell reflects the pattern of one role performing read·write·rewrite together within its own context (Cognition Principle 1: full context, no message-passing loss). **Cognition Principle 2**: actions carry implicit decisions — when two roles act on the same area, their outputs embed conflicting implicit decisions, so every capability area has exactly one owning role and multi-role work runs as a sequential chain, not a parallel merge.
 
-## Verification Ladder
+## Content Verification Ladder
 
-The VERIFY column of the matrix above is instantiated as a **ladder that climbs from the lowest-cost, lowest-determinism stage upward**. The principle: defects that an automated stage will catch are not pushed all the way up to a human cycle.
+The VERIFY column of the matrix above is instantiated as a **ladder that climbs from the lowest-cost, lowest-determinism stage upward**. The principle: defects that an automated stage will catch are not pushed all the way up to a human cycle. The guideline layer has an isomorphic counterpart — [editor-in-chief.md § Guideline Verification Ladder](editor-in-chief.md#guideline-verification-ladder) — for changes to the instruction SoTs themselves.
 
 | Stage | Owner | Cost | Determinism | Hand-off on failure |
 |---|---|---|---|---|
@@ -118,9 +118,9 @@ Wiki content is the product of **dual automation** — humans do not type it dir
 - **The Authoring Guide·Rubric is the axis that determines quality**. A Claude with no prior knowledge must be able to read only the Guide·Rubric and reproduce the same quality (the Claude reproducibility principle).
 - **The feedback loop is the automated Claude ↔ lint ↔ Desk loop**. Humans supervise direction from outside the loop and do not intervene in individual iterations inside it.
 - **lint·Desk automated verification is the bridge**. Quantitative goes to the lint Rubric, qualitative to the Desk — the two mechanisms divide the labor and together form the self-bias-avoiding structure.
-- **Derived content is a single semi-automated contract**. Every derived type shares one skeleton of scaffolding → gap detection → rewrite-block → Verification Ladder, and the only per-type differences are the `role·lint group·roster·enforcement` parameters.
+- **Derived content is a single semi-automated contract**. Every derived type shares one skeleton of scaffolding → gap detection → rewrite-block → Content Verification Ladder, and the only per-type differences are the `role·lint group·roster·enforcement` parameters.
 
-**Scope**: Layer 2-2 full hub·timeline + Layer 2-3 cluster overview·theme contradiction·synthesis·trail + Layer 2-4 overview·contradiction. Layer 2-1 source and Layer 2-2 entity·concept stubs follow the same cycle, including Desk qualitative review — unconditional for stubs (format·attribution·narrative tone), sub-trigger for L2-1 source (Verification Ladder above).
+**Scope**: Layer 2-2 full hub·timeline + Layer 2-3 cluster overview·theme contradiction·synthesis·trail + Layer 2-4 overview·contradiction. Layer 2-1 source and Layer 2-2 entity·concept stubs follow the same cycle, including Desk qualitative review — unconditional for stubs (format·attribution·narrative tone), sub-trigger for L2-1 source (Content Verification Ladder above).
 
 ## Execution Mechanism (mechanism-invariant)
 
@@ -137,7 +137,7 @@ Delivery responsibility sits with the **caller** (the Editor-in-Chief), not the 
 
 1. **Contract** — the **Report delivery** clause in each role SoT's § I/O Contract defines *what* the reply must contain. A role SoT loads as the sub-Agent's system prompt, so it is not restated in the invocation prompt. For a teammate, the brief must additionally restate the `SendMessage(to: "main")` obligation — left to model discretion, that call is skipped non-deterministically.
 2. **Recovery** — a teammate report that never arrives is unsent, not lost. It remains in the transcript: `.claude/projects/<proj>/<session>/subagents/agent-a<name>-*.jsonl` → the `text` of the last `assistant` entry.
-3. **Gate** — a missing report is not an agent failure. Do not substitute author self-review — recover it via 2 above. Self-review cannot stand in for Desk VERIFY₂ because of self-preference bias (§ Verification Ladder).
+3. **Gate** — a missing report is not an agent failure. Do not substitute author self-review — recover it via 2 above. Self-review cannot stand in for Desk VERIFY₂ because of self-preference bias (§ Content Verification Ladder).
 
 In either mechanism, the 4 principles in § Change Procedure (one author · reviewer reads the shared FS directly · `subagent_type` boundary · Editor-in-Chief ADAPT counter) are preserved identically. For the cells the desk.md matrix marks mandatory, Desk VERIFY₂ is non-waivable under any mechanism — self-preference bias exists independent of mechanism, so an independent qualitative review is mandatory.
 

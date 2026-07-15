@@ -39,6 +39,21 @@ The Layer × Cycle matrix (which role sits in which cell), the Standard ADAPT ch
 
 ---
 
+## Self-Evolution
+
+The guideline layer improves through the same four-stage cycle as content — the loop that proposes, measures, and adopts changes to the instruction SoTs themselves:
+
+| Stage | Content cycle | Guideline self-evolution |
+|---|---|---|
+| **GROUND** | read the relevant SoT | `mine_feedback` (operator utterances) + `mine_failures` (verifier-grounded defect corpus) |
+| **APPLY** | write the EDITOR block | edit the responsible instruction SoT (absorb-by-default) |
+| **VERIFY** | Copy Editor (lint) + Desk (qualitative) | Guideline Verification Ladder — lint meta → minimal-edit check → blind review → effect-measurement gate |
+| **ADAPT** | fix on defects | severity-ruled re-pass; 3rd same-cause FAIL escalates to the operator |
+
+SoT: workflow + acceptance rule = [`agents/editor-in-chief.md`](.claude/agents/editor-in-chief.md) (§ SoT Self-Evolution Workflow · § Guideline Verification Ladder) · measurement variants = [`operations/proposal-validation-runbook.md`](.claude/operations/proposal-validation-runbook.md) · authoring craft = [`skills/guideline-writing/`](.claude/skills/guideline-writing/SKILL.md). Standing artifacts: the operator-local defect corpus (written by `tools/log_defect.py`, gitignored) · transition records (the accept/reject ledger) · `.claude/memory/` rejected directions. **Adoption always passes the operator gate** — the loop proposes and measures; it never self-adopts.
+
+---
+
 ## Directory Structure
 
 ```
@@ -162,7 +177,7 @@ Guideline-authoring voice and plan-bloat control are craft, not policy — they 
   - guard: exit-2 block on direct Write|Edit of auto-generated build artifacts (`wiki/index.md`, `graph/_*.json`, etc.) or `raw/` originals — steering you to fix the input and regenerate (re-derivation, human-edited files, and queue files are exceptions; the full list is in `dispatch.py`)
   - advisory: after writing a stub, recommend `python tools/build.py` reconciliation + Desk VERIFY₂ (`wiki/entities·concepts·timelines/*.md` — structural prevention of the 2026-05-09 / 05-20 incidents)
   - advisory: after editing L2-2 full hub, timeline, L2-3, or L2-4, recommend target-scope `python tools/lint.py <group> <target>` self-VERIFY₀
-  - advisory: for `*/plans/*.md`, the 5-step self-check, the 4 red-flag types + `.claude/` instruction SoT and CLAUDE.md Voice Pass + a diff bullet-depth check (helper `check_bullet_depth.py`)
+  - advisory: for `*/plans/*.md`, the 5-step self-check, the 4 red-flag types + for `.claude/` instruction SoTs and CLAUDE.md, the Guideline Verification Ladder + a diff bullet-depth check (helper `check_bullet_depth.py`)
   - advisory: on editing a desk-judged prose-craft SoT (`.claude/layers/*.md`, `agents/desk|reporter|columnist.md`), recommend the proposal-validation measurement before adoption (SoT: `operations/proposal-validation-runbook.md` + `agents/editor-in-chief.md` step 6)
   - advisory: on Write of a script-like temporary file directly under the project root, recommend a temp directory (structural prevention of the 2026-05-08 incident)
   - advisory: on writing or modifying `tools/**/*.py`, recommend loading and applying the `ponytail-coding` skill (the authoring-time code-restraint reflex — the SoT is `skills/ponytail-coding/SKILL.md`; the rule body is not duplicated here)

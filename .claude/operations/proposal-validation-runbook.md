@@ -1,14 +1,20 @@
 # Proposal Validation Batch Runbook
 
-Instructions for measuring whether an edit to a **desk-judged guideline** (the layers craft / prose authoring rules — the areas `lint.py` does not score) actually reduces defects, using verifier evidence, when the SoT self-evolution loop proposes such an edit. Open this file and start with "perform proposal validation per these instructions." The acceptance rule and transition logging have their single SoT in [`../agents/editor-in-chief.md`](../agents/editor-in-chief.md) self-evolution workflow steps 6–7 — this file holds only the *measurement procedure* for the desk-judged case. (For lint-scored guidance, step 6's single `lint.py` before/after measurement is enough, so this batch is not needed.)
+Instructions for measuring whether a guideline edit actually reduces defects, using verifier evidence, when the SoT self-evolution loop proposes one. Open this file and start with "perform proposal validation per these instructions." The acceptance rule and transition logging have their single SoT in [`../agents/editor-in-chief.md`](../agents/editor-in-chief.md) self-evolution workflow steps 6–7 — this file holds the *measurement procedure*, in **three variants by guideline type**:
+
+| Guideline type | Variant | Sections |
+|---|---|---|
+| desk-judged content craft (layers prose·desk lenses·reporter/columnist authoring craft) | blind rewrite × blind desk | Held-in · Held-out · Desk Scoring below |
+| behavioral guideline (procedure·routing·contract rules whose effect shows in agent behavior, not page prose) | probe task | § Variant — Behavioral Guideline |
+| lint-scored rule (`criteria.json` judge:A·quantitative rubric·lint logic) | deterministic before/after | § Variant — Lint-Scored |
 
 ## When to Run
 
-**Always before adoption** of desk-judged craft prose that governs wiki content authoring/review (layers authoring standards·rubric prose·desk lenses·reporter·columnist authoring craft) — regardless of origin. It fires not only in an evolve session (editor-in-chief stage 1 proposal) but equally for a strengthening the desk surfaces mid-cycle or a self-proposal, as a self-harness reflex without an explicit instruction (editing `.claude/layers/*.md`·`agents/{desk,reporter,columnist}.md` triggers the `dispatch.py` proposal-validation advisory as a file-event reminder). The held-in target is the defect pages where that mechanism manifested, drawn from the corpus (`tools/_defect-log.jsonl`, written locally by `tools/log_defect.py`). The exception is § Out of Scope (lint-scored guidance such as skills craft goes through the lint measurement path·structural/editorial·routing rules).
+**Always before adoption** of a substantive change of one of the three types above — regardless of origin. It fires not only in an evolve session (editor-in-chief stage 1 proposal) but equally for a strengthening the desk surfaces mid-cycle or a self-proposal, as a self-harness reflex without an explicit instruction (editing `.claude/layers/*.md`·`agents/{desk,reporter,columnist}.md` triggers the `dispatch.py` proposal-validation advisory as a file-event reminder; behavioral/lint-scored surfaces are classified by the ladder's blind-review rung, not by file event). The held-in target is the defect pages where that mechanism manifested, drawn from the corpus (`tools/_defect-log.jsonl`, written locally by `tools/log_defect.py`). The exception is § Out of Scope (typo·slimming·structural/editorial·cross-reference fixes — no measurement obligation).
 
-## Measure Without Editing the File
+## Measure Without Editing the File (injection variants)
 
-Do not modify the guideline file during measurement — separate the variants by **injecting the Control (current passage) and Treatment (proposed strengthening) text into the agent prompt** instead. Edit the file only after adoption is confirmed (this avoids SoT contamination and re-diagnosis confusion mid-measurement).
+For the desk-judged and behavioral variants, do not modify the guideline file during measurement — separate the conditions by **injecting the Control (current passage) and Treatment (proposed strengthening) text into the agent prompt** instead. Edit the file only after adoption is confirmed (this avoids SoT contamination and re-diagnosis confusion mid-measurement). The lint-scored variant is exempt — a deterministic revert is exact, so direct edit + before/after runs are fine.
 
 ## Held-in — Blind Re-author
 
@@ -33,9 +39,26 @@ A desk agent scores the held-in and held-out outputs:
 - The desk is probabilistic, so **aggregate N≥2 per target**. Return integer counts + severity.
 - **Fresh-sample load cap**: desk-judged fresh samples = held-in 1 + held-out 2 = a fixed total of 3 (the motivating target is outside the cap·separate), so the desk's N≥2 multiplier does not hollow out the gate. The lint-scored path has no cap (deterministic lint, measured once).
 
+## Variant — Behavioral Guideline (Probe Task)
+
+For a rule whose effect shows in **agent behavior** (a routing step, a hand-over contract, a gate ordering), a page rewrite measures nothing — reproduce the behavior instead:
+
+- **Probe task**: reconstruct the failure scenario that motivated the rule (the task where the old behavior went wrong) and run it once under the Control prompt and once under the Treatment prompt — injection, not file edits, same as the desk-judged variant.
+- **Adjacent-normal held-out**: run one adjacent task where the OLD behavior was already correct, under both conditions — catches a rule that fixes the failure by over-firing on normal flow.
+- **Blind judging, N≥2**: judges receive the two transcripts under blind labels and a verdict taxonomy limited to the measured behavior (did the failure reproduce? did the normal flow regress?). Aggregate as with desk scoring.
+- Acceptance: the step 6 rule, with "defect count" read as "failure reproductions."
+
+## Variant — Lint-Scored (Deterministic)
+
+For a rule `lint.py` scores (a `criteria.json` judge:A threshold, a quantitative rubric line, lint logic itself), the verifier is deterministic — no injection, no blind desk:
+
+- Run the affected lint group over held-in (motivating + fresh same-mechanism) and held-out (fixed set + fresh stable samples) **before and after the edit** — the file may be edited directly here, since a revert is exact.
+- Measured once (same input → same output); over-fire on held-out = any stable page newly FAILing.
+- Acceptance: the step 6 rule, applied to the deterministic score deltas.
+
 ## Tally & Accept
 
-Tally the average defect count for Control vs Treatment per target. **The acceptance rule's SoT is editor-in-chief step 6** — **≥1 improvement on the motivating held-in** ∧ **non-regression** across every slice (motivating·fresh held-in·fixed/fresh held-out) ∧ no page going PASS→FAIL·over-fire. The fresh samples count only as non-regression guards (the improvement verdict is judged on the motivating target). On acceptance, edit the guideline file → [`../agents/editor-in-chief.md`](../agents/editor-in-chief.md) § Claude guideline-change Voice Pass → record `log_defect` `kind:transition` (surface · held-in/out delta · decision) per step 7.
+Tally the average defect count for Control vs Treatment per target. **The acceptance rule's SoT is editor-in-chief step 6** — **≥1 improvement on the motivating held-in** ∧ **non-regression** across every slice (motivating·fresh held-in·fixed/fresh held-out) ∧ no page going PASS→FAIL·over-fire. The fresh samples count only as non-regression guards (the improvement verdict is judged on the motivating target). On acceptance, edit the guideline file → [`../agents/editor-in-chief.md`](../agents/editor-in-chief.md) § Guideline Verification Ladder → record `log_defect` `kind:transition` (surface · held-in/out delta · decision) per step 7.
 
 ## Pitfalls
 
@@ -48,8 +71,8 @@ Tally the average defect count for Control vs Treatment per target. **The accept
 
 ## Out of Scope
 
-- Lint-scored guidance (`criteria.json` · `layers/` quantitative · `policies/` lint · `lint.py` logic): step 6's single deterministic before/after lint path — this batch is not needed.
-- Unattended self-adoption: the desk qualitative scoring and operator gate are required before adoption — only the measurement is batched; adoption keeps the gate.
+- Typo·slimming·structural/editorial·cross-reference fixes, routing/gate wording with no behavioral change: no measurement obligation (the ladder's blind-review rung classifies these invariant).
+- Unattended self-adoption: the qualitative scoring and operator gate are required before adoption — only the measurement is batched; adoption keeps the gate.
 
 ## SoT
 

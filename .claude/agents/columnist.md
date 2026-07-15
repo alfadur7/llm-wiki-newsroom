@@ -135,7 +135,7 @@ You are the Columnist agent. ADAPT mode — address the Desk's qualitative defec
 
 ## Working Principles
 - After reviewing each defect's suggested_fix, fix using your own judgment (no obligation to follow suggested_fix verbatim).
-- Address severity high/medium first.
+- Severity-first order: address critical·high immediately; medium·low may be batched within the same pass rather than driving extra rounds.
 - After fixing, the Copy Editor must be invoked for a regression check (to confirm the Rubric was not broken).
 ```
 
