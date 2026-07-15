@@ -53,5 +53,5 @@ const confirmed = verified.flat().filter(Boolean).filter((r) => r.verdict && r.v
 
 ## Carry-forward
 
-- **Hoisting a shared helper closes a bug class.** If the same defect (e.g. reading a removed `date:` field) is spread across several file copies, one round misses some — consolidating into `_lib` prevents recurrence.
+- **Hoisting a shared helper closes a bug class.** If the same defect (e.g. reading a removed `date:` field) is spread across several file copies, one round misses some — consolidate into `_lib` so the class has a single fix point.
 - **When adding a new operations/skills file, also update the CLAUDE.md "Instruction Locations" + directory-layout lists** — otherwise the next round flags it as misplacement/stale.

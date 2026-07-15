@@ -112,6 +112,7 @@ Each folder has a **single responsibility**; when adding a new instruction, use 
 - `consulting-writing` (`con.*`) — management consulting (McKinsey SCR, MECE, BCG bold-bullet)
 - `encyclopedia-writing` (`enc.*`) — encyclopedic neutrality (NPOV, summary style, wikilink conventions)
 - `scholarly-citation` (`cit.*`) — verifiable attribution and citation (claim atomization, evidence grading, citation typing, anchoring)
+- `guideline-writing` (`gdl.*`) — guideline-authoring craft for the instruction layer itself (operative rule vs recital, MUST/SHOULD/MAY, pruning, bloat control, blind review; the deliberation-narrative detectors run in `lint.py meta`)
 
 *Coding discipline* (`SKILL.md` only, not lint-measured):
 - `ponytail-coding` — lazy-senior code restraint (the YAGNI ladder, reuse first, root-cause fixes). Divides labor with karpathy-guidelines (assumptions, success criteria) and `/simplify` (after-the-fact cleanup).
@@ -131,8 +132,8 @@ Each folder has a **single responsibility**; when adding a new instruction, use 
 - `language.md` (English body text + English frontmatter keys + Meta-Doc English headers + Prose Style avoidance of translationese; Korean body text is an optional `WIKI_LANG=ko` mode)
 - `platform.md` (Windows non-Latin filename encoding workaround)
 - `index-log-format.md` (the two-tier structure of `wiki/index.md` + `log.md` append-at-bottom)
-- `claude-guideline-voice.md` (the voice convention for authoring `.claude/` guide SoTs — no decisions, external references, or timestamps in the body + automatic antipattern detection)
-- `no-plan-bloat.md` (the duty to avoid plan-file bloat and duplication — absorb into existing sections by default, the 5-step self-check, red flags)
+
+Guideline-authoring voice and plan-bloat control are craft, not policy — they live in the `guideline-writing` skill (`gdl.*`).
 
 ### `.claude/operations/` — One-Time Procedures & Infra Setup
 

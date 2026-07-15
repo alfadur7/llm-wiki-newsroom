@@ -152,7 +152,8 @@ The default operating pattern is that the wiki operator does not edit the `.clau
 
 Mandatory right before commit when changes to `.claude/` (agents·commands·layers·policies·operations)·`CLAUDE.md` are staged. The `dispatch.sh` hook (minimality advisory) reminds at edit time — no reliance on memory. Steps 2·3 are complete only when the response presents the inspection evidence (edit↔sibling bullet length·depth comparison, the per-item confirmation content) — a bare "passed" declaration is incomplete.
 
-1. Run `python tools/lint.py meta` — confirm the voice group PASSes (automatic regex detection — decision option names·supplementation round number·introduction timestamp·external-case reference·absorption narrative)
-2. Slim down — remove redundancy·decorative sentences·self-evident rationale, absorb into an existing section by default, keep voice·depth consistency with surrounding bullets (no verbose additions)
+1. Run `python tools/lint.py meta` — confirm the voice group PASSes (automatic detection — the `guideline-writing` skill's deliberation-narrative detectors + the project voice patterns)
+2. Slim down — remove redundancy·decorative sentences·self-evident rationale, absorb into an existing section by default, keep voice·depth consistency with surrounding bullets. The craft criteria are the skill's Pruning + Bloat control sections ([skills/guideline-writing/SKILL.md](../skills/guideline-writing/SKILL.md))
 3. Qualitative review (the area automatic detection cannot reach) — (a) a paragraph restating a table row, (b) self-containment (meaning is clear without knowing other documents), (c) leftover decision narrative
-4. On a violation, move the expression to `log.md` + remove it from the body. The policy SoT is [.claude/policies/claude-guideline-voice.md](../policies/claude-guideline-voice.md)
+4. Blind review pass — hand the diff (diff only, no deliberation context) to a fresh reviewer per the skill's Blind review protocol; the reviewer returns a substantive/invariant classification per hunk + `gdl.*` defects
+5. On a violation, move the expression to `log.md` + remove it from the body. The craft SoT is [.claude/skills/guideline-writing/SKILL.md](../skills/guideline-writing/SKILL.md)

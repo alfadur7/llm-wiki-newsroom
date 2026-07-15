@@ -148,11 +148,11 @@ RESERVED_META_FILENAMES = frozenset({"claude.md", "readme.md"})
 SKILLS_DIR = ROOT / ".claude" / "skills"
 MANIFEST_JSON = ROOT / ".claude" / "layers" / "_manifest.json"
 LAYERS_DIR = ROOT / ".claude" / "layers"
-CRAFT_PREFIXES = ("jrn", "con", "enc", "cit")
+CRAFT_PREFIXES = ("jrn", "con", "enc", "cit", "gdl")
 # Dot-ids appearing in layers prose. struct.*/house.* live in the layers
 # structural/house-style sections (no craft skill) so only craft prefixes are
 # cross-checked against criteria.json.
-DOT_ID_RE = re.compile(r"\b((?:jrn|con|enc|cit|struct|house)\.[a-z][a-z0-9-]+)\b")
+DOT_ID_RE = re.compile(r"\b((?:jrn|con|enc|cit|gdl|struct|house)\.[a-z][a-z0-9-]+)\b")
 # Pre-merge guide filenames; literal split so the regex source itself is not a hit.
 STALE_GUIDE_RE = re.compile(r"[\w-]+-(?:authoring|" + "rubric)\\.md")
 
@@ -251,10 +251,8 @@ def _check_slash_commands(text: str) -> list[str]:
 # index — was previously unchecked, so a new file under .claude/operations/ or
 # .claude/policies/ could land without an entry in the CLAUDE.md "Instruction
 # Locations" or the folder README and drift silently. Scope is limited to
-# operations + policies, the
-# two folders where this drift was actually observed (CLAUDE.md listed only 1/5
-# operations files; no-plan-bloat.md was absent from policies). agents/commands/
-# layers are intentionally out of scope.
+# operations + policies, the two folders where this drift occurs in practice.
+# agents/commands/layers are intentionally out of scope.
 #
 # Section header per folder in CLAUDE.md, e.g. "### `.claude/policies/` — ...".
 _CLAUDE_SECTION_RE_TMPL = r"^###\s+`\.claude/{folder}/`.*?(?=^###\s|\Z)"
@@ -424,20 +422,35 @@ def _check_language_in_file(path: Path) -> list[tuple[int, str]]:
     return violations
 
 
-CLAUDE_VOICE_PATTERNS = [
-    ("decision option name", re.compile(r"옵션\s*[A-Z][+]?(?!\s*입장)")),
-    ("reinforcement counter", re.compile(r"(보강|Reinforcement)\s*\d+", re.IGNORECASE)),
-    ("introduction timestamp", re.compile(r"\d{4}-\d{2}-\d{2}\s*(도입|시점|적용)")),
+# Voice antipatterns are split craft/project. The project-agnostic
+# deliberation-narrative detectors (decision option name · reinforcement
+# counter · introduction timestamp · changelog header · recurrence-prevention
+# narrative) live in the guideline-writing skill's checks.py (gdl.*) and are
+# loaded here by caller injection — meta_schema stays the thin orchestrator
+# (same idiom as overview.py ← encyclopedia-writing). Only patterns tied to
+# THIS wiki's vocabulary stay below.
+_GDL_CHECKS_PATH = ROOT / ".claude" / "skills" / "guideline-writing" / "checks.py"
+
+
+def _load_gdl_checks():
+    """Load the guideline-writing skill detectors; None if the skill is
+    absent (this lint degrades to project patterns only outside this wiki)."""
+    if not _GDL_CHECKS_PATH.exists():
+        return None
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("gdl_checks", _GDL_CHECKS_PATH)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+PROJECT_VOICE_PATTERNS = [
     ("external case reference", re.compile(
         r"(Wikipedia|ProCon|BERTopic|Wikidata|Stack\s*Overflow|Kialo)[^\n]{0,80}?(등가|모델|model)",
         re.IGNORECASE,
     )),
-    ("benchmark absorption narrative", re.compile(r"외부 벤치마크\s*\d+\s*/\s*\d+")),
-    ("changelog section header", re.compile(
-        r"^#{2,4}\s*(Changelog|변경\s*이력|변경\s*사항|Change\s*Log)\s*$",
-        re.IGNORECASE | re.MULTILINE,
-    )),
-    ("recurrence prevention narrative", re.compile(r"재발\s*(방지|회피)")),
+    ("benchmark absorption narrative", re.compile(
+        r"external benchmark\s*\d+\s*/\s*\d+", re.IGNORECASE)),
     # A trail is a Memex associative path (layers/trail.md), not a graded
     # curriculum. Bilingual: the English gloss fires on this corpus; the Korean
     # literals are carried over. Benign "learner"/"learning order" don't match
@@ -449,19 +462,20 @@ CLAUDE_VOICE_PATTERNS = [
     )),
 ]
 
-# Self-skip — the policy files list antipatterns by example, not as violations.
+# Self-skip — these files list antipatterns by example, not as violations.
 CLAUDE_VOICE_SELF_SKIP = {
-    ".claude/policies/claude-guideline-voice.md",
+    ".claude/skills/guideline-writing/SKILL.md",
     ".claude/policies/language.md",
 }
 
 
 def _check_claude_voice_violations() -> list[str]:
-    """Surface decision-history, external-benchmark reference, and changelog-
-    section antipatterns across Claude guideline SoT files. Scope covers
-    `.claude/commands/*.md`, `.claude/agents/*.md`, `.claude/policies/*.md`,
-    `.claude/layers/*.md`, `.claude/operations/*.md`, `.claude/skills/*/SKILL.md`,
-    and `CLAUDE.md` — wiki/ is content territory and is unaffected.
+    """Surface deliberation-narrative (guideline-writing skill, gdl.*) and
+    project-vocabulary voice antipatterns across Claude guideline SoT files.
+    Scope covers `.claude/commands/*.md`, `.claude/agents/*.md`,
+    `.claude/policies/*.md`, `.claude/layers/*.md`, `.claude/operations/*.md`,
+    `.claude/skills/*/SKILL.md`, and `CLAUDE.md` — wiki/ is content territory
+    and is unaffected.
     """
     violations: list[str] = []
     targets: list[Path] = [CLAUDE_MD]
@@ -476,6 +490,7 @@ def _check_claude_voice_violations() -> list[str]:
     if skills_dir.exists():
         targets.extend(sorted(skills_dir.glob("*/*.md")))
 
+    gdl = _load_gdl_checks()
     for path in targets:
         rel = path.relative_to(ROOT).as_posix()
         if rel in CLAUDE_VOICE_SELF_SKIP:
@@ -484,8 +499,12 @@ def _check_claude_voice_violations() -> list[str]:
             text = read_text_cached(path)
         except OSError:
             continue
-        for i, line in _iter_non_fenced_lines(text):
-            for label, pat in CLAUDE_VOICE_PATTERNS:
+        lines = list(_iter_non_fenced_lines(text))
+        if gdl is not None:
+            for i, label, matched in gdl.find_deliberation_narrative(lines):
+                violations.append(f"{rel}:{i}: [{label}] '{matched}'")
+        for i, line in lines:
+            for label, pat in PROJECT_VOICE_PATTERNS:
                 m = pat.search(line)
                 if m:
                     violations.append(
@@ -1097,9 +1116,8 @@ def run() -> int:
         print(f"FAIL - {language_total} Korean header violation(s)")
         print("Rule: section headers in CLAUDE.md and .claude/commands/*.md must be English.")
 
-    # CLAUDE VOICE pass — guideline antipattern (decision option / reinforcement
-    # counter / introduction timestamp / external case reference / benchmark
-    # absorption narrative). See .claude/policies/claude-guideline-voice.md.
+    # CLAUDE VOICE pass — deliberation narrative (guideline-writing skill,
+    # gdl.no-deliberation-narrative) + project voice patterns.
     voice_issues = _check_claude_voice_violations()
     if voice_issues:
         print(f"\n[Claude guideline voice violations: {len(voice_issues)}]")
@@ -1109,7 +1127,7 @@ def run() -> int:
             "Rule: .claude/commands/*.md, .claude/agents/*.md, CLAUDE.md must "
             "express current policy only — decision history, external case "
             "reference, introduction timestamps belong in log.md. "
-            "See .claude/policies/claude-guideline-voice.md."
+            "See .claude/skills/guideline-writing/SKILL.md."
         )
     else:
         print("OK - no Claude guideline voice antipatterns")

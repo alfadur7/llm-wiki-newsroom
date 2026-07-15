@@ -118,7 +118,7 @@ Reference: .claude/commands/wiki-lint.md "Required per-target Drift Block"."""
 
 PLAN_MSG = """[minimality-advisory] PLAN FILE WRITE DETECTED
 
-5-step self-check required just before ExitPlanMode (SoT: .claude/policies/no-plan-bloat.md):
+5-step self-check required just before ExitPlanMode (SoT: .claude/skills/guideline-writing/SKILL.md, Bloat control):
 
   1. New section/table/matrix vs absorb one line into an existing section — absorb by default
   2. Zero duplication of another SoT's table/matrix — replace with a cross-reference
@@ -135,7 +135,7 @@ PLAN_MSG = """[minimality-advisory] PLAN FILE WRITE DETECTED
 T1 naming principle: new memory/policy/hook files default to a prescriptive
 `no_X`·`X_to_Y`·`X_not_Y` form. descriptive forms (`*_voice`·`*_posture`) weaken recall.
 
-Reference: .claude/policies/no-plan-bloat.md."""
+Reference: .claude/skills/guideline-writing/SKILL.md (Bloat control)."""
 
 GUIDE_MSG = """[minimality-advisory] GUIDELINE EDIT DETECTED
 
@@ -147,6 +147,8 @@ Claude-guideline-change Voice Pass required just before commit
   2. Slimming check — remove redundancy·decorative sentences·self-evident grounds, absorb into existing sections by default,
      keep surrounding bullet voice·depth consistent (no verbose additions)
   3. Qualitative — table-row restatement·self-containment (meaning clear without knowing other docs)·residual decision narrative
+     + a blind review pass (diff-only reviewer, substantive/invariant classification —
+     skill SoT: .claude/skills/guideline-writing/SKILL.md, Blind review protocol)
 
 Steps 2 and 3 are complete only when the check evidence (edit↔sibling bullet
 length/depth comparison, per-item findings) is presented in the reply — a bare
@@ -154,7 +156,7 @@ length/depth comparison, per-item findings) is presented in the reply — a bare
 
 Move violating phrasings to log.md + remove them from the body.
 
-Reference: editor-in-chief.md § Voice Pass + policies/claude-guideline-voice.md."""
+Reference: editor-in-chief.md § Voice Pass + skills/guideline-writing/SKILL.md."""
 
 PROPOSAL_VALIDATION_MSG = """[proposal-validation-advisory] DESK-JUDGED PROSE GUIDELINE EDIT DETECTED
 
@@ -267,16 +269,25 @@ def _rel_wiki(path: str) -> str:
     return m.group(1) if m else path
 
 
-def _protected_path(path: str) -> str | None:
+def _protected_path(path: str, tool_name: str = "", content: str = "") -> str | None:
     """Return a reason string if `path` is an auto-generated/immutable target
     that must not be hand-edited via Write|Edit, else None. `path` is slash-
-    normalized."""
+    normalized.
+
+    Inbox WebFetch-fallback exception: the 2nd-stage fetch (wiki-ingest.md
+    Inbox Mode) legitimately Writes a NEW raw/ file whose frontmatter keeps
+    the `source:` URL — a Write to a not-yet-existing raw path with a
+    `source: http...` line passes; Edits and URL-less writes stay blocked.
+    """
     if any(("/" + path).endswith("/" + p) for p in PROTECTED_EXACT):
         return "build artifact"
     if any(rx.search(path) for rx in PROTECTED_GLOB):
         return "build artifact"
     m = re.search(r"/raw/(.+)$", path)
     if m and m.group(1) not in ("_inbox.md", "_archive.md"):
+        if (tool_name == "Write" and not Path(path).exists()
+                and re.search(r"^source:\s*['\"]?https?://", content, re.MULTILINE)):
+            return None
         return "raw/ original (immutable)"
     return None
 
@@ -312,7 +323,7 @@ def run_pre(data: dict) -> int:
     content = tool_input.get("content") or tool_input.get("new_string") or ""
 
     # 0) protected-path guard — blocking (exit 2). Auto-gen/immutable targets.
-    reason = _protected_path(path)
+    reason = _protected_path(path, data.get("tool_name", ""), content)
     if reason:
         print(PROTECTED_MSG_TMPL.format(rel=_rel_wiki(path), reason=reason), file=sys.stderr)
         return 2

@@ -30,6 +30,7 @@ The two areas map naturally to a Korean newspaper's "reporting mode"·"writing m
 - Run the first-pass quantitative lint on its own authored source·stub (confirm `python tools/lint.py source <slug>` PASS — on FAIL, re-run its own ADAPT before handing off)
 
 **X — what not to do**:
+- Expanding the stub target set by its own threshold judgment — the Editor-in-Chief judges the creation threshold and hands over the approved targets (contract SoT: [`layers/hub.md`](../layers/hub.md) stub authoring)
 - L2-2 **full hub authoring** — substantively expanding·rewriting an existing hub via cross-source deep read (Columnist territory)
 - Authoring L2-3·L2-4 content (Columnist territory)
 - Qualitative review (Desk territory)

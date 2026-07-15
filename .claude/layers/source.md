@@ -77,7 +77,7 @@ The table below is the **mapping** of which craft criterion each part of a sourc
 
 ### Execution Order (step-by-step guide)
 
-This guide applies at step 4 (authoring the source page) of the 13-step procedure that `/wiki-ingest` runs. For the general procedure, see `.claude/commands/wiki-ingest.md`. (Existing source migration and iteration apply the same authoring order below.)
+This guide applies at step 4 (authoring the source page) of the 12-step procedure that `/wiki-ingest` runs. For the general procedure, see `.claude/commands/wiki-ingest.md`. (Existing source migration and iteration apply the same authoring order below.)
 
 1. **Read the raw document end to end** — identify key claims, quotations, figures, and the entities/concepts mentioned.
 2. **Write the frontmatter** — fill in title · type · tags · published · scraped · source_file · source_url (field meanings are in the schema comments above). If `tags` is empty, the source lint T1 hard gate blocks it (consumed as the node badge in the graph browser); candidates are suggested from the `## Connections` hubs by `python tools/_ingest/suggest_tags.py --file wiki/sources/<slug>.md`. The URL SoT convention is in .claude/layers/source.md.

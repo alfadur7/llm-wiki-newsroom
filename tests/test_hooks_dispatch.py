@@ -185,6 +185,35 @@ def test_protected_path_blocks_raw_originals(capsys):
     assert "immutable" in capsys.readouterr().err
 
 
+def test_raw_webfetch_fallback_write_passes(tmp_path, capsys):
+    # Inbox 2nd-stage fallback: a Write of a NEW raw file whose frontmatter
+    # keeps the `source:` URL is the sanctioned fetch path — not blocked.
+    p = tmp_path / "raw" / "NewsScrap" / "new-article.md"
+    rc = dispatch.run_pre(_input(
+        "Write", str(p),
+        content="---\nsource: https://example.com/a\n---\nbody"))
+    assert rc == 0
+    assert capsys.readouterr().err == ""
+
+
+def test_raw_write_without_source_url_still_blocked(tmp_path, capsys):
+    p = tmp_path / "raw" / "NewsScrap" / "no-url.md"
+    rc = dispatch.run_pre(_input("Write", str(p), content="---\ntitle: x\n---\nbody"))
+    assert rc == 2
+    assert "immutable" in capsys.readouterr().err
+
+
+def test_raw_edit_with_source_url_still_blocked(tmp_path, capsys):
+    # Only NEW Writes are excused — an Edit to an existing raw stays blocked.
+    p = tmp_path / "raw" / "NewsScrap" / "existing.md"
+    p.parent.mkdir(parents=True)
+    p.write_text("---\nsource: https://example.com/a\n---\nbody", encoding="utf-8")
+    rc = dispatch.run_pre(_input(
+        "Edit", str(p), new_string="source: https://example.com/a\nmore"))
+    assert rc == 2
+    assert "immutable" in capsys.readouterr().err
+
+
 def test_protected_path_allows_exceptions(capsys):
     # Allowed: themes JSON re-derived by Claude, human-edited cluster_labels, and queue append files.
     for p in ("/r/wiki/contradictions/_contradictions_themes.json",
