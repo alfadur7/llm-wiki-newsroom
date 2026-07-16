@@ -19,9 +19,9 @@ This wiki maps the debate over what "open source" should mean for AI systems. Th
 
 On 2024-10-28 the [[OpenSourceInitiative]] released the Open Source AI Definition 1.0, the first binary standard for open AI: a system either grants the four freedoms — use, study, modify, share — or it does not, and qualifying requires data information, source code, and parameters. OSI validated Pythia, OLMo, Amber, CrystalCoder, and T5, and judged Llama non-compliant.
 
-The grouping's actors split three ways. The [[OpenSourceInitiative]] is the standard-setter; [[Mozilla]] is the prominent endorser, framing openness as an AI-safety precondition; the [[FreeSoftwareFoundation]] is the dissenter building a stricter alternative. The anchor concept is [[OpenSourceAI]], and the contested component is [[TrainingData]].
+The grouping's actors split three ways. The [[OpenSourceInitiative]] is the standard-setter; [[Mozilla]] is the prominent endorser, framing openness as an AI-safety precondition; the [[FreeSoftwareFoundation]] anchors a broader critic coalition building a stricter alternative. The anchor concept is [[OpenSourceAI]], and the contested component is [[TrainingData]].
 
-The central collision is whether a workable binary standard or a maximalist open-data requirement should define "open." OSI and [[Mozilla]] argue an imperfect-but-clear definition serves developers and regulators now; the [[FreeSoftwareFoundation]] holds that without raw training data the label is hollow. The procedural fact that a 10-person board, not the full membership, approved the definition feeds the dispute.
+The central collision is whether a workable binary standard or a maximalist open-data requirement should define "open." OSI and [[Mozilla]] back the imperfect-but-clear definition as a workable floor — Mozilla with a stated intent to raise the data bar over time. The critics call the missing training data disqualifying now rather than a defect to refine later. The procedural fact that a 10-person board, not the full membership, approved the definition feeds the dispute.
 
 Details: [[open-source-ai-definition|the Open-Source AI Definition field]].
 
