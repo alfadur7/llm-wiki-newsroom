@@ -70,7 +70,7 @@ VALID_GAP_TYPES = TRACK_A_SLUGS + TRACK_B_SLUGS + TRACK_C_SLUGS + TRACK_D_SLUGS
 
 # Thresholds — derived from current wiki measurements (568 hubs, median
 # hub-hub degree 16, p25 9, age median 9d max 35d, 9 clusters size 25-115).
-# See gap-detection-rollout.md "Rationale — decisions based on measured statistics".
+# See gap-detection-rollout.md "Calibrating thresholds".
 SPARSE_CLUSTER_MIN_SIZE = 20
 SINGLE_SOURCE_MIN_DEGREE = 9         # p25 of hub-hub degree — floor for "normal influence"
 SINGLE_SOURCE_MIN_CLUSTER_COUNT = 2  # adjacent to multiple clusters

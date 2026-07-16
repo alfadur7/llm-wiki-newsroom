@@ -30,7 +30,7 @@ bounds, Freshness vs `_contradictions.json`) lives in the sibling
 Axis pairing: the landscape axis equivalent lives in `overview.py`.
 
 L2-4 aggregate (`wiki/contradiction.md`) Rubric + drill-down verification
-is deferred — no lint-level Rubric exists yet for it.
+lives in `_check_contradictions_md` (the `aggregate` target scope of `run()`).
 """
 from __future__ import annotations
 
@@ -158,8 +158,9 @@ S3_LEAD_WIKILINKS_MAX = 5
 # Rubric Part 2 (Aggregate) thresholds — `.claude/layers/contradiction.md` Part 2
 L24_W1_MIN = 50
 L24_S2_INSIGHTS_MIN = 3
-L24_D1_AXES_MIN = 2
-L24_D1_AXES_MAX = 4
+# D1 (axis-count range) threshold lives with the D1 measurement in the
+# consulting-writing skill's checks.py (AXES_MIN/AXES_MAX) — consumed via
+# the bundle's d1_ok/axes_min/axes_max return values.
 L24_D3_BALANCE_MAX = 4.0
 
 # S2 — `## Implications` bullet count. Bold labels emphasized with numbered markers (①②③…⑩).
@@ -181,13 +182,10 @@ L24_THEMES_STAT_RE = re.compile(r"(\d+)\s*topic (?:clusters?|categories|themes?)
 
 # Bold-label matching for the `## Opposing Positions` position labels, used only
 # to locate where the lead paragraph ends (the consumer uses `.start()`, not the
-# captured groups). The English layer prescribes `**Position A**` / `**Position B**`
-# / `**C — Mediation/Third view**` (contradiction.md); a parenthetical subtitle may
-# follow (e.g. `**Position A (suppliers / substitution)**:`). The Korean labels
-# `**A 입장…**` / `**C 중재…**` are kept for WIKI_LANG=ko corpora.
-DIALECTIC_LABEL_RE = re.compile(
-    r"\*\*(?:Position\s+[ABC]\b|[ABC]\s*(?:[—-]|입장|중재|제3관점))[^*]*\*\*"
-)
+# captured groups — the extra named groups in the skill's regex are harmless here).
+# Single SoT: the enc skill owns the A/B/C label grammar (was a drifted local
+# copy here); consume it directly so the copies cannot diverge.
+DIALECTIC_LABEL_RE = enc_skill.DIALECTIC_LABEL_RE
 
 
 # N6 — numeric token regex. Counts **only measurements that carry a unit** so
@@ -1018,7 +1016,7 @@ def _check_contradictions_md(
     axis_skew_hits = _agg_enc["axis_skew_hits"]
     n7_skew = _agg_enc["n7_skew"]
     n7_ok = n7_skew == 0
-    d1_ok = L24_D1_AXES_MIN <= d1_axes <= L24_D1_AXES_MAX
+    d1_ok = _agg_con["d1_ok"]
     d2_total = _agg_enc["d2_total"]
     d2_aliased = _agg_enc["d2_aliased"]
     d2_raw = _agg_enc["d2_raw"]
@@ -1049,7 +1047,7 @@ def _check_contradictions_md(
     if not d1_ok:
         issues.append(
             f"  wiki/contradiction.md: D1 FAIL — {d1_axes} named axes "
-            f"(expected {L24_D1_AXES_MIN}~{L24_D1_AXES_MAX}): {axes_named}"
+            f"(expected {_agg_con['axes_min']}~{_agg_con['axes_max']}): {axes_named}"
         )
     if not d2_ok:
         if d2_total == 0:

@@ -38,7 +38,9 @@ REQUIRED_FRONTMATTER = {"title", "type", "created"}
 REQUIRED_SECTIONS = ("## Path", "## Commentary")
 PATH_MIN, PATH_MAX = 4, 12
 
-REQUIRED_KEYS = ("schema", "path_links", "path_length", "slug_alias")
+# struct.path-length is optional per _manifest.json trail.roster / trail.md —
+# reported in the [Rubric]/PathLen output but never gates the exit code.
+REQUIRED_KEYS = ("schema", "path_links", "slug_alias")
 
 # A `## Path` numbered list item: `1. ...`, `12. ...`
 PATH_ITEM_RE = re.compile(r"^\s*\d+\.\s+(.*)$", re.MULTILINE)

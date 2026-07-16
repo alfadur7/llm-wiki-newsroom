@@ -13,7 +13,9 @@ contradiction.py `_rubric_metrics` (diff-0).
 
 from __future__ import annotations
 
+import importlib.util as _ilu
 import re
+from pathlib import Path
 
 
 # ── dialectic/Toulmin measurement regexes (verbatim from contradiction.py) ──
@@ -38,13 +40,16 @@ QUALIFIER_PATTERNS = [
 ]
 # Hegelian dialectic A/B/C position label (D1/D5). The letter is captured in `p`
 # when it follows `Position ` (English `**Position A**`, per contradiction.md) or
-# in `b` when it leads (`**C — Mediation**`, Korean `**A 입장**`). The strict
-# alternation mirrors contradiction.py's DIALECTIC_LABEL_RE so ordinary bold
-# phrases starting with a bare A/B/C (`**A key caveat**`) are not matched.
-DIALECTIC_LABEL_RE = re.compile(
-    r"\*\*(?:Position\s+(?P<p>[ABC])\b|(?P<b>[ABC])\s*(?:[—-]|입장|중재|제3관점))[^*]*\*\*"
+# in `b` when it leads (`**C — Mediation**`, Korean `**A 입장**`). Single SoT:
+# the encyclopedia-writing skill owns the label grammar (was a byte-identical
+# second copy here); load it from the sibling skill so the copies cannot diverge.
+_enc_spec = _ilu.spec_from_file_location(
+    "enc_checks_jrn", Path(__file__).parent.parent / "encyclopedia-writing" / "checks.py"
 )
-C_LABEL_BROAD_RE = re.compile(r"\*\*C\s+[^*]+\*\*")  # language-agnostic (any **C …** label)
+_enc_checks = _ilu.module_from_spec(_enc_spec)
+_enc_spec.loader.exec_module(_enc_checks)
+DIALECTIC_LABEL_RE = _enc_checks.DIALECTIC_LABEL_RE
+C_LABEL_BROAD_RE = re.compile(r"\*\*(?:Position\s+)?C\b[^*]*\*\*")  # language-agnostic (any **C …** / **Position C …** label)
 # C-position meta-critique keywords (D6). English-native literals first; the Korean
 # forms fire under WIKI_LANG=ko.
 C_META_KEYWORDS = [
@@ -131,7 +136,7 @@ def evaluate_overview_aggregate(*, all_links: list, cluster_slugs: set) -> dict:
     overview.py. (Counts slug references — language-agnostic.)"""
     cluster_ref_counts: dict = {}
     for target in all_links:
-        stem = target.strip().split("/")[-1]
+        stem = target.strip().split("/")[-1].split("#", 1)[0]
         if stem in cluster_slugs:
             cluster_ref_counts[stem] = cluster_ref_counts.get(stem, 0) + 1
     if len(cluster_ref_counts) >= 2:

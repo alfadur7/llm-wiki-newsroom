@@ -1,15 +1,18 @@
-"""encyclopedia-writing craft skill — deterministic checks (Phase 0 PoC).
+"""encyclopedia-writing craft skill — deterministic checks.
 
-PoC of the "full modularization" pattern that combines the probabilistic part
+The "full modularization" pattern that combines the probabilistic part
 (SKILL.md craft prose) and the deterministic part (this module) in a single skill
 folder. It reads criteria.json as the single SoT and provides craft-agnostic
 measurement algorithms. The threshold VALUE is injected from the manifest by the
 caller (the content-type orchestrator = tools/lint.py) — the skill does not know
 the content type.
 
-Phase 1 scope: enc.link-density (total wikilinks, legacy W1) +
-enc.first-mention (in-section duplicate wikilinks, legacy W3). Demonstrates that
-tools/lint.py can import this module and call it headless.
+Owns the enc.* criteria bundles across four content types, each injected per
+_manifest.json bundles: wikilink craft (enc.link-density · enc.first-mention ·
+enc.slug-alias · enc.abbr-gloss), NPOV (enc.verdict-restraint), the
+contradiction-theme NPOV bundle (W1·N4·N5·N6·N7·L1·X2), the
+contradiction-aggregate (N5·N7·D2·D3·F1) and overview-aggregate (D2·F1)
+bundles, and the L2-2 hub body/connection grouping.
 """
 
 from __future__ import annotations
@@ -483,7 +486,7 @@ def evaluate_overview_aggregate(content: str, *, section_spans: list, all_links:
         next_h2 = re.search(r"^##\s", content[start:], re.MULTILINE)
         end = start + next_h2.start() if next_h2 else len(content)
         sec_text = content[start:end]
-        if not re.search(rf"\[\[{re.escape(slug)}(?:\|[^\]]*)?\]\]", sec_text):
+        if not re.search(rf"\[\[{re.escape(slug)}(?:#[^\]|]*)?(?:\|[^\]]*)?\]\]", sec_text):
             d2_missing.append(slug)
     d2_found = len(section_spans)
     d2_count = d2_found - len(d2_missing)
@@ -491,7 +494,7 @@ def evaluate_overview_aggregate(content: str, *, section_spans: list, all_links:
     # F1 — block theme references (Coatrack)
     f1_count = 0
     for target in all_links:
-        stem = target.strip().split("/")[-1]
+        stem = target.strip().split("/")[-1].split("#", 1)[0]
         if stem in theme_stems:
             f1_count += 1
 

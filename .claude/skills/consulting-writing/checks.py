@@ -4,8 +4,8 @@ Craft drawn from the management-consulting deliverable tradition (McKinsey SCR·
 Minto Pyramid/MECE·BCG bold-bullet·"So what upfront"·Forrester Landscape). It owns
 the MECE (Collectively Exhaustive) measurements of an aggregate roll-up —
 overview L2-4 cluster completeness and contradiction-aggregate tension-axis
-grouping. Many criteria (C1 SCR·C2 bold-bullet·C3 So-what·S5 trend subsections of
-the overview cluster, etc.) are judge=M (qualitative), so only the SKILL.md /
+grouping. Many criteria (C1 SCR·C2 bold-bullet·C3 So-what·S2 numeric precision,
+etc.) are judge=M (qualitative), so only the SKILL.md /
 criteria.json definitions live here and desk reviews them.
 
 content-type-agnostic: shared parsing (analysis_section·content·cluster_slugs) is
