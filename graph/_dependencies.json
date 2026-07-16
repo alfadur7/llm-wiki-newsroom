@@ -122,7 +122,7 @@
       "upstream_max_date": "2026-06-26"
     },
     "overviews/licensing-open-washing.md": {
-      "last_updated": "2026-06-26",
+      "last_updated": "2026-07-17",
       "upstream": [
         "concepts/ModelLicensing.md",
         "concepts/OpenWashing.md",
@@ -131,7 +131,7 @@
       "upstream_max_date": "2026-07-01"
     },
     "overviews/open-source-ai-definition.md": {
-      "last_updated": "2026-06-26",
+      "last_updated": "2026-07-17",
       "upstream": [
         "concepts/OpenSourceAI.md",
         "concepts/TrainingData.md",
@@ -179,7 +179,7 @@
         "overviews/open-source-ai-definition.md",
         "overviews/open-weights.md"
       ],
-      "upstream_max_date": "2026-06-26"
+      "upstream_max_date": "2026-07-17"
     },
     "contradiction.md": {
       "last_updated": null,

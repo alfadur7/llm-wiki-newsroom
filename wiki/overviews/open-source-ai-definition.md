@@ -4,7 +4,7 @@ type: overview
 tags: []
 cluster: open-source-ai-definition
 sources: []
-last_updated: 2026-06-26
+last_updated: 2026-07-17
 ---
 
 # Open-Source AI Definition
@@ -32,6 +32,10 @@ The cluster splits into three roles. The **standard-setter** is [[OpenSourceInit
 ## Subtopics
 
 The **data-information compromise** is the heart of the cluster. OSAID requires enough detail to recreate a substantially equivalent system rather than the raw [[TrainingData]], a deliberate concession to fields like medical AI where datasets cannot be legally shared. Endorsers read this as pragmatic; the [[FreeSoftwareFoundation]] reads it as fatal, holding that data and processing scripts must respect the four freedoms or the model is not free. This axis is analysed in depth in [[open-training-data-requirement|the open-training-data dispute]].
+
+Yet the endorser position is not static acceptance. [[Mozilla]] backs the standard as "an important step forward" while conceding its data treatment "will need refinement" ([[mozilla-celebrates-osaid|its endorsement post]]). Having convened experts with EleutherAI on open-dataset norms, its [forecast]-grade intent is to raise the data bar over time.
+
+Critics reject the refinement-over-time framing: they hold the data omission is disqualifying now, not a defect to be fixed later. A companion analysis, [[open-source-ai-every-camp-standard|what clears every camp's bar]], finds the only plausible candidates are the fully-open-data models OSI itself validated.
 
 The **binary-vs-spectrum question** is the second axis. [[OpenSourceAI]] is intentionally all-or-nothing so that regulators and civil society can tell genuinely open systems from marketing, and so [[OpenWashing]] has a clear line to fall on the wrong side of. Critics counter that a binary that admits data-less models simply moves the open-washing line rather than removing it.
 
