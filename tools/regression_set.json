@@ -1,27 +1,23 @@
 {
-  "_note": "Held-out regression canary for guideline self-evolution — a fixed set of central, stable pages per content type. Consumed by the SoT self-evolution workflow (editor-in-chief.md step 6) acceptance rule: a guideline change is adopted only if this set's lint and Desk scores do not regress before vs. after. Human-curated; no automatic Claude edits — never used as a revision target so the proposer cannot game the comparison set (held-out). This fixed set is the longitudinal-reproduction core; each validation cycle supplements it with a fresh, audit-logged sample of stable pages of the edit type·already-treated defects of the same mechanism (frozen-set rot prevention) — the fresh samples live only in the transition record and are not appended to this file (preserving its fixedness). Paths are relative to wiki/.",
+  "_note": "Held-out regression canary for guideline self-evolution — a fixed set of central, stable pages per content type. Consumed by the SoT self-evolution workflow (editor-in-chief.md step 6) acceptance rule: a guideline change is adopted only if this set's lint and Desk scores do not regress before vs. after. Human-curated; no automatic Claude edits — never used as a revision target so the proposer cannot game the comparison set (held-out). This fixed set is the longitudinal-reproduction core; each validation cycle supplements it with a fresh, audit-logged sample of stable pages of the edit type·already-treated defects of the same mechanism (frozen-set rot prevention) — the fresh samples live only in the transition record and are not appended to this file (preserving its fixedness). Paths are relative to wiki/. Types that ship empty in this corpus (timeline, trail) hold empty lists until the operator curates pages of that type.",
   "overview": [
-    "overviews/llm-foundation.md",
-    "overviews/bank-it-digital.md"
+    "overviews/open-source-ai-definition.md",
+    "overviews/licensing-open-washing.md"
   ],
   "contradiction": [
-    "contradictions/ai-coding-productivity-debate.md",
-    "contradictions/agentic-ai-saas-debate.md"
+    "contradictions/open-training-data-requirement.md",
+    "contradictions/other-fragmentary.md"
   ],
   "hub": [
-    "entities/AWS.md",
-    "concepts/AGI.md"
+    "entities/OpenSourceInitiative.md",
+    "concepts/OpenSourceAI.md"
   ],
-  "timeline": [
-    "timelines/Anthropic.md"
-  ],
+  "timeline": [],
   "synthesis": [
-    "syntheses/ai-coding-evolution-developer-productivity.md"
+    "syntheses/open-source-ai-every-camp-standard.md"
   ],
-  "trail": [
-    "trails/ai-coding-rapid-evolution.md"
-  ],
+  "trail": [],
   "source": [
-    "sources/33-year-financial-it-veteran.md"
+    "sources/osi-open-source-ai-definition.md"
   ]
 }

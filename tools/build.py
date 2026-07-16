@@ -21,6 +21,9 @@ Five phases, each owned by one module (axis-aligned after the Phase B refactor):
                     AUTO blocks by design, so no run_pages step)
   index          → wiki/index.md + wiki/_backlinks.json
                    + wiki/sources/_source_map.json
+                   + graph/_pages.json refresh (pages.run re-runs after
+                    _backlinks.json is written so the reading-panel bundle
+                    carries the current build's backlinks)
                    (global meta — depends on all prior phases for counts/links)
   dependencies   → graph/_dependencies.json
                    (layer-cascade upstream index: page → {upstream pages it
@@ -61,6 +64,15 @@ def _phase_clusters(cold: bool = False) -> None:
     pages.run()
 
 
+def _phase_index() -> None:
+    index.run()
+    # _pages.json backlinks come from wiki/_backlinks.json, which index.run
+    # writes just above — refresh the bundle here so a single full build ships
+    # current backlinks (the clusters phase already built it once for the
+    # single-phase `build.py clusters` contract).
+    pages.run()
+
+
 def _phase_contradictions(dry_run: bool = False) -> None:
     contradictions.run(dry_run=dry_run)
     # _overlays.json depends on the contradiction JSONs written just above
@@ -74,7 +86,7 @@ PHASES = {
     "graph":          _phase_graph,
     "clusters":       _phase_clusters,
     "contradictions": _phase_contradictions,
-    "index":          index.run,
+    "index":          _phase_index,
     "dependencies":   dependencies.run,
 }
 
