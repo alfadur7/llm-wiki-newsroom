@@ -162,8 +162,17 @@ def test_ponytail_advisory_tools_python(capsys):
     assert "[ponytail-advisory]" in _payload(capsys)
 
 
+def test_ponytail_advisory_hook_scripts(capsys):
+    # The hook layer itself is in scope — .py and .sh under .claude/hooks/.
+    dispatch.run_pre(_input("Edit", "/r/.claude/hooks/dispatch.py", new_string="x"))
+    ctx = _payload(capsys)
+    assert "[ponytail-advisory]" in ctx and ".claude/hooks/dispatch.py" in ctx
+    dispatch.run_pre(_input("Write", "/r/.claude/hooks/new-guard.sh", content="#!/bin/sh"))
+    assert "[ponytail-advisory]" in _payload(capsys)
+
+
 def test_ponytail_advisory_scope(capsys):
-    # .py outside tools/ and non-.py inside tools/ do not fire.
+    # .py outside tools//hooks and non-script files inside them do not fire.
     assert dispatch.run_pre(_input("Write", "/r/scratch/foo.py", content="x")) == 0
     assert capsys.readouterr().out == ""
     dispatch.run_pre(_input("Write", "/r/tools/README.md", content="x"))

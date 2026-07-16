@@ -1022,20 +1022,21 @@ def _check_log_monotonicity() -> list[str]:
         text = read_text_cached(LOG_MD)
     except OSError:
         return violations
-    entries: list[tuple[str, int]] = []
-    for m in LOG_HEADER_RE.finditer(text):
-        date = m.group(1)
-        line_no = text[: m.start()].count("\n") + 1
-        entries.append((date, line_no))
+    # Single line-wise scan — the per-match `text[:m.start()].count("\n")`
+    # form is O(headers × file size) and log.md only grows (append-only).
     rel = LOG_MD.relative_to(ROOT).as_posix()
-    for i in range(len(entries) - 1):
-        cur_date, cur_line = entries[i]
-        nxt_date, nxt_line = entries[i + 1]
-        if nxt_date < cur_date:
+    prev_date, prev_line = None, 0
+    for line_no, line in enumerate(text.splitlines(), start=1):
+        m = LOG_HEADER_RE.match(line)
+        if not m:
+            continue
+        date = m.group(1)
+        if prev_date is not None and date < prev_date:
             violations.append(
-                f"{rel}:{nxt_line}: [{nxt_date}] entry follows "
-                f"[{cur_date}] at :{cur_line} (dates must be ascending)"
+                f"{rel}:{line_no}: [{date}] entry follows "
+                f"[{prev_date}] at :{prev_line} (dates must be ascending)"
             )
+        prev_date, prev_line = date, line_no
     return violations
 
 

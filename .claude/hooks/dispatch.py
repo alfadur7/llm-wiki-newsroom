@@ -57,6 +57,9 @@ def _drift_group_counts(scan: str) -> tuple[int, int]:
                 cn += 1
     return ov, cn
 AUTO_MARKER_RE = re.compile(r"<!--\s*AUTO:")
+# Ponytail advisory scope — project scripts: tools/ Python + the hook layer
+# itself (.claude/hooks/ py|sh); hook code is as prone to accretion as tools/.
+PONYTAIL_RE = re.compile(r"/tools/.*\.py$|/\.claude/hooks/.*\.(py|sh)$")
 SCRATCH_EXTS = {".py", ".sh", ".tmp", ".scratch", ".ipynb"}
 # Repo root derived from this hook's own location (<root>/.claude/hooks/dispatch.py)
 # so the scratch advisory fires regardless of the clone directory name.
@@ -246,9 +249,10 @@ After ≤ 2 self-attempts for the same reason, PASS or force the handoff (blocks
 Reference: .claude/agents/columnist.md "self-VERIFY₀" + .claude/agents/README.md
            "Standard ADAPT chain" + .claude/agents/copyeditor.md "invocation contract"."""
 
-PONYTAIL_MSG_TMPL = """[ponytail-advisory] tools/ PYTHON AUTHORING — {rel}
+PONYTAIL_MSG_TMPL = """[ponytail-advisory] SCRIPT AUTHORING — {rel}
 
 Before writing/editing this file, load and apply the `ponytail-coding` skill via the Skill tool.
+Ladder rung 1 first: does this need to exist at all? A no-op beats the cleverest implementation.
 The gist: the code you didn't write is best — reuse an existing helper before writing new code.
 Full discipline (the ladder·root-cause·output restraint) SoT: .claude/skills/ponytail-coding/SKILL.md.
 
@@ -383,9 +387,10 @@ def run_pre(data: dict) -> int:
         if parent.lower() == _REPO_ROOT and ext in SCRATCH_EXTS:
             messages.append(SCRATCH_MSG_TMPL.format(basename=basename))
 
-    # 4) ponytail advisory — tools/ Python authoring (generation-time reflex).
-    if re.search(r"/tools/.*\.py$", path):
-        messages.append(PONYTAIL_MSG_TMPL.format(rel=path.rsplit("/tools/", 1)[-1]))
+    # 4) ponytail advisory — project-script authoring (generation-time reflex).
+    if PONYTAIL_RE.search(path):
+        rel = re.split(r"/(?=tools/|\.claude/hooks/)", path)[-1]
+        messages.append(PONYTAIL_MSG_TMPL.format(rel=rel))
 
     _emit("PreToolUse", messages)
     return 0

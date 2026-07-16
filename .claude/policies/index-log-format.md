@@ -59,4 +59,6 @@ grep "^## \[" log.md | tail -10
 
 A new entry is **appended at the end of the file**, and its date must be **equal to or greater than** the previous entry's. This ordering is the premise that lets `tail -10` return "the 10 most recent entries."
 
+`log.md` grows past the harness Read cap (256KB) over time — pick the read path by intent: recent entries → `grep "^## \[" log.md | tail`; a specific date → `grep -n "\[YYYY-MM-DD\]" log.md` then a ranged Read; full-file processing → Python from Bash (the cap applies to the Read tool, not the file).
+
 The "Log ordering" check in `python tools/lint.py meta schema` validates this automatically; when a violation is found, restore it manually by moving the offending entry block (from its header up to just before the next header) to the correct date position.
