@@ -230,8 +230,8 @@ Structural and mechanical rules with no external craft source text. Measurement 
 | `enc.broken-link` (W4) | Real filenames | 0 broken wikilinks (`python tools/lint.py graph structure`) | A | ✅ |
 | `struct.theme-drilldown` (X2) | Contradiction drill-down link | A `[[<theme>]]`-format `wiki/contradictions/<theme>.md` reference is inserted in the body | A |  |
 | `struct.prose-rhythm` (S3) | Narrative/bullet rhythm | Roughly half the subtopics are paragraph narrative, the rest bullets | M |  |
-| `struct.prose-min` (S4) | Paragraph narrative ≥ 2 | 2+ subtopics are in paragraph form | A |  |
-| `struct.subsection-min` (S5) | Trends·figures ≥ 3 subsections | `## Key Trends & Figures` has ≥ 3 `**Bold**` subsections | A |  |
+| `struct.prose-min` (S4) | Paragraph narrative ≥ 2 | 2+ subtopics are in paragraph form | M |  |
+| `struct.subsection-min` (S5) | Trends·figures ≥ 3 subsections | `## Key Trends & Figures` has ≥ 3 `**Bold**` subsections | M |  |
 | `house.repetition` (R1) | Repetition of key figures/cases | A unique figure/unit token appears ≤ 2 times across the document (a 3rd occurrence only for a new cross-angle) | A (warning) |  |
 | `house.date-format` (L2) | Date notation unified | Mixed forms other than YYYY-MM-DD/YYYY-MM ≤ 3 | A (warning) |  |
 | `house.sentence-length` (S6) | Sentence-length cap | One sentence ≤ 200 characters, ≤ 3 exceedances | A (warning) |  |

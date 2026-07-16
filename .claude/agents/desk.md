@@ -91,7 +91,7 @@ If 0 defects are found, give 2–3 sentences of rationale for "why it was judged
 | L2-4 root overview VERIFY₂ | **mandatory** |
 | L2-4 root contradiction VERIFY₂ | **mandatory** |
 | L2-2 full hub VERIFY₂ | **mandatory** |
-| L2-2 timeline VERIFY₂ | applied |
+| L2-2 timeline VERIFY₂ | **mandatory** — on new-file authoring (subsequent narrative edits: applied) |
 | L2-2 stub VERIFY₂ (person·company·institution·product/SW·concept, all together) | **mandatory** |
 | L2-1 source VERIFY₂ (sub-trigger) | **mandatory** — when `[fact] ≥ 7 AND quoted citations ≥ 3` is met |
 
@@ -103,6 +103,7 @@ If 0 defects are found, give 2–3 sentences of rationale for "why it was judged
 - L2-3 edited content — `wiki/overviews/<cluster>.md`·`wiki/contradictions/<theme>.md`·`wiki/syntheses/<slug>.md`·`wiki/trails/<slug>.md`
 - L2-4 aggregate content — `wiki/overview.md`·`wiki/contradiction.md`
 - L2-2 full hub authoring output — entity·concept hubs that the Columnist authored or rewrote by integrating cross-source deep reads·synthesized narrative·timeline narrative across many sources (the authoring-act definition SoT is [`layers/hub.md`](../layers/hub.md), "authoring acts — stub authoring vs full hub authoring")
+- **L2-2 timeline authoring output** — newly authored `wiki/timelines/<Entity>.md` files (subsequent narrative edits follow the applied tier)
 - **L2-2 stub authoring output** (all 5 types together) — limited to format·attribution·narrative tone. Do not encroach on the hub-stub-threshold judgment ([naming.md](../policies/naming.md), consistent with "the main session spot-checks directly")
 - **L2-1 source** — when the sub-trigger `[fact] ≥ 7 AND quoted citations ≥ 3` is met. The lint advisory surfaces it automatically
 

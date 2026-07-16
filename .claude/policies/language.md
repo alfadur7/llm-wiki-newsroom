@@ -1,6 +1,6 @@
 # Language Rules
 
-> **English-native engine.** This framework is English throughout — the documentation, the wiki page content, and the engine's fixed page-schema tokens. The schema tokens (`## Summary`, `## Connections`, `## Key Claims`, the evidence markers `[fact]`/`[analysis]`/`[forecast]`, and the relation prefixes `cites:`/`references:`/`contradicts:`/`defines:`) are the literal strings the tools grep for — they are the engine's page schema and must be written in English exactly as shown. (The engine retains a dormant Korean-filename capability for Korean-named entities — see [naming.md](naming.md) — but English is the default everywhere.)
+> **English-native engine.** This framework is English throughout — the documentation, the wiki page content, and the engine's fixed page-schema tokens. The schema tokens (`## Summary`, `## Connections`, `## Key Claims`, the evidence markers `[fact]`/`[analysis]`/`[forecast]`, and the relation prefixes `cites:`/`references:`/`contradicts:`/`defines:`) are the literal strings the tools grep for — they are the engine's page schema and must be written in English exactly as shown. (The engine retains a dormant Korean-filename capability for Korean-named entities — see [naming.md](naming.md) — but English is the default everywhere.) Korean **body text** is an optional mode gated behind the `WIKI_LANG=ko` environment variable; English stays the default, and the schema tokens above remain English in both modes.
 
 ## Wiki Content
 

@@ -55,7 +55,7 @@ Input gaps (Track A·B·C — external source ingest · operator decision · the
 
 | Track | Gap | Definition | Threshold | severity |
 |---|---|---|---|---|
-| A | **sparse-cluster** | weak label cohesion, size ≥ 20 | `coherence == "mixed"` AND `size >= 20` AND (`containment < 0.9` OR top-tag share < 60%) | `1 - containment` |
+| A | **sparse-cluster** | weak label cohesion, size ≥ 20 | `coherence == "mixed"` AND `size >= 20` (containment feeds only the severity score) | `1 - containment` |
 | A | **single-source** | 1 source but normal influence | `len(sources) == 1` AND `hub_hub_degree >= 9` AND `cluster_count >= 2` | `0.5` (constant) |
 | A | **stale-hub** | cluster active but this hub alone stagnant | `(hub_age - cluster_avg_age) >= 14d` AND `cluster_avg_age <= 10d` | `(hub_age - cluster_avg_age) / 14` |
 | B | **bridge** | multi-cluster junction | `discover.py surprising` composite-score top-N (default 10 via `detect_bridge_nodes` / 15 via the standalone CLI) | normalized composite score |

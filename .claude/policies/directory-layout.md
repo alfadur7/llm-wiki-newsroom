@@ -68,7 +68,7 @@ lint-report.md          # Lint results (for user viewing · generated · untrack
 | **Auto-generated data** (overwritten by scripts each run, do not edit) | `_` | `_backlinks.json`, `_source_map.json`, `_graph.json`, `_clusters.json`, `_catalog*.md`, `_contradictions.json` |
 | **Human-edited config / viewable content** (Obsidian/browser access · manual editing) | none | `index.md`, `overview.md`, `contradiction.md`, `log.md`, `lint-report.md`, `graph.html`, `cluster_labels.json` |
 
-Naming rule: a `_` prefix means auto-generated (do not edit); no prefix means human-edited/viewable.
+Naming rule: under `wiki/` and `graph/`, a `_` prefix means an auto-generated data artifact (do not edit); no prefix means human-edited/viewable. Codified exceptions: `wiki/contradictions/_contradictions_themes.json` is a Claude-re-derived mapping SoT (edited by Claude, never by scripts), `raw/_inbox.md`·`raw/_archive.md` are append queues, and under `tools/` the `_` prefix marks internal modules and operator-local state instead.
 
 `log.md` is append-only; `overview.md` and `contradiction.md` are hybrid (AUTO + EDITOR) mode.
 

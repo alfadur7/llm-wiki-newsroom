@@ -116,7 +116,7 @@ This Rubric pairs with "how to write" (Authoring) to judge "how well it was writ
 
 **Judgment method**:
 - Each criterion is 3-tier: **PASS / PARTIAL / FAIL** (PARTIAL is excluded from the completion count).
-- **Automatic (A)** = metrics from `python tools/lint.py synthesis [<slug>]` output. What synthesis lint measures automatically is only **structural (schema-sections·source-coverage·source-exists) + enc.slug-alias (L1)** + advisories (W1·F1·Placement·J1). J1 is **not the verdict metric for `struct.join-grounded` but a surfacing metric** — it counts only the join locations; whether each holds is judged by the desk (M).
+- **Automatic (A)** = metrics from `python tools/lint.py synthesis [<slug>]` output. What synthesis lint measures automatically is only **structural (schema-sections·source-coverage·source-exists) + enc.slug-alias (L1) + MarkupLeak (tool-call markup leak — hard-gates even in advisory mode)** + advisories (W1·F1·Placement·J1). J1 is **not the verdict metric for `struct.join-grounded` but a surfacing metric** — it counts only the join locations; whether each holds is judged by the desk (M).
 - **Manual (M)** = judged by Claude·Desk reading the body (most of the craft mapping-table dotted IDs — `jrn.*`·`con.*`·`cit.grounding`·`enc.connection-grouping`, etc.).
 
 **Criteria SoT**: the criterion roster·required are `_manifest.json` `synthesis.roster` (28 criteria); craft definitions·PASS conditions are the mapping-table skills' `criteria.json`·SKILL.md. Structural criteria with no external craft source are in the section below.
@@ -140,7 +140,7 @@ This Rubric pairs with "how to write" (Authoring) to judge "how well it was writ
 
 ```
 syntheses/<slug>.md:
-  [Rubric] S1 sections=2/2+num✓ ✅  SrcCov=15/17 (88%) ✅  SrcExist=✅  L1 raw_slugs=0 ✅  J1 joins=2  W1 links=N ✅  F1 last_updated=✅
+  [Rubric] S1 sections=2/2+num✓ ✅  SrcCov=15/17 (88%) ✅  SrcExist=✅  L1 raw_slugs=0 ✅  J1 joins=2  W1 links=N ✅  F1 last_updated=✅  MarkupLeak=0 ✅
   [Join] 2 conflation surface(s) (claims joining ≥2 sources) — desk must verify span-by-span (no spot check)
 ```
 
@@ -157,7 +157,7 @@ syntheses/<slug>.md:
 
 #### Migration
 
-This lint is in **advisory mode** (`synthesis.py` `ADVISORY_MODE = True`) — until the seed-calibration batch (consolidated-layer standardization plan, step 2) normalizes existing files and adjusts thresholds via exemplar comparison, it shows only the FAIL count and keeps exit 0. After calibration, hard-switch to `ADVISORY_MODE = False` (same precedent as source.py).
+This lint is in **advisory mode** (`synthesis.py` `ADVISORY_MODE = True`) — until the seed-calibration batch (consolidated-layer standardization plan, step 2) normalizes existing files and adjusts thresholds via exemplar comparison, it shows only the FAIL count and keeps exit 0 — except a tool-call markup leak (MarkupLeak), which is a publish blocker and hard-gates (exit 1) even in advisory mode. After calibration, hard-switch to `ADVISORY_MODE = False` (same precedent as source.py).
 
 ## Sources
 

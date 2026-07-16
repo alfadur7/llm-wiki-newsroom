@@ -76,7 +76,7 @@
       "algorithm": "evaluate_contradiction_dialectic", "comparator": "advisory", "default_threshold": null,
       "legacy": {"contradiction-theme": "D5"},
       "source": "Hegel's Dialectics — Stanford Encyclopedia of Philosophy", "source_url": "https://plato.stanford.edu/entries/hegel-dialectics/",
-      "note": "The C (mediating) paragraph word count ≤ each of A and B (so C is not mistaken for the main clash). A/B/C word counts measured."
+      "note": "The C (mediating) paragraph word count ≤ max(A, B) (so C is not mistaken for the main clash). A/B/C word counts measured."
     },
     "jrn.c-stance-naming": {
       "name": "C-stance naming rule", "dimension": "Dialectic", "judge": "A",

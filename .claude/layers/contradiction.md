@@ -91,7 +91,7 @@ The concrete procedure a Claude performing this task for the first time should f
 |------|------|------|------|
 | Paragraph 1 | Frame the issue | 2–4 sentences · **number tokens ≤ 4 · wikilinks ≤ 5** | Compress "who and what this issue pits against each other" into **one paragraph (2–4 sentences)** (do not compress into a single standalone sentence). First state the structure "A claims X, B claims Y." Inverted pyramid — if 6+ figures or 6+ wikilinks are densely packed, the paragraph loses its intended function (declaring the issue frame). Distribute overflow information to paragraph 2 (A·B juxtaposition) or to `## Representative Evidence`. (Corresponds to Rubric S3) |
 | Paragraph 2 | A position + B position (juxtaposed) | 3–5 sentences each, or 2 bold labels | Juxtapose, one paragraph each, the key claim, lead actor, and core grounds per camp in the form `**Position A**: ...` / `**Position B**: ...`. Point-counterpoint convention. |
-| (Optional) Paragraph 3 | Third viewpoint | **2–4 sentences strict + at most the word count of each A·B paragraph** | Only when a C mediator / exception viewpoint genuinely exists. Set off as a separate paragraph with a `**C — Mediation/Third view**:` label. **If C is longer than A·B, the reader misreads the convergence point as the main opposition** — undermining the identity of the `## Opposing Positions` section. If the issue is rich in C, move it to `## Derived Tensions & Generational Readings`. No forced insertion. |
+| (Optional) Paragraph 3 | Third viewpoint | **2–4 sentences strict + at most the word count of the longer A·B paragraph** | Only when a C mediator / exception viewpoint genuinely exists. Set off as a separate paragraph with a `**C — Mediation/Third view**:` label. **If C is longer than A·B, the reader misreads the convergence point as the main opposition** — undermining the identity of the `## Opposing Positions` section. If the issue is rich in C, move it to `## Derived Tensions & Generational Readings`. No forced insertion. |
 
 #### Authoring principles (craft application + project procedure)
 
@@ -128,7 +128,7 @@ The theme body narrative consciously reflects the evidence grade (`[fact]` Data 
 - `## Opposing Positions` describes "what binds the residual claims together" (e.g. **groups by character** such as timeline updates · pending Soft judgments · individual single-entity cases)
 - `## Representative Evidence` distributes representative sources per character group, **2–3 per group**
 - `## Derived Tensions & Generational Readings` and `## Interpretive Direction` cover "why it did not converge into another theme" and "the follow-up refinement plan"
-- In Rubric judgment, Part 1's A·B attribution balance (N2 DUE) is exempted (no axis of contention). The remaining criteria apply the same.
+- In Rubric judgment, four criteria are exempted — N2 (due weight) · D5 (C size) · D6 (C naming) · S3 (lead density) — since there is no axis of contention (matching the feedback-loop tally, the Rubric legend, and the lint exemption). The remaining criteria apply the same.
 
 #### Feedback loop (iterate until the Rubric conditions are met)
 

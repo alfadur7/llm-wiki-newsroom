@@ -16,7 +16,7 @@ It surfaces the derived-narrative types (overview · contradiction · synthesis 
 
 Handle each surfaced page by type. The page GROUNDs its own new source/claim context; for a cluster overview, narrow it to the primary-source delta in `graph/_clusters.json::source_assignments` that was `scraped` after the page's body edit date.
 
-- **cluster overview · contradiction theme · L2-4 root** (high-risk narrative): columnist rewrite → **desk qualitative gate** → 3-stage ADAPT. Run many items in parallel with a Workflow `pipeline` (each file is independent, so no worktree is needed; check progress with `tools/show_workflow.py`). The desk does a spot check against the originals to catch missing claimant attribution, figures, evidence grades, and due-weight gaps (the areas deterministic lint cannot reach).
+- **cluster overview · contradiction theme · synthesis · L2-4 root** (high-risk narrative): columnist rewrite → **desk qualitative gate** → 3-stage ADAPT. Run many items in parallel with a Workflow `pipeline` (each file is independent, so no worktree is needed; check progress with `tools/show_workflow.py`). The desk does a spot check against the originals to catch missing claimant attribution, figures, evidence grades, and due-weight gaps (the areas deterministic lint cannot reach).
 - **timeline · trail** (low-risk, structural): a single columnist re-ground pass (new events · hops · refreshed commentary) plus a deterministic lint and a spot review in the main session. Skip the full desk gate to save cost, but cross-check each new timeline item's date and source index against the original one by one.
 - **L2-4 root** (`overview.md` · `contradiction.md`): aggregate last, after the lower layers are re-grounded. Carry the lower layers' due-weight gaps and balance markers up to the root, and — since it is the reader-facing top entry point — keep internal implementation terms out of it (see [`../layers/overview.md`](../layers/overview.md) Part 2 principles).
 
@@ -24,7 +24,7 @@ Handle each surfaced page by type. The page GROUNDs its own new source/claim con
 
 Run these directly in the main session after ADAPT (don't trust an agent's self-report):
 
-- Per-type lint (`python tools/lint.py <overview|contradiction|timeline|trail> [<slug>]`) required metrics PASS + `python tools/lint.py graph` broken links 0 + AUTO blocks and frontmatter preserved.
+- Per-type lint (`python tools/lint.py <overview|contradiction|synthesis|timeline|trail> [<slug>]`) required metrics PASS + `python tools/lint.py graph` broken links 0 + AUTO blocks and frontmatter preserved.
 - **One clean rebuild before committing** (`python tools/build.py`) — build artifacts an agent ran concurrently during re-grounding can otherwise get mixed in.
 - After committing, re-run `python tools/lint.py staleness` to confirm resolution. The body date is git-based, so a page **stays STALE until you commit, and clears on commit** (expected behavior).
 

@@ -143,7 +143,7 @@ Each folder has a **single responsibility**; when adding a new instruction, use 
 
 **Instructions located here**:
 - `directory-layout.md` (directory structure + the `_` prefix and placement rules + the `cluster_labels.json` human-edit convention)
-- `naming.md` (slug and filename conventions + Reserved meta-doc names + the person-stub threshold)
+- `naming.md` (slug and filename conventions + Reserved meta-doc names + the entity/concept stub thresholds)
 - `language.md` (English body text + English frontmatter keys + Meta-Doc English headers + Prose Style avoidance of translationese; Korean body text is an optional `WIKI_LANG=ko` mode)
 - `platform.md` (Windows non-Latin filename encoding workaround)
 - `index-log-format.md` (the two-tier structure of `wiki/index.md` + `log.md` append-at-bottom)
@@ -201,8 +201,8 @@ Guideline-authoring voice and plan-bloat control are craft, not policy — they 
 In the following situations, do not proceed automatically:
 - A 3rd ADAPT FAIL for the same reason
 - A new cluster slug (`graph/cluster_labels.json`) / a new contradiction theme slug
-- A new person entity stub (only for core figures cited many times and appearing across multiple sources — `.claude/policies/naming.md` person-stub threshold)
+- A new entity (person/company/SW-solution) or concept stub (only past the citation thresholds — `.claude/policies/naming.md` entity/concept stub thresholds)
 - Publishing L2-4 root content
 - Changes to the skeleton of a guide, rubric, or matrix
-- External commit / push
+- External commit / push (exception: the system-managed inbox queue files `raw/_inbox.md`·`raw/_archive.md`, which `/wiki-ingest` Inbox Mode commits·pushes automatically)
 - A large body rewrite (>50% changed)
