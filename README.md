@@ -46,7 +46,7 @@ git clone https://github.com/alfadur7/llm-wiki-newsroom.git
 cd llm-wiki-newsroom
 ```
 
-> Or click **["Use this template"](https://github.com/alfadur7/llm-wiki-newsroom/generate)** to create your own wiki repo from this scaffold. To start from a clean slate, delete the example documents under `raw/` and the example pages under `wiki/` (keep the folders and `graph/cluster_labels.json`), then ingest your own sources with `/wiki-ingest`.
+> Or click **["Use this template"](https://github.com/alfadur7/llm-wiki-newsroom/generate)** to create your own wiki repo from this scaffold. To start from a clean slate, delete the example pages under `wiki/` (keep the folders and `graph/cluster_labels.json`), then ingest your own sources with `/wiki-ingest`.
 
 This project assumes an environment where the AI agent reads and edits files and invokes tools on its own. Support levels by agent:
 
@@ -86,7 +86,7 @@ In Claude Code, typing a `/`-prefixed command like `/wiki-ingest` runs the match
 
 | Command | Arguments | Description | Example |
 |--------|------|------|------|
-| `/wiki-discover` | `<seed \| --random \| --surprising>` | Unexpected connections within 2 hops from a seed (or random seed), or auto-ranking of hubs that bridge clusters | `/wiki-discover Meta` |
+| `/wiki-discover` | `<seed \| --random \| --surprising \| --gaps [<slug>]>` | Unexpected connections within 2 hops from a seed (or random seed), or auto-ranking of hubs that bridge clusters | `/wiki-discover Meta` |
 | `/wiki-trail` | `<create\|follow\|list> [args]` | Build and save a 5–10 step page path that follows a single topic | `/wiki-trail create open source AI definition` |
 | `/wiki-timeline` | `<entity> [year]` | A chronological storyline of a person's or company's events sorted by year | `/wiki-timeline Meta 2024` |
 
@@ -113,10 +113,10 @@ The Layer 2 wiki is further formalized into **four sub-layers**. Knowing which s
 |------|------|----------------|---------|
 | **L2-1 Source reflection** | Reflect one source into summary, claims, quotes, and connection sections | `/wiki-ingest` | `wiki/sources/<slug>.md` |
 | **L2-2 Abstraction** | Extract and update the entities, concepts, and timelines mentioned in sources | `/wiki-ingest`'s cascading update · `/wiki-timeline` | `wiki/entities/`, `wiki/concepts/`, `wiki/timelines/` |
-| **L2-3 Per-domain analysis** | Cluster overviews · issue (contradiction) analyses · query answers · discovery trails | Skeletons auto-generated (`/wiki-graph` · `/wiki-lint contradiction --fix`) → Claude writes the body against an evaluation rubric. Plus: `/wiki-query` · `/wiki-trail` | `wiki/overviews/<cluster>.md`, `wiki/contradictions/<theme>.md`, `wiki/syntheses/<slug>.md`, `wiki/trails/<slug>.md` |
+| **L2-3 Per-domain analysis** | Cluster overviews · issue (contradiction) analyses · query answers · discovery trails | Skeletons auto-generated (the full `tools/build.py` rebuild via `/wiki-ingest` · `/wiki-lint overview --fix`; `/wiki-lint contradiction --fix` for issue analyses) → Claude writes the body against an evaluation rubric. Plus: `/wiki-query` · `/wiki-trail` | `wiki/overviews/<cluster>.md`, `wiki/contradictions/<theme>.md`, `wiki/syntheses/<slug>.md`, `wiki/trails/<slug>.md` |
 | **L2-4 Global aggregation** | Restate each per-domain overview and per-theme contradiction analysis one paragraph at a time + cross-domain narrative | Claude rewrites periodically | `wiki/overview.md`, `wiki/contradiction.md` |
 
-For example, ingesting one article with `/wiki-ingest` creates L2-1 and L2-2 at the same time. When `/wiki-graph` later recomputes clusters, the relevant per-domain overviews (L2-3) are automatically affected, and Claude rewrites them against the evaluation rubric as needed. The global overview (L2-4) is rewritten periodically once the per-domain overviews stabilize, keeping it current. Each sub-layer is responsible only for its own axis (**per-domain overview** or **issue/contradiction**), so editing one page leaves the other axis's files untouched.
+For example, ingesting one article with `/wiki-ingest` creates L2-1 and L2-2 at the same time. When the next full rebuild recomputes clusters, the relevant per-domain overviews (L2-3) are automatically affected, and Claude rewrites them against the evaluation rubric as needed. The global overview (L2-4) is rewritten periodically once the per-domain overviews stabilize, keeping it current. Each sub-layer is responsible only for its own axis (**per-domain overview** or **issue/contradiction**), so editing one page leaves the other axis's files untouched.
 
 <details>
 <summary><strong>Full directory layout</strong> — where every file lives. <em>Skim only if you want the exact on-disk structure.</em></summary>
@@ -208,7 +208,7 @@ raw/NewsScrap/article.md  or  raw/PDF/report.pdf  (folder argument scans both .m
      · For PDFs, the original URL is recorded in this page's source_url field (for dedup)
   4) Cascading update: append new facts to the entity/concept pages that appear in the source and refresh their reference lists
   5) Link enrichment: propose [[wikilink]] candidates for existing page names that appear as plain text in the body
-  6) Full rebuild: graph/visualization → clusters/catalogs/per-domain overviews → contradiction theme analysis → index,
+  6) Full rebuild: graph/visualization → clusters/catalogs/per-domain overviews → contradiction source DB → index → dependency index,
      updated in that order (a single tools/build.py run)
   7) Auto-validation: check broken links, filename convention, missing tags
   8) Cluster health diagnosis: surface new topic clusters that need a label (graph/cluster_labels.json)
@@ -242,11 +242,12 @@ Checks are split into the groups below; invoking with no argument runs them all 
     · orphans   : bidirectional source↔entity reference match (sources frontmatter ↔ source ## Connections)
     · clusters  : Leiden community health codes [A]–[G] + health-trend log (isolated hubs, unnamed groups, fragile bridges, etc.)
     · internal-refs : whether published content links internal build/guide files (.claude/·tools/·CLAUDE.md) — blocks self-references leaking into RAG
-    · raw-files : flags direct edits to auto-generated build artifacts / raw originals (fix the input and regenerate instead)
+    · raw-files : source page `source_file:` ↔ raw/ filename integrity (smart-quote folding/stripping; --fix repairs unambiguous matches)
 
   hub    — L2-2 hub page (entity·concept·timeline) status
-    · speakers     : people cited 2+ times across documents (speakers/quoted voices)
+    · speakers     : people cited ≥3 times across ≥3 distinct sources (speakers/quoted voices)
                      who lack their own entity page — stub candidates
+                     (under WIKI_LANG=ko; English corpora use cit.A2 + count_mentions.py)
     · suggestions  : common broken links + frequent body nouns that have no page
                      (informational, no pass/fail impact)
     · schema       : required frontmatter fields for entities/·concepts/·timelines/ files
@@ -255,7 +256,7 @@ Checks are split into the groups below; invoking with no argument runs them all 
 
   meta   — meta-document conventions (bundle: integrity + drift + language + flat-path guard)
     · CLAUDE.md anchor link and file path validity
-    · L2-3 ↔ L2-4 Rubric common-criteria sync
+    · craft-skill chain integrity: .claude/layers/_manifest.json ↔ skills criteria.json/checks.py referential closure
     · English section-header convention
     · python tools/lint.py <flat-subcmd> recurrence prevention
 
@@ -316,7 +317,7 @@ A full wiki rebuild is run automatically by /wiki-ingest · /wiki-lint --fix.
 To run it directly: `python tools/build.py` — a 5-stage sequential pipeline:
   graph          → _graph.json
   clusters       → _clusters.json + source catalogs + automatic per-domain overview refresh
-                   + the data wrappers graph.html reads (_graph.js·_clusters.js)
+                   + graph/_pages.json (the reading-panel bundle graph.html fetches)
                    (Leiden community detection; each document is assigned to the cluster of the hubs
                    it links to, by weighted vote; labels live in graph/cluster_labels.json)
   contradictions → _contradictions.json (source DB collecting contradicting claims from source documents)
@@ -418,7 +419,7 @@ The scripts that work behind the slash commands. They **run locally** with no ex
 | Script | What it does |
 |----------|---------|
 | `build.py` | Rebuild the entire wiki — a 5-stage sequential pipeline: graph/visualization → clusters/catalogs/per-domain overviews → contradiction source DB extraction → index → dependency index. To run a single stage: `python tools/build.py <stage>` (`graph` / `clusters` / `contradictions` / `index` / `dependencies`) |
-| `lint.py` | Group checks: `graph` (page structure · document↔entity references · cluster health) / `hub` (quoted speakers · new-page candidates · L2-2 hub frontmatter) / `meta` (CLAUDE.md internal links · header convention · Rubric sync) / `overview` (landscape-axis overview file Rubric · Freshness) / `contradiction` (conflict-axis per-theme analysis) / `source` (L2-1 source page schema) / plus auxiliary groups `synthesis`·`trail`·`timeline`·`staleness`. Also suggests "new page candidates worth creating" at the end of the report. `python tools/lint.py graph orphans --fix` auto-connects orphan documents; `python tools/lint.py overview <target> --fix` produces a single per-domain overview skeleton + rewrite instructions |
+| `lint.py` | Group checks: `graph` (page structure · document↔entity references · cluster health) / `hub` (quoted speakers · new-page candidates · L2-2 hub frontmatter) / `meta` (CLAUDE.md internal links · header convention · craft-skill chain integrity) / `overview` (landscape-axis overview file Rubric · Freshness) / `contradiction` (conflict-axis per-theme analysis) / `source` (L2-1 source page schema) / plus auxiliary groups `synthesis`·`trail`·`timeline`·`staleness`. Also suggests "new page candidates worth creating" at the end of the report. `python tools/lint.py graph orphans --fix` auto-connects orphan documents; `python tools/lint.py overview <target> --fix` produces a single per-domain overview skeleton + rewrite instructions |
 | `query.py` | Search/traversal CLI — `graph` subcommand for graph traversal (`path A B`·`explain N`·`neighbors N`), `qmd` subcommand for body search (`hybrid`·`search`·`vsearch`). `--budget` to reduce response size and `--json` for machine parsing |
 | `discover.py` | Rank pages that bridge clusters (`surprising`) — combine shortest-path frequency · neighbor cluster diversity · over-degree penalty to auto-surface "centers of unexpected connection" |
 
@@ -506,7 +507,7 @@ Forms it draws on:
 ### Knowledge graph visualization
 Drawing every page as a node and every wikilink as an edge, it generates an interactive browser graph (`graph/graph.html`). Clicking a node highlights its connections, and each edge carries a "why it's connected" label readable on mouse hover. Edges are classified into 5 types (contradicts·defines·cites·references·inferred) and color-coded — the 4 explicit edge types stated in the body get different colors by relationship meaning, while inferred edges leading to pages that aren't directly linked but share 3+ common references are shown in lavender, surfacing implicit relatedness.
 
-Double-click the file to open it, and these interactions are available right in the browser:
+Serve the `graph/` folder over a local web server (e.g. `python -m http.server`) and open `graph.html` — it fetches its data, so a `file://` double-click is unsupported — and these interactions are available right in the browser:
 
 - **Live physics simulation** — nodes find their place by spring, gravity, and repulsion, and stop automatically when motion settles
 - **Drag to rearrange** — drop a node and it pins there; surrounding nodes respond physically to adjust the layout
@@ -593,7 +594,7 @@ A small knowledge base mapping the debate over what "open source" should mean fo
 | Backlink index | 11 targets |
 | Contradiction tracking | 1 item (classified into 2 themes) |
 
-**Main topics** (3 domain clusters): the open-source AI definition, open weights, and licensing · open-washing — plus 2 contradiction themes cutting across them. (Analysis reports, associative trails, and timelines ship empty here — generate them with `/wiki-query`, `/wiki-trail`, and `/wiki-timeline` once you've added sources.)
+**Main topics** (3 domain clusters): the open-source AI definition, open weights, and licensing · open-washing — plus 2 contradiction themes cutting across them. (Associative trails and timelines ship empty here; one example synthesis is included — generate more with `/wiki-query`, `/wiki-trail`, and `/wiki-timeline` once you've added sources.)
 
 ---
 

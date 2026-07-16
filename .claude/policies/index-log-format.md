@@ -14,15 +14,15 @@
 This file is auto-generated and updated.
 
 ## Overview
-- [Overview](overview.md) — global view along the landscape axis
-- [Contradiction Analysis](contradiction.md) — global view along the conflict axis (N contradictions, per-theme drill-down)
+- [Overview](overview.md) — wiki-wide view along the landscape axis
+- [Contradiction Analysis](contradiction.md) — wiki-wide view along the conflict axis (N contradictions, drill down by theme)
 
-## Recent Developments (N)            # only when there is at least 1 weekly-briefing-* (latest week first, max 8); over the cap the header is `## Recent Developments (latest 8/N)`
+## Recent Developments (N)            # only when there is at least 1 weekly-briefing-* (latest week first, max 8); over the cap the header is `## Recent Developments (latest 8/N)`; the builder inserts a description paragraph under this header
 - [Weekly briefing title](syntheses/weekly-briefing-slug.md) — description
 - _For the N earlier weekly briefings, see `wiki/syntheses/weekly-briefing-*`_  # only when N>8
 
 ## Sources (N)
-For the full source list, see the [source catalog](sources/_catalog.md), or browse per cluster:
+For the full source list see the [source catalog](sources/_catalog.md), or browse by cluster:
 
 | Cluster | Count | Catalog |
 |----------|------|---------|

@@ -18,8 +18,8 @@ The copy editor's role is classified as an agent, but its execution is determini
 
 **O — what to do** (`tools/lint.py [<group>] [<subcmd|target>] [--fix]`, a single entry point):
 - **graph group** — clusters (isolated hub·too-small·mixed-topic·unnamed·unassigned source·orphan label·fragile bridge, 7 codes)·drift (opt-in cold-start comparison)
-- **hub group** — entity·concept body schema (`## Overview` + `## Connections`, 2 H2s · body ≥ 200 chars · begins with a concrete fact) · timeline schema
-- **meta group** — meta-doc schema (section headers in English·flat-path guard·craft-skill integrity·anchor·file-ref·slash-cmd integrity·Korean filename·log ordering)
+- **hub group** — entity·concept body schema (`## Overview` + `## Connections`, 2 H2s · body ≥ 200 chars) · timeline schema
+- **meta group** — meta-doc schema (section headers in English·flat-path guard·craft-skill integrity·anchor·file-ref·slash-cmd integrity·reserved-filename collision (wiki/ basenames case-folding to CLAUDE.md/README.md)·log ordering)
 - **overview group** — Layer 2-3 cluster overview·Layer 2-4 root overview Rubric (criteria per the `overview-cluster`·`overview-aggregate` roster in `.claude/layers/_manifest.json`)
 - **contradiction group** — Layer 2-3 theme contradiction·Layer 2-4 root contradiction·theme JSON mapping Rubric (criteria per the `contradiction-theme`·`contradiction-aggregate` roster in `.claude/layers/_manifest.json`)
 - **source group** — Layer 2-1 source page Rubric (criteria per the `source` roster in `.claude/layers/_manifest.json`)
@@ -46,7 +46,7 @@ The copy editor's role is classified as an agent, but its execution is determini
 - the `--fix` flag (auto-repair mode)
 
 **Output**:
-- `lint-report.md` (a human-readable Markdown report) — informational subcommands (`hub promotion`·`hub suggestions`) are also included in their group section as **a single aggregate line** (count + grade distribution, ℹ️ advisory, regardless of pass/fail); individual enumeration is omitted.
+- `lint-report.md` (a human-readable Markdown report) — informational subcommands (`hub promotion`·`hub demotion`·`hub suggestions`) are also included in their group section as **a single aggregate line** (count + grade distribution, ℹ️ advisory, regardless of pass/fail); individual enumeration is omitted.
 - new lines in `graph/_health-log.jsonl` (on a cluster-group check)
 - exit code (0=PASS, non-0=FAIL)
 - (with the --json option) JSON output (for automation·pipelines)

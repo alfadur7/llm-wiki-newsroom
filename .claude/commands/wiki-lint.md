@@ -2,28 +2,6 @@ Health-check the LLM Wiki for issues.
 
 Usage: `/wiki-lint [<group>] [<subcmd|target>] [--fix]`
 
-## Traversal Pattern
-
-A verify-and-fix cycle. The Copy Editor is the lead; when `--fix` is set, the Columnist and Desk chain is entered.
-
-| Mode | Cycle | Owner |
-|---|---|---|
-| **Check only** (no `--fix`) | VERIFY | Copy Editor (`tools/lint.py`) — exit code + lint-report.md |
-| **`overview/contradiction <target> --fix`** (L2-3·L2-4 rewrite) | VERIFY → ADAPT → APPLY → VERIFY | Copy Editor (VERIFY₁) → Columnist (ADAPT) → Copy Editor → Desk (VERIFY₂) → Editor-in-Chief gate |
-| **Other group `--fix`** (`graph`·`hub`, etc. — auto-enrich/correct) | (deterministic) | Copy Editor (formattable-area auto-fix only; no meaning-affecting changes) |
-
-In this chain, `--yes` is **Claude's explicit opt-in to executing the chain** — deferring to `lint-report.md` violates the opt-in intent (`.claude/hooks/lint-chain-guard.sh` enforces this at the system level).
-
-## Sub-procedure (Owned by This Folder)
-
-Two sub-procedures are the sole responsibility of this command:
-- [`## Sub-procedure: Contradiction Theme Mapping Procedure`](#sub-procedure-contradiction-theme-mapping-procedure) — the raw DB → JSON mapping procedure for `contradiction theme --fix`
-- [`## Sub-procedure: Conflict Axis Sync Rule`](#sub-procedure-conflict-axis-sync-rule) — the 4-tier bottom-up synchronization rule for `contradiction --fix`
-
-The [A]–[G] code definitions and the diagnostic output format for the Cluster Health Diagnostic are not a separate sub-procedure; they are defined inline in the `graph clusters` row of the [`## Group Structure`](#group-structure) table plus the `Cluster health` item under [`## Check Items`](#check-items-full-suite-layout).
-
-
-
 `$ARGUMENTS` is optional. With no arguments, the full suite (= the `all` group) runs; specifying a group or subcommand runs only that scope.
 
 ```
@@ -50,6 +28,26 @@ Examples:
 ```
 
 `--yes` (`-y`) bypasses the file create/delete confirmation prompt of `overview --fix`·`contradiction --fix`. In a non-TTY environment (Claude Code Bash·CI) the prompt cannot be answered, so the command aborts; add `--yes` only when you intend deliberate execution after review. `--yes` itself has no effect in other groups (`graph`·`hub`, etc.) — those perform only content edits and auto-enrichment, with no file creation or deletion.
+
+## Traversal Pattern
+
+A verify-and-fix cycle. The Copy Editor is the lead; when `--fix` is set, the Columnist and Desk chain is entered.
+
+| Mode | Cycle | Owner |
+|---|---|---|
+| **Check only** (no `--fix`) | VERIFY | Copy Editor (`tools/lint.py`) — exit code + lint-report.md |
+| **`overview/contradiction <target> --fix`** (L2-3·L2-4 rewrite) | VERIFY → ADAPT → APPLY → VERIFY | Copy Editor (VERIFY₁) → Columnist (ADAPT) → Copy Editor → Desk (VERIFY₂) → Editor-in-Chief gate |
+| **Other group `--fix`** (`graph`·`hub`, etc. — auto-enrich/correct) | (deterministic) | Copy Editor (formattable-area auto-fix only; no meaning-affecting changes) |
+
+In this chain, `--yes` is **Claude's explicit opt-in to executing the chain** — deferring to `lint-report.md` violates the opt-in intent (`.claude/hooks/lint-chain-guard.sh` enforces this at the system level).
+
+## Sub-procedure (Owned by This Folder)
+
+Two sub-procedures are the sole responsibility of this command:
+- [`## Sub-procedure: Contradiction Theme Mapping Procedure`](#sub-procedure-contradiction-theme-mapping-procedure) — the raw DB → JSON mapping procedure for `contradiction theme --fix`
+- [`## Sub-procedure: Conflict Axis Sync Rule`](#sub-procedure-conflict-axis-sync-rule) — the 4-tier bottom-up synchronization rule for `contradiction --fix`
+
+The [A]–[G] code definitions and the diagnostic output format for the Cluster Health Diagnostic are not a separate sub-procedure; the per-code definitions · action guides are SoT in `tools/_lint/graph_clusters.py` (module docstring + report output), while the `graph clusters` row of the [`## Group Structure`](#group-structure) table and the `Cluster health` item under [`## Check Items`](#check-items-full-suite-layout) record only the codes' pass/fail posture.
 
 ### Chain Execution Obligation
 
@@ -126,13 +124,14 @@ For target-based groups (`overview`·`contradiction`), the second positional arg
 3. **Broken links** (`graph structure`) — [[wikilink]]s pointing to non-existent pages. Root meta files (overview, contradiction, index, log, lint-report) are also valid targets. Code blocks · inline code are auto-excluded. **`log.md` is excluded from the source scan** — being an append-only operational record, past cluster slugs · dissolved concepts permanently linger and surface as broken links every time, burying real regressions.
 4. **Missing entity pages** (`graph structure`) — names referenced by 3+ pages but lacking their own page.
 5. **Korean entity with English filename** (`graph structure`) — entities that are Korean companies · institutions · people but have an English filename (industry-standard English brands are excluded via the `ENGLISH_STANDARD` whitelist).
-5-A. **Uncovered cited speakers** (`hub speakers`) — `> "..." — Name (role)` quoted speakers who meet **both** conditions of **≥3 total quotes + ≥3 distinct source files** while lacking an `entities/<name>.md` page. The two conditions are the operational threshold of the memory policy `feedback_no_single_source_stub` ("stub only for core figures who are quoted multiple times and appear across several sources"); single-source · 1–2-quote one-off citations are not actionable stub candidates. Single-file detection is handled by `/wiki-ingest` workflow step 10. **When creating a stub, current-role verification via `WebSearch` is mandatory** — between the article's writing date and now, the person may have changed jobs, retired, or been promoted. For people no longer in their role due to retirement · resignation, hold off on creation or request human-reviewer confirmation.
-6. **Cluster health** (`graph clusters`) — reports Leiden codes [A]–[G]. Code definitions · action guides are defined inline in the `graph clusters` row of the [`## Group Structure`](#group-structure) table above (single SoT — drift prevention).
-7. **Meta-doc schema** (`meta schema`) — a 4-axis bundle for meta documents:
+5-A. **Uncovered cited speakers** (`hub speakers`) — `> "..." — Name (role)` quoted speakers who meet **both** conditions of **≥3 total quotes + ≥3 distinct source files** while lacking an `entities/<name>.md` page. The two conditions are the operational threshold of the memory policy `feedback_no_single_source_stub` ("stub only for core figures who are quoted multiple times and appear across several sources"); single-source · 1–2-quote one-off citations are not actionable stub candidates. Single-file detection is handled by `/wiki-ingest` workflow step 9. **When creating a stub, current-role verification via `WebSearch` is mandatory** — between the article's writing date and now, the person may have changed jobs, retired, or been promoted. For people no longer in their role due to retirement · resignation, hold off on creation or request human-reviewer confirmation.
+6. **Cluster health** (`graph clusters`) — reports Leiden codes [A]–[G]. Code definitions · action guides are SoT in `tools/_lint/graph_clusters.py` (module docstring + report output — single SoT, drift prevention); the `graph clusters` row of the [`## Group Structure`](#group-structure) table above records only the pass/fail posture.
+7. **Meta-doc schema** (`meta schema`) — a 5-axis bundle for meta documents:
    - **Integrity**: CLAUDE.md self-consistency — anchor-link targets exist, backtick file-path files exist, `/wiki-*` slash commands' definition files exist
    - **Craft-skill integrity + stale-slug guard**: craft skills' `_manifest.json` roster ↔ `criteria.json` ↔ `checks.py` referential consistency + detection of stale `_catalog-<slug>.md` cluster-slug literals no longer resolving in `graph/_clusters.json`
    - **Language Convention**: no Korean in CLAUDE.md + `.claude/commands/*.md` section headers
    - **Flat-path guard**: blocks the `python tools/lint.py <flat-subcmd>` form — enforces the group form (`python tools/lint.py <group> [<sub>]`)
+   - **Agent tool-permission parity**: each agent role's X-list ↔ its frontmatter `disallowedTools`, checked in both directions
 8. **L2-2 hub frontmatter** (`hub schema`) — entities require `title · type · kind · tags · sources · last_updated`; concepts `title · type · tags · sources · last_updated`; timelines `title · type · tags · last_updated` (no `sources`) + `type` value matches the directory name (entity/concept/timeline). Also checks the `## Overview`/`## Connections` required sections + ≥200-char body.
 9. **L2-3/L2-4 overview schema·Rubric** (`overview`) — `wiki/overviews/<slug>.md` completeness · frontmatter · H2 sections · AUTO markers · Rubric metrics (W1·W2·W3·X2) · Freshness + **cluster name drift** (frontmatter `title`·body H1 matches `_clusters.json::clusters[].name` SoT) + `wiki/overview.md` Rubric L2-4 (W1·W2·W3·D1·D2·D3·F1).
 10. **Theme contradiction MD schema·mapping** (`contradiction`) — `wiki/contradictions/<theme>.md` frontmatter · H2 sections (`## Opposing Positions`·`## Representative Evidence`·`## Derived Tensions & Generational Readings`·`## Interpretive Direction`) + slug 1:1 mapping with the `_contradictions_themes.json` SoT (JSON-only → MD not created / MD-only → orphan MD) + detection of residual legacy AUTO blocks (CLAIMS/SOURCES) and their removal via `--fix`.
@@ -431,7 +430,7 @@ The top level is a JSON array, and each element is a record with the fields belo
 
 #### Source File Structure — `wiki/sources/<slug>.md`
 
-A Phase 2 Priority Read target. Each source page consists of frontmatter + 5 H2 sections:
+A Phase 2 Priority Read target. Each source page consists of frontmatter + 4 H2 sections:
 
 | Section | Content | Use in theme determination |
 |---|---|---|

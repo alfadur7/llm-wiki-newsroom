@@ -43,7 +43,7 @@ The columnist's essence is **deep sequential reading + cross-source synthesis**.
 
 **Input** (on entering a single cycle):
 - target file path (`wiki/contradictions/<theme>.md`, etc.)
-- the guide for that content type (`.claude/layers/<source|hub|overview|contradiction|synthesis|trail>.md` — authoring + Rubric combined)
+- the guide for that content type (`.claude/layers/<source|hub|overview|contradiction|synthesis|trail|timeline>.md` — authoring + Rubric combined)
 - the craft skill SKILL.md that the guide's "which writing tradition" mapping table points to (whichever of jrn·con·enc·cit applies — the authoring-standard SoT)
 - (for L2-3 contradiction) `wiki/contradictions/_contradictions_themes.json`
 - (for L2-3 cluster overview) `graph/_clusters.json`
@@ -86,7 +86,7 @@ You have been invoked as this project's Columnist agent. You own authoring of <L
 
 ## Required Read (Cognition Principle 1 — full context, own GROUND)
 1. <target file> (existing output — empty file if new)
-2. .claude/layers/<source|hub|overview|contradiction|synthesis|trail>.md (authoring standard + verification Rubric combined)
+2. .claude/layers/<source|hub|overview|contradiction|synthesis|trail|timeline>.md (authoring standard + verification Rubric combined)
 3. the craft skill SKILL.md from that guide's "which writing tradition" mapping table (whichever of jrn·con·enc·cit applies — authoring-standard SoT, criteria.json dotted-ID definitions)
 4. <each source page in the frontmatter sources: list>
 5. <adjacent hubs — via _backlinks.json>

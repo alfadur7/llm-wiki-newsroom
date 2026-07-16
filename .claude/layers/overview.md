@@ -150,7 +150,7 @@ Along with the common authoring principles (block above), the following items ap
 - **Paragraph↔bullet rhythm**: `## Overview` is all paragraph prose. `## Key Trends & Figures` is all bullets (`jrn.inverted-pyramid`). `## Subtopics` is **mixed roughly 5:5** — topics with a core tension axis dissolved in get paragraph narrative, peripheral topics get bullets.
 - **Bold-bullet structure of `## Key Trends & Figures`** (`con.bold-bullet`): each subsection is a pair of a **bold subheading (key claim)** + **bullets (supporting data)** (criteria from con SKILL.md). E.g., `**Open-weight model releases**` followed by `- Meta Llama 3.1: 405B-parameter weights released under a community license — ...`.
 - **Explicit adjacent fields and scope**: clusters auto-grouped by the Leiden clustering algorithm do not have cleanly cut topic boundaries, so make the scope distinction from adjacent clusters explicit in a `## Adjacent Domains & Scope` subsection. The content is 2–4 bullets, each a `[[<adjacent-cluster-slug>|<cluster name>]]`-format wikilink (the alias principle is in the common block, e.g., `[[open-weights|Open Weights]]` covers the release model · `[[licensing-open-washing|Licensing & Open-Washing]]` covers license terms) + a one-line description of the boundary with that field's content. This section includes only references to adjacent overviews within the landscape axis — conflict-axis theme links (per X2) are placed separately in the body such as `## Overview`/`## Subtopics`. `python tools/lint.py overview` automatically detects alias-less cluster-slug links in this section.
-- **Leveraging paired_exempt + semantic branching of anchor invasion**: the `paired_with` field in `graph/cluster_labels.json` defines an essential coupling between clusters, and the lint anchor-invasion advisory computes a paired-exempt count separately (e.g., `[paired-exempt: 8 refs — ops-reliability(5), aidc-infrastructure(3)]`). paired-exempt is an essential coupling, so it is not a target for narrative-separation treatment. If invasion beyond paired-exempt is found, branch semantically in the following two directions — **(i) Integrate**: if the invading anchor touches this cluster's essence, naturally integrate it within the narrative (keep the first-mention wikilink, annotate the role); **(ii) Demote**: if it is outside this cluster's essence, demote to plain text or weaken to a single cross-reference word, and guide the narrative's main body to the adjacent cluster overview. The integrate-vs-demote decision must be consistent with the cluster's identity definition (the `## Overview` paragraph), and a cross-reference meta-note like "the main narrative is the [[<adjacent-cluster-slug>|<Name>]] cluster; this cluster covers only the ... aspect" is the standard pattern when demoting. This branching judgment is the Desk's qualitative-review domain, not a target for automatic lint exemption (false-negative risk).
+- **Leveraging paired_exempt + semantic branching of anchor invasion**: the `paired_with` field in `graph/cluster_labels.json` defines an essential coupling between clusters, and the lint anchor-invasion advisory computes a paired-exempt count separately (e.g., `[paired-exempt: 3 refs — licensing-open-washing(3)]`). paired-exempt is an essential coupling, so it is not a target for narrative-separation treatment. If invasion beyond paired-exempt is found, branch semantically in the following two directions — **(i) Integrate**: if the invading anchor touches this cluster's essence, naturally integrate it within the narrative (keep the first-mention wikilink, annotate the role); **(ii) Demote**: if it is outside this cluster's essence, demote to plain text or weaken to a single cross-reference word, and guide the narrative's main body to the adjacent cluster overview. The integrate-vs-demote decision must be consistent with the cluster's identity definition (the `## Overview` paragraph), and a cross-reference meta-note like "the main narrative is the [[<adjacent-cluster-slug>|<Name>]] cluster; this cluster covers only the ... aspect" is the standard pattern when demoting. This branching judgment is the Desk's qualitative-review domain, not a target for automatic lint exemption (false-negative risk).
 
 #### Leveraging source schema metadata (`cit.grade-meta` · `cit.cite-type-meta`)
 
@@ -184,7 +184,7 @@ Along with the common authoring principles (block above), the following items ap
 - **Cross-domain narrative**: organize 2–3 macro topics that cut across multiple clusters into separate subsections. The connecting topics not absorbable into a single cluster section are the heart of editorial value.
 - **Conflict-axis reference ban**: do not use `[[<theme>]]`-format references. This file is landscape-axis only; the conflict-axis entry point is the sole responsibility of `wiki/index.md` (.claude/layers/README.md). The same logic as Wikipedia:Coatrack — the nominal subject (the landscape overview) must not be obscured by a tangential subject (the conflict axis).
 - **No implementation terms (reader-facing)**: the root is the wiki's top-level entry point, the first screen a reader with no prior knowledge sees. Do not expose the clustering mechanism (cold partition · anchor · re-condensation), internal file/field names (cluster_labels.json · paired_with), graph edge types (cites/references/contradicts), or internal axis names (conflict/landscape axis) in the EDITOR prose. Render field reorganization plainly without the mechanism, and gloss an abbreviation once at first mention (reader-organizing vocabulary such as "grouping" / "field" is allowed).
-- **Cluster section order**: topic-flow driven (maintain domain adjacency such as AI · cloud · finance · operations · security). Sorting by the `size` in `_clusters.json` is not required.
+- **Cluster section order**: topic-flow driven (maintain domain adjacency such as definition · weights · licensing). Sorting by the `size` in `_clusters.json` is not required.
 - **Lead figure SoT**: scale statistics (counts of sources · entities · concepts · overview · synthesis · trail · timeline) take the values in `wiki/index.md` as SoT. If a discrepancy is found across `graph/_clusters.json`/the sources catalog, it is a target for editor review.
 
 #### Leveraging source schema metadata (`cit.grade-meta` · `cit.cite-type-meta`)
@@ -254,7 +254,7 @@ The lint output is notated for readability with **legacy codes** (W1 · W2 · W3
 ```
   overviews/<slug>.md:
     [Rubric] W1 links=119 (≥150) ⚠️  W2 lead/body=5.5/6.93 ratio=0.79 ⚠️  W3 dup=15 ⚠️  X2 contradiction_refs=4 ✅
-    [Rubric] G1 grade_meta=0 (≥2) ⚠️  G2 cite_meta=0 (≥1) ⚠️
+    [Rubric] G1 grade_meta=0 ⚠️  G2 cite_type_meta=0 ⚠️
 ```
 (The R1 · R2 · B1 · L1 · L2 · L3 · S6 advisory lines are omitted in this excerpt — the full set of lines is owned by `tools/_lint/overview.py` as SoT)
 
@@ -265,7 +265,7 @@ The lint output is notated for readability with **legacy codes** (W1 · W2 · W3
   - **W3**: `dup == 0` — duplicate wikilinks of the same term within a section must be 0 to PASS (`_W3_THRESHOLD` = manifest `enc.first-mention` threshold = 0; even 1 means FAIL). The `## Adjacent Domains & Scope` section is excluded from the count because its structure cites each adjacent cluster twice in the form `[[slug|Display Name]]` + boundary description.
   - **X2**: `contradiction_refs ≥ 1` — count of `[[<theme>]]`-format references
   - **G1**: `grade_meta ≥ 2` — number of evidence-grade/attribution meta-expressions appearing in the EDITOR region. The lint matches the English tokens `[fact]` · `[analysis]` · `[forecast]`, `attribution`, `grade A/B/C`, and `evidence grade`. (Korean/ko-mode meta-phrases — `1차 fact`, `발화 주체`, `fact급`/`analysis급`/`forecast급`, `증거 등급` — are dormant on the English corpus.)
-  - **G2**: `cite_meta ≥ 1` — number of citation-type meta-expressions appearing in the EDITOR region. The lint matches the English citation-type literals `cites:` · `references:` · `contradicts:` · `defines:`. (Korean meta-phrases — `정의 attribution`, `맥락 참조`, `인용 강도`, `강한 결합`, `약한 참조` — fire only under WIKI_LANG=ko.)
+  - **G2**: `cite_type_meta ≥ 1` — number of citation-type meta-expressions appearing in the EDITOR region. The lint matches the English citation-type literals `cites:` · `references:` · `contradicts:` · `defines:`. (Korean meta-phrases — `정의 attribution`, `맥락 참조`, `인용 강도`, `강한 결합`, `약한 참조` — fire only under WIKI_LANG=ko.)
 - **W4** (required) is checked separately: after running `python tools/lint.py graph structure`, the overview file in question must not be in the "Broken links" list to PASS
 - **C2 · S4 · S5** are outside the automatic-metric output range and are manually confirmed in the Desk's qualitative review (they require semantic analysis, outside the deterministic-lint domain).
 
@@ -274,11 +274,11 @@ The lint output is notated for readability with **legacy codes** (W1 · W2 · W3
 `python tools/lint.py overview` automatically detects whether the Authoring Guide's "update `last_updated` on completion" convention was executed. In two situations it outputs a one-line warning next to the overview file:
 
 ```
-  [Freshness] ⚠️ last_updated=2026-04-18 but file has uncommitted edits (today=2026-04-19) — update frontmatter before commit
-  [Freshness] ⚠️ last_updated=2026-04-18 but git last commit is 2026-04-19 — frontmatter was not refreshed in that commit
+  [Freshness] ⚠️ last_updated=2026-04-18 but EDITOR region has uncommitted edits (today=2026-04-19) — update frontmatter before commit
+  [Freshness] ⚠️ last_updated=2026-04-18 but EDITOR last changed in commit on 2026-04-19 — frontmatter was not refreshed
 ```
 
-- **uncommitted case**: edits in the working tree + `last_updated` earlier than today → requests a frontmatter update before commit
+- **uncommitted case**: EDITOR-region edits in the working tree (AUTO-block-only rebuilds do not warn) + `last_updated` earlier than today → requests a frontmatter update before commit
 - **commit-elapsed case**: the date of the most recent commit that touched the file > `last_updated` → the update was missed in a past iteration
 
 Reason it is not incorporated as a Rubric criterion: it is **metadata hygiene**, not quality evaluation (the 30-criterion roster), so it sits as a separate advisory layer. No effect on the exit code. Silently skipped when git is not installed or on error.
@@ -327,7 +327,7 @@ wiki/overview.md:
   [Rubric L2-4] W1 links=N (≥200) ✅/⚠️  W2 ratio=X ✅/⚠️  W3 dup=N ✅/⚠️
   [Rubric L2-4] D1 clusters=N/N ✅  D2 drilldowns=N/N ✅  D3 balance=max/min ratio ✅/⚠️  F1 theme_refs=N ✅/⚠️
   [Rubric L2-4] R1 hot_tokens=N ✅/⚠️  L1 raw_slugs=N ✅/⚠️
-  [Rubric L2-4] G1 grade_meta=N (≥2) ✅/⚠️  G2 cite_meta=N (≥1) ✅/⚠️
+  [Rubric L2-4] G1 grade_meta=N ✅/⚠️  G2 cite_type_meta=N ✅/⚠️
 ```
 (The R2 dense_paras · B1 verdicts · L2 date_nonstd · L3 abbr_unexplained · S6 long_sents lines are omitted in this excerpt — the full set of lines is owned by `tools/_lint/overview.py` as SoT)
 

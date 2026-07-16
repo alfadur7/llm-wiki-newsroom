@@ -10,7 +10,7 @@ A multi-agent batch procedure for an ultrareview-grade, exhaustive pass over the
 
 ## Variant A — Python code (tools/ + hooks + graph.html)
 
-- **Group decomposition**: just before starting, enumerate `tools/**/*.py` live into ~10–12 groups by submodule, ≤~8 files per group (a size one agent can fully read). No hardcoded list — files accumulate. Exclude vendored artifacts such as the obsidian plugin `main.js`.
+- **Group decomposition**: just before starting, enumerate `tools/**/*.py` + `.claude/hooks/**/*.{py,sh}` + `graph/graph.html` live into ~10–12 groups by submodule, ≤~8 files per group (a size one agent can fully read). No hardcoded list — files accumulate. Exclude vendored artifacts such as the obsidian plugin `main.js`.
 - **Review dimensions**: `bug` (runtime errors · wrong conditions · None/KeyError · regex · resource leaks · encoding/path · broad-except masking) · `dead-code` (unused functions/constants/imports · unreachable branches · `_lib` duplication) · `inconsistency` (not using a `_lib` helper · hand-rolled frontmatter parsing · inconsistent exit/error handling) · `over-engineering` (needless abstraction · speculative generalization · single-impl interface/factory · config for values that never change · symptom-only non-root-cause fixes — criteria SoT `.claude/skills/ponytail-coding/SKILL.md` ladder; missing reuse belongs to `inconsistency`, so it's excluded here).
 - **Application**: `fix_safe=true` (a code-variant field in FINDINGS_SCHEMA — see § Harness) is fixed directly. Verification is § Verify & gate protocol item 2 (code).
 

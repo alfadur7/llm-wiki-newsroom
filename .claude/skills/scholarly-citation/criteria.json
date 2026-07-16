@@ -49,7 +49,7 @@
       "algorithm": "evaluate_citation", "comparator": "<=", "default_threshold": 0.95,
       "legacy": {"source": "C2"},
       "source": "scite Smart Citations", "source_url": "https://scite.ai/",
-      "note": "references ratio ≥95% → advisory (default-safe avoidance). <5 lines exempt."
+      "note": "references ratio >95% → advisory (default-safe avoidance). <5 lines exempt."
     },
     "cit.cite-type-hub": {
       "name": "Type-hub consistency", "dimension": "Citation type", "judge": "A",

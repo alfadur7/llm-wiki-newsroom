@@ -113,7 +113,7 @@ This Rubric pairs with "how to write" (Authoring) to judge "how well it was writ
 
 ```
 timelines/<slug>.md:
-  [Rubric] S1 schema=flow-summary+YYYY ✅  SourceIndexed src=25/hub=7/total=32 → path ✅
+  [Rubric] S1 schema=FlowSummary+YYYY ✅  SourceIndexed src=25/hub=7/total=32 → path ✅
 ```
 
 - **✅ = PASS**, **⚠️ = FAIL**

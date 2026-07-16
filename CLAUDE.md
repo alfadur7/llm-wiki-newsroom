@@ -147,6 +147,7 @@ Each folder has a **single responsibility**; when adding a new instruction, use 
 - `language.md` (English body text + English frontmatter keys + Meta-Doc English headers + Prose Style avoidance of translationese; Korean body text is an optional `WIKI_LANG=ko` mode)
 - `platform.md` (Windows non-Latin filename encoding workaround)
 - `index-log-format.md` (the two-tier structure of `wiki/index.md` + `log.md` append-at-bottom)
+- `README.md` (file index + invocation convention)
 
 Guideline-authoring voice and plan-bloat control are craft, not policy — they live in the `guideline-writing` skill (`gdl.*`).
 
@@ -162,7 +163,7 @@ Guideline-authoring voice and plan-bloat control are craft, not policy — they 
 - `graph-hosting-setup.md` (setup for publicly deploying the graph browser's `_site/` artifact to Cloudflare Pages)
 - `codebase-audit-runbook.md` (the multi-agent batch procedure for ultrareviewing tools/ code and .claude/ instructions — group decomposition, review dimensions, adversarial verify, the mechanical/gated application policy)
 - `staleness-reground-runbook.md` (the batch procedure for re-grounding stale derived narratives surfaced by `/wiki-lint staleness` — per-type pipeline, Desk gate, verification, recurrence pitfalls)
-- `proposal-validation-runbook.md` (the batch procedure for measuring the effect of self-evolved, desk-judged guideline strengthenings — Control/Treatment prompt injection, held-in blind rewrite, held-out canary, blind-desk N aggregation; the acceptance rule lives in `agents/editor-in-chief.md` step 6)
+- `proposal-validation-runbook.md` (the batch procedure for measuring the effect of self-evolved guideline changes — three variants by type (desk-judged blind rewrite × blind desk, behavioral probe task, lint-scored before/after); the acceptance rule lives in `agents/editor-in-chief.md` step 6)
 
 ### `.claude/hooks/` — Auto-Block & Guard Shell
 
@@ -177,10 +178,10 @@ Guideline-authoring voice and plan-bloat control are craft, not policy — they 
   - guard: exit-2 block on direct Write|Edit of auto-generated build artifacts (`wiki/index.md`, `graph/_*.json`, etc.) or `raw/` originals — steering you to fix the input and regenerate (re-derivation, human-edited files, and queue files are exceptions; the full list is in `dispatch.py`)
   - advisory: after writing a stub, recommend `python tools/build.py` reconciliation + Desk VERIFY₂ (`wiki/entities·concepts·timelines/*.md` — structural prevention of the 2026-05-09 / 05-20 incidents)
   - advisory: after editing L2-2 full hub, timeline, L2-3, or L2-4, recommend target-scope `python tools/lint.py <group> <target>` self-VERIFY₀
-  - advisory: for `*/plans/*.md`, the 5-step self-check, the 4 red-flag types + for `.claude/` instruction SoTs and CLAUDE.md, the Guideline Verification Ladder + a diff bullet-depth check (helper `check_bullet_depth.py`)
+  - advisory: for `*/plans/*.md`, the 5-step self-check, the 4 red-flag types + for `.claude/{agents,commands,layers,policies,operations}/` SoTs and CLAUDE.md (skills·hooks·memory excluded), the Guideline Verification Ladder + a diff bullet-depth check (helper `check_bullet_depth.py`)
   - advisory: on editing a desk-judged prose-craft SoT (`.claude/layers/*.md`, `agents/desk|reporter|columnist.md`), recommend the proposal-validation measurement before adoption (SoT: `operations/proposal-validation-runbook.md` + `agents/editor-in-chief.md` step 6)
   - advisory: on Write of a script-like temporary file directly under the project root, recommend a temp directory (structural prevention of the 2026-05-08 incident)
-  - advisory: on writing or modifying `tools/**/*.py`, recommend loading and applying the `ponytail-coding` skill (the authoring-time code-restraint reflex — the SoT is `skills/ponytail-coding/SKILL.md`; the rule body is not duplicated here)
+  - advisory: on writing or modifying `tools/**/*.py` or `.claude/hooks/*.py|sh`, recommend loading and applying the `ponytail-coding` skill (the authoring-time code-restraint reflex — the SoT is `skills/ponytail-coding/SKILL.md`; the rule body is not duplicated here)
 
 ### `.claude/memory/` — Local Memory
 
@@ -188,7 +189,7 @@ Guideline-authoring voice and plan-bloat control are craft, not policy — they 
 
 **When read**: on entering related work.
 
-> **Note:** local memory starts empty in this distribution (the folder holds only a `.gitkeep`); notes accumulate here as you operate the wiki.
+> **Note:** local memory is gitignored and created on first use; notes accumulate here as you operate the wiki.
 
 **Instructions located here**:
 - Local notes such as `feedback_*.md`

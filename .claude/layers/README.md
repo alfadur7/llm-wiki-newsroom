@@ -55,9 +55,9 @@ last_updated: YYYY-MM-DD
 ---
 ```
 
-Per-layer additional fields (L2-1 source's `source_url`·`source_file`·`date`, L2-3 cluster overview's `cluster`, etc.) are defined by each content file (`source.md`·`overview.md`, etc.).
+Per-layer additional fields (L2-1 source's `source_url`·`source_file`·`published`·`scraped`, L2-3 cluster overview's `cluster`, etc.) are defined by each content file (`source.md`·`overview.md`, etc.).
 
-**Two per-type exceptions** (the content file is the SoT): a **trail** carries `created` only — no `sources:`·`last_updated:` ([trail.md](trail.md)); a **timeline** omits `sources:` ([timeline.md](timeline.md)).
+**Three per-type exceptions** (the content file is the SoT): a **trail** carries `created` only — no `sources:`·`last_updated:` ([trail.md](trail.md)); a **timeline** omits `sources:` ([timeline.md](timeline.md)); a **source** omits `sources:` (it is itself the source — raw pointers live in `source_file`/`source_url`; [source.md](source.md)).
 
 ## Root Meta Files Exception
 
@@ -72,7 +72,7 @@ The meta files at the `wiki/` root (`index.md`·`overview.md`·`contradiction.md
 - **GROUND·APPLY·ADAPT stages** (Reporter · Columnist) → read 1 relevant content file (e.g. the `contradiction.md` Authoring section when writing a contradiction theme).
 - **APPLY-stage body prose** (common to all content types) → follow the translationese-avoidance discipline in [`../policies/language.md`](../policies/language.md) `## Prose Style` (verb-centric · avoid inanimate subjects · short sentences · reduce double passives).
 - **VERIFY qualitative stage** (Desk) → the relevant content file + `.claude/agents/desk.md` (the SoT for the 6 qualitative-review lenses and the promotion loop — Cognition principle 1, full context).
-- **VERIFY quantitative stage** (Copy Editor) → `tools/lint.py` automatically reads the relevant content file's Evaluation Rubric H2 section.
+- **VERIFY quantitative stage** (Copy Editor) → `tools/lint.py` evaluates against the `_manifest.json` roster plus the craft skills' `criteria.json`/`checks.py`; the Evaluation Rubric H2 documents those criteria for authors/Desk but is not parsed by lint.
 
 For per-role capability boundaries, see the [`.claude/agents/`](../agents/) SoT. For the Universal Cycle and the standard ADAPT chain, see the [`.claude/agents/README.md`](../agents/README.md) SoT.
 
@@ -89,7 +89,7 @@ Per-file H2 structure (navigable):
 | File | H2 structure |
 |---|---|
 | [source.md](source.md) | `## Page Format` → `## Authoring` → `## Evaluation Rubric` |
-| [hub.md](hub.md) | `## Page Format` → `## Body Structure` (hub authoring craft has its SoT in the dotted-ID craft skills — applied to stub and full alike — so page format + body structure are combined without separate `## Authoring`·`## Evaluation Rubric` sections; stubs still receive Desk VERIFY₂ limited to format·attribution·tone) |
+| [hub.md](hub.md) | `## Body Structure` (hub authoring craft has its SoT in the dotted-ID craft skills — applied to stub and full alike — so page format + body structure are combined without separate `## Authoring`·`## Evaluation Rubric` sections; stubs still receive Desk VERIFY₂ limited to format·attribution·tone) |
 | [timeline.md](timeline.md) | `## Page Format` → `## Authoring` → `## Evaluation Rubric` |
 | [overview.md](overview.md) | `## Authoring` (`### Part 1`·`### Part 2`) → `## Evaluation Rubric` (`### Part 1`·`### Part 2`) |
 | [contradiction.md](contradiction.md) | `## Authoring` (`### Part 1`·`### Part 2`) → `## Evaluation Rubric` (`### Part 1`·`### Part 2`) |

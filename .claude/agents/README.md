@@ -148,7 +148,7 @@ In either mechanism, the 4 principles in § Change Procedure (one author · revi
 **Rule**: when a role's **X — what NOT to do** list forbids using a tool and names it (e.g. "external lookup (WebSearch·WebFetch)"), the role frontmatter `disallowedTools` must list that tool, and vice versa — every `disallowedTools` entry must be justified by an X-list item that names it. `python tools/lint.py meta` checks this parity in both directions.
 
 **Exceptions** (why parity is a rule, not a seal):
-1. **Own artifacts** — a role may produce its own artifacts through a path the tool ban does not govern (the Copy Editor's `lint-report.md` is written by the `lint.py` CLI, not by the Write tool); such X-list items state the restriction without naming tool names, so they stay outside the parity check.
+1. **Own artifacts** — a role may produce its own artifacts through a path the tool ban does not govern (the Copy Editor authors `lint-report.md` from `lint.py` stdout via the Write tool — its X-list restricts wiki-content authoring without naming Write/Edit); such X-list items state the restriction without naming tool names, so they stay outside the parity check.
 2. **Editor-in-Chief dead path** — the Editor-in-Chief normally runs as the main thread, where role frontmatter is never loaded as a restriction; its `disallowedTools` is declared for parity and for the sub-Agent case, but the operative rule is the X-list itself.
 3. **Name-blocking is not a seal** — `disallowedTools` blocks the named tool, not the capability (a role could still reach the same effect via Bash). The X-list prose remains the governing rule; the frontmatter is defense-in-depth, and for a **teammate** it is not enforced at all (the brief is the only channel — table above).
 

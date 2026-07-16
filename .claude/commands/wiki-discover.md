@@ -75,7 +75,7 @@ Definitions, thresholds, and priorities have their SoT in [`.claude/operations/g
    - Recommended follow-up: create a new bridge hub or redesign the cluster (unsuitable for auto-enrichment)
 
    **Track C — separate cycle** (orphan-claims·cap-theme·stale-theme)
-   - Recommended follow-up: `/wiki-lint contradiction theme --fix` (theme MD rewrite · burn · orphan mapping)
+   - Recommended follow-up: `/wiki-lint contradiction theme --fix` (JSON re-derivation: orphan-claim → theme mapping) · theme-MD rewrite via `/wiki-lint contradiction <theme-slug> --fix` · theme burn via the periodic-review dual gate
 
    **Track D — derivation coverage** (synthesis·trail·timeline) — pages that consolidate already-accumulated material are missing. Filled by Columnist authoring rather than external search (separate from the input track)
    - synthesis missing → `/wiki-lint synthesis <slug> --fix` (skeleton + rewrite block) → Columnist authoring

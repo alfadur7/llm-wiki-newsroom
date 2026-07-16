@@ -2,7 +2,7 @@
 
 ## Page Format
 
-A trail page (`wiki/trails/<slug>.md`) is an **ordered associative path** (Memex trail-blazing) — it strings 5–12 hubs into a single line for a learner to walk along, plus the through-running narrative of that path. Its distinctive role is a **navigation path** — not a single-domain overview, and not a question synthesis.
+A trail page (`wiki/trails/<slug>.md`) is an **ordered associative path** (Memex trail-blazing) — it strings 5–12 hubs (authoring target; the lint struct.path-length band is 4–12) into a single line for a learner to walk along, plus the through-running narrative of that path. Its distinctive role is a **navigation path** — not a single-domain overview, and not a question synthesis.
 
 ### Standard structure
 
@@ -62,7 +62,7 @@ A trail follows the journalism explainer-reporting·kicker traditions. Each step
 
 ### Execution order (step-by-step guide)
 
-1. **Select the path line** — identify 5–12 hubs that run through one topic, in order (chronological·causal·learning order).
+1. **Select the path line** — identify 5–12 hubs (authoring target; the lint struct.path-length band is 4–12) that run through one topic, in order (chronological·causal·learning order).
 2. **Write `## Path`** — each hop as a numbered item `N. [[Hub]] — role·transition commentary`. Each line starts with a wikilink (with `jrn.explainer`, one line of "why this connection").
 3. **Write `## Commentary`** — name the path's through-running narrative and tension in 1–2 paragraphs (`jrn.kicker`).
 3a. **self-VERIFY₀** — confirm `python tools/lint.py trail <slug>` PASS. After ≤ 2 self-attempts on the same cause, either PASS or force handoff.

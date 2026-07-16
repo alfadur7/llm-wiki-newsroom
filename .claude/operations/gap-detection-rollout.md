@@ -56,10 +56,10 @@ Input gaps (Track A·B·C — external source ingest · operator decision · the
 | Track | Gap | Definition | Threshold | severity |
 |---|---|---|---|---|
 | A | **sparse-cluster** | weak label cohesion, size ≥ 20 | `coherence == "mixed"` AND `size >= 20` AND (`containment < 0.9` OR top-tag share < 60%) | `1 - containment` |
-| A | **single-source** | 1 source but normal influence | `len(sources) == 1` AND `hub_hub_degree >= 9` AND `cluster_count >= 2` | `log(degree+1) × 0.5` |
+| A | **single-source** | 1 source but normal influence | `len(sources) == 1` AND `hub_hub_degree >= 9` AND `cluster_count >= 2` | `0.5` (constant) |
 | A | **stale-hub** | cluster active but this hub alone stagnant | `(hub_age - cluster_avg_age) >= 14d` AND `cluster_avg_age <= 10d` | `(hub_age - cluster_avg_age) / 14` |
 | B | **bridge** | multi-cluster junction | `discover.py surprising` composite-score top-N (default 10 via `detect_bridge_nodes` / 15 via the standalone CLI) | normalized composite score |
-| C | **orphan-claims** | raw claim not mapped to a theme | a source in `_contradictions.json` is in no theme's `sources:` | `count × 0.1` |
+| C | **orphan-claims** | raw claim not mapped to a theme | claim ids remaining in `_contradictions_themes.json::unassigned` | `count × 0.1` |
 | C | **cap-theme** | real-claim count near cap | `real_claim_count >= 30` (60% of the cap of 50) — the catch-all `other-fragmentary` theme is exempt (`CAP_THEME_EXEMPT_SLUGS`): by definition it holds genuine one-off residuals that fit no other theme, so a large count is normal even after full sub-axis extraction; forcing a split would force fragmentation | `(real - 30) / 20` |
 | C | **stale-theme** | claims accumulated vs theme MD not updated | `theme.last_updated < max(mapped_source.last_updated) - 7d` | `stale_days / 7` |
 | D | **synthesis** | integration-worthy theme but no synthesis | `claim_count >= 30` AND no synthesis references `[[<theme>]]` | `(claim - 30) / 20 + 1` |
@@ -90,10 +90,10 @@ Queries are generated in **English by default**; the Korean-language variants be
 |---|---|---|---|
 | **sparse-cluster** | `<cluster_name> 2026 trends` | `<cluster_name> <top_tag1> <top_tag2> 2026` (dedup words already in the cluster name) | — |
 | **single-source** | `<hub> <cluster_top_hub> 2026` | `<hub> 2026 announcement` | `<hub> <cluster_name> trends` |
-| **stale-hub** | `<hub> 2026 update` | `<hub> <cluster_top_hub> 2026` | — |
+| **stale-hub** | `<hub> 2026 announcement update` | `<hub> <cluster_top_hub> 2026` | — |
 
 Normalization:
-- **`<hub>`**: `tools/_news/normalize.hub_label()` — strips parenthetical glosses (`"Tesla (TSLA)"` → `"Tesla"`).
+- **`<hub>`**: `tools/_news/normalize.hub_korean_label()` — strips parenthetical glosses (`"Tesla (TSLA)"` → `"Tesla"`).
 - **tags**: `tools/_news/normalize.normalize_tags()` — case-fold + synonym mapping (`['llm', 'AI', 'LLM']` → `['LLM', 'AI']`).
 
 ### Domain filter

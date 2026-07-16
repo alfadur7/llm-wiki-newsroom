@@ -12,7 +12,7 @@
       "legacy": {"overview-cluster": "W1", "overview-aggregate": "W1", "contradiction-theme": "W1", "contradiction-aggregate": "W1", "source": "W1"},
       "source": "Wikipedia:Manual of Style/Linking",
       "source_url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Linking",
-      "note": "Count of [[wikilink]] in the EDITOR region. Threshold VALUE·strip_auto injected per content-type by manifest (overview-cluster=150 strip_auto=true·overview-aggregate=200 strip_auto=false·contradiction-theme=30·aggregate=50·source=5)."
+      "note": "Count of [[wikilink]] in the EDITOR region. overview-cluster=150 strip_auto=true·overview-aggregate=200 strip_auto=false injected by manifest; contradiction-theme=30·aggregate=50·source=5 are orchestrator constants (contradiction.py W1_MIN_LINKS/L24_W1_MIN, source.py W1_MIN_LINKS)."
     },
     "enc.first-mention": {
       "name": "First-mention (minimize in-section duplicate links)",

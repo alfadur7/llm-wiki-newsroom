@@ -16,7 +16,7 @@ The slash-argument notation in each row quotes the child file's `Usage` line as 
 | Query | `/wiki-query <question>` | "query: ..." | [`wiki-query.md`](wiki-query.md) |
 | Lint | `/wiki-lint [<group>] [<subcmd\|target>] [--fix]` | "lint the wiki" | [`wiki-lint.md`](wiki-lint.md) |
 | Build graph | `/wiki-graph` | — | [`wiki-graph.md`](wiki-graph.md) |
-| News search | `/wiki-news [cluster\|keyword]` | — | [`wiki-news.md`](wiki-news.md) |
+| News search | `/wiki-news [cluster\|keyword \| --gap [<slug>] [--batch] [--no-filter]]` | — | [`wiki-news.md`](wiki-news.md) |
 | Export | `/wiki-export` | (for Claude.ai Project Knowledge) | [`wiki-export.md`](wiki-export.md) |
 | Discover | `/wiki-discover <seed \| --random \| --surprising \| --gaps [<slug>]>` | "diagnose gaps" → `--gaps` | [`wiki-discover.md`](wiki-discover.md) |
 | Trail | `/wiki-trail <create\|follow\|list> [args]` | — | [`wiki-trail.md`](wiki-trail.md) |
@@ -73,7 +73,7 @@ Each command file fills the same 6 sections in the same order — so that even a
 1. **Nature·Trigger** (1-2 sentences or a short paragraph) — gives a self-contained statement of what task this command performs and on what trigger. A single line is fine if it is clear enough on one line.
 2. **`Usage`** + usage notation + examples — the single SoT for slash-argument notation (the Task Index table quotes this line verbatim).
 3. **`## Traversal Pattern`** — which cell of the [Layer × Cycle matrix](../agents/README.md#layer--cycle-matrix-design-skeleton) it passes through, in which cycle-stage flow, plus a per-stage role-assignment table.
-4. **`## Sub-procedure`** (where applicable) — the area of sole responsibility of this command. Only procedures listed in the [`## Sub-procedure Locations`](#sub-procedure-locations) table above.
+4. **`## Sub-procedure`** (where applicable) — the area of sole responsibility of this command. Only procedures listed in the [`## Sub-procedure Locations`](#sub-procedure-locations) table below.
 5. **Procedure-detail H2** — per-step tool calls, intermediate artifacts, and verification points. The generic naming is `## Operation` or `## Procedure`, but you may use a semantically clearer H2 name that fits the command's nature, e.g. `## 12-Step Procedure` (wiki-ingest), `## Mode 1 / Mode 2` (wiki-discover), `## Authoring Procedure` (wiki-timeline), or `## Common Wrap-up` + `## Synthesis Save Mode` (wiki-query). The key is that it be **readable step-by-step from a single location**.
 6. **`## Human Reviewer Gate`** — the gate specific to this command. The global gates have their single SoT in [`CLAUDE.md` "Human Reviewer Gate"](../../CLAUDE.md#human-reviewer-gate).
 
@@ -87,7 +87,7 @@ Command-specific procedures (mapping rules, sync rules, etc.) live inside the re
 | Conflict Axis Sync Rule (4-tier bottom-up sync) | [`wiki-lint.md` → `## Sub-procedure: Conflict Axis Sync Rule`](wiki-lint.md#sub-procedure-conflict-axis-sync-rule) |
 | Parallel Batch Mode (ingest fanout) | [`wiki-ingest.md`](wiki-ingest.md) |
 
-The [A]–[G] code definitions of the Cluster Health Diagnostic are not a separate sub-procedure; they are defined inline in the `graph clusters` row of the [`wiki-lint.md` → `## Group Structure`](wiki-lint.md#group-structure) table (single SoT).
+The [A]–[G] code definitions of the Cluster Health Diagnostic are not a separate sub-procedure; the per-code definitions · action guides are SoT in `tools/_lint/graph_clusters.py` (module docstring + report output — single SoT), with the pass/fail posture noted in the `graph clusters` row of the [`wiki-lint.md` → `## Group Structure`](wiki-lint.md#group-structure) table.
 
 ## Invocation Flow
 

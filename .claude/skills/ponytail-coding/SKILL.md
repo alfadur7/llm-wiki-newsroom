@@ -128,6 +128,6 @@ statusline, and companion commands (`/ponytail-audit|review|debt|gain|help`)
 are excluded because they conflict with this project's single hook dispatcher
 (`.claude/hooks/dispatch.*`). The `/ponytail` slash command referenced above is
 therefore not installed — set intensity (`lite|full|ultra`) via the skill
-argument or in prose ("ponytail ultra"). Scope is authoring `tools/` Python; it
+argument or in prose ("ponytail ultra"). Scope is authoring `tools/` Python and the hook layer (`.claude/hooks/` py|sh); it
 divides labor with karpathy-guidelines (assumptions, success criteria) and
 `/simplify` (post-hoc cleanup).

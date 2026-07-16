@@ -17,7 +17,7 @@ A `wiki/**/*.md` filename must not case-fold to `CLAUDE.md` or `README.md`. Wind
 
 `python tools/lint.py meta schema` detects violations automatically.
 
-**Discoverability of suffixed hubs**: a hub whose filename diverges from its common name (such as one with the collision-avoidance suffix above) includes the common name in its frontmatter `title` and `tags` (e.g., `ClaudeLLM.md` → `title: "Claude"` · `tags: [Claude, …]`). Bilingual title/tags (e.g., `title: "클로드 (Claude)"` · `tags: [클로드, Claude, …]`) are added only under WIKI_LANG=ko or for a native-script entity. The ingest existence-check finds variant-slug hubs by content-grepping the title and tags rather than the filename, preventing duplicate creation.
+**Discoverability of suffixed hubs**: a hub whose filename diverges from its common name (such as one with the collision-avoidance suffix above) includes the common name in its frontmatter `title` and `tags` (e.g., `ClaudeLLM.md` → `title: "Claude"` · `tags: [Claude, …]`). Bilingual title/tags (e.g., `title: "클로드 (Claude)"` · `tags: [클로드, Claude, …]`) are added only under WIKI_LANG=ko or for a native-script entity. The ingest existence-check surfaces variant-slug hubs via the generated `wiki/index.md` list, which shows each hub's frontmatter title — the common name in `title` keeps a suffixed hub discoverable, preventing duplicate creation.
 
 ## Homonymous-Abbreviation Disambiguation
 

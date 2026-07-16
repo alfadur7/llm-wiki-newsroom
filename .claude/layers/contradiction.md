@@ -49,7 +49,7 @@ The `Claim type 4-way classification` (the `type` field in `_contradictions.json
 
 ### Part 1 — Theme Contradiction Authoring Guide
 
-**What this Part explains**: how to author a `wiki/contradictions/<theme>.md` file. This file is a **deep-analysis page for a specific theme (an issue classification defined by the editor)**, unpacking one axis of contention together with its evidence. For example, `ai-coding-productivity-debate.md` covers the issue "the myth of AI coding productivity vs. empirical evidence."
+**What this Part explains**: how to author a `wiki/contradictions/<theme>.md` file. This file is a **deep-analysis page for a specific theme (an issue classification defined by the editor)**, unpacking one axis of contention together with its evidence. For example, `open-training-data-requirement.md` covers the issue "OSAID Definition vs Open Training-Data Requirement."
 
 #### File structure — frontmatter + 4 EDITOR sections
 
@@ -316,7 +316,7 @@ If there is an upper-bound exceedance, a reappearing token, or a consistency vio
   - dialectic · NPOV craft → skill: `N5 verdict_fails ≤2` · `N7 label_skew ==0` · `T4 qualifiers ≥1` · `D1 labels ≥2` · `D5 C_words ≤ max(A,B)` · `D6 C_meta ==0`
   - citation · linking craft → skill: `W1 links ≥30` · `X2 landscape ≥1` · `L1 raw_slugs ==0` · `L2 cite_miss ==0` · `L3 grounded ≥1` · `G1 grade_meta ≥2` · `G2 cite_type_meta ≥1`
   - structural · house → structural section above: `S1 4/4 todo=0` · `S2 evidence/slug 3~7` · `S3 lead nums≤4 wiki≤5` · `X1 source_refs/total ≥0.7` · `N4 reuse_max ≤2` · `N6 num_reuse_max ≤2`
-- Measurement nuance (skill `checks.py` · `tools/_lint/contradiction.py` is SoT): `N4` · `S2` are by source slug (entity/concept wikilinks excluded from the count) · the `X1` denominator is the JSON SoT (no editor gaming) · `L2` is the set difference claim source ∩ body − frontmatter (non-claim mentions excluded from the count) · `L3` blocks only the "0 Reads extreme" (partial gaming is the editor's self-discipline) · the figure vocabulary is contradiction.py (`NUMBER_TOKEN_RE`), while the assertion/qualifier/camp-word dictionaries are owned by the skill `checks.py` (encyclopedia-writing · journalism-writing) as SoT.
+- Measurement nuance (skill `checks.py` · `tools/_lint/contradiction.py` is SoT): `N4` · `S2` are by source slug (entity/concept wikilinks excluded from the count) · the `X1` denominator is the JSON SoT (no editor gaming) · `L2` is the set difference claim source ∩ body − frontmatter (non-claim mentions excluded from the count) · `L3` blocks only the "0 Reads extreme" (partial gaming is the editor's self-discipline) · the figure vocabulary (`NUMBER_TOKEN_RE`) is owned by the skill `checks.py` (encyclopedia-writing) and consumed by contradiction.py, while the assertion/qualifier/camp-word dictionaries are owned by the skill `checks.py` (encyclopedia-writing · journalism-writing) as SoT.
 - **W4** (required) is separate: 0 broken links in `python tools/lint.py graph structure`.
 
 #### `[Freshness]` warning (advisory outside the Rubric)

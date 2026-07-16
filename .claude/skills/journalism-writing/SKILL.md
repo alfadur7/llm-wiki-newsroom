@@ -9,7 +9,7 @@ Writing craft drawn from news/explanatory journalism and argumentation tradition
 
 ## Dialectic structure (jrn.thesis-antithesis · jrn.c-section-size · jrn.c-stance-naming · jrn.monitoring-balance)
 
-Develop an issue as Hegelian thesis → antithesis → synthesis. State thesis and antithesis with explicit **Position A / Position B** bold labels (ko rendering: **A 입장 / B 입장**); add a **C Mediation** label (ko: **C 중재**) only when a genuine convergence exists. The C paragraph must not run longer than A or B, so the convergence is not mistaken for the main clash. If C is not a synthesis but a meta-critique (weakening both sides at once, flagging interest bias), move it out of the dialectic frame — a meta-critique in the C slot breaks the three-part structure.
+Develop an issue as Hegelian thesis → antithesis → synthesis. State thesis and antithesis with explicit **Position A / Position B** bold labels (ko rendering: **A 입장 / B 입장**); add a **C — Mediation** label (ko: **C 중재**) only when a genuine convergence exists. The C paragraph must not run longer than A or B, so the convergence is not mistaken for the main clash. If C is not a synthesis but a meta-critique (weakening both sides at once, flagging interest bias), move it out of the dialectic frame — a meta-critique in the C slot breaks the three-part structure.
 
 Synthesis does not pick a winner. In Hegel's terms it *sublates* — cancels and preserves — identifying what each side correctly grasps. Concretely, place each side's **monitoring point** (what one would observe if that side were right) symmetrically (jrn.monitoring-balance); a monitor skewed to one side hides an editorial verdict under hedged wording (combine with BBC due impartiality). e.g. ✅ "If tighter regulation is right, we would observe reduced consumer harm; if looser regulation is right, increased new entry" (winning conditions symmetric on both sides) / ❌ "Regulation blocks innovation, so abolishing it is right" (one-sided verdict).
 
@@ -23,7 +23,7 @@ Check each side's support structure with the Toulmin model (claim · grounds/dat
 
 ## Fairness (jrn.due-impartiality)
 
-When aggregating many topics/sides into one piece, keep length and references from skewing to one side — BBC due impartiality is proportionate to weight, not a mechanical 50:50, and privileges no side. The deterministic check signals via a max/min reference-ratio ceiling (threshold injected by manifest), but a hub that is intrinsically more referenced can be normal, so human review accompanies it.
+When aggregating many topics/sides into one piece, keep length and references from skewing to one side — BBC due impartiality is proportionate to weight, not a mechanical 50:50, and privileges no side. The deterministic check signals via a max/min reference-ratio ceiling (default 3.0, see criteria.json), but a hub that is intrinsically more referenced can be normal, so human review accompanies it.
 
 ## Narrative lead (jrn.lede · jrn.nutgraf · jrn.kicker · jrn.page · jrn.explainer · jrn.inverted-pyramid)
 
