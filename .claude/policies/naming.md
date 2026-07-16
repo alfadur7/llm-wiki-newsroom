@@ -66,7 +66,7 @@ If a local memory note mirroring this policy exists under `.claude/memory/`, kee
 A concept hub is created for an **analytical axis that ties multiple sources together**. Its nature differs from an entity — an entity is measured by appearance frequency and demotes to plain text, whereas a concept is measured by conceptual independence and, on demotion, is **absorbed into a higher-level existing concept** (concepts are hierarchical). A new concept also requires the explicit approval of the wiki operator.
 
 **Threshold conditions**:
-- **Recommended: functions as an analytical axis in ≥3 distinct sources** — a conceptual anchor that ties multiple sources together, not mere term appearance (consistent with the entity threshold)
+- **Required: functions as an analytical axis in ≥3 distinct sources** — a conceptual anchor that ties multiple sources together, not mere term appearance (consistent with the entity threshold; count with `python tools/count_mentions.py <name>`, same as entities — a raw grep over-counts catalog files)
 - **Cannot be absorbed into a higher-level existing concept hub** — if a higher-level one subsumes it, absorption is the default. Descriptive neologisms ("renaissance developer," "verification debt") are almost always absorption candidates.
 - **Prefer pull signals** — a cross-cutting concept candidate in `hub suggestions` (an un-created concept that ≥2 seeds already point to via `[[wikilink]]`) is strong grounds for creation.
 

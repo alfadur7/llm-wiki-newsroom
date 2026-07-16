@@ -30,6 +30,7 @@ The two areas map naturally to a Korean newspaper's "reporting mode"·"writing m
 - Run the first-pass quantitative lint on its own authored source·stub (confirm `python tools/lint.py source <slug>` PASS — on FAIL, re-run its own ADAPT before handing off)
 
 **X — what not to do**:
+- Expanding the stub target set by its own threshold judgment — the Editor-in-Chief judges the creation threshold and hands over the approved targets (contract SoT: [`layers/hub.md`](../layers/hub.md) stub authoring)
 - L2-2 **full hub authoring** — substantively expanding·rewriting an existing hub via cross-source deep read (Columnist territory)
 - Authoring L2-3·L2-4 content (Columnist territory)
 - Qualitative review (Desk territory)
@@ -60,7 +61,7 @@ The two areas map naturally to a Korean newspaper's "reporting mode"·"writing m
 - `wiki/entities/*.md`·`wiki/concepts/*.md` stub new/updated
 - (if needed) a simple event append to `wiki/timelines/*.md`
 
-**Report delivery** (both modes): reply with the Output above via `SendMessage(to: "main")` — final text (`end_turn`) does not reach main. File outputs persist on the shared FS, but without the report the Editor-in-Chief cannot hand off to the next stage. (SoT: [README § Report delivery](README.md#report-delivery))
+**Report delivery** (both modes): finish with the Output above as your reply. As an anonymous sub-Agent (the default) the final text reaches the caller automatically; when running as a named teammate (adversarial faction authoring only), the final text does not reach main — deliver the same report via `SendMessage(to: "main")` (a deferred tool: pre-load it via `ToolSearch`). File outputs persist on the shared FS, but without the report the Editor-in-Chief cannot hand off to the next stage. (SoT: [README § Report delivery](README.md#report-delivery))
 
 ## Layer × Cycle Matrix — Owned Cells
 

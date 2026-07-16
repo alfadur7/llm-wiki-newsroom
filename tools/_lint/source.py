@@ -380,6 +380,12 @@ def _print_corpus_summary(results: list[dict]) -> None:
         f"[advisory] — [fact] ≥ {DESK_TRIGGER_FACT_MIN} AND quoted citations ≥ "
         f"{DESK_TRIGGER_QUOTE_MIN}"
     )
+    # Slug list so the batch VERIFY₂ step can be invoked without re-deriving
+    # the trigger set (wiki-ingest.md step 11).
+    for r in results:
+        if r["desk"][0]:
+            slug = r["rel"].removeprefix("sources/").removesuffix(".md")
+            print(f"    [desk sub-trigger] {slug}")
 
     # Top non-compliant slugs (by number of FAILed required criteria).
     fail_counts = []

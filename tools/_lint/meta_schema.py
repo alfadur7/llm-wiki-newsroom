@@ -101,7 +101,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import CLUSTERS_JSON, REPO_ROOT as ROOT, WIKI as WIKI_DIR, read_text_cached  # noqa: E402
+from _lib import CLUSTERS_JSON, REPO_ROOT as ROOT, WIKI as WIKI_DIR, parse_frontmatter, read_text_cached  # noqa: E402
 
 CLAUDE_MD = ROOT / "CLAUDE.md"
 COMMANDS_DIR = ROOT / ".claude" / "commands"
@@ -148,11 +148,11 @@ RESERVED_META_FILENAMES = frozenset({"claude.md", "readme.md"})
 SKILLS_DIR = ROOT / ".claude" / "skills"
 MANIFEST_JSON = ROOT / ".claude" / "layers" / "_manifest.json"
 LAYERS_DIR = ROOT / ".claude" / "layers"
-CRAFT_PREFIXES = ("jrn", "con", "enc", "cit")
+CRAFT_PREFIXES = ("jrn", "con", "enc", "cit", "gdl")
 # Dot-ids appearing in layers prose. struct.*/house.* live in the layers
 # structural/house-style sections (no craft skill) so only craft prefixes are
 # cross-checked against criteria.json.
-DOT_ID_RE = re.compile(r"\b((?:jrn|con|enc|cit|struct|house)\.[a-z][a-z0-9-]+)\b")
+DOT_ID_RE = re.compile(r"\b((?:jrn|con|enc|cit|gdl|struct|house)\.[a-z][a-z0-9-]+)\b")
 # Pre-merge guide filenames; literal split so the regex source itself is not a hit.
 STALE_GUIDE_RE = re.compile(r"[\w-]+-(?:authoring|" + "rubric)\\.md")
 
@@ -251,10 +251,8 @@ def _check_slash_commands(text: str) -> list[str]:
 # index — was previously unchecked, so a new file under .claude/operations/ or
 # .claude/policies/ could land without an entry in the CLAUDE.md "Instruction
 # Locations" or the folder README and drift silently. Scope is limited to
-# operations + policies, the
-# two folders where this drift was actually observed (CLAUDE.md listed only 1/5
-# operations files; no-plan-bloat.md was absent from policies). agents/commands/
-# layers are intentionally out of scope.
+# operations + policies, the two folders where this drift occurs in practice.
+# agents/commands/layers are intentionally out of scope.
 #
 # Section header per folder in CLAUDE.md, e.g. "### `.claude/policies/` — ...".
 _CLAUDE_SECTION_RE_TMPL = r"^###\s+`\.claude/{folder}/`.*?(?=^###\s|\Z)"
@@ -424,20 +422,35 @@ def _check_language_in_file(path: Path) -> list[tuple[int, str]]:
     return violations
 
 
-CLAUDE_VOICE_PATTERNS = [
-    ("decision option name", re.compile(r"옵션\s*[A-Z][+]?(?!\s*입장)")),
-    ("reinforcement counter", re.compile(r"(보강|Reinforcement)\s*\d+", re.IGNORECASE)),
-    ("introduction timestamp", re.compile(r"\d{4}-\d{2}-\d{2}\s*(도입|시점|적용)")),
+# Voice antipatterns are split craft/project. The project-agnostic
+# deliberation-narrative detectors (decision option name · reinforcement
+# counter · introduction timestamp · changelog header · recurrence-prevention
+# narrative) live in the guideline-writing skill's checks.py (gdl.*) and are
+# loaded here by caller injection — meta_schema stays the thin orchestrator
+# (same idiom as overview.py ← encyclopedia-writing). Only patterns tied to
+# THIS wiki's vocabulary stay below.
+_GDL_CHECKS_PATH = ROOT / ".claude" / "skills" / "guideline-writing" / "checks.py"
+
+
+def _load_gdl_checks():
+    """Load the guideline-writing skill detectors; None if the skill is
+    absent (this lint degrades to project patterns only outside this wiki)."""
+    if not _GDL_CHECKS_PATH.exists():
+        return None
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("gdl_checks", _GDL_CHECKS_PATH)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+PROJECT_VOICE_PATTERNS = [
     ("external case reference", re.compile(
         r"(Wikipedia|ProCon|BERTopic|Wikidata|Stack\s*Overflow|Kialo)[^\n]{0,80}?(등가|모델|model)",
         re.IGNORECASE,
     )),
-    ("benchmark absorption narrative", re.compile(r"외부 벤치마크\s*\d+\s*/\s*\d+")),
-    ("changelog section header", re.compile(
-        r"^#{2,4}\s*(Changelog|변경\s*이력|변경\s*사항|Change\s*Log)\s*$",
-        re.IGNORECASE | re.MULTILINE,
-    )),
-    ("recurrence prevention narrative", re.compile(r"재발\s*(방지|회피)")),
+    ("benchmark absorption narrative", re.compile(
+        r"external benchmark\s*\d+\s*/\s*\d+", re.IGNORECASE)),
     # A trail is a Memex associative path (layers/trail.md), not a graded
     # curriculum. Bilingual: the English gloss fires on this corpus; the Korean
     # literals are carried over. Benign "learner"/"learning order" don't match
@@ -449,19 +462,20 @@ CLAUDE_VOICE_PATTERNS = [
     )),
 ]
 
-# Self-skip — the policy files list antipatterns by example, not as violations.
+# Self-skip — these files list antipatterns by example, not as violations.
 CLAUDE_VOICE_SELF_SKIP = {
-    ".claude/policies/claude-guideline-voice.md",
+    ".claude/skills/guideline-writing/SKILL.md",
     ".claude/policies/language.md",
 }
 
 
 def _check_claude_voice_violations() -> list[str]:
-    """Surface decision-history, external-benchmark reference, and changelog-
-    section antipatterns across Claude guideline SoT files. Scope covers
-    `.claude/commands/*.md`, `.claude/agents/*.md`, `.claude/policies/*.md`,
-    `.claude/layers/*.md`, `.claude/operations/*.md`, `.claude/skills/*/SKILL.md`,
-    and `CLAUDE.md` — wiki/ is content territory and is unaffected.
+    """Surface deliberation-narrative (guideline-writing skill, gdl.*) and
+    project-vocabulary voice antipatterns across Claude guideline SoT files.
+    Scope covers `.claude/commands/*.md`, `.claude/agents/*.md`,
+    `.claude/policies/*.md`, `.claude/layers/*.md`, `.claude/operations/*.md`,
+    `.claude/skills/*/SKILL.md`, and `CLAUDE.md` — wiki/ is content territory
+    and is unaffected.
     """
     violations: list[str] = []
     targets: list[Path] = [CLAUDE_MD]
@@ -476,6 +490,7 @@ def _check_claude_voice_violations() -> list[str]:
     if skills_dir.exists():
         targets.extend(sorted(skills_dir.glob("*/*.md")))
 
+    gdl = _load_gdl_checks()
     for path in targets:
         rel = path.relative_to(ROOT).as_posix()
         if rel in CLAUDE_VOICE_SELF_SKIP:
@@ -484,8 +499,12 @@ def _check_claude_voice_violations() -> list[str]:
             text = read_text_cached(path)
         except OSError:
             continue
-        for i, line in _iter_non_fenced_lines(text):
-            for label, pat in CLAUDE_VOICE_PATTERNS:
+        lines = list(_iter_non_fenced_lines(text))
+        if gdl is not None:
+            for i, label, matched in gdl.find_deliberation_narrative(lines):
+                violations.append(f"{rel}:{i}: [{label}] '{matched}'")
+        for i, line in lines:
+            for label, pat in PROJECT_VOICE_PATTERNS:
                 m = pat.search(line)
                 if m:
                     violations.append(
@@ -919,6 +938,75 @@ def _check_reserved_filename_collisions() -> list[str]:
     return violations
 
 
+# AGENT TOOL PERMISSIONS — X-list ↔ frontmatter `disallowedTools` parity.
+# Governed candidate set is fixed and small (FP-averse): only tool names the
+# role SoTs actually legislate about. A bare word like "editing"/"search" in an
+# X-list bullet never matches — only the exact tool token with word boundaries.
+AGENT_TOOL_CANDIDATES = ("WebSearch", "WebFetch", "Write", "Edit")
+AGENTS_DIR = ROOT / ".claude" / "agents"
+# Own-artifacts exception (agents/README.md § Tool permissions, exception 1):
+# a role that produces its artifacts through a CLI path may mention these tools
+# in restriction prose without disallowing them.
+_AUTHORS_OWN_FILES = {"copyeditor": {"Write", "Edit"}}
+_XLIST_START_RE = re.compile(r"^\*\*X — ", re.MULTILINE)
+
+
+def check_agent_tool_permissions(name: str, disallowed: list[str],
+                                 xlist_text: str) -> list[str]:
+    """Pure parity check for one role — returns violation strings.
+
+    Bidirectional: a candidate tool named in the X-list must appear in
+    `disallowedTools` (missing), and every `disallowedTools` entry must be
+    named by an X-list item (unjustified). Candidates = the fixed governed
+    set + whatever the frontmatter lists (so an unknown frontmatter entry is
+    still checked for justification rather than silently ignored).
+    """
+    violations: list[str] = []
+    candidates = set(AGENT_TOOL_CANDIDATES) | set(disallowed)
+    mentioned = {t for t in candidates
+                 if re.search(rf"\b{re.escape(t)}\b", xlist_text)}
+    excused = _AUTHORS_OWN_FILES.get(name, set())
+    for tool in sorted(mentioned - set(disallowed) - excused):
+        violations.append(
+            f"{name}: X-list names `{tool}` but frontmatter "
+            f"disallowedTools omits it"
+        )
+    for tool in sorted(set(disallowed) - mentioned):
+        violations.append(
+            f"{name}: disallowedTools lists `{tool}` but no X-list "
+            f"entry names it"
+        )
+    return violations
+
+
+def _check_agent_tool_permissions() -> list[str]:
+    """Disk wrapper — parity check across every role SoT in .claude/agents/.
+
+    Files without an X-list section (README.md) are skipped. The X-list scan
+    window runs from the `**X — ` marker to the next `## ` heading, so tool
+    mentions in prompt templates / risk sections never count.
+    """
+    violations: list[str] = []
+    if not AGENTS_DIR.exists():
+        return violations
+    for path in sorted(AGENTS_DIR.glob("*.md")):
+        try:
+            text = read_text_cached(path)
+        except OSError:
+            continue
+        m_x = _XLIST_START_RE.search(text)
+        if not m_x:
+            continue
+        end = text.find("\n## ", m_x.end())
+        xlist = text[m_x.end():end if end != -1 else len(text)]
+        raw = parse_frontmatter(text).get("disallowedTools", "")
+        disallowed = (raw if isinstance(raw, list)
+                      else [t.strip() for t in raw.split(",") if t.strip()])
+        violations.extend(
+            check_agent_tool_permissions(path.stem, disallowed, xlist))
+    return violations
+
+
 def _check_log_monotonicity() -> list[str]:
     """Verify log.md headers are chronologically ascending.
 
@@ -934,20 +1022,21 @@ def _check_log_monotonicity() -> list[str]:
         text = read_text_cached(LOG_MD)
     except OSError:
         return violations
-    entries: list[tuple[str, int]] = []
-    for m in LOG_HEADER_RE.finditer(text):
-        date = m.group(1)
-        line_no = text[: m.start()].count("\n") + 1
-        entries.append((date, line_no))
+    # Single line-wise scan — the per-match `text[:m.start()].count("\n")`
+    # form is O(headers × file size) and log.md only grows (append-only).
     rel = LOG_MD.relative_to(ROOT).as_posix()
-    for i in range(len(entries) - 1):
-        cur_date, cur_line = entries[i]
-        nxt_date, nxt_line = entries[i + 1]
-        if nxt_date < cur_date:
+    prev_date, prev_line = None, 0
+    for line_no, line in enumerate(text.splitlines(), start=1):
+        m = LOG_HEADER_RE.match(line)
+        if not m:
+            continue
+        date = m.group(1)
+        if prev_date is not None and date < prev_date:
             violations.append(
-                f"{rel}:{nxt_line}: [{nxt_date}] entry follows "
-                f"[{cur_date}] at :{cur_line} (dates must be ascending)"
+                f"{rel}:{line_no}: [{date}] entry follows "
+                f"[{prev_date}] at :{prev_line} (dates must be ascending)"
             )
+        prev_date, prev_line = date, line_no
     return violations
 
 
@@ -1028,9 +1117,8 @@ def run() -> int:
         print(f"FAIL - {language_total} Korean header violation(s)")
         print("Rule: section headers in CLAUDE.md and .claude/commands/*.md must be English.")
 
-    # CLAUDE VOICE pass — guideline antipattern (decision option / reinforcement
-    # counter / introduction timestamp / external case reference / benchmark
-    # absorption narrative). See .claude/policies/claude-guideline-voice.md.
+    # CLAUDE VOICE pass — deliberation narrative (guideline-writing skill,
+    # gdl.no-deliberation-narrative) + project voice patterns.
     voice_issues = _check_claude_voice_violations()
     if voice_issues:
         print(f"\n[Claude guideline voice violations: {len(voice_issues)}]")
@@ -1040,7 +1128,7 @@ def run() -> int:
             "Rule: .claude/commands/*.md, .claude/agents/*.md, CLAUDE.md must "
             "express current policy only — decision history, external case "
             "reference, introduction timestamps belong in log.md. "
-            "See .claude/policies/claude-guideline-voice.md."
+            "See .claude/skills/guideline-writing/SKILL.md."
         )
     else:
         print("OK - no Claude guideline voice antipatterns")
@@ -1084,6 +1172,20 @@ def run() -> int:
         )
     else:
         print("OK - log.md entries are chronologically ordered")
+
+    # AGENT TOOL-PERMISSION pass — X-list ↔ frontmatter disallowedTools parity.
+    tool_perm_issues = _check_agent_tool_permissions()
+    if tool_perm_issues:
+        print(f"\n[Agent tool-permission parity violations: {len(tool_perm_issues)}]")
+        for v in tool_perm_issues:
+            print(v)
+        print(
+            "Rule: a tool named in a role SoT's X-list must appear in that "
+            "file's frontmatter `disallowedTools`, and vice versa. "
+            "See .claude/agents/README.md \"Tool permissions\"."
+        )
+    else:
+        print("OK - agent X-list <-> disallowedTools parity holds")
 
     # HOOK BASH-PREFIX pass — settings.json hook `.sh` commands must lead with `bash`.
     hook_prefix_issues = _check_hook_bash_prefix()
@@ -1202,7 +1304,7 @@ def run() -> int:
     else:
         print("OK - no nested wikilinks in authored content aliases")
 
-    total = integrity_total + language_total + total_drift + len(flat_issues) + len(reserved_issues) + len(log_issues) + len(voice_issues) + len(hook_prefix_issues) + len(hook_channel_issues) + len(hook_utf8_issues) + len(regex_hoist_issues) + len(craft_issues) + len(stale_guide_issues) + len(link_issues) + len(nested_issues)
+    total = integrity_total + language_total + total_drift + len(flat_issues) + len(reserved_issues) + len(log_issues) + len(voice_issues) + len(tool_perm_issues) + len(hook_prefix_issues) + len(hook_channel_issues) + len(hook_utf8_issues) + len(regex_hoist_issues) + len(craft_issues) + len(stale_guide_issues) + len(link_issues) + len(nested_issues)
     if total == 0:
         return 0
     print(f"\nFAIL - {total} meta-schema issue(s)")

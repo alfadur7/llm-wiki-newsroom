@@ -47,11 +47,11 @@ const confirmed = verified.flat().filter(Boolean).filter((r) => r.verdict && r.v
 
 1. Before applying, re-confirm each finding by reading it directly (don't blindly trust an agent's claim).
 2. Code: byte-compile → `python -m pytest tests/` PASS → `python tools/lint.py` EXIT=0 → entry-point smoke run.
-3. Guidelines: `python tools/lint.py meta` PASS (voice antipattern · craft-chain consistency · all items) → for `.claude/` and CLAUDE.md edits, present the Voice Pass evidence.
+3. Guidelines: `python tools/lint.py meta` PASS (voice antipattern · craft-chain consistency · all items) → for `.claude/` and CLAUDE.md edits, present the Guideline Verification Ladder evidence (rungs 1–3).
 4. Gated items are not applied — handle separately after operator approval.
 5. On completion, after operator approval, commit + push to origin (split by logical unit: code / guidelines / regenerated artifacts).
 
 ## Carry-forward
 
-- **Hoisting a shared helper closes a bug class.** If the same defect (e.g. reading a removed `date:` field) is spread across several file copies, one round misses some — consolidating into `_lib` prevents recurrence.
+- **Hoisting a shared helper closes a bug class.** If the same defect (e.g. reading a removed `date:` field) is spread across several file copies, one round misses some — consolidate into `_lib` so the class has a single fix point.
 - **When adding a new operations/skills file, also update the CLAUDE.md "Instruction Locations" + directory-layout lists** — otherwise the next round flags it as misplacement/stale.

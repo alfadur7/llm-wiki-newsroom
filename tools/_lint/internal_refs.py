@@ -8,7 +8,7 @@ as self-meta into the exported corpus (the export dead-strips the link to plain
 text, but the governance phrase still pollutes the prose).
 
 This is the mirror of two existing guards:
-  - `.claude/` guides must not carry decisions/external refs (claude-guideline-voice)
+  - `.claude/` guides must not carry decisions/external refs (guideline-writing skill)
   - L2-2 hubs must not carry editor self-meta (`hub voice`)
 
 Detection is link-based, which is false-positive-free: a *markdown link* whose

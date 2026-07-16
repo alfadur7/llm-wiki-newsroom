@@ -57,6 +57,9 @@ def _drift_group_counts(scan: str) -> tuple[int, int]:
                 cn += 1
     return ov, cn
 AUTO_MARKER_RE = re.compile(r"<!--\s*AUTO:")
+# Ponytail advisory scope — project scripts: tools/ Python + the hook layer
+# itself (.claude/hooks/ py|sh); hook code is as prone to accretion as tools/.
+PONYTAIL_RE = re.compile(r"/tools/.*\.py$|/\.claude/hooks/.*\.(py|sh)$")
 SCRATCH_EXTS = {".py", ".sh", ".tmp", ".scratch", ".ipynb"}
 # Repo root derived from this hook's own location (<root>/.claude/hooks/dispatch.py)
 # so the scratch advisory fires regardless of the clone directory name.
@@ -68,6 +71,10 @@ GUIDE_DIRS = ("/.claude/agents/", "/.claude/commands/", "/.claude/layers/",
 # (NOT lint-scored) — edits here trigger the proposal-validation reflex (2b). Allowlist
 # of the content standards + authoring/review roles; editor-in-chief (routing)·
 # copyeditor (lint)·README (matrix)·skills (lint-scored path) are deliberately out.
+# Behavioral-rule surfaces are also absent on purpose: whether an edit is
+# substantive vs formal cannot be told from a file event — that classification
+# belongs to the ladder's blind-review rung, which routes substantive behavioral
+# changes to the runbook's probe-task variant.
 CRAFT_PROSE_DIRS = ("/.claude/layers/",)
 CRAFT_PROSE_FILES = ("/agents/desk.md", "/agents/reporter.md", "/agents/columnist.md")
 
@@ -118,7 +125,7 @@ Reference: .claude/commands/wiki-lint.md "Required per-target Drift Block"."""
 
 PLAN_MSG = """[minimality-advisory] PLAN FILE WRITE DETECTED
 
-5-step self-check required just before ExitPlanMode (SoT: .claude/policies/no-plan-bloat.md):
+5-step self-check required just before ExitPlanMode (SoT: .claude/skills/guideline-writing/SKILL.md, Bloat control):
 
   1. New section/table/matrix vs absorb one line into an existing section — absorb by default
   2. Zero duplication of another SoT's table/matrix — replace with a cross-reference
@@ -135,26 +142,27 @@ PLAN_MSG = """[minimality-advisory] PLAN FILE WRITE DETECTED
 T1 naming principle: new memory/policy/hook files default to a prescriptive
 `no_X`·`X_to_Y`·`X_not_Y` form. descriptive forms (`*_voice`·`*_posture`) weaken recall.
 
-Reference: .claude/policies/no-plan-bloat.md."""
+Reference: .claude/skills/guideline-writing/SKILL.md (Bloat control)."""
 
 GUIDE_MSG = """[minimality-advisory] GUIDELINE EDIT DETECTED
 
-Claude-guideline-change Voice Pass required just before commit
-(SoT: .claude/agents/editor-in-chief.md § Claude guideline-change Voice Pass):
+Guideline Verification Ladder required just before commit
+(SoT: .claude/agents/editor-in-chief.md § Guideline Verification Ladder):
 
-  1. python tools/lint.py meta — voice group PASS (regex antipattern detection:
-     decision option names·reinforcement round·introduction timestamp·external reference·absorption narrative)
-  2. Slimming check — remove redundancy·decorative sentences·self-evident grounds, absorb into existing sections by default,
-     keep surrounding bullet voice·depth consistent (no verbose additions)
-  3. Qualitative — table-row restatement·self-containment (meaning clear without knowing other docs)·residual decision narrative
+  1. Quantitative lint — python tools/lint.py meta PASS (guideline-writing skill
+     deliberation-narrative detectors + project voice patterns)
+  2. Minimal-edit self-check — skill § Pruning + Bloat control; keep sibling
+     voice/depth; present the check evidence (a bare "passed" is incomplete)
+  3. Blind review (mandatory) — diff-only reviewer, substantive/invariant
+     classification per hunk + gdl.* defects. Severity rule: critical/high fix
+     now + re-pass; medium/low carry to the corpus (log_defect batch)
+  4. Effect-measurement gate — substantive ∧ measurement-obligated type →
+     an accept transition must exist before commit (runbook 3 variants)
 
-Steps 2 and 3 are complete only when the check evidence (edit↔sibling bullet
-length/depth comparison, per-item findings) is presented in the reply — a bare
-"passed" declaration is incomplete.
+Deliberation narrative moves to log.md; the body keeps operative rules only.
 
-Move violating phrasings to log.md + remove them from the body.
-
-Reference: editor-in-chief.md § Voice Pass + policies/claude-guideline-voice.md."""
+Reference: editor-in-chief.md § Guideline Verification Ladder +
+           skills/guideline-writing/SKILL.md."""
 
 PROPOSAL_VALIDATION_MSG = """[proposal-validation-advisory] DESK-JUDGED PROSE GUIDELINE EDIT DETECTED
 
@@ -169,9 +177,10 @@ reflex even without an explicit instruction:
   → desk N≥2 blind scoring → accept = held-in ≥1 improvement ∧ no slice regresses.
   Only on acceptance make the confirmed edit to this file + log the transition (log_defect kind:transition).
 
-Exception (no blind-desk batch needed): lint.py-scored rules (skills craft criteria.json·
-quantitative rubric·policies lint) go through the single lint measurement path (separate)·
-typo·slimming·structural/editorial·cross-reference fixes·routing·gate rules.
+Measurement variant by guideline type (runbook): desk-judged prose → the blind batch
+above · behavioral rule → probe task · lint-scored rule → deterministic before/after.
+Exempt (no measurement): typo·slimming·structural/editorial·cross-reference fixes —
+the ladder's blind-review rung classifies these invariant.
 
 Same applies regardless of origin (evolve session·desk surfacing mid-cycle·self-proposal).
 
@@ -212,8 +221,8 @@ L2-2 stub created/edited. Two follow-up obligations:
    2026-05-20 incident: desk VERIFY₂ of 5 byproduct stubs was missed → 11 defects found after the fact.
    Stubs bypassed by explicit wiki-operator approval fall below the quantitative threshold, so review them at the Desk more strictly.
 
-Reference: .claude/agents/README.md "Authoring Responsibilities"·"Verification
-Ladder" stage 3·"Standard ADAPT chain" + .claude/layers/hub.md "stub authoring"."""
+Reference: .claude/agents/README.md "Authoring Responsibilities"·"Content
+Verification Ladder" stage 3·"Standard ADAPT chain" + .claude/layers/hub.md "stub authoring"."""
 
 PROTECTED_MSG_TMPL = """[protected-path-guard] BLOCKED — {rel}
 
@@ -240,9 +249,10 @@ After ≤ 2 self-attempts for the same reason, PASS or force the handoff (blocks
 Reference: .claude/agents/columnist.md "self-VERIFY₀" + .claude/agents/README.md
            "Standard ADAPT chain" + .claude/agents/copyeditor.md "invocation contract"."""
 
-PONYTAIL_MSG_TMPL = """[ponytail-advisory] tools/ PYTHON AUTHORING — {rel}
+PONYTAIL_MSG_TMPL = """[ponytail-advisory] SCRIPT AUTHORING — {rel}
 
 Before writing/editing this file, load and apply the `ponytail-coding` skill via the Skill tool.
+Ladder rung 1 first: does this need to exist at all? A no-op beats the cleverest implementation.
 The gist: the code you didn't write is best — reuse an existing helper before writing new code.
 Full discipline (the ladder·root-cause·output restraint) SoT: .claude/skills/ponytail-coding/SKILL.md.
 
@@ -267,16 +277,25 @@ def _rel_wiki(path: str) -> str:
     return m.group(1) if m else path
 
 
-def _protected_path(path: str) -> str | None:
+def _protected_path(path: str, tool_name: str = "", content: str = "") -> str | None:
     """Return a reason string if `path` is an auto-generated/immutable target
     that must not be hand-edited via Write|Edit, else None. `path` is slash-
-    normalized."""
+    normalized.
+
+    Inbox WebFetch-fallback exception: the 2nd-stage fetch (wiki-ingest.md
+    Inbox Mode) legitimately Writes a NEW raw/ file whose frontmatter keeps
+    the `source:` URL — a Write to a not-yet-existing raw path with a
+    `source: http...` line passes; Edits and URL-less writes stay blocked.
+    """
     if any(("/" + path).endswith("/" + p) for p in PROTECTED_EXACT):
         return "build artifact"
     if any(rx.search(path) for rx in PROTECTED_GLOB):
         return "build artifact"
     m = re.search(r"/raw/(.+)$", path)
     if m and m.group(1) not in ("_inbox.md", "_archive.md"):
+        if (tool_name == "Write" and not Path(path).exists()
+                and re.search(r"^source:\s*['\"]?https?://", content, re.MULTILINE)):
+            return None
         return "raw/ original (immutable)"
     return None
 
@@ -312,7 +331,7 @@ def run_pre(data: dict) -> int:
     content = tool_input.get("content") or tool_input.get("new_string") or ""
 
     # 0) protected-path guard — blocking (exit 2). Auto-gen/immutable targets.
-    reason = _protected_path(path)
+    reason = _protected_path(path, data.get("tool_name", ""), content)
     if reason:
         print(PROTECTED_MSG_TMPL.format(rel=_rel_wiki(path), reason=reason), file=sys.stderr)
         return 2
@@ -368,9 +387,10 @@ def run_pre(data: dict) -> int:
         if parent.lower() == _REPO_ROOT and ext in SCRATCH_EXTS:
             messages.append(SCRATCH_MSG_TMPL.format(basename=basename))
 
-    # 4) ponytail advisory — tools/ Python authoring (generation-time reflex).
-    if re.search(r"/tools/.*\.py$", path):
-        messages.append(PONYTAIL_MSG_TMPL.format(rel=path.rsplit("/tools/", 1)[-1]))
+    # 4) ponytail advisory — project-script authoring (generation-time reflex).
+    if PONYTAIL_RE.search(path):
+        rel = re.split(r"/(?=tools/|\.claude/hooks/)", path)[-1]
+        messages.append(PONYTAIL_MSG_TMPL.format(rel=rel))
 
     _emit("PreToolUse", messages)
     return 0

@@ -7,8 +7,9 @@ and ingested via `log_defect.py`. Being a prefilter, it prescribes nothing — i
 aggregates and prioritizes; which surface to fix is judged by the Editor-in-Chief who
 reads it (the stage-1 input of the SoT self-evolution workflow).
 
-Grouping key = `mechanism` (an authoring-habit label). The same mechanism is broken out
-by caught_at stage (lint/desk) — which rung it escaped from signals which surface is empty.
+Grouping key = `cluster` (the slugified mechanism-cluster join key shared with
+transitions; legacy records without it fall back to `mechanism`). The same cluster is
+broken out by caught_at stage — which rung it escaped from signals which surface is empty.
 
 Priority = **recurrence after treatment > support count**. A mechanism that was fixed once
 (an accept transition) yet reappeared is top priority (treatment failure). The review window
@@ -61,19 +62,19 @@ def read_watermark() -> str | None:
     return _review.read_watermark(WATERMARK_PATH)
 
 
-def fixed_mechanisms(records: list[dict]) -> set[str]:
-    """Set of mechanisms pointed to by accepted transitions — the recurrence criterion.
+def fixed_clusters(records: list[dict]) -> set[str]:
+    """Set of clusters pointed to by accepted transitions — the recurrence criterion.
 
-    transition.cluster has the form `mechanism` or `mechanism@stage` → take only the part before `@`.
+    transition.cluster has the form `slug` or `slug@stage` → take only the part before `@`.
     """
     return {str(r.get("cluster", "")).split("@")[0]
             for r in records
             if r.get("kind") == "transition" and r.get("decision") == "accept"}
 
 
-def analyze(records: list[dict], since: str | None):
-    """Group defects by mechanism, sorted by (recurrence, support). addressable=false is split out."""
-    fixed = fixed_mechanisms(records)
+def analyze(records: list[dict], since: str | None, pages: bool = False):
+    """Group defects by cluster, sorted by (recurrence, support). addressable=false is split out."""
+    fixed = fixed_clusters(records)
     clusters: dict[str, dict] = defaultdict(
         lambda: {"count": 0, "stages": Counter(), "targets": []})
     blocked: Counter = Counter()  # addressable=false mechanism → count
@@ -84,14 +85,14 @@ def analyze(records: list[dict], since: str | None):
         if since and str(r.get("date", "")) <= since:
             continue
         in_window += 1
-        mech = r.get("mechanism") or "(unknown)"
+        mech = r.get("cluster") or r.get("mechanism") or "(unknown)"
         if r.get("addressable") is False:
             blocked[mech] += 1
             continue
         c = clusters[mech]
         c["count"] += 1
         c["stages"][str(r.get("caught_at", "?")).split(":")[0]] += 1
-        if len(c["targets"]) < 3 and r.get("target"):
+        if (pages or len(c["targets"]) < 3) and r.get("target"):
             c["targets"].append(r["target"])
     ranked = sorted(clusters.items(),
                     key=lambda kv: (kv[0] in fixed, kv[1]["count"]), reverse=True)
@@ -111,16 +112,16 @@ def write_checkpoint(when: str, since: str | None, note: str,
     return entry
 
 
-def mine(since: str | None) -> int:
+def mine(since: str | None, pages: bool = False) -> int:
     records = read_log()
     if not records:
         print(f"no defect corpus at {LOG_PATH} (no defects ingested yet — log_defect.py)",
               file=sys.stderr)
         return 1
-    a = analyze(records, since)
+    a = analyze(records, since, pages=pages)
     print(f"defect corpus: {LOG_PATH.name} ({sum(1 for r in records if r.get('kind')=='defect')} defect)")
     print(f"review window: {('after ' + since) if since else 'ALL (no watermark)'}")
-    print(f"in-window defects: {a['in_window']}  ·  already-treated mechanisms: {len(a['fixed'])}")
+    print(f"in-window defects: {a['in_window']}  ·  already-treated clusters: {len(a['fixed'])}")
     print()
     print("=== Recurring defects (recurrence after treatment ▶ first) ===")
     if not a["ranked"]:
@@ -129,7 +130,8 @@ def mine(since: str | None) -> int:
         flag = "▶recur" if mech in a["fixed"] else "      "
         stages = " ".join(f"{s}:{n}" for s, n in c["stages"].most_common())
         print(f"  {flag} {c['count']:4d}  {mech}  [{stages}]")
-        print(f"            e.g.: {', '.join(c['targets'])}")
+        label = 'pages' if pages else 'e.g.'
+        print(f"            {label}: {', '.join(c['targets'])}")
     if a["blocked"]:
         print()
         print("=== Won't patch (addressable=false — source quality, contested topics, tool limits) ===")
@@ -146,6 +148,7 @@ def main() -> int:
     p.add_argument("--checkpoint", nargs="?", const="", default=None,
                    help="confirm review complete — advance the watermark to today (or a given YYYY-MM-DD)")
     p.add_argument("--note", default="", help="review note to record in the history on --checkpoint")
+    p.add_argument("--pages", action="store_true", help="list every defect page per cluster (default: 3 examples)")
     args = p.parse_args()
     if args.checkpoint is not None:
         when = args.checkpoint or date.today().isoformat()
@@ -160,7 +163,7 @@ def main() -> int:
                   f"(0 = settled)")
         return 0
     since = None if args.all else (args.since or read_watermark())
-    return mine(since)
+    return mine(since, pages=args.pages)
 
 
 if __name__ == "__main__":

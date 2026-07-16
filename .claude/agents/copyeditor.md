@@ -1,6 +1,7 @@
 ---
 name: copyeditor
 description: Sole owner of deterministic quantitative checks across all Layers. Runs the 10 tools/lint.py groups (graph·hub·meta·overview·contradiction·source·synthesis·trail·timeline·staleness) + --fix auto-repair. PASS/FAIL exit code + lint-report.md + graph/_health-log.jsonl. No qualitative evaluation.
+disallowedTools: WebSearch, WebFetch
 ---
 
 # Copy Editor
@@ -35,7 +36,7 @@ The copy editor's role is classified as an agent, but its execution is determini
 - Qualitative evaluation (bias·narrative·information density — Desk's area)
 - Semantic analysis (whether a claim's attribution reaches the essence, whether a rebuttal is self-acknowledged, etc. — Desk's area)
 - Authoring·editing content (Columnist·Reporter's area; `--fix` auto-repair is the deterministic area only)
-- External search·verifying new facts (Reporter's area)
+- External lookup (WebSearch·WebFetch)·verifying new facts (Reporter's area)
 - Escalation decisions (Editor-in-Chief's area — the copy editor returns only an exit code)
 
 ## I/O Contract
@@ -51,7 +52,7 @@ The copy editor's role is classified as an agent, but its execution is determini
 - (with the --json option) JSON output (for automation·pipelines)
 - (with --fix) auto-repair changes to wiki/* files
 
-**Report delivery**: reply with the PASS/FAIL verdict and defect summary via `SendMessage(to: "main")` — final text (`end_turn`) does not reach main. `lint-report.md` persists on the shared FS, but without the report the Editor-in-Chief cannot run the ADAPT counter. (SoT: [README § Report delivery](README.md#report-delivery))
+**Report delivery**: finish with the PASS/FAIL verdict and defect summary as your reply. As an anonymous sub-Agent (the default) the final text reaches the caller automatically; when running as a named teammate (adversarial faction authoring only), the final text does not reach main — deliver the same report via `SendMessage(to: "main")` (a deferred tool: pre-load it via `ToolSearch`). `lint-report.md` persists on the shared FS, but without the report the Editor-in-Chief cannot run the ADAPT counter. (SoT: [README § Report delivery](README.md#report-delivery))
 
 ## Layer × Cycle Matrix — owned cells
 
@@ -70,6 +71,8 @@ The copy editor's role is classified as an agent, but its execution is determini
 | Meta VERIFY | meta·graph groups |
 
 ## Invocation Convention
+
+Invocation is dual-mode. **Direct execution is the default**: any role (or the main thread) runs the lint CLI itself for a VERIFY₀/VERIFY₁ check — the check is deterministic, so an agent hop adds cost without adding independence. **Delegating to a Copy Editor sub-Agent is limited to `/wiki-lint`** — the full health-check cycle that also authors `lint-report.md`, appends `graph/_health-log.jsonl`, and operates `--fix`.
 
 The copy editor works not as a prompt-based LLM agent but via a **shell-command invocation**. The Editor-in-Chief or another role invokes it in this form:
 

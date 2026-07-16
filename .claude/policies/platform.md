@@ -14,6 +14,10 @@ The Python call above is the standard — patterns that work around it by creati
 
 The default stdout encoding of Windows `python`/`python3` is cp949 — printing UTF-8 non-ASCII to the console breaks it as mojibake or corrupts it into lone surrogates that contaminate the whole session. `PYTHONUTF8=1` in the `env` of [`settings.json`](../settings.json) forces UTF-8 stdout for **all** python calls in Bash and PowerShell (ad-hoc `python -c` · `tools/*.py` · analysis scripts · hooks) — global and automatic, no need to memorize a per-call prefix. The `PYTHONUTF8=1 python3` prefix in hook scripts is kept as a double safeguard against environments where env is not applied (a different device, a missing env key), and `python tools/lint.py meta` checks for it.
 
+## raw/ Is Not Searchable with the Grep Tool
+
+`.gitignore` covers `raw/*/`, and ripgrep (the Grep tool's engine) silently skips ignored files — a Grep over `raw/` therefore always returns 0 hits and reads as "no match" when the truth is "not searched." To search raw originals, use `rg --no-ignore` or a plain `grep -c` with an explicit file path from Bash.
+
 ## PowerShell vs Bash
 
 Per the Claude Code environment memo, this project's Primary Shell is PowerShell. Run POSIX scripts with the Bash tool, but general system calls (file listing, git, python, etc.) can use either. Read non-Latin filenames via the Bash + Python workaround above.

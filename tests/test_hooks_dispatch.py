@@ -162,8 +162,17 @@ def test_ponytail_advisory_tools_python(capsys):
     assert "[ponytail-advisory]" in _payload(capsys)
 
 
+def test_ponytail_advisory_hook_scripts(capsys):
+    # The hook layer itself is in scope — .py and .sh under .claude/hooks/.
+    dispatch.run_pre(_input("Edit", "/r/.claude/hooks/dispatch.py", new_string="x"))
+    ctx = _payload(capsys)
+    assert "[ponytail-advisory]" in ctx and ".claude/hooks/dispatch.py" in ctx
+    dispatch.run_pre(_input("Write", "/r/.claude/hooks/new-guard.sh", content="#!/bin/sh"))
+    assert "[ponytail-advisory]" in _payload(capsys)
+
+
 def test_ponytail_advisory_scope(capsys):
-    # .py outside tools/ and non-.py inside tools/ do not fire.
+    # .py outside tools//hooks and non-script files inside them do not fire.
     assert dispatch.run_pre(_input("Write", "/r/scratch/foo.py", content="x")) == 0
     assert capsys.readouterr().out == ""
     dispatch.run_pre(_input("Write", "/r/tools/README.md", content="x"))
@@ -181,6 +190,35 @@ def test_protected_path_blocks_build_output(capsys):
 
 def test_protected_path_blocks_raw_originals(capsys):
     rc = dispatch.run_pre(_input("Edit", "/r/raw/NewsScrap/foo.md", new_string="x"))
+    assert rc == 2
+    assert "immutable" in capsys.readouterr().err
+
+
+def test_raw_webfetch_fallback_write_passes(tmp_path, capsys):
+    # Inbox 2nd-stage fallback: a Write of a NEW raw file whose frontmatter
+    # keeps the `source:` URL is the sanctioned fetch path — not blocked.
+    p = tmp_path / "raw" / "NewsScrap" / "new-article.md"
+    rc = dispatch.run_pre(_input(
+        "Write", str(p),
+        content="---\nsource: https://example.com/a\n---\nbody"))
+    assert rc == 0
+    assert capsys.readouterr().err == ""
+
+
+def test_raw_write_without_source_url_still_blocked(tmp_path, capsys):
+    p = tmp_path / "raw" / "NewsScrap" / "no-url.md"
+    rc = dispatch.run_pre(_input("Write", str(p), content="---\ntitle: x\n---\nbody"))
+    assert rc == 2
+    assert "immutable" in capsys.readouterr().err
+
+
+def test_raw_edit_with_source_url_still_blocked(tmp_path, capsys):
+    # Only NEW Writes are excused — an Edit to an existing raw stays blocked.
+    p = tmp_path / "raw" / "NewsScrap" / "existing.md"
+    p.parent.mkdir(parents=True)
+    p.write_text("---\nsource: https://example.com/a\n---\nbody", encoding="utf-8")
+    rc = dispatch.run_pre(_input(
+        "Edit", str(p), new_string="source: https://example.com/a\nmore"))
     assert rc == 2
     assert "immutable" in capsys.readouterr().err
 

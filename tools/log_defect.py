@@ -15,22 +15,27 @@ self-VERIFY₀ + VERIFY₁ + regression repetition double-counts the same FAIL a
 commit noise. One batch → low noise.
 
 Two record kinds (`kind`):
-- defect:     {date, layer, target, caught_at, check, mechanism, severity, addressable, run}
-- transition: {date, cluster, surface, change, held_in_delta, held_out_delta, decision, commit,
-               held_in_sampled, held_out_sampled}  # fresh-sampled page lists (audit · anti-cherry-pick)
+- defect:     {date, layer, target, caught_at, check, cluster, mechanism, severity, addressable, run}
+- transition: {date, cluster, surface, change, held_in_delta, held_out_delta, decision,
+               rationale, model, commit, held_in_sampled, held_out_sampled}
 
-caught_at has the form `<stage>:<detail>` (e.g. `lint:source`, `desk:density`) — the
-leading segment (lint/desk) carries which rung of the verification ladder it escaped
-from, signaling which surface is empty.
+`cluster` is the slugified mechanism-cluster key (kebab-case; transitions may
+suffix `@<stage>`) — the join key between defects, transitions, and the
+mine_failures grouping. `mechanism` stays as an optional free-text label.
+caught_at has the form `<stage>:<detail>` (e.g. `lint:source`, `desk:density`) —
+the leading segment carries which verification surface caught it. Transition
+`rationale` (one-line why) + `model` (which model produced the measured output)
+make the accept/reject ledger auditable.
 
 Usage:
-    echo '{"kind":"defect","target":"...","mechanism":"...","caught_at":"lint:source"}' \
+    echo '{"kind":"defect","target":"...","cluster":"...","caught_at":"lint:source"}' \
         | python tools/log_defect.py
     python tools/log_defect.py < records.json   # accepts either a JSON array or JSONL
 """
 from __future__ import annotations
 
 import json
+import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -41,9 +46,14 @@ LOG_PATH = Path(__file__).resolve().parent / "_defect-log.jsonl"
 
 # Required keys per kind — reject if missing (prevents a garbage corpus). Other keys are free.
 REQUIRED = {
-    "defect": ("target", "mechanism", "caught_at"),
-    "transition": ("cluster", "surface", "decision"),
+    "defect": ("target", "cluster", "caught_at"),
+    "transition": ("cluster", "surface", "decision", "rationale", "model"),
 }
+# `cluster` join key: kebab-case slug; transitions may carry an `@<stage>` suffix.
+SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*(@[a-z0-9-]+)?$")
+DECISIONS = ("accept", "reject", "defer")
+# Verification surfaces a defect can escape from / be caught at (caught_at prefix).
+STAGES = ("lint", "desk", "blind", "probe")
 
 
 def parse_records(raw: str) -> list[dict]:
@@ -76,6 +86,14 @@ def validate(rec: dict) -> str | None:
     missing = [k for k in REQUIRED[kind] if not rec.get(k)]
     if missing:
         return f"{kind} missing required keys: {missing}"
+    if not SLUG_RE.match(str(rec["cluster"])):
+        return f"cluster must be a kebab-case slug (got {rec['cluster']!r})"
+    if kind == "transition" and rec["decision"] not in DECISIONS:
+        return f"decision must be one of {list(DECISIONS)} (got {rec['decision']!r})"
+    if kind == "defect":
+        stage = str(rec["caught_at"]).split(":")[0]
+        if stage not in STAGES:
+            return f"caught_at stage must be one of {list(STAGES)} (got {stage!r})"
     return None
 
 

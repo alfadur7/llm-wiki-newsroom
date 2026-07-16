@@ -45,6 +45,11 @@
       {"pattern": "(timing|scale|schedule).{0,10}(firmed up|confirmed|changed)", "weight": 0.5}
     ],
     "real": [
+      {"pattern": "(file[sd]?|filing|faces?|facing) (a |an )?(lawsuit|suit|antitrust complaint|class action)", "weight": 0.8},
+      {"pattern": "\\bsue[sd]?\\b|\\bsuing\\b|\\blitigation against\\b", "weight": 0.8},
+      {"pattern": "antitrust (complaint|probe|investigation|action|case)", "weight": 0.7},
+      {"pattern": "(regulatory|corrective|cease.and.desist) order|injunction against", "weight": 0.7},
+      {"pattern": "appeal(s|ed|ing)? (the |a )?(ruling|decision|verdict|order|fine)", "weight": 0.7},
       {"pattern": "\\bvs\\b", "weight": 0.7},
       {"pattern": "\\b(whereas|conversely|by contrast)\\b", "weight": 0.6},
       {"pattern": "the (exact )?opposite|diametrically opposed", "weight": 0.8},

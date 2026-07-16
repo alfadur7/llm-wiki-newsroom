@@ -1,0 +1,52 @@
+{
+  "skill": "guideline-writing",
+  "_note": "Guideline-authoring craft criteria, single SoT. judge=A `gdl.no-deliberation-narrative` is measured by `evaluate_deliberation_narrative` in checks.py — the caller (tools/_lint/meta_schema.py voice pass) injects the target text; the count of matches must be <= 0. judge=M criteria keep definition + pass_condition and are applied in the blind review pass (SKILL.md 'Blind Review Protocol'). Authoring prose with examples is in SKILL.md.",
+  "criteria": {
+    "gdl.no-deliberation-narrative": {
+      "name": "No deliberation narrative", "dimension": "Operative voice", "judge": "A",
+      "algorithm": "evaluate_deliberation_narrative", "comparator": "<=", "default_threshold": 0,
+      "source": "Recitals vs operative provisions — EU legislative drafting guide", "source_url": "https://eur-lex.europa.eu/content/techleg/EN-legislative-drafting-guide.pdf",
+      "note": "Decision option names, reinforcement counters, introduction timestamps, changelog sections, and recurrence-prevention narratives are recital material — history belongs in log.md, the body states only current policy."
+    },
+    "gdl.rule-not-reason": {
+      "name": "Rule, not reason", "dimension": "Operative voice", "judge": "M",
+      "pass_condition": "Each rule states what to do and when; any rationale is at most one line naming the trigger condition, never a narrative of how the rule was decided."
+    },
+    "gdl.reason-not-pointer": {
+      "name": "Local obligation, pointer for depth", "dimension": "Operative voice", "judge": "M",
+      "pass_condition": "A rule states its obligation locally in one sentence; a cross-reference supplies depth but never replaces the obligation ('see X' alone is not a rule)."
+    },
+    "gdl.exception-reasoned": {
+      "name": "Exceptions carry their condition", "dimension": "Operative voice", "judge": "M",
+      "pass_condition": "Every exception names the condition that licenses it; a bare 'except X' without a licensing condition fails."
+    },
+    "gdl.universal-claim-verified": {
+      "name": "Universal claims verified", "dimension": "Accuracy", "judge": "M",
+      "pass_condition": "Universal quantifiers about system behavior ('always', 'never', 'every') appear only when verified against the current code/corpus or qualified ('as measured', 'currently')."
+    },
+    "gdl.sot-link-not-restate": {
+      "name": "Link the SoT, do not restate it", "dimension": "Single source of truth", "judge": "M",
+      "pass_condition": "No paragraph re-narrates a policy already stated by a table row or another SoT; the duplicate is replaced with a cross-reference."
+    },
+    "gdl.self-contained": {
+      "name": "Self-contained meaning", "dimension": "Executability", "judge": "M",
+      "pass_condition": "A reader can state what the rule obliges without opening another document, prior session context, or history."
+    },
+    "gdl.executable": {
+      "name": "Executable by a fresh reader", "dimension": "Executability", "judge": "M",
+      "pass_condition": "A Claude with no prior knowledge can perform the procedure from the text alone — inputs, order, and completion criteria are all present (the Claude-reproducibility principle)."
+    },
+    "gdl.normative-restraint": {
+      "name": "One force tier per rule", "dimension": "Normative force", "judge": "M",
+      "pass_condition": "Each rule sits at exactly one MUST/SHOULD/MAY tier with tier-consistent wording; hedged stacks ('should generally always') fail."
+    },
+    "gdl.prune-or-enforce": {
+      "name": "Prune or enforce", "dimension": "Corpus hygiene", "judge": "M",
+      "pass_condition": "Every rule has an enforcement surface (lint, hook, review lens) or a deletion rationale; rules kept 'as documentation' fail."
+    },
+    "gdl.absorb-before-adding": {
+      "name": "Absorb before adding", "dimension": "Corpus hygiene", "judge": "M",
+      "pass_condition": "A new section, table, or file exists only where absorption into an existing pattern was checked and does not fit (SKILL.md 'Bloat Control' 5-step + red flags)."
+    }
+  }
+}
