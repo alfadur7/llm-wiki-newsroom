@@ -130,8 +130,17 @@ ACCEPTABLE_FAILS = 10
 # entity stub creation and source-schema claimant fixability).
 # Adding a slug here MUST cite the policy clause that justifies permanent
 # residual status (single-cite claim source · generic-noun form · no multi-cluster appearance).
-# Empty in this distribution — entries accumulate as the operated corpus does.
-INTRINSICALLY_UNFIXABLE_SOURCES: set[str] = set()
+# Entries accumulate as the operated corpus does.
+INTRINSICALLY_UNFIXABLE_SOURCES: set[str] = {
+    # Bradley Kuhn / Software Freedom Conservancy — single-cite claim source, no
+    # multi-cluster appearance: 1 source ∩ 1 cluster across all four name variants
+    # ("Software Freedom Conservancy", "Bradley Kuhn", "Conservancy", "SFC"),
+    # so it fails the naming.md entity-addition threshold (≥3 sources ∩ ≥2 clusters).
+    # The claimant is carried as plain text rather than linked to a hub that does
+    # not exist. Reopen per layers/source.md § whitelist operation once the
+    # threshold is met: create the stub → restore the wikilink → drop this entry.
+    "case-against-osaid",
+}
 
 # Required Rubric criteria — any FAIL on these
 # keys causes a non-zero exit (subject to ACCEPTABLE_FAILS at corpus level).

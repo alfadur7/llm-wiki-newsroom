@@ -15,4 +15,4 @@ Mozilla is the nonprofit-backed technology organization that publicly endorsed t
 - [[OpenSourceInitiative]] — the body whose definition Mozilla endorses
 - [[OpenSourceAI]] — the definition Mozilla champions
 - [[OpenWashing]] — the practice Mozilla says the definition helps combat
-- [[TrainingData]] — the area Mozilla concedes needs refinement
+- [[TrainingData]] — the aspect Mozilla acknowledges some disagree with

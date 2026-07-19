@@ -12,12 +12,12 @@ This wiki maps the debate over what "open source" should mean for AI systems. Th
 
 - 2025-05-19 — A legal primer frames the open-weights middle ground against the strict definition, using [[DeepSeek]] R1 as its leading example.
 - 2025-01 — [[DeepSeek]] releases R1 with MIT-licensed weights but withheld training data, the defining open-weights case.
-- 2024-12-05 — Criticism of the definition's omission of open training data is rounded up, led by the [[FreeSoftwareFoundation]] and OSI co-founder Bruce Perens.
-- 2024-10-28 — The [[OpenSourceInitiative]] releases the Open Source AI Definition 1.0; [[Mozilla]] endorses it the same day, and [[Meta]]'s Llama is judged non-compliant.
+- 2024-12-05 — Criticism of the definition's omission of open training data is rounded up, led by critics from Debian, the Software Freedom Conservancy, and OSI co-founder Bruce Perens, with the [[FreeSoftwareFoundation]] anchoring the position.
+- 2024-10-28 — The [[OpenSourceInitiative]] releases the Open Source AI Definition 1.0; [[Mozilla]] endorses it the same day, and [[Meta]]'s Llama 2 is judged non-compliant.
 
 ## 1. [[open-source-ai-definition|Open-Source AI Definition]]
 
-On 2024-10-28 the [[OpenSourceInitiative]] released the Open Source AI Definition 1.0, the first binary standard for open AI: a system either grants the four freedoms — use, study, modify, share — or it does not, and qualifying requires data information, source code, and parameters. OSI validated Pythia, OLMo, Amber, CrystalCoder, and T5, and judged Llama non-compliant.
+On 2024-10-28 the [[OpenSourceInitiative]] released the Open Source AI Definition 1.0, the first binary standard for open AI: a system either grants the four freedoms — use, study, modify, share — or it does not, and qualifying requires data information, source code, and parameters. OSI validated Pythia, OLMo, Amber, CrystalCoder, and T5, and judged Llama 2 non-compliant.
 
 The grouping's actors split three ways. The [[OpenSourceInitiative]] is the standard-setter; [[Mozilla]] is the prominent endorser, framing openness as an AI-safety precondition; the [[FreeSoftwareFoundation]] anchors a broader critic coalition building a stricter alternative. The anchor concept is [[OpenSourceAI]], and the contested component is [[TrainingData]].
 

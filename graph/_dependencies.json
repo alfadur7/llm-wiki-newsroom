@@ -58,7 +58,7 @@
       "upstream_max_date": "2026-06-26"
     },
     "entities/OpenSourceInitiative.md": {
-      "last_updated": "2026-06-26",
+      "last_updated": "2026-07-19",
       "upstream": [
         "sources/osi-open-source-ai-definition.md",
         "sources/case-against-osaid.md",
@@ -84,7 +84,7 @@
       "upstream_max_date": "2026-06-26"
     },
     "concepts/OpenSourceAI.md": {
-      "last_updated": "2026-06-26",
+      "last_updated": "2026-07-19",
       "upstream": [
         "sources/osi-open-source-ai-definition.md",
         "sources/mozilla-celebrates-osaid.md",
@@ -112,7 +112,7 @@
       "upstream_max_date": "2026-06-26"
     },
     "concepts/TrainingData.md": {
-      "last_updated": "2026-07-01",
+      "last_updated": "2026-07-19",
       "upstream": [
         "sources/case-against-osaid.md",
         "sources/osi-open-source-ai-definition.md",
@@ -131,7 +131,7 @@
       "upstream_max_date": "2026-07-01"
     },
     "overviews/open-source-ai-definition.md": {
-      "last_updated": "2026-07-17",
+      "last_updated": "2026-07-19",
       "upstream": [
         "concepts/OpenSourceAI.md",
         "concepts/TrainingData.md",
@@ -139,7 +139,7 @@
         "entities/Mozilla.md",
         "entities/OpenSourceInitiative.md"
       ],
-      "upstream_max_date": "2026-07-01"
+      "upstream_max_date": "2026-07-19"
     },
     "overviews/open-weights.md": {
       "last_updated": "2026-06-26",
@@ -151,7 +151,7 @@
       "upstream_max_date": "2026-06-26"
     },
     "contradictions/open-training-data-requirement.md": {
-      "last_updated": "2026-06-26",
+      "last_updated": "2026-07-19",
       "upstream": [
         "sources/case-against-osaid.md"
       ],
@@ -163,7 +163,7 @@
       "upstream_max_date": null
     },
     "syntheses/open-source-ai-every-camp-standard.md": {
-      "last_updated": "2026-07-01",
+      "last_updated": "2026-07-19",
       "upstream": [
         "sources/osi-open-source-ai-definition.md",
         "sources/case-against-osaid.md",
@@ -179,7 +179,7 @@
         "overviews/open-source-ai-definition.md",
         "overviews/open-weights.md"
       ],
-      "upstream_max_date": "2026-07-17"
+      "upstream_max_date": "2026-07-19"
     },
     "contradiction.md": {
       "last_updated": null,
@@ -187,7 +187,7 @@
         "contradictions/open-training-data-requirement.md",
         "contradictions/other-fragmentary.md"
       ],
-      "upstream_max_date": "2026-06-26"
+      "upstream_max_date": "2026-07-19"
     }
   }
 }

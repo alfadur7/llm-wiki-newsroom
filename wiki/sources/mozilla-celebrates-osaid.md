@@ -11,7 +11,7 @@ last_updated: 2026-06-26
 
 ## Summary
 
-In a post by Ayah Bdeir, Imo Udom, and Nik Marda, Mozilla endorses the Open Source Initiative's new Open Source AI Definition as an important step forward. It argues a shared, binary definition brings clarity for developers, advocates, and regulators and helps combat open-washing, while conceding that the definition's treatment of training data is imperfect and will need refinement over time.
+In a post by Ayah Bdeir, Imo Udom, and Nik Marda, Mozilla endorses the Open Source Initiative's new Open Source AI Definition as an important step forward. It argues a shared, binary definition brings clarity for developers, advocates, and regulators and helps combat open-washing, while acknowledging that some may disagree with aspects such as its treatment of training data, and that the definition will need refinement over time.
 
 ## Key Claims
 
@@ -30,4 +30,4 @@ In a post by Ayah Bdeir, Imo Udom, and Nik Marda, Mozilla endorses the Open Sour
 - references: [[OpenSourceInitiative]] — author of the definition
 - references: [[OpenWashing]] — the practice Mozilla says the definition helps combat
 - references: [[Meta]] — Llama 3 cited as an "open-ish" example
-- references: [[TrainingData]] — the area Mozilla concedes needs refinement
+- references: [[TrainingData]] — the aspect Mozilla acknowledges some disagree with

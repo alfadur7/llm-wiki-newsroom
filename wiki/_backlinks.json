@@ -55,6 +55,10 @@
       "title": "Open Source Initiative"
     },
     {
+      "from": "concepts/OpenSourceAI.md",
+      "title": "Open Source AI"
+    },
+    {
       "from": "concepts/TrainingData.md",
       "title": "Training Data"
     }
@@ -327,6 +331,12 @@
     {
       "from": "concepts/OpenWeights.md",
       "title": "Open Weights"
+    }
+  ],
+  "open-training-data-requirement": [
+    {
+      "from": "concepts/OpenSourceAI.md",
+      "title": "Open Source AI"
     }
   ]
 }
