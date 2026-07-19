@@ -755,6 +755,31 @@ def _claims_staleness_line(
     )
 
 
+def _reground_status_line(claims: list[dict]) -> str | None:
+    """Follow-up reground surface — claims whose own source reports the dispute
+    settled (`type: superseded`) while they stay `status: open`.
+
+    The comparison is exact, but `type` is a regex auto-classification, so a hit
+    means "worth re-adjudicating", not "provably settled". Hence **advisory
+    only**: deciding a dispute is actually settled is a Desk judgment ending at
+    the operator gate, never an automatic close.
+
+    Nothing writes `status: "resolved"` today — `_build/contradictions.py` stamps
+    every claim `open` on each build — so an item surfaced here re-fires on every
+    run until an adjudication ledger exists. The first non-empty surface is the
+    trigger to build one (SoT: CLAUDE.md § Reground, follow-up trigger)."""
+    stuck = [c for c in claims
+             if c.get("type") == "superseded" and c.get("status") == "open"]
+    if not stuck:
+        return None
+    shown = ", ".join(c.get("id", "?") for c in stuck[:10])
+    more = f" (+{len(stuck) - 10} more)" if len(stuck) > 10 else ""
+    return (
+        f"    [Reground status] {len(stuck)} superseded claim(s) still open: "
+        f"{shown}{more} ⚠️  — re-adjudicate via Desk → operator gate"
+    )
+
+
 def _format_metrics_line(m: dict, exempt: set[str] | None = None) -> list[str]:
     """Render Rubric metrics as advisory lines.
 
@@ -978,13 +1003,22 @@ def _check_contradictions_md(
     # F2 — head-matter statistics match JSON SoT.
     # Claim count stat: "**N source-to-source contradictions**" vs len(claims).
     # Theme count stat: "M topic clusters" vs the non-fragmentary theme count.
-    claim_stat_match = L24_CLAIMS_STAT_RE.search(content)
+    # The claim stat is checked at EVERY occurrence, not just the head: a
+    # delta-only re-ground updates the head sentence and leaves stale copies
+    # mid-body, which a head-only check passes. The bold delimiter makes the
+    # pattern specific enough to scan the whole document without false hits;
+    # informal restatements ("accumulated N claims") stay out of scope and
+    # belong to the Desk bundle re-read.
+    claim_stat_matches = list(L24_CLAIMS_STAT_RE.finditer(content))
     theme_stat_match = L24_THEMES_STAT_RE.search(content)
     f2_drift: list[str] = []
-    if claim_stat_match:
-        declared_claims = int(claim_stat_match.group(1).replace(",", ""))
-        if declared_claims != claim_count:
-            f2_drift.append(f"claims declared={declared_claims} actual={claim_count}")
+    if claim_stat_matches:
+        declared_set = {int(m.group(1).replace(",", "")) for m in claim_stat_matches}
+        off = sorted(d for d in declared_set if d != claim_count)
+        if off:
+            detail = ",".join(str(d) for d in off)
+            occ = f" across {len(claim_stat_matches)} occurrences" if len(claim_stat_matches) > 1 else ""
+            f2_drift.append(f"claims declared={detail} actual={claim_count}{occ}")
     else:
         f2_drift.append("claims stat regex not matched")
     if theme_stat_match:
@@ -1624,6 +1658,10 @@ def run(target: str | None = None, fix: bool = False, auto_yes: bool = False) ->
             )
             for line in aggregate_metrics:
                 print(line)
+        reground_status = _reground_status_line(claims)
+        if reground_status:
+            print("\n[Reground — follow-up trigger, advisory]")
+            print(reground_status)
 
     drift_notes: list[str] = []
     if scope != "aggregate":

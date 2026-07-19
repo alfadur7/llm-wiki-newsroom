@@ -309,6 +309,9 @@ Calls `python tools/lint.py contradiction [<target>]` to output:
 - **JSON↔MD mapping**: JSON-only slug (MD not created) · MD-only slug (orphan MD)
 - **frontmatter `sources:` ↔ JSON-implied sources drift** (informational)
 - **Rubric metrics**: each theme file's `[Rubric]` (Part 1 automatic metrics) + aggregate's `[Rubric L2-4]` (Part 2 automatic metrics). The automatic-metric count · number of output lines are SoT in the relevant Part of `.claude/layers/contradiction.md`
+- **`[Reground status]`** (advisory, aggregate scope): claims auto-classified `type: superseded` yet still `status: open`. Never affects the exit code, never auto-closes; re-adjudication is a Desk judgment ending at the operator gate (SoT: CLAUDE.md § Reground)
+
+F2 checks the canonical claim total at **every** occurrence in `wiki/contradiction.md`, not only the head sentence — a delta-only re-ground leaves stale copies mid-body.
 
 Exit code 0 means schema · mapping within scope pass. 1 means issues remain.
 

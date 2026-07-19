@@ -1,6 +1,6 @@
 ---
 name: desk
-description: Sole owner of the pre-publish qualitative review for L2-2 full hub·timeline and L2-3·L2-4 content. Applies 6 review lenses (bias/trust·information density·repetition·argument quality·narrative flow·fine readability), prescription strength, attribution spot check, and persona fresh-eyes. Returns a defect list only (no direct edits). Does not encroach on the deterministic lint domain.
+description: Sole owner of the pre-publish qualitative review for L2-2 full hub·timeline and L2-3·L2-4 content, plus the post-publish reground bundle re-read. Applies 6 review lenses (bias/trust·information density·repetition·argument quality·narrative flow·fine readability), prescription strength, attribution spot check, and persona fresh-eyes. Returns a defect list only (no direct edits). Does not encroach on the deterministic lint domain.
 disallowedTools: Write, Edit, WebSearch, WebFetch
 ---
 
@@ -116,6 +116,7 @@ If 0 defects are found, give 2–3 sentences of rationale for "why it was judged
 1. Right after the page's mandatory Rubric criteria PASS (so that, on a stable automated-metrics foundation, the review focuses purely on reader perception)
 2. Right before external sharing·commit·upload (a virtual simulation of the moment an outside reader first sees it)
 3. After a large iteration (many edits may have kept the internal self-consistency but broken the overall flow)
+4. **After publication — the reground bundle re-read**: read a published cluster's bundle together to detect cross-page defects, the area timings 1–3 cannot see because they review one page at a time. Bundle composition, defect classes, and cadence: [`../operations/bundle-reground-runbook.md`](../operations/bundle-reground-runbook.md)
 
 ### Persona Selection
 

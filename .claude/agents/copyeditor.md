@@ -94,7 +94,12 @@ python tools/lint.py [<group>] [<subcmd|target>] [--fix] [--json]
 **Risk — encroaching on the qualitative area (overreaching dictionary additions)**:
 Trying to catch qualitative defects that dictionaries·thresholds cannot catch, by overstretching the dictionary, explodes false positives.
 
-**Mitigation**: when adding to the dictionary, maintain the division-of-labor principle with the Desk's area. The qualitative area is the Desk's responsibility — the copy editor handles only dictionaries·thresholds·counts.
+**Mitigation**: when adding to the dictionary, maintain the division-of-labor principle with the Desk's area. The qualitative area is the Desk's responsibility — the copy editor handles only dictionaries·thresholds·counts. When a newly added detector's false positives exceed half its hits on live measurement, **narrow its scope rather than widening the pattern** — a channel that fires mostly noise trains its reader to ignore it, which costs more than the missed detections.
+
+**Risk — surfacing a drift whose two sides are both machine-written**:
+When a check compares two values that are both auto-generated (an AUTO-block count against a generated catalog header), reporting the mismatch as a defect is a band-aid: no author can edit generated output, so the advisory recurs on every run while the real fault — two generators disagreeing on one membership rule — stays hidden.
+
+**Mitigation**: surface a count drift only when an author can edit one side (prose restating a generated number). **When both sides are machine-written, the defect belongs to the generator** — make the build produce agreeing values, and pin the agreement with a regression test, since a membership rule duplicated across two functions diverges again.
 
 **Risk — ambiguous `--fix` auto-repair scope**:
 If repair reaches beyond the formattable area (whitespace·typo·section-name normalization) into meaning-affecting changes, the determinism guarantee breaks.

@@ -24,7 +24,7 @@ Per-role capabilities, prompts, and risk mitigations: [`.claude/agents/`](.claud
 
 ## Universal Cycle
 
-Every workflow in this project maps onto a four-stage cycle — ingest, query, lint, and overview/contradiction rewrite all share the same skeleton.
+Every workflow in this project maps onto a four-stage cycle — ingest, query, lint, and reground all share the same skeleton.
 
 | Stage | Essence | Owner |
 |---|---|---|
@@ -34,6 +34,16 @@ Every workflow in this project maps onto a four-stage cycle — ingest, query, l
 | **ADAPT** | On VERIFY failure, return to GROUND | Reporter / Columnist (no qualitative self-review) |
 
 **The 5 invariants** (APPLY stage): read first, follow the pattern, preserve policy, minimal change, stay in scope.
+
+### Reground
+
+The workflow that re-aligns the derived layer (L2-3 · L2-4 + L2-2 hub·timeline) with ground truth — **published pages come back around as GROUND input**. The blind spot it closes: the quality machinery points only at sources, so nothing ever re-reads whether the pages the wiki itself produced have drifted. Three triggers (condition → realign against · surfacing · execution):
+
+- **Update** — upstream sources changed → the sources · `lint staleness` · [`staleness-reground-runbook`](.claude/operations/staleness-reground-runbook.md) (Columnist)
+- **Follow-up** — our own claims carry an unresolved status or a matured deadline → elapsed reality · `lint contradiction`'s `[Reground status]` · Desk re-adjudication ending at the operator gate. **No close path exists yet**: the build stamps every claim `status: open` and nothing writes `resolved`, so a surfaced item re-fires on every run. The first non-empty surface is the trigger to build an adjudication ledger (operator gate)
+- **Correction** — our own pages disagree with each other or with a generated artifact → self-consistency · the F2 canonical total (deliberately narrow) + cross-page via [`bundle-reground-runbook`](.claude/operations/bundle-reground-runbook.md) (Desk, by rotation)
+
+Deterministic lint surfaces only mechanically parseable signals (explicit integers, dates, field comparisons); staleness and `[Reground status]` are advisory, while the F2 canonical total is a hard FAIL. The comparison is exact but inherits any imprecision in the field it reads — `type:` is a regex auto-classification, not a verified judgment. The remaining cross-page coherence is the Desk's qualitative responsibility. A deterministic surface never closes an item by itself. Roles reuse the Universal Cycle — Copy Editor quantitative, Desk qualitative, Columnist rewrite.
 
 The Layer × Cycle matrix (which role sits in which cell), the Standard ADAPT chain, the escalation procedure, and the Authoring Responsibilities tiering: [`.claude/agents/README.md`](.claude/agents/README.md) is the SoT. The authoring standards per content type and the Evaluation Rubric: [`.claude/layers/`](.claude/layers/) is the SoT (read by Reporter / Columnist on entering the cycle).
 
@@ -162,7 +172,8 @@ Guideline-authoring voice and plan-bloat control are craft, not policy — they 
 - `gap-detection-rollout.md` (the rollout plan for gap diagnosis, automatic backfill, and separating the operator surface + the SoT for thresholds, priorities, and the domain set)
 - `graph-hosting-setup.md` (setup for publicly deploying the graph browser's `_site/` artifact to Cloudflare Pages)
 - `codebase-audit-runbook.md` (the multi-agent batch procedure for ultrareviewing tools/ code and .claude/ instructions — group decomposition, review dimensions, adversarial verify, the mechanical/gated application policy)
-- `staleness-reground-runbook.md` (the batch procedure for re-grounding stale derived narratives surfaced by `/wiki-lint staleness` — per-type pipeline, Desk gate, verification, recurrence pitfalls)
+- `staleness-reground-runbook.md` (Reground **update mode** — the batch procedure for re-grounding stale derived narratives surfaced by `/wiki-lint staleness`: per-type pipeline, Desk gate, verification, recurrence pitfalls)
+- `bundle-reground-runbook.md` (Reground **correction mode** — the Desk reads a published cluster's bundle together to catch the cross-page defects single-page review cannot see: bundle assembly, defect classes, routing, cadence, deterministic-promotion candidates)
 - `proposal-validation-runbook.md` (the batch procedure for measuring the effect of self-evolved guideline changes — three variants by type (desk-judged blind rewrite × blind desk, behavioral probe task, lint-scored before/after); the acceptance rule lives in `agents/editor-in-chief.md` step 6)
 
 ### `.claude/hooks/` — Auto-Block & Guard Shell

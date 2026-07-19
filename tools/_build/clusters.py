@@ -844,8 +844,17 @@ def _render_sources_block(cluster: dict, clusters_data: dict, top_n: int = 15) -
     threshold = float(clusters_data.get("source_weight_threshold", 0.3))
     in_cluster: list[tuple[str, float, str]] = []
     for path, entry in source_assignments.items():
-        w = entry.get("weights", {}).get(slug, 0.0)
-        if w >= threshold:
+        weights = entry.get("weights", {})
+        w = weights.get(slug, 0.0)
+        # Membership must match the catalog builder (_group_sources_by_cluster):
+        # a source below threshold in EVERY cluster still falls back to its
+        # primary cluster. Without the fallback this count undercounts those
+        # orphans while the catalog lists them — and because both numbers are
+        # generated, no author could reconcile the drift by editing a page.
+        if w >= threshold or (
+            entry.get("primary") == slug
+            and not any(x >= threshold for x in weights.values())
+        ):
             in_cluster.append((path, w, read_source_date(path)))
 
     # Three-stage stable sort (least significant key first)

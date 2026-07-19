@@ -1,5 +1,6 @@
 """Audit regression target tests — catches recurrences of the "copy then edit only
 one side" class, such as divergent lint verdicts and F4 lint-ification."""
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -103,3 +104,98 @@ def test_meta_lint_regex_hoisting_check_active():
     )
     assert proc.returncode in (0, 1)  # 1 = clone-environment artifacts (.claude/memory/, etc.) allowed
     assert "OK - shared FRONTMATTER*/WIKILINK*/AUTO* regexes defined only in _lib" in proc.stdout
+
+
+def test_overview_sources_total_matches_catalog_membership():
+    """Reground regression — the overview AUTO:SOURCES "N total" and the source
+    catalog must apply ONE membership rule.
+
+    Previously `_group_sources_by_cluster` fell back to the primary cluster for a
+    source below threshold in every cluster, while `_render_sources_block` counted
+    only `weight >= threshold` — so an orphan source appeared in the catalog but
+    was missing from the overview total. Both numbers are generated, so no author
+    could reconcile them by editing a page; the fix belongs to the build. This
+    pins the two rules together, because a membership rule duplicated across two
+    functions diverges again (copyeditor.md § Risk Mitigation Design)."""
+    from _build import clusters as C
+
+    clusters_data = {
+        "source_weight_threshold": 0.3,
+        "clusters": [{"slug": "c1", "name": "Cluster One"},
+                     {"slug": "c2", "name": "Cluster Two"}],
+        "source_assignments": {
+            "sources/strong.md": {"primary": "c1", "weights": {"c1": 0.9, "c2": 0.4}},
+            # below threshold everywhere → catalog falls back to its primary (c1)
+            "sources/orphan.md": {"primary": "c1", "weights": {"c1": 0.2, "c2": 0.1}},
+        },
+    }
+    sources = [
+        ("Strong", "sources/strong.md", "", "", "2026-01-01", ""),
+        ("Orphan", "sources/orphan.md", "", "", "2026-01-02", ""),
+    ]
+
+    cluster_files, _ = C._group_sources_by_cluster(sources, clusters_data)
+    for cluster in clusters_data["clusters"]:
+        slug = cluster["slug"]
+        m = re.search(r"(\d+) total", C._render_sources_block(cluster, clusters_data))
+        assert m, f"cluster {slug}: rendered block has no total"
+        assert int(m.group(1)) == len(cluster_files.get(slug, [])), (
+            f"cluster {slug}: overview total {m.group(1)} != "
+            f"catalog membership {len(cluster_files.get(slug, []))}"
+        )
+
+    # The orphan is exactly what the divergence used to hide.
+    assert len(cluster_files["c1"]) == 2
+
+
+def test_f2_claim_stat_checked_at_every_occurrence(tmp_path, monkeypatch):
+    """Reground regression — a stale restatement of the canonical claim total
+    mid-body must fail F2, not only a stale head sentence.
+
+    A delta-only re-ground edits the head and leaves earlier copies behind; the
+    previous head-only `.search()` passed such a document."""
+    import contradiction as CT
+
+    md = tmp_path / "contradiction.md"
+
+    def _write(head_n, body_n):
+        md.write_text(
+            f"# Contradictions\n\n"
+            f"**{head_n} source-to-source contradictions** across the corpus.\n\n"
+            f"## Synopsis\n\n"
+            f"Restated later: **{body_n} source-to-source contradictions**.\n",
+            encoding="utf-8",
+        )
+
+    monkeypatch.setattr(CT, "CONTRADICTIONS_MD_PATH", md)
+
+    # Assert on the claim-stat drift specifically: this fixture is a minimal
+    # document, so unrelated criteria (S1 sections, the theme stat) fail anyway.
+    _write(7, 7)  # every occurrence agrees with the SoT
+    issues, _ = CT._check_contradictions_md(set(), set(), 7, 0)
+    assert not any("claims declared" in i for i in issues), issues
+
+    _write(7, 5)  # head correct, mid-body stale — the case head-only checking missed
+    issues, _ = CT._check_contradictions_md(set(), set(), 7, 0)
+    assert any("claims declared=5 actual=7" in i for i in issues), issues
+
+
+def test_reground_status_surfaces_superseded_but_open_claims():
+    """Reground follow-up trigger — a claim whose own source reports the dispute
+    settled (`type: superseded`) while it stays `status: open` is surfaced; every
+    other type/status combination stays silent (the surface must be zero-FP)."""
+    import contradiction as CT
+
+    assert CT._reground_status_line([]) is None
+    assert CT._reground_status_line([{"id": "a", "type": "soft", "status": "open"}]) is None
+    assert CT._reground_status_line(
+        [{"id": "b", "type": "superseded", "status": "resolved"}]
+    ) is None
+
+    line = CT._reground_status_line([
+        {"id": "c1", "type": "superseded", "status": "open"},
+        {"id": "c2", "type": "real", "status": "open"},
+    ])
+    assert line is not None
+    assert "1 superseded claim(s) still open" in line
+    assert "c1" in line and "c2" not in line
