@@ -32,6 +32,11 @@ social:
   links:
     - https://github.com/alfadur7/llm-wiki-newsroom
 
+# Search-console ownership verification — jekyll-seo-tag emits the meta tags.
+# google -> <meta name="google-site-verification">; bing -> <meta name="msvalidate.01">.
+webmaster_verifications:
+  google: JcmSvJXz8UNynBgl0sobM8ItkyYbazgk_kxu7z8VNaQ
+
 # Default Open Graph / Twitter image for every page (absolute URL is built from url + baseurl)
 defaults:
   - scope:
