@@ -1,0 +1,22 @@
+# LLM Wiki Newsroom
+
+> A multi-agent "newsroom" on Claude Code that turns a folder of documents into a cross-linked, human-readable markdown wiki. The agent that writes a page is never the one that reviews it; the authoring guidelines evolve themselves; contradictions between sources get their own pages instead of being smoothed over. Local-first (the Python tools need no API keys; the agent itself runs on Claude Code) — a structured, persistent alternative to RAG.
+
+It follows Andrej Karpathy's three-layer LLM Wiki pattern: source documents, the agent-built wiki, and the agent's operating rules stay in separate layers. Ingesting one document cascades updates into ~10–15 related pages. The public repository is the idea plus a small 15-node reproducible example (the debate over what "open source" means for AI), not a battle-tested product; the writer-reviewer split and the self-evolving loop are framed as hypotheses the author is measuring, not solved claims.
+
+## Core docs
+- [README](https://github.com/alfadur7/llm-wiki-newsroom/blob/main/README.md): full overview, install, all 9 slash commands, architecture, feature reference
+- [Landing page](https://alfadur7.github.io/llm-wiki-newsroom/): concise overview and a comparison table against RAG
+- [FAQ](https://alfadur7.github.io/llm-wiki-newsroom/faq/): what it is, how it differs from RAG, API-key needs, agent support, writer-reviewer split, self-evolving guidelines
+- [Browsable example wiki](https://github.com/alfadur7/llm-wiki-newsroom/wiki): the shipped corpus rendered as pages, no clone required
+
+## Key concepts and code
+- [Karpathy's LLM Wiki (origin)](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f): the three-layer pattern and cascading-update idea this implements
+- [Vannevar Bush's Memex (1945)](https://en.wikipedia.org/wiki/Memex): the associative-trail and serendipity inspiration
+- [tools/query.py](https://github.com/alfadur7/llm-wiki-newsroom/blob/main/tools/query.py): graph traversal plus local semantic search, used to narrow candidates before reading full pages
+- [CLAUDE.md](https://github.com/alfadur7/llm-wiki-newsroom/blob/main/CLAUDE.md): the agent's operating rules (Layer 3), including the five roles and the verification cycle
+
+## Notes
+- Local-first: the graph, lint, and search tools run on-device with no external API keys. The language model is whatever your Claude Code session uses (bring your own key).
+- Claude Code is the primary, fully supported agent (all 9 slash commands). Codex (AGENTS.md) and Gemini CLI (GEMINI.md) are supported at a basic level.
+- Optional Korean mode (WIKI_LANG=ko) localizes body prose and frontmatter; the wiki schema tokens stay English by design because the tools grep for them.

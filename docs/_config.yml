@@ -1,0 +1,36 @@
+# Jekyll config for the GitHub Pages site served from /docs.
+# Settings → Pages → "Deploy from a branch" → main → /docs.
+
+title: LLM Wiki Newsroom
+description: >-
+  A multi-agent "newsroom" on Claude Code that turns your documents into a
+  cross-linked, human-readable markdown wiki — where the agent that writes a
+  page is never the one that reviews it. Local-first, plain markdown + git, a
+  structured alternative to RAG.
+
+url: "https://alfadur7.github.io"
+baseurl: "/llm-wiki-newsroom"
+lang: en-US
+
+theme: jekyll-theme-cayman
+
+plugins:
+  - jekyll-seo-tag   # meta description, canonical, Open Graph, Twitter card, JSON-LD
+  - jekyll-sitemap   # generates /sitemap.xml for search-engine + Bing (GEO) submission
+
+# jekyll-seo-tag identity fields
+author: alfadur7
+logo: /knowledge-graph.png
+twitter:
+  card: summary_large_image
+social:
+  name: LLM Wiki Newsroom
+  links:
+    - https://github.com/alfadur7/llm-wiki-newsroom
+
+# Default Open Graph / Twitter image for every page (absolute URL is built from url + baseurl)
+defaults:
+  - scope:
+      path: ""
+    values:
+      image: /knowledge-graph.png

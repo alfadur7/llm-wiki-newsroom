@@ -1,0 +1,112 @@
+# FAQ content — single source for both the visible /faq page and the FAQPage
+# JSON-LD structured data (built in _includes/head-custom.html). Keep answers as
+# plain prose (no markdown syntax) so they render as clean paragraphs and also
+# serialize safely into JSON-LD. Keep each answer self-contained and factual —
+# generative search engines (ChatGPT, Gemini, Perplexity) quote these directly.
+
+- q: "What is LLM Wiki Newsroom?"
+  a: >-
+    LLM Wiki Newsroom is an open-source framework that turns a folder of
+    documents into a cross-linked, human-readable markdown wiki, maintained by
+    an AI agent organized as a five-role newsroom. You drop articles, notes, or
+    PDFs into a folder and run one command; the agent reads them, extracts
+    entities, concepts, and relationships, and organizes everything into
+    interlinked pages. It is a persistent, structured alternative to RAG, and it
+    is designed primarily for Claude Code.
+
+- q: "How is it different from RAG?"
+  a: >-
+    RAG (retrieval-augmented generation) re-extracts source chunks on every
+    query and injects them into the answer. LLM Wiki Newsroom instead structures
+    and accumulates the knowledge in advance: it organizes sources once into
+    wiki pages, keeps them cross-referenced with wikilinks and a backlink index,
+    flags contradictions at ingest time rather than query time, and enriches
+    existing pages every time you add a new source. Retrieval then reads a small
+    number of already-structured pages instead of raw chunks.
+
+- q: "Does it require API keys?"
+  a: >-
+    The Python tools that build the wiki — the graph builder, the linter, and
+    the local search — run entirely on your machine with no external API keys.
+    The agent that does the reading and writing itself runs on Claude Code, so
+    you bring your own Claude Code access for that part. In short, the tooling is
+    local-first; the language model is whatever your Claude Code uses.
+
+- q: "Which AI agents does it work with?"
+  a: >-
+    Claude Code is the primary and fully supported agent, with all nine slash
+    commands and the advanced features such as cascading updates and associative
+    discovery. Codex and Gemini CLI are supported at a basic level through
+    AGENTS.md and GEMINI.md — you drive them with natural language and get the
+    core ingest-and-organize workflow, but not the Claude-Code-only features.
+
+- q: "Is this related to Andrej Karpathy's LLM Wiki idea?"
+  a: >-
+    Yes. It follows the three-layer LLM Wiki pattern Andrej Karpathy described —
+    keeping the source documents, the agent-built wiki, and the agent's
+    operating rules in separate layers — and implements his idea that ingesting
+    one document should cascade updates into ten to fifteen related pages. Where
+    it goes further than most implementations is the self-evolving authoring
+    guidelines and the five-role newsroom with a separate reviewer.
+
+- q: "What does 'the writer is never the reviewer' mean?"
+  a: >-
+    The agent that writes a wiki page and the agent that reviews it are kept in
+    separate instances with isolated context. The reviewer sees only the drafted
+    page and an editorial rubric — never the writer's reasoning or intermediate
+    notes — which is meant to reduce the self-bias you get when one agent grades
+    its own work. Publication is gated by both a deterministic lint check and
+    this qualitative review; both must pass. This is a design hypothesis the
+    project is testing, not a rigorously measured result.
+
+- q: "What are self-evolving authoring guidelines?"
+  a: >-
+    When the same review failure keeps recurring, the system drafts a fix to its
+    own writing rules and keeps the change only if a blind A/B comparison against
+    a held-out set of past failures shows it actually helped. The regression set
+    rotates in fresh failures so the rules do not overfit to a frozen test. So
+    over time it is not only the wiki that improves but the guidelines that build
+    it. This loop is still experimental and its benefit is not yet rigorously
+    measured.
+
+- q: "Is it production-ready or proven?"
+  a: >-
+    Treat the public repository as the idea plus a small, reproducible example —
+    a fifteen-node example corpus mapping the debate over what open source means
+    for AI — not as a battle-tested product. The differentiators such as
+    writer-reviewer separation and the self-evolving loop are framed as
+    hypotheses the author is measuring, not as solved claims. It is new and
+    honest about its limits by design.
+
+- q: "What is contradiction tracking?"
+  a: >-
+    When a newly ingested document conflicts with an existing claim, the
+    disagreement is recorded at ingest time instead of being silently smoothed
+    over. Contradictions get their own dedicated pages, organized from a global
+    summary down through per-theme analysis to the raw conflicting claims, so a
+    reader can see where sources disagree and why rather than getting a single
+    averaged answer.
+
+- q: "Can I use it in Korean or another language?"
+  a: >-
+    There is an optional Korean mode, enabled with WIKI_LANG=ko, that translates
+    the page body text and frontmatter into Korean. The wiki schema tokens — the
+    section headers and inline evidence tags the tools search for — stay in
+    English by design because they are part of the data format, not display text.
+    So Korean mode localizes the prose, not the underlying schema.
+
+- q: "How can I see the output before installing anything?"
+  a: >-
+    The example corpus shipped in the repository is published as a browsable
+    GitHub Wiki, so you can read the generated pages without cloning. The
+    interactive knowledge graph — every page a node, every link an edge,
+    auto-clustered — runs locally after you clone, by serving the graph folder
+    and opening graph.html in a browser.
+
+- q: "Is my data sent anywhere?"
+  a: >-
+    The wiki is stored as plain markdown files under version control on your own
+    machine, and the build, lint, and local-search tools do not transmit your
+    content anywhere. The one network component is the agent itself: since it
+    runs on Claude Code, the text it reads and writes passes through your Claude
+    Code session like any other Claude Code use.

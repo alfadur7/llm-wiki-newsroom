@@ -1,0 +1,48 @@
+{%- comment -%}
+  Structured data (JSON-LD) injected into <head> via the Cayman theme's
+  head-custom hook. jekyll-seo-tag already emits WebSite/WebPage/Organization
+  markup; these blocks add the software and FAQ schema that generative search
+  engines (GEO) look for. Gated by per-page front-matter flags so each schema
+  appears only where it belongs.
+{%- endcomment -%}
+{%- if page.software_schema -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "LLM Wiki Newsroom",
+  "description": "A multi-agent \"newsroom\" on Claude Code that turns your documents into a cross-linked, human-readable markdown wiki, where the agent that writes a page is never the one that reviews it. Local-first, plain markdown and git, a structured alternative to RAG.",
+  "url": "https://alfadur7.github.io/llm-wiki-newsroom/",
+  "codeRepository": "https://github.com/alfadur7/llm-wiki-newsroom",
+  "programmingLanguage": ["Python", "Markdown"],
+  "runtimePlatform": "Claude Code",
+  "license": "https://opensource.org/licenses/MIT",
+  "author": {
+    "@type": "Person",
+    "name": "alfadur7",
+    "url": "https://github.com/alfadur7"
+  },
+  "keywords": "LLM wiki, Karpathy LLM Wiki, RAG alternative, multi-agent, Claude Code, knowledge base, second brain, Obsidian, contradiction tracking, self-evolving guidelines, local-first"
+}
+</script>
+{%- endif -%}
+{%- if page.faq_schema -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {%- for item in site.data.faq -%}
+    {
+      "@type": "Question",
+      "name": {{ item.q | jsonify }},
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": {{ item.a | strip_newlines | jsonify }}
+      }
+    }{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  ]
+}
+</script>
+{%- endif -%}
