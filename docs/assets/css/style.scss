@@ -1,0 +1,114 @@
+---
+# Overrides the Cayman theme stylesheet: re-import the theme, then force a
+# GitHub-dark palette for every visitor (always-on dark mode), regardless of
+# their OS/browser prefers-color-scheme setting.
+---
+
+@import "{{ site.theme }}";
+
+body {
+  background-color: #0d1117;
+  color: #c9d1d9;
+}
+
+// Darken the Cayman header (was a bright teal->blue gradient) so it reads as a
+// dark banner cohesive with the page, keeping the brand's blue->teal direction.
+.page-header {
+  background-color: #0d1f1c;
+  background-image: linear-gradient(120deg, #0a2540, #0d3b34);
+  border-bottom: 1px solid #30363d;
+}
+
+.main-content {
+  color: #c9d1d9;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: #e6edf3;
+  }
+
+  a {
+    color: #58a6ff;
+  }
+
+  // Body call-to-action buttons: Cayman's .btn is translucent white (meant for
+  // the header). Give the in-content ones an explicit dark, readable style.
+  .btn {
+    color: #c9d1d9;
+    background-color: #161b22;
+    border-color: #30363d;
+
+    &:hover {
+      color: #e6edf3;
+      border-color: #58a6ff;
+      background-color: #1c2430;
+    }
+  }
+
+  code {
+    background-color: #161b22;
+    color: #c9d1d9;
+  }
+
+  pre {
+    background-color: #161b22;
+    border-color: #30363d;
+
+    > code {
+      background-color: transparent;
+      color: #c9d1d9;
+    }
+  }
+
+  blockquote {
+    color: #8b949e;
+    border-left-color: #30363d;
+  }
+
+  table {
+    th,
+    td {
+      border-color: #30363d;
+    }
+
+    th {
+      background-color: #161b22;
+    }
+
+    tr {
+      background-color: #0d1117;
+      border-top-color: #21262d;
+    }
+
+    tr:nth-child(2n) {
+      background-color: #161b22;
+    }
+  }
+
+  hr {
+    background-color: #30363d;
+  }
+
+  dl dt {
+    color: #e6edf3;
+  }
+
+  kbd {
+    background-color: #161b22;
+    border-color: #30363d;
+    color: #c9d1d9;
+  }
+}
+
+.site-footer {
+  border-top-color: #30363d;
+  color: #8b949e;
+
+  a {
+    color: #58a6ff;
+  }
+}
