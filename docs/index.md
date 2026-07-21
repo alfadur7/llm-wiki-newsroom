@@ -6,7 +6,19 @@ description: >-
   cross-linked markdown wiki — the writer never reviews their own page. Local-first,
   plain markdown + git, a structured alternative to RAG.
 software_schema: true
+schema_inlanguage: en
+schema_url: "https://alfadur7.github.io/llm-wiki-newsroom/"
+schema_description: >-
+  A multi-agent "newsroom" on Claude Code that turns your documents into a
+  cross-linked, human-readable markdown wiki, where the agent that writes a page
+  is never the one that reviews it. Local-first, plain markdown and git, a
+  structured alternative to RAG.
+schema_keywords: "LLM wiki, Karpathy LLM Wiki, RAG alternative, multi-agent, Claude Code, knowledge base, second brain, Obsidian, contradiction tracking, self-evolving guidelines, local-first"
+hreflang_en: "https://alfadur7.github.io/llm-wiki-newsroom/"
+hreflang_ko: "https://alfadur7.github.io/llm-wiki-newsroom/ko/"
 ---
+
+*Read this in [한국어]({{ '/ko/' | relative_url }}).*
 
 **LLM Wiki Newsroom is an open-source framework that turns a folder of documents into a cross-linked, human-readable markdown wiki, maintained by an AI agent organized as a five-role newsroom.** Drop articles, notes, and PDFs into a folder, run one command, and the agent — powered by [Claude Code](https://www.anthropic.com/claude-code) — reads them, extracts entities, concepts, and relationships, and organizes everything into interlinked pages. It's a persistent, structured alternative to RAG. Unlike most takes on the idea, **the agent that _writes_ a page is never the one that _reviews_ it**, and the authoring guidelines evolve themselves over time.
 

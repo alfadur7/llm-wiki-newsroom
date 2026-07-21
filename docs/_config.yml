@@ -2,6 +2,10 @@
 # Settings → Pages → "Deploy from a branch" → main → /docs.
 
 title: LLM Wiki Newsroom
+# tagline is appended to the homepage <title> by jekyll-seo-tag; kept short so the
+# title tag stays ~60 chars. The long `description` below is still used verbatim for
+# the meta description and the Cayman hero subtitle.
+tagline: Turn documents into a cross-linked AI wiki
 description: >-
   A multi-agent "newsroom" on Claude Code that turns your documents into a
   cross-linked, human-readable markdown wiki — where the agent that writes a

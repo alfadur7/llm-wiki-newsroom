@@ -1,18 +1,24 @@
 {%- comment -%}
-  Structured data (JSON-LD) injected into <head> via the Cayman theme's
-  head-custom hook. jekyll-seo-tag already emits WebSite/WebPage/Organization
-  markup; these blocks add the software and FAQ schema that generative search
-  engines (GEO) look for. Gated by per-page front-matter flags so each schema
-  appears only where it belongs.
+  Structured data (JSON-LD) + hreflang, injected into <head> via the Cayman
+  theme's head-custom hook. jekyll-seo-tag already emits WebSite/WebPage/
+  Organization markup; these blocks add the software and FAQ schema that
+  generative search engines (GEO) look for, per-language. Driven by per-page
+  front-matter so each language page carries its own localized schema.
 {%- endcomment -%}
+{%- if page.hreflang_en and page.hreflang_ko -%}
+<link rel="alternate" hreflang="en" href="{{ page.hreflang_en }}" />
+<link rel="alternate" hreflang="ko" href="{{ page.hreflang_ko }}" />
+<link rel="alternate" hreflang="x-default" href="{{ page.hreflang_en }}" />
+{%- endif -%}
 {%- if page.software_schema -%}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "SoftwareSourceCode",
   "name": "LLM Wiki Newsroom",
-  "description": "A multi-agent \"newsroom\" on Claude Code that turns your documents into a cross-linked, human-readable markdown wiki, where the agent that writes a page is never the one that reviews it. Local-first, plain markdown and git, a structured alternative to RAG.",
-  "url": "https://alfadur7.github.io/llm-wiki-newsroom/",
+  "description": {{ page.schema_description | jsonify }},
+  "inLanguage": {{ page.schema_inlanguage | default: "en" | jsonify }},
+  "url": {{ page.schema_url | jsonify }},
   "codeRepository": "https://github.com/alfadur7/llm-wiki-newsroom",
   "programmingLanguage": ["Python", "Markdown"],
   "runtimePlatform": "Claude Code",
@@ -22,17 +28,19 @@
     "name": "alfadur7",
     "url": "https://github.com/alfadur7"
   },
-  "keywords": "LLM wiki, Karpathy LLM Wiki, RAG alternative, multi-agent, Claude Code, knowledge base, second brain, Obsidian, contradiction tracking, self-evolving guidelines, local-first"
+  "keywords": {{ page.schema_keywords | jsonify }}
 }
 </script>
 {%- endif -%}
 {%- if page.faq_schema -%}
+{%- assign faqdata = site.data[page.faq_data] -%}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "FAQPage",
+  "inLanguage": {{ page.schema_inlanguage | default: "en" | jsonify }},
   "mainEntity": [
-    {%- for item in site.data.faq -%}
+    {%- for item in faqdata -%}
     {
       "@type": "Question",
       "name": {{ item.q | jsonify }},

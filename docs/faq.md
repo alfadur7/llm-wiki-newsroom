@@ -7,7 +7,13 @@ description: >-
   from RAG, whether it needs API keys, which agents it supports, and how the
   writer-reviewer split and self-evolving guidelines work.
 faq_schema: true
+faq_data: faq
+schema_inlanguage: en
+hreflang_en: "https://alfadur7.github.io/llm-wiki-newsroom/faq/"
+hreflang_ko: "https://alfadur7.github.io/llm-wiki-newsroom/ko/faq/"
 ---
+
+*Read this in [한국어]({{ '/ko/faq/' | relative_url }}).*
 
 # Frequently asked questions
 

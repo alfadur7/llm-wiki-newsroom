@@ -10,6 +10,10 @@ It follows Andrej Karpathy's three-layer LLM Wiki pattern: source documents, the
 - [FAQ](https://alfadur7.github.io/llm-wiki-newsroom/faq/): what it is, how it differs from RAG, API-key needs, agent support, writer-reviewer split, self-evolving guidelines
 - [Browsable example wiki](https://github.com/alfadur7/llm-wiki-newsroom/wiki): the shipped corpus rendered as pages, no clone required
 
+## Korean (한국어)
+- [소개 페이지 / Landing (KO)](https://alfadur7.github.io/llm-wiki-newsroom/ko/): concise Korean overview and a comparison table against RAG
+- [FAQ (KO)](https://alfadur7.github.io/llm-wiki-newsroom/ko/faq/): the same FAQ in Korean, for Korean-speaking engineers
+
 ## Key concepts and code
 - [Karpathy's LLM Wiki (origin)](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f): the three-layer pattern and cascading-update idea this implements
 - [Vannevar Bush's Memex (1945)](https://en.wikipedia.org/wiki/Memex): the associative-trail and serendipity inspiration
