@@ -5,8 +5,6 @@ permalink: /ko/
 lang: ko
 description: >-
   흩어진 문서를 서로 연결된 마크다운 위키로 정리해 주는 멀티에이전트 'AI 편집국'.
-  글 쓰는 에이전트와 검수하는 에이전트를 아예 따로 둡니다. 로컬 우선, 순수 마크다운 + git,
-  RAG의 구조화된 대안.
 software_schema: true
 schema_inlanguage: ko
 schema_url: "https://alfadur7.github.io/llm-wiki-newsroom/ko/"
@@ -14,7 +12,7 @@ schema_description: >-
   흩어진 문서를 서로 연결된 마크다운 위키로 정리해 주는 멀티에이전트 'AI 편집국'
   프레임워크. 글을 쓰는 에이전트와 검수하는 에이전트를 아예 따로 두고, 위키를 만드는
   저작 지침이 스스로 조금씩 나아진다. 로컬 우선, 순수 마크다운과 git, RAG의 구조화된 대안.
-schema_keywords: "LLM 위키, 카파시 LLM Wiki, RAG 대안, 멀티에이전트, Claude Code, 지식베이스, 세컨드 브레인, 옵시디언, 모순 추적, 자기진화 지침, 로컬 우선"
+schema_keywords: "LLM 위키, 카파시 LLM Wiki, RAG 대안, 멀티에이전트, AI 에이전트, 에이전틱 AI, Claude Code, Claude 스킬, 지식베이스, 지식 그래프, 세컨드 브레인, 개인 지식 관리, PKM, 디지털 가든, 옵시디언, 시맨틱 검색, 메멕스, 모순 추적, 자기진화 지침, 로컬 우선"
 hreflang_en: "https://alfadur7.github.io/llm-wiki-newsroom/"
 hreflang_ko: "https://alfadur7.github.io/llm-wiki-newsroom/ko/"
 ---

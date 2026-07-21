@@ -4,9 +4,7 @@ title: 자주 묻는 질문
 permalink: /ko/faq/
 lang: ko
 description: >-
-  LLM Wiki Newsroom 자주 묻는 질문. 무엇인지, RAG와 어떻게 다른지, API 키가 필요한지,
-  어떤 에이전트를 지원하는지, 쓰는 쪽과 검수하는 쪽을 나눈 설계와 자기진화 지침이 어떻게
-  동작하는지 다룹니다.
+  LLM Wiki Newsroom 자주 묻는 질문(FAQ).
 faq_schema: true
 faq_data: faq_ko
 schema_inlanguage: ko

@@ -3,8 +3,7 @@ layout: default
 title: LLM Wiki Newsroom
 description: >-
   A multi-agent "newsroom" on Claude Code that turns your documents into a
-  cross-linked markdown wiki — the writer never reviews their own page. Local-first,
-  plain markdown + git, a structured alternative to RAG.
+  cross-linked markdown wiki.
 software_schema: true
 schema_inlanguage: en
 schema_url: "https://alfadur7.github.io/llm-wiki-newsroom/"
@@ -13,7 +12,7 @@ schema_description: >-
   cross-linked, human-readable markdown wiki, where the agent that writes a page
   is never the one that reviews it. Local-first, plain markdown and git, a
   structured alternative to RAG.
-schema_keywords: "LLM wiki, Karpathy LLM Wiki, RAG alternative, multi-agent, Claude Code, knowledge base, second brain, Obsidian, contradiction tracking, self-evolving guidelines, local-first"
+schema_keywords: "LLM wiki, Karpathy LLM Wiki, RAG alternative, multi-agent, AI agents, agentic AI, Claude Code, Claude skills, knowledge base, knowledge graph, second brain, personal knowledge management, PKM, digital garden, Obsidian, semantic search, Memex, contradiction tracking, self-evolving guidelines, local-first"
 hreflang_en: "https://alfadur7.github.io/llm-wiki-newsroom/"
 hreflang_ko: "https://alfadur7.github.io/llm-wiki-newsroom/ko/"
 ---

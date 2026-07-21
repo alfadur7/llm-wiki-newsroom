@@ -3,9 +3,7 @@ layout: default
 title: FAQ
 permalink: /faq/
 description: >-
-  Frequently asked questions about LLM Wiki Newsroom — what it is, how it differs
-  from RAG, whether it needs API keys, which agents it supports, and how the
-  writer-reviewer split and self-evolving guidelines work.
+  Frequently asked questions about LLM Wiki Newsroom.
 faq_schema: true
 faq_data: faq
 schema_inlanguage: en
