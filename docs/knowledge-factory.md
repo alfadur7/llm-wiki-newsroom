@@ -38,7 +38,7 @@ hreflang_ko: "https://alfadur7.github.io/llm-wiki-newsroom/ko/knowledge-factory/
 
 *Read this in [한국어]({{ '/ko/knowledge-factory/' | relative_url }}).*
 
-"Software factory" has become one of the more useful phrases in this wave of AI-assisted development. The premise: AI agents write essentially all of the shipped code, and developers stop building features by hand and start building — and improving — the system that produces them. Dru Knox of Tessl, an AI developer-tooling company, gave the discipline a name: **harness engineering**. The harness is everything that steers and drives the agent, the way a harness steers a horse, and at the center of it sit three loops.
+"Software factory" has become one of the more useful phrases in this wave of AI-assisted development. The premise: AI agents write essentially all of the shipped code, and developers stop building features by hand and start building — and improving — the system that produces them. [Dru Knox](https://www.youtube.com/watch?v=D_cw-k0F1DM&t=2400) of Tessl, an AI developer-tooling company, gave the discipline a name: **harness engineering**. The harness is everything that steers and drives the agent, the way a harness steers a horse, and at the center of it sit three loops.
 
 This article asks the same question of knowledge work. What should the factory look like when the product isn't source code but a wiki of cross-linked pages? The short answer is that all three loops transfer cleanly. But knowledge has one property code doesn't: it keeps decaying after you ship it. That gap needs a fourth loop. What follows defines that four-loop production system as a **knowledge factory**, then works top-down from the concept to a running implementation: [LLM Wiki Newsroom](https://github.com/alfadur7/llm-wiki-newsroom), an open-source framework where a five-role crew of [Claude Code](https://www.anthropic.com/claude-code) agents turns a folder of documents into a cross-linked markdown wiki.
 
@@ -196,4 +196,4 @@ And the most valuable thing the knowledge factory takes from the software factor
 
 ---
 
-*The software factory and its three loops come from Dru Knox's session at the AI Engineer conference. For the implementation this article describes, see the [README](https://github.com/alfadur7/llm-wiki-newsroom#readme) and the [overview]({{ '/' | relative_url }}).*
+*The software factory and its three loops come from Dru Knox's AI Engineer SF talk, carried in Tessl's video [Harness Engineering: The New Discipline of Agentic Dev](https://www.youtube.com/watch?v=D_cw-k0F1DM&t=2400) — his talk begins at 28:50 and lays out the three layers at 40:00; the loops are also walked through in the interview segment at 3:56. For the implementation this article describes, see the [README](https://github.com/alfadur7/llm-wiki-newsroom#readme) and the [overview]({{ '/' | relative_url }}).*
