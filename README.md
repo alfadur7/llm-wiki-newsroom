@@ -31,17 +31,20 @@ This project is one question worked into a running system: **how far can you tru
 Four loops turn that division of labor into trust. The first three nest inside one another; only the fourth sits outside, feeding published pages back in:
 
 ```mermaid
-flowchart TB
-    subgraph meta["Meta loop — recurring mistakes become proposals to amend the rules"]
-        subgraph outer["Outer loop — two gates at publication: Copy Editor lint, then Desk review"]
-            subgraph inner["Inner loop — the writer self-checks while drafting"]
-                draft(["a page being drafted"])
-            end
+%%{init: {"flowchart": {"wrappingWidth": 700}}}%%
+flowchart BT
+    subgraph meta["Meta loop — mistakes become new rules"]
+        subgraph outer["Outer loop — two gates before publication"]
+            inner["Inner loop — the writer self-checks while drafting"]
         end
     end
-    pages(["published wiki pages"])
-    outer -- "both gates pass" --> pages
-    pages -- "Reground loop — stale or inconsistent pages come back as input" --> inner
+    %% the &nbsp; padding keeps this box as wide as the Meta loop box above
+    reground["&nbsp;&nbsp;Reground loop — pages that go stale or inconsistent come back as input&nbsp;&nbsp;"]
+    reground -.-> meta
+    style meta fill:transparent,stroke:#58a6ff,stroke-width:2px
+    style outer fill:transparent,stroke:#3fb950,stroke-width:2px
+    style inner fill:transparent,stroke:#d29922,stroke-width:2px
+    style reground fill:transparent,stroke:#bc8cff,stroke-width:2px,stroke-dasharray:4 4
 ```
 
 | Loop | When it runs | What it does |
