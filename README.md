@@ -12,30 +12,58 @@
 
 <sub>The interactive knowledge graph (`graph/graph.html`) — every page a node, every wikilink an edge, color-coded by auto-detected cluster, with a live physics layout and filter/search built in. Shown here on a larger private deployment (~2,300 nodes) to convey how it scales; **this repo ships a deliberately small 15-node example corpus** you can browse the exact same way. (Interface shown in the optional Korean `WIKI_LANG=ko` mode.)</sub>
 
+## The concept
+
+This project is one question worked into a running system: **how far can you trust knowledge an AI wrote?** Two ideas organize everything below.
+
+**1. The product is an [LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) — Andrej Karpathy's three-layer pattern.** The original documents you collect (Layer 1, `raw/`), the cross-linked wiki the agent maintains (Layer 2, `wiki/`), and the operating rules the agent follows (Layer 3, `CLAUDE.md` + `.claude/`) are kept strictly separate, so humans and AI don't trespass into each other's territory. As the operator you do exactly two things — feed Layer 1 and tune Layer 3; **only the agent writes Layer 2**. And ingesting one document doesn't just add a page: it refreshes the ~10–15 existing pages that mention the same entities and concepts, which is what makes the wiki compound instead of just piling up.
+
+**2. The factory is a newsroom running four loops.** The wiki is produced by five roles modeled on a newspaper staff — and the agent that *writes* a page is never the one that *reviews* it:
+
+| Role | What it does |
+|---|---|
+| **Reporter** | gathers material and drafts source pages + entity/concept stubs |
+| **Columnist** | writes the deep cross-source analyses |
+| **Copy Editor** | rule-based Python checks — not an LLM at all |
+| **Desk** | re-reads finished drafts with fresh eyes; the only independent qualitative judgment in the system |
+| **Editor-in-Chief** | routes work and gates publication — orchestration, not evaluation |
+
+Four loops turn that division of labor into trust. The first three nest inside one another; only the fourth sits outside, feeding published pages back in:
+
+```mermaid
+flowchart TB
+    subgraph meta["Meta loop — recurring mistakes become proposals to amend the rules"]
+        subgraph outer["Outer loop — two gates at publication: Copy Editor lint, then Desk review"]
+            subgraph inner["Inner loop — the writer self-checks while drafting"]
+                draft(["a page being drafted"])
+            end
+        end
+    end
+    pages(["published wiki pages"])
+    outer -- "both gates pass" --> pages
+    pages -- "Reground loop — stale or inconsistent pages come back as input" --> inner
+```
+
+| Loop | When it runs | What it does |
+|---|---|---|
+| **Inner** | while drafting | the writer self-checks against the same yardstick the review gates will use later, and hands off instead of grinding |
+| **Outer** | at publication | two gates — deterministic lint (Copy Editor), then a six-lens qualitative review (Desk) — and both must pass |
+| **Meta** | when mistakes recur | repeat failures become proposals to amend the authoring rules themselves, adopted only after blind measurement plus operator sign-off |
+| **Reground** | after publication | published pages that have gone stale or inconsistent come back around as factory input |
+
+The first three loops mirror the "software factory" playbook for AI-assisted coding; the fourth exists because knowledge, unlike code, keeps decaying after you ship it. The full argument for this design is in the companion article: **[The Knowledge Factory](https://alfadur7.github.io/llm-wiki-newsroom/knowledge-factory/)**.
+
+Everything else in this README — the commands, the tools, the feature list — hangs off this map.
+
 ## What makes this different
 
-There are plenty of takes on Karpathy's [LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) idea now. After reading the popular implementations, two things here are genuinely rare:
+There are plenty of takes on Karpathy's LLM Wiki idea now. After reading the popular implementations, three things here are genuinely rare — and they are the bet:
 
-**1. Authoring guidelines that evolve themselves — something I haven't found in the other implementations.** When the same review failure keeps recurring, the system drafts a fix to its *own writing rules* and keeps it only if a blind A/B against a regression set shows it actually helped — an idea borrowed from [Self-Harness](https://arxiv.org/abs/2606.09498) and [Microsoft SkillOpt](https://github.com/microsoft/SkillOpt). So it isn't only the wiki that improves over time, but the rules that build it. *(This loop is still experimental — I'm measuring whether it earns its keep rather than claiming it's solved.)*
+- **Authoring guidelines that evolve themselves** (the meta loop) — something I haven't found in the other implementations. When the same review failure keeps recurring, the system drafts a fix to its *own writing rules* and keeps it only if a blind A/B against a regression set shows it actually helped — an idea borrowed from [Self-Harness](https://arxiv.org/abs/2606.09498) and [Microsoft SkillOpt](https://github.com/microsoft/SkillOpt). So it isn't only the wiki that improves over time, but the rules that build it. *(This loop is still experimental — I'm measuring whether it earns its keep rather than claiming it's solved.)*
+- **A full newsroom, not just "an agent"** (the outer loop) — plenty of tools wrap one agent around your notes, and a few add a verifier. Here authoring and review sit in different hands, the review is held to an editorial rubric drawn from real craft (journalism, consulting, encyclopedic forms) so a different person or session reproduces the same bar, and a two-sided gate means the deterministic lint and the qualitative review must *both* pass.
+- **Memex-style associative discovery** — saved reading trails and "unexpected connection" surfacing that the other implementations don't carry.
 
-**2. A full newsroom, not just "an agent."** Plenty of tools wrap one agent around your notes, and a few add a verifier. Here the work is split across five roles — a **reporter** drafts source pages and entity/concept stubs, a **columnist** writes the deep cross-source analysis, a **desk** editor reviews it with fresh eyes, a **copy editor** runs the deterministic checks, and an **editor-in-chief** gates publication — and the agent that *writes* a page is never the one that *reviews* it. That review is held to an editorial rubric drawn from real craft (journalism, consulting, encyclopedic forms), so a different person or session reproduces the same bar, and a two-sided gate means the deterministic lint and the qualitative review must *both* pass.
-
-It also leans on **Memex-style associative discovery** — saved reading trails and "unexpected connection" surfacing — that the other implementations don't carry.
-
-The rest — the knowledge graph, contradiction tracking, cascading updates, plain-markdown/Obsidian output — many LLM-wiki tools have in some form. The self-evolving guidelines, the five-role newsroom with its editorial rubric, and the Memex discovery are the bet.
-
----
-
-## Highlights
-
-- **Persistent, plain-markdown knowledge base** — your "second brain" as version-controlled `.md` files, not a vendor silo. Doubles as an [Obsidian](https://obsidian.md) vault for personal knowledge management (PKM).
-- **Cascading updates** — ingesting one document refreshes ~10–15 related existing pages automatically.
-- **Contradiction tracking** — conflicting claims between sources are flagged at ingest time, not at query time.
-- **Interactive knowledge graph** — every page a node, every link an edge, auto-clustered and browsable.
-- **Associative discovery (Memex)** — follow connected concepts to surface unexpected relationships.
-- **Local-first, no API keys** — the Python tools (graph, lint, search) run entirely on your machine.
-
-See [Key Features](#key-features) below for how each one works.
+The rest — the knowledge graph, contradiction tracking, cascading updates, plain-markdown/Obsidian output — many LLM-wiki tools have in some form.
 
 ---
 
@@ -101,13 +129,187 @@ You don't have to memorize the slash commands — you can request the same tasks
 
 ---
 
+## Key Features
+
+Grouped by where each feature sits in [the concept](#the-concept) above: first the product (the wiki itself and the ways to explore it), then the loops that make it trustworthy.
+
+### The wiki itself
+
+#### Persistent wiki
+AI conversation sessions evaporate when they end, but this project **accumulates the extracted knowledge as structured markdown files**. They're plain text files, version-controlled with Git and viewable in ordinary tools like Obsidian or VS Code, so you're not locked into any vendor.
+
+#### Cascading updates
+Ingesting one new document **automatically updates the existing entity/concept pages it mentions**. For example, ingesting an article about "Meta releases an open-weights model" extends the fact list in `Meta.md` and adds an item to the releases section of `OpenWeights.md`. This implements Karpathy's original idea that "ingesting 1 document changes 10–15 pages" — one of the framework's core characteristics.
+
+#### Automatic duplicate-document skip
+To avoid re-ingesting the same article, it **double-indexes by URL and file path** (`wiki/sources/_source_map.json`). Even if a re-scrape via Obsidian Web Clipper changes the filename slightly, a matching URL is detected as a duplicate. Cases where a filename drifts due to Unicode quote differences (`'` vs `'`) are normalized and handled too.
+
+#### PDF ingest (multimodal)
+Beyond text articles, PDF documents are absorbed through the same pipeline. Drop a `.pdf` file into the `raw/PDF/` folder, and the next `/wiki-ingest` run auto-detects it; Claude Code's Read tool opens the PDF directly and interprets its body, tables, and figures. It's a mechanism for handling **long documents not published as HTML**, like industry reports, regulatory filings, and conference materials.
+
+- **Download**: Put the PDF URL in the inbox queue (`raw/_inbox.md`) and run `/wiki-ingest inbox` to save it as a binary under `raw/PDF/`. Just the `.pdf` lands, with no separate meta file.
+- **URL management inside the wiki page**: Record the URL in the `source_url:` frontmatter of `wiki/sources/<slug>.md` generated at ingest, so dedup works even if the same document is re-downloaded. Even if you manually drop just a PDF with no URL, duplicates are filtered by file path.
+
+#### Contradiction detection · 3-layer tracking
+When a new document conflicts with existing claims, it's auto-recorded at ingest time. Readers drill down three levels using `wiki/index.md` as the entry point.
+
+1. **`wiki/contradiction.md`** — global aggregation of contradictions. The editor's tension-axis narrative + theme summaries.
+2. **`wiki/contradictions/<theme>.md`** — per-theme deep analysis (e.g., whether an "open source" model must release its training data). Which themes exist and which raw issues belong to which theme is defined by `_contradictions_themes.json` as the mapping SoT.
+3. **`wiki/contradictions/_contradictions.json`** — source DB of auto-detected individual issues.
+
+It's designed in `macro summary → theme interpretation → raw evidence` order, so wherever a reader stops, that layer reads as self-contained. `wiki/overview.md` covers only per-domain overviews and includes no contradiction references — the common entry point for both axes is `wiki/index.md`.
+
+#### Automatic topic clustering
+Instead of a human assigning every entity/concept page to a category by hand, it uses an algorithm that **groups similar topics looking only at the connections between pages** ([Leiden community detection](https://en.wikipedia.org/wiki/Leiden_algorithm)). The result is intuitive clusters — here, the example corpus splits cleanly into "open-source AI definition," "open weights," and "licensing · open-washing." Each source document is assigned by weighted vote to the cluster of the entities it referenced, so documents that overlap in topic are listed in multiple cluster catalogs at once.
+
+> Leiden is the successor to the better-known Louvain algorithm, solving Louvain's limitation (the modularity-local-maxima trap) where cluster boundaries swing wildly under small graph changes, via a refinement stage and connectivity guarantees. In the larger corpus this engine was built for, as the wiki grew to ~470 hubs Louvain hit an unstable regime where adding just 7 new sources would make the cluster count jump from 7 to 10; after adopting Leiden, the same change was measured to stay stable at 8→8. (The small example corpus shipped here has only 3 clusters, so the instability doesn't show up — but the algorithm choice still matters as a wiki grows.)
+
+<details>
+<summary>✍️ <strong>Editing cluster labels (<code>graph/cluster_labels.json</code>)</strong> — the one config you hand-edit. <em>Operator detail.</em></summary>
+
+The algorithm only finds clusters; it can't name them. `graph/cluster_labels.json` is a small config file that attaches a **human-understandable name** ("cyber security," "cloud native," etc.) to each automatically found cluster. This file is nearly the only config in this project that the operator opens and edits directly; everything else is auto-generated.
+
+When a new topic cluster is discovered and needs a label, `/wiki-lint` tells you. Just add one entry in the format below.
+
+```json
+{
+  "slug": "licensing-open-washing",
+  "name": "Licensing & Open-Washing",
+  "anchor_members": [
+    "concepts/ModelLicensing.md",
+    "concepts/OpenWashing.md",
+    "entities/Meta.md"
+  ],
+  "paired_with": ["open-source-ai-definition"]
+}
+```
+
+- **`slug`** — an English identifier. Used as the catalog filename (`_catalog-<slug>.md`) and as the `/wiki-news <slug>` command argument, so use only letters, digits, and hyphens.
+- **`name`** — the human-readable display name. Surfaced in the catalog title and the index.
+- **`anchor_members`** — 3–6 pages representing this cluster. The script matches a label by "are at least half of the designated representative pages grouped into one community," so too few risks a match failure and too many risks overlap with another community.
+- **`paired_with`** *(optional)* — an array of paired-cluster slugs whose work naturally overlaps. E.g., here "licensing · open-washing" ↔ "open-source AI definition" (the two debates share figures and arguments). Writing it on one side applies it both ways, and even if a paired cluster's representative page appears in the per-domain overview body, `/wiki-lint` won't flag it as narrative drift. Do not list a split-off relationship where a domain broke away — there you *do* need to check whether the body is stuck in the old flow.
+
+After editing, re-run `python tools/build.py` and the new name is reflected in every catalog and the index.
+
+</details>
+
+#### Knowledge graph visualization
+Drawing every page as a node and every wikilink as an edge, it generates an interactive browser graph (`graph/graph.html`). Clicking a node highlights its connections, and each edge carries a "why it's connected" label readable on mouse hover. Edges are classified into 5 types (contradicts·defines·cites·references·inferred) and color-coded — the 4 explicit edge types stated in the body get different colors by relationship meaning, while inferred edges leading to pages that aren't directly linked but share 3+ common references are shown in lavender, surfacing implicit relatedness.
+
+Serve the `graph/` folder over a local web server (e.g. `python -m http.server`) and open `graph.html` — it fetches its data, so a `file://` double-click is unsupported — and these interactions are available right in the browser:
+
+- **Live physics simulation** — nodes find their place by spring, gravity, and repulsion, and stop automatically when motion settles
+- **Drag to rearrange** — drop a node and it pins there; surrounding nodes respond physically to adjust the layout
+- **Domain filter** — toggle on/off by clicking in the sidebar; hovering a domain row wraps that region in color
+- **Relationship filter** — classify edges into 5 types (contradicts·defines·cites·references·inferred) and toggle, e.g., "I want to see only contradiction relationships in this graph"
+- **Search** — search by node name for automatic camera move + top-match highlight
+- **Select and explore surroundings** — clicking a node highlights its connected edges and shows neighbor labels; a **local view** mode that keeps only the 1·2·3-hop range to focus on nearby relationships
+- **Fragile-bridge highlight** — mark connection points that link two domains by a single edge in orange (sidebar toggle)
+- **Analysis overlay** — overlay a saved associative trail or a contradiction's opposing camps in color on top of the graph, to see a path's flow or a confrontation structure within the overall terrain
+- **Shareable link** — filter, local-view, and highlight state are all recorded in the URL, so the same view can be shared as-is
+
+#### Two-level index
+Once the wiki exceeds 1,000 documents, a single list file becomes hard to navigate. This project lists only entities/concepts/analyses in the main index (`wiki/index.md`) and **splits documents into per-cluster sub-catalogs**. A document spanning multiple clusters is listed in all relevant catalogs. All lists — entities, concepts, analyses — are uniformly sorted A–Z (under `WIKI_LANG=ko`, Hangul-titled pages sort first in ga-na-da order, then A–Z).
+
+### Exploring and sharing the wiki
+
+#### Search/traversal queries (`tools/query.py`)
+Having the LLM read every page in full to answer a question is costly, and an AI agent can only handle a limited amount of context at once. This tool is a CLI that helps the agent **understand the structure first, or narrow candidates, before reading pages**, with two subcommands, `graph` and `qmd`.
+
+**Graph traversal** (`python tools/query.py graph ...`) — structural queries using link relationships:
+
+- **`graph path Meta OpenSourceInitiative`** — shows the shortest path connecting two pages and why each link was formed (`[[X]] — connection reason` explanation). You can trace the logical flow from "Meta" to "OpenSourceInitiative" without a single click.
+- **`graph explain OpenWeights`** — summarizes which cluster a page belongs to, which pages reference it, and what it points to.
+- **`graph neighbors Meta`** — groups directly connected pages by cluster to see "what's around" at a glance.
+
+**Body search** (`python tools/query.py qmd ...`) — local search that actually inspects page bodies to find the ones matching a topic (no external transmission):
+
+- **`qmd hybrid "open weights vs open source"`** — recommendation search combining keyword, meaning, and reranking.
+- **`qmd search "OpenAI"`** — BM25 keyword matching (fastest).
+- **`qmd vsearch "models that are open in name only"`** — vector-based semantic similarity (finds it by context even when the exact keyword isn't in the body — here, surfacing the open-washing pages).
+
+`--budget N` limits the number of output lines so the agent pulls exactly as much as it can digest. `--json` enables program-to-program integration.
+
+#### Associative discovery — finding unexpected connections
+`/wiki-discover` surfaces connections hidden in the wiki in two ways.
+
+- **Seed exploration**: starting from a specific page like `/wiki-discover Meta`, it follows backlinks and co-references 2 hops to present **pages not directly linked to the seed but unexpectedly close** (e.g., "model licensing terms → training-data disclosure"). Giving `--random` picks a random hub in the mid-range of backlink counts and runs the same exploration.
+
+- **Bridge-hub ranking (`--surprising`)**: automatically selects the pages that **most bridge** different topic clusters. The score rises the more often it appears on shortest paths, the more its neighbors span multiple clusters, and the less it's so famous as to seem "obvious." The "unexpected centers" are output as a top N even with no seed input.
+
+#### Associative trails (Memex Trail)
+[Vannevar Bush's Memex](https://en.wikipedia.org/wiki/Memex) (1945) proposed knowledge exploration that follows trails between pieces of information. `/wiki-trail` builds and saves a **path of 5–10 pages woven in order, with commentary at each step**, for a given topic. Good for sharing with a team: "to understand this topic, read it in this order."
+
+#### Timeline
+Specifying an entity and a year like `/wiki-timeline Meta 2024` generates a **storyline sorted chronologically** of that person's or company's events. It groups by year, combining backlinks and each source's publish date.
+
+#### Wiki-based latest-news search
+`/wiki-news` builds keyword combinations from the entities/concepts accumulated in the wiki and **selects only the latest articles** from the web. For example, specifying the `open-source-ai-definition` cluster generates search terms combining that cluster's major hubs ("OpenSourceInitiative," "OSAID," "training data"). It dedups against existing source titles and recommends only new articles as ingest candidates. It fetches the body even on sites with strong bot blocking by behaving like a browser. When a particular topic is empty, it follows the links in related articles to find further candidates to fill that gap.
+
+#### Claude.ai mobile integration
+`/wiki-export` exports the wiki in **two layers** — a RAG layer (synthesis pages + directory) that builds the answers, and deep links into the graph browser that serve the detailed originals. A Claude.ai project loads attached knowledge **wholesale into context** rather than retrieving it, so entity/concept bodies (about 70% of the total) and source originals are not put into RAG — doing so would vastly exceed the context limit (~200K tokens). Instead, `index.md` is a directory holding every entity/concept with a one-line description + deep link, and the synthesis layer (domain overviews · contradiction analyses · analysis reports) fills in the substance of answers. `README.md` carries the upload budget guide (start from Core ~130K tokens) and the deep-link convention to paste into project instructions. Push these files to GitHub and connect them as Claude.ai **Project Knowledge**, and you can query the wiki even from a phone — answers built from the synthesis layer, details pointed to via graph links.
+
+So that answers understand the wiki structure and attach links to the graph, paste the entire `wiki-export/README.md` that export also produces (an instruction document covering file structure, answer rules, and the deep-link convention) once into the **custom instructions** box of the Claude.ai project. Then, when citing a hub the answer links to that page, and when pinning a specific claim's source it links straight to the original.
+
+### The inner and outer loops — how a page earns publication
+
+#### Dual automation
+The wiki body is not typed by humans. Two kinds of automation handle it in layers.
+
+- **Deterministic automation**: Python scripts generate mechanical outputs like links, rankings, and catalogs
+- **Probabilistic automation**: Claude writes narrative prose following authoring guidelines and an evaluation rubric, self-verifying and rewriting against `/wiki-lint`'s automated metrics — the inner loop at work
+
+The human operator's role is tuning the guidelines and rubric and making the final acceptance call — focusing on **directional oversight** rather than sentence-level copyediting. When the guidelines and rubric are fully captured in `CLAUDE.md`, any other Claude session rewrites to the same quality.
+
+#### Separation of authoring and review
+
+The probabilistic automation above doesn't have one Claude do everything. The Claude that writes the body and the Claude that re-reads and reviews it are split into different instances, reducing self-bias. Just as a newspaper divides labor among reporters, columnists, and the desk, authoring and verification are placed in different hands.
+
+- **Two-sided verification gate** — deterministic lint (quantitative metrics like link/citation/structure consistency) and qualitative review with fresh reader's eyes (areas like bias, narrative flow, argument quality) operate as one unit. Passing the quantitative side alone can still be blocked on the qualitative side, and vice versa.
+- **Verification failure count** — if the same criterion fails 1st, 2nd, 3rd in a row, the count is tracked automatically, and a 3rd failure for the same reason is escalated to human-operator review to prevent infinite self-repetition.
+- **Common 4-stage skeleton** — every workflow (ingest, query, health-check, rewrite, etc.) shares an "observe → write → verify → adapt" 4-stage structure, so new tasks are understood by the same pattern.
+- **Two isomorphic verification ladders** — wiki content climbs a Content Verification Ladder (post-edit hook → self-lint → batch lint → qualitative desk review → publish gate), and changes to the writing rules themselves climb a matching Guideline Verification Ladder (deterministic lint → minimal-edit check → blind review → effect-measurement gate). The same "cheapest deterministic check first" principle governs both layers.
+
+#### Editorial-form-based quality evaluation
+The body quality of per-domain overviews (`wiki/overviews/<cluster>.md`, `wiki/overview.md`) and per-theme contradiction analyses (`wiki/contradictions/<theme>.md`, `wiki/contradiction.md`) is judged by an **evaluation rubric grounded in external editorial forms**. It's designed to reduce subjective judgment and let different people or different AI sessions reproduce the same standard. The two axes use different forms — a domain overview is writing that spreads information out like a landscape, while a contradiction analysis fairly juxtaposes opposing viewpoints, so the editorial traditions differ.
+
+Forms it draws on:
+- **Per-domain overview**: journalism's nut graph · inverted pyramid (NN/g) · PAGE framing; consulting's McKinsey SCR (Situation-Complication-Resolution) · BCG Bold-bullet; Wikipedia's Summary style · Coatrack avoidance
+- **Contradiction analysis**: Wikipedia NPOV · ASF (attribute sources) · DUE (due weight); Toulmin argument (claim-grounds-rebuttal-qualifier); Hegelian thesis-antithesis-synthesis; BBC Due Impartiality
+- **Common to both axes**: Wikipedia MoS link density · first-mention principle · broken-link avoidance
+
+`python tools/lint.py overview` and `python tools/lint.py contradiction` instantly judge auto-verifiable criteria (total links, density ratio, dedup minimization, section completeness, domain boundaries, etc.) and emit a `✅/⚠️` report. The feedback loop in which Claude self-verifies against this report after writing and rewrites until the required criteria are met serves as the quality bridge of **dual automation**.
+
+#### Health-check · auto-fix
+As the wiki grows, problems accumulate: orphan pages (referenced from nowhere), broken wikilinks, missing person pages, naming-convention violations (in the optional Korean mode, say, a Korean company page created under an English filename). `/wiki-lint` checks all of these in one pass and shows a report, and the `--fix` option immediately repairs the auto-fixable items. When topic clusters form differently than expected, the diagnosis is provided alongside. At the end of the report, "page candidates referenced in multiple places but not yet created" are attached as suggestions, hinting at what to create next.
+
+Hard-to-reverse operations like creating a new page or deleting an existing one first show which files are affected and then ask for confirmation — preventing unintended changes even without Git. If the data that synchronization is keyed on (cluster definitions, contradiction theme mapping) is stale, auto-fix pauses briefly and first tells you which command to refresh with.
+
+### The meta loop — rules that learn from their own failures
+
+When the same review failure recurs, the system doesn't stop at fixing individual cases; it **collects those failures and drafts a proposal to fix the authoring guidelines themselves**. So not only the wiki body but the rules that build the wiki learn from their own mistakes.
+
+- Proposals aren't applied immediately — a change must show a **measured effect**: the same task is rewritten side-by-side with and without the change and scored blind, and a pre-fixed regression set confirms nothing else got worse. A substantive change without an accept verdict is held back.
+- Guideline edits are reviewed **blind** — a reviewer who never saw the deliberation reads only the diff and classifies each change as substantive or invariant, so wording churn can't masquerade as improvement.
+- Every accepted or rejected proposal lands in a **transition ledger**, and defects that recur after a fix are ranked first in the next review round — the loop learns from its own failed fixes, not just from new defects.
+- Recurring findings can also be **hardened into code** — promoted into a deterministic lint rule or hook, moving the problem out of the judgment layer entirely so the qualitative review stays pointed at problems nobody has seen before.
+- Adoption always ends at the operator gate: the loop proposes and measures; **it never adopts on its own**.
+
+### The reground loop — published pages come back as input
+
+Once code ships it stays put until the spec changes; knowledge doesn't — it drifts away from reality as the world moves. So this system feeds published pages back in as factory input, on three triggers, each an old newsroom practice:
+
+- **Update** — an upstream source changed. `/wiki-lint staleness` surfaces derived pages that lag the sources they were built from; a Columnist re-reads the sources and rewrites. *(A follow-up story.)*
+- **Follow-up** — one of the wiki's own claims carries an unresolved marker or a deadline that has now passed. The Desk re-adjudicates, ending at operator confirmation. *(Circling back on a story you promised to follow.)*
+- **Correction** — the wiki's own pages disagree with each other or with a generated artifact. The Desk re-reads a published cluster as one bundle, catching the mismatches that reading one page at a time can't reveal. *(A correction notice.)*
+
+These triggers surface work as advisories rather than hard failures (one narrow exception does fail the build), and a deterministic check never closes an item by itself — a human or the Desk does. One honest gap: follow-up items don't yet have a close procedure, so a surfaced item re-fires on every run until an adjudication ledger is built.
+
+---
+
 ## Architecture
 
-### Three-layer structure
-
-This follows the [LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) proposed by Andrej Karpathy. The source documents (Layer 1), the agent-processed wiki (Layer 2), and the agent's operating rules (Layer 3) are kept separate so that humans and AI don't trespass into each other's territory.
-
-The Layer 2 wiki is further formalized into **four sub-layers**. Knowing which slash command produces or updates each sub-layer makes the workflow intuitive to follow.
+The three layers from [the concept](#the-concept) live in `raw/` (Layer 1), `wiki/` (Layer 2), and `CLAUDE.md` + `.claude/` (Layer 3). The Layer 2 wiki is further formalized into **four sub-layers**. Knowing which slash command produces or updates each sub-layer makes the workflow intuitive to follow.
 
 | Sub-layer | Role | Producing/updating command | Output location |
 |------|------|----------------|---------|
@@ -422,160 +624,6 @@ The scripts that work behind the slash commands. They **run locally** with no ex
 | `lint.py` | Group checks: `graph` (page structure · document↔entity references · cluster health) / `hub` (quoted speakers · new-page candidates · L2-2 hub frontmatter) / `meta` (CLAUDE.md internal links · header convention · craft-skill chain integrity) / `overview` (landscape-axis overview file Rubric · Freshness) / `contradiction` (conflict-axis per-theme analysis) / `source` (L2-1 source page schema) / plus auxiliary groups `synthesis`·`trail`·`timeline`·`staleness`. Also suggests "new page candidates worth creating" at the end of the report. `python tools/lint.py graph orphans --fix` auto-connects orphan documents; `python tools/lint.py overview <target> --fix` produces a single per-domain overview skeleton + rewrite instructions |
 | `query.py` | Search/traversal CLI — `graph` subcommand for graph traversal (`path A B`·`explain N`·`neighbors N`), `qmd` subcommand for body search (`hybrid`·`search`·`vsearch`). `--budget` to reduce response size and `--json` for machine parsing |
 | `discover.py` | Rank pages that bridge clusters (`surprising`) — combine shortest-path frequency · neighbor cluster diversity · over-degree penalty to auto-surface "centers of unexpected connection" |
-
----
-
-## Key Features
-
-### Persistent wiki
-AI conversation sessions evaporate when they end, but this project **accumulates the extracted knowledge as structured markdown files**. They're plain text files, version-controlled with Git and viewable in ordinary tools like Obsidian or VS Code, so you're not locked into any vendor.
-
-### Dual automation
-The wiki body is not typed by humans. Two kinds of automation handle it in layers.
-
-- **Deterministic automation**: Python scripts generate mechanical outputs like links, rankings, and catalogs
-- **Probabilistic automation**: Claude writes narrative prose following authoring guidelines and an evaluation rubric, self-verifying and rewriting against `/wiki-lint`'s automated metrics
-
-The human operator's role is tuning the guidelines and rubric and making the final acceptance call — focusing on **directional oversight** rather than sentence-level copyediting. When the guidelines and rubric are fully captured in `CLAUDE.md`, any other Claude session rewrites to the same quality.
-
-### Separation of authoring and review
-
-The probabilistic automation above doesn't have one Claude do everything. The Claude that writes the body and the Claude that re-reads and reviews it are split into different instances, reducing self-bias. Just as a newspaper divides labor among reporters, columnists, and the desk, authoring and verification are placed in different hands.
-
-- **Two-sided verification gate** — deterministic lint (quantitative metrics like link/citation/structure consistency) and qualitative review with fresh reader's eyes (areas like bias, narrative flow, argument quality) operate as one unit. Passing the quantitative side alone can still be blocked on the qualitative side, and vice versa.
-- **Verification failure count** — if the same criterion fails 1st, 2nd, 3rd in a row, the count is tracked automatically, and a 3rd failure for the same reason is escalated to human-operator review to prevent infinite self-repetition.
-- **Common 4-stage skeleton** — every workflow (ingest, query, health-check, rewrite, etc.) shares an "observe → write → verify → adapt" 4-stage structure, so new tasks are understood by the same pattern.
-- **Two isomorphic verification ladders** — wiki content climbs a Content Verification Ladder (post-edit hook → self-lint → batch lint → qualitative desk review → publish gate), and changes to the writing rules themselves climb a matching Guideline Verification Ladder (deterministic lint → minimal-edit check → blind review → effect-measurement gate). The same "cheapest deterministic check first" principle governs both layers.
-- **Self-improvement loop** — when the same review failure recurs, it doesn't stop at fixing individual cases; it **collects those failures and drafts a proposal to fix the authoring guidelines themselves**. So not only the wiki body but the rules that build the wiki learn from their own mistakes.
-  - Proposals aren't applied immediately — a change must show a **measured effect**: the same task is rewritten side-by-side with and without the change and scored blind, and a pre-fixed regression set confirms nothing else got worse. A substantive change without an accept verdict is held back.
-  - Guideline edits are reviewed **blind** — a reviewer who never saw the deliberation reads only the diff and classifies each change as substantive or invariant, so wording churn can't masquerade as improvement.
-  - Every accepted or rejected proposal lands in a **transition ledger**, and defects that recur after a fix are ranked first in the next review round — the loop learns from its own failed fixes, not just from new defects.
-
-### Cascading updates
-Ingesting one new document **automatically updates the existing entity/concept pages it mentions**. For example, ingesting an article about "Meta releases an open-weights model" extends the fact list in `Meta.md` and adds an item to the releases section of `OpenWeights.md`. This implements Karpathy's original idea that "ingesting 1 document changes 10–15 pages" — one of the framework's core characteristics.
-
-### Automatic duplicate-document skip
-To avoid re-ingesting the same article, it **double-indexes by URL and file path** (`wiki/sources/_source_map.json`). Even if a re-scrape via Obsidian Web Clipper changes the filename slightly, a matching URL is detected as a duplicate. Cases where a filename drifts due to Unicode quote differences (`'` vs `'`) are normalized and handled too.
-
-### Contradiction detection · 3-layer tracking
-When a new document conflicts with existing claims, it's auto-recorded at ingest time. Readers drill down three levels using `wiki/index.md` as the entry point.
-
-1. **`wiki/contradiction.md`** — global aggregation of contradictions. The editor's tension-axis narrative + theme summaries.
-2. **`wiki/contradictions/<theme>.md`** — per-theme deep analysis (e.g., whether an "open source" model must release its training data). Which themes exist and which raw issues belong to which theme is defined by `_contradictions_themes.json` as the mapping SoT.
-3. **`wiki/contradictions/_contradictions.json`** — source DB of auto-detected individual issues.
-
-It's designed in `macro summary → theme interpretation → raw evidence` order, so wherever a reader stops, that layer reads as self-contained. `wiki/overview.md` covers only per-domain overviews and includes no contradiction references — the common entry point for both axes is `wiki/index.md`.
-
-### Search/traversal queries (`tools/query.py`)
-Having the LLM read every page in full to answer a question is costly, and an AI agent can only handle a limited amount of context at once. This tool is a CLI that helps the agent **understand the structure first, or narrow candidates, before reading pages**, with two subcommands, `graph` and `qmd`.
-
-**Graph traversal** (`python tools/query.py graph ...`) — structural queries using link relationships:
-
-- **`graph path Meta OpenSourceInitiative`** — shows the shortest path connecting two pages and why each link was formed (`[[X]] — connection reason` explanation). You can trace the logical flow from "Meta" to "OpenSourceInitiative" without a single click.
-- **`graph explain OpenWeights`** — summarizes which cluster a page belongs to, which pages reference it, and what it points to.
-- **`graph neighbors Meta`** — groups directly connected pages by cluster to see "what's around" at a glance.
-
-**Body search** (`python tools/query.py qmd ...`) — local search that actually inspects page bodies to find the ones matching a topic (no external transmission):
-
-- **`qmd hybrid "open weights vs open source"`** — recommendation search combining keyword, meaning, and reranking.
-- **`qmd search "OpenAI"`** — BM25 keyword matching (fastest).
-- **`qmd vsearch "models that are open in name only"`** — vector-based semantic similarity (finds it by context even when the exact keyword isn't in the body — here, surfacing the open-washing pages).
-
-`--budget N` limits the number of output lines so the agent pulls exactly as much as it can digest. `--json` enables program-to-program integration.
-
-### PDF ingest (multimodal)
-Beyond text articles, PDF documents are absorbed through the same pipeline. Drop a `.pdf` file into the `raw/PDF/` folder, and the next `/wiki-ingest` run auto-detects it; Claude Code's Read tool opens the PDF directly and interprets its body, tables, and figures. It's a mechanism for handling **long documents not published as HTML**, like industry reports, regulatory filings, and conference materials.
-
-- **Download**: Put the PDF URL in the inbox queue (`raw/_inbox.md`) and run `/wiki-ingest inbox` to save it as a binary under `raw/PDF/`. Just the `.pdf` lands, with no separate meta file.
-- **URL management inside the wiki page**: Record the URL in the `source_url:` frontmatter of `wiki/sources/<slug>.md` generated at ingest, so dedup works even if the same document is re-downloaded. Even if you manually drop just a PDF with no URL, duplicates are filtered by file path.
-
-### Health-check · auto-fix
-As the wiki grows, problems accumulate: orphan pages (referenced from nowhere), broken wikilinks, missing person pages, naming-convention violations like a Korean company created with an English filename. `/wiki-lint` checks all of these in one pass and shows a report, and the `--fix` option immediately repairs the auto-fixable items. When topic clusters form differently than expected, the diagnosis is provided alongside. At the end of the report, "page candidates referenced in multiple places but not yet created" are attached as suggestions, hinting at what to create next.
-
-Hard-to-reverse operations like creating a new page or deleting an existing one first show which files are affected and then ask for confirmation — preventing unintended changes even without Git. If the data that synchronization is keyed on (cluster definitions, contradiction theme mapping) is stale, auto-fix pauses briefly and first tells you which command to refresh with.
-
-### Editorial-form-based quality evaluation
-The body quality of per-domain overviews (`wiki/overviews/<cluster>.md`, `wiki/overview.md`) and per-theme contradiction analyses (`wiki/contradictions/<theme>.md`, `wiki/contradiction.md`) is judged by an **evaluation rubric grounded in external editorial forms**. It's designed to reduce subjective judgment and let different people or different AI sessions reproduce the same standard. The two axes use different forms — a domain overview is writing that spreads information out like a landscape, while a contradiction analysis fairly juxtaposes opposing viewpoints, so the editorial traditions differ.
-
-Forms it draws on:
-- **Per-domain overview**: journalism's nut graph · inverted pyramid (NN/g) · PAGE framing; consulting's McKinsey SCR (Situation-Complication-Resolution) · BCG Bold-bullet; Wikipedia's Summary style · Coatrack avoidance
-- **Contradiction analysis**: Wikipedia NPOV · ASF (attribute sources) · DUE (due weight); Toulmin argument (claim-grounds-rebuttal-qualifier); Hegelian thesis-antithesis-synthesis; BBC Due Impartiality
-- **Common to both axes**: Wikipedia MoS link density · first-mention principle · broken-link avoidance
-
-`python tools/lint.py overview` and `python tools/lint.py contradiction` instantly judge auto-verifiable criteria (total links, density ratio, dedup minimization, section completeness, domain boundaries, etc.) and emit a `✅/⚠️` report. The feedback loop in which Claude self-verifies against this report after writing and rewrites until the required criteria are met serves as the quality bridge of **dual automation**.
-
-### Knowledge graph visualization
-Drawing every page as a node and every wikilink as an edge, it generates an interactive browser graph (`graph/graph.html`). Clicking a node highlights its connections, and each edge carries a "why it's connected" label readable on mouse hover. Edges are classified into 5 types (contradicts·defines·cites·references·inferred) and color-coded — the 4 explicit edge types stated in the body get different colors by relationship meaning, while inferred edges leading to pages that aren't directly linked but share 3+ common references are shown in lavender, surfacing implicit relatedness.
-
-Serve the `graph/` folder over a local web server (e.g. `python -m http.server`) and open `graph.html` — it fetches its data, so a `file://` double-click is unsupported — and these interactions are available right in the browser:
-
-- **Live physics simulation** — nodes find their place by spring, gravity, and repulsion, and stop automatically when motion settles
-- **Drag to rearrange** — drop a node and it pins there; surrounding nodes respond physically to adjust the layout
-- **Domain filter** — toggle on/off by clicking in the sidebar; hovering a domain row wraps that region in color
-- **Relationship filter** — classify edges into 5 types (contradicts·defines·cites·references·inferred) and toggle, e.g., "I want to see only contradiction relationships in this graph"
-- **Search** — search by node name for automatic camera move + top-match highlight
-- **Select and explore surroundings** — clicking a node highlights its connected edges and shows neighbor labels; a **local view** mode that keeps only the 1·2·3-hop range to focus on nearby relationships
-- **Fragile-bridge highlight** — mark connection points that link two domains by a single edge in orange (sidebar toggle)
-- **Analysis overlay** — overlay a saved associative trail or a contradiction's opposing camps in color on top of the graph, to see a path's flow or a confrontation structure within the overall terrain
-- **Shareable link** — filter, local-view, and highlight state are all recorded in the URL, so the same view can be shared as-is
-
-### Automatic topic clustering
-Instead of a human assigning every entity/concept page to a category by hand, it uses an algorithm that **groups similar topics looking only at the connections between pages** ([Leiden community detection](https://en.wikipedia.org/wiki/Leiden_algorithm)). The result is intuitive clusters — here, the example corpus splits cleanly into "open-source AI definition," "open weights," and "licensing · open-washing." Each source document is assigned by weighted vote to the cluster of the entities it referenced, so documents that overlap in topic are listed in multiple cluster catalogs at once.
-
-> Leiden is the successor to the better-known Louvain algorithm, solving Louvain's limitation (the modularity-local-maxima trap) where cluster boundaries swing wildly under small graph changes, via a refinement stage and connectivity guarantees. In the larger corpus this engine was built for, as the wiki grew to ~470 hubs Louvain hit an unstable regime where adding just 7 new sources would make the cluster count jump from 7 to 10; after adopting Leiden, the same change was measured to stay stable at 8→8. (The small example corpus shipped here has only 3 clusters, so the instability doesn't show up — but the algorithm choice still matters as a wiki grows.)
-
-<details>
-<summary>✍️ <strong>Editing cluster labels (<code>graph/cluster_labels.json</code>)</strong> — the one config you hand-edit. <em>Operator detail.</em></summary>
-
-The algorithm only finds clusters; it can't name them. `graph/cluster_labels.json` is a small config file that attaches a **human-understandable name** ("cyber security," "cloud native," etc.) to each automatically found cluster. This file is nearly the only config in this project that the operator opens and edits directly; everything else is auto-generated.
-
-When a new topic cluster is discovered and needs a label, `/wiki-lint` tells you. Just add one entry in the format below.
-
-```json
-{
-  "slug": "licensing-open-washing",
-  "name": "Licensing & Open-Washing",
-  "anchor_members": [
-    "concepts/ModelLicensing.md",
-    "concepts/OpenWashing.md",
-    "entities/Meta.md"
-  ],
-  "paired_with": ["open-source-ai-definition"]
-}
-```
-
-- **`slug`** — an English identifier. Used as the catalog filename (`_catalog-<slug>.md`) and as the `/wiki-news <slug>` command argument, so use only letters, digits, and hyphens.
-- **`name`** — the human-readable display name. Surfaced in the catalog title and the index.
-- **`anchor_members`** — 3–6 pages representing this cluster. The script matches a label by "are at least half of the designated representative pages grouped into one community," so too few risks a match failure and too many risks overlap with another community.
-- **`paired_with`** *(optional)* — an array of paired-cluster slugs whose work naturally overlaps. E.g., here "licensing · open-washing" ↔ "open-source AI definition" (the two debates share figures and arguments). Writing it on one side applies it both ways, and even if a paired cluster's representative page appears in the per-domain overview body, `/wiki-lint` won't flag it as narrative drift. Do not list a split-off relationship where a domain broke away — there you *do* need to check whether the body is stuck in the old flow.
-
-After editing, re-run `python tools/build.py` and the new name is reflected in every catalog and the index.
-
-</details>
-
-### Wiki-based latest-news search
-`/wiki-news` builds keyword combinations from the entities/concepts accumulated in the wiki and **selects only the latest articles** from the web. For example, specifying the `open-source-ai-definition` cluster generates search terms combining that cluster's major hubs ("OpenSourceInitiative," "OSAID," "training data"). It dedups against existing source titles and recommends only new articles as ingest candidates. It fetches the body even on sites with strong bot blocking by behaving like a browser. When a particular topic is empty, it follows the links in related articles to find further candidates to fill that gap.
-
-### Claude.ai mobile integration
-`/wiki-export` exports the wiki in **two layers** — RAG (synthesis · directory) synthesizes the answer, and detailed originals are provided by the graph browser (deep links). A Claude.ai project loads attached knowledge **wholesale into context** rather than retrieving it, so entity/concept bodies (about 70% of the total) and source originals are not put into RAG — doing so would vastly exceed the context limit (~200K tokens). Instead, `index.md` is a directory holding every entity/concept with a one-line description + deep link, and the synthesis layer (domain overviews · contradiction analyses · analysis reports) fills in the substance of answers. `README.md` carries the upload budget guide (start from Core ~130K tokens) and the deep-link convention to paste into project instructions. Push these files to GitHub and connect them as Claude.ai **Project Knowledge**, and you can query the wiki even from a phone — answers built from the synthesis layer, details pointed to via graph links.
-
-So that answers understand the wiki structure and attach links to the graph, paste the entire `wiki-export/README.md` that export also produces (an instruction document covering file structure, answer rules, and the deep-link convention) once into the **custom instructions** box of the Claude.ai project. Then, when citing a hub the answer links to that page, and when pinning a specific claim's source it links straight to the original.
-
-### Associative discovery — finding unexpected connections
-`/wiki-discover` surfaces connections hidden in the wiki in two ways.
-
-- **Seed exploration**: starting from a specific page like `/wiki-discover Meta`, it follows backlinks and co-references 2 hops to present **pages not directly linked to the seed but unexpectedly close** (e.g., "model licensing terms → training-data disclosure"). Giving `--random` picks a random hub in the mid-range of backlink counts and runs the same exploration.
-
-- **Bridge-hub ranking (`--surprising`)**: automatically selects the pages that **most bridge** different topic clusters. The score rises the more often it appears on shortest paths, the more its neighbors span multiple clusters, and the less it's so famous as to seem "obvious." The "unexpected centers" are output as a top N even with no seed input.
-
-### Associative trails (Memex Trail)
-[Vannevar Bush's Memex](https://en.wikipedia.org/wiki/Memex) (1945) proposed knowledge exploration that follows trails between pieces of information. `/wiki-trail` builds and saves a **path of 5–10 pages woven in order, with commentary at each step**, for a given topic. Good for sharing with a team: "to understand this topic, read it in this order."
-
-### Timeline
-Specifying an entity and a year like `/wiki-timeline Meta 2024` generates a **storyline sorted chronologically** of that person's or company's events. It groups by year, combining backlinks and each source's publish date.
-
-### Two-level index
-Once the wiki exceeds 1,000 documents, a single list file becomes hard to navigate. This project lists only entities/concepts/analyses in the main index (`wiki/index.md`) and **splits documents into per-cluster sub-catalogs**. A document spanning multiple clusters is listed in all relevant catalogs. All lists — entities, concepts, analyses — are uniformly sorted A–Z (under `WIKI_LANG=ko`, Hangul-titled pages sort first in ga-na-da order, then A–Z).
 
 ---
 
