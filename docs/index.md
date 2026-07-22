@@ -34,11 +34,20 @@ The example corpus shipped in the repo — the debate over what "open source" me
 
 ## What makes it different
 
-There are plenty of takes on [Karpathy's LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) idea now. After reading the popular implementations, three things here are genuinely rare:
+It keeps the three-layer shape of [Karpathy's LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) — `raw/` for untouched sources, `wiki/` for the pages the agent maintains, and a schema layer holding the operating rules — plus the same three operations: ingest, query, and lint. There are plenty of takes on that idea now; after reading the popular implementations, three things here are genuinely rare:
 
 - **Authoring guidelines that evolve themselves.** When the same review failure keeps recurring, the system drafts a fix to its _own_ writing rules and keeps it only if a blind A/B against a rotating regression set shows it actually helped. So it isn't only the wiki that improves over time, but the rules that build it. *(Still experimental — the author is measuring whether it earns its keep rather than claiming it's solved.)*
-- **A full newsroom, not just "an agent."** The work is split across five roles — a **reporter** drafts source pages, a **columnist** writes the deep cross-source analysis, a **desk** editor reviews it with fresh eyes against an editorial rubric, a **copy editor** runs deterministic checks, and an **editor-in-chief** gates publication. The reviewer sees only the draft and the rubric, never the writer's reasoning — the real lever is context isolation, not instance count.
+- **A full newsroom, not just "an agent."** The work is split across five roles — a **reporter** drafts source pages, a **columnist** writes the deep cross-source analysis, a **desk** editor re-reads it for bias, argument quality, and narrative flow, a **copy editor** runs deterministic checks, and an **editor-in-chief** routes work and gates publication. Not every seat is a model passing judgment: the desk holds the only independent LLM verdict, the copy editor is a Python script, and the rest is writing work or orchestration. The reviewer sees only the draft and the rubric, never the writer's reasoning — the real lever is context isolation, not instance count.
 - **Memex-style associative discovery.** Saved reading trails and "unexpected connection" surfacing, inspired by [Vannevar Bush's Memex (1945)](https://en.wikipedia.org/wiki/Memex), that the other implementations don't carry.
+
+Nothing reaches the wiki until it clears both gates:
+
+| Gate | Who | What it checks | How |
+|---|---|---|---|
+| 1 | copy editor | links, citations, structure | deterministic — `tools/lint.py`, a Python script, not a model |
+| 2 | desk | bias, argument quality, narrative flow | qualitative — a fresh-context review against an editorial rubric |
+
+Machine-checkable things are checked by machine; only what needs judgment costs a model call.
 
 The rest — the knowledge graph, contradiction tracking, cascading updates, plain-markdown/Obsidian output — many LLM-wiki tools have in some form. The self-evolving guidelines, the five-role newsroom with its rubric, and the Memex discovery are the bet.
 
@@ -53,6 +62,8 @@ The rest — the knowledge graph, contradiction tracking, cascading updates, pla
 | Accumulation effect | none | new sources enrich existing pages |
 | Exploration | keyword search | graph traversal + associative trails |
 
+To be precise, this doesn't do away with retrieval. Karpathy framed the wiki as a compile step for knowledge, not as a replacement for search, and the optional local search used here is itself a BM25 + vector hybrid. What changes is *what* gets retrieved: a few already-structured, cross-referenced pages instead of raw chunks reassembled from scratch on every query.
+
 ## Highlights
 
 - **Persistent, plain-markdown knowledge base** — your "second brain" as version-controlled `.md` files, not a vendor silo. Doubles as an [Obsidian](https://obsidian.md) vault.
@@ -61,6 +72,23 @@ The rest — the knowledge graph, contradiction tracking, cascading updates, pla
 - **Interactive knowledge graph** — every page a node, every link an edge, auto-clustered and browsable.
 - **Associative discovery (Memex)** — follow connected concepts to surface unexpected relationships.
 - **Local-first** — the Python tools (graph, lint, search) run entirely on your machine with no API keys; the agent itself runs on Claude Code.
+
+## When the split earns its cost
+
+A separate reviewer costs more tokens and more wall-clock than letting one agent grade its own draft. That trade isn't always worth it:
+
+- **One agent is enough** when the output is quick and disposable, and a mistake costs nothing to throw away — a scratch summary, a one-off answer. Self-critique in the same context will do.
+- **Separate the writer from the reviewer** when the output is published, accumulates, and gets built on later — where a plausible-but-wrong page quietly hardens into the thing everything else cites.
+
+A wiki is the second case by construction: today's page is tomorrow's input, so an error doesn't stay one error. That's the bet here, and why this spends the extra tokens.
+
+## Where it stands
+
+- **New.** The repository went public on 2026-06-26. Treat it as the idea plus a small reproducible example, not a battle-tested product.
+- **The shipped corpus is deliberately small** — 15 pages on the open-source-AI debate. The graph screenshot above comes from a larger private instance (~2,300 nodes), shown for scale; that one you can't verify from the repo.
+- **The differentiators are hypotheses.** Writer–reviewer separation and the self-evolving loop are argued from design, not from published A/B numbers. They're being measured, not claimed as settled.
+- **"No API keys" covers the tooling, not the agent.** Build, lint, and search are local Python; the reading and writing happen through your own Claude Code access.
+- **Korean mode localizes prose, not schema.** `WIKI_LANG=ko` translates body text and field values; the frontmatter keys and section headers the tools parse stay English, and the shipped example corpus is English throughout.
 
 ## Quick start
 

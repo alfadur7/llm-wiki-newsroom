@@ -59,6 +59,27 @@
     this qualitative review; both must pass. This is a design hypothesis the
     project is testing, not a rigorously measured result.
 
+- q: "Is separating the writer and the reviewer worth the extra cost?"
+  a: >-
+    Not always. Running a separate reviewer costs more tokens and more time than
+    letting one agent critique its own draft in the same context, so for quick
+    disposable output where a mistake is cheap to throw away, a single instance is
+    enough. The split earns its cost when the output is published, accumulates,
+    and gets built on later, because there a plausible-but-wrong page quietly
+    becomes the thing everything else cites. A wiki is that second case by
+    construction: today's page is tomorrow's input, so one error does not stay one
+    error.
+
+- q: "Are all five roles separate language models?"
+  a: >-
+    No, and that distinction matters. The desk is the only seat where a language
+    model passes an independent verdict on someone else's draft. The copy editor
+    is a deterministic Python linter, not a model, because broken links, missing
+    citations, and structural violations can be settled by code. The reporter and
+    the columnist are writing roles with different jobs, and the editor-in-chief
+    routes work and gates publication. The point is context isolation between
+    writing and reviewing, not the number of agents.
+
 - q: "What are self-evolving authoring guidelines?"
   a: >-
     When the same review failure keeps recurring, the system drafts a fix to its
@@ -90,10 +111,12 @@
 - q: "Can I use it in Korean or another language?"
   a: >-
     There is an optional Korean mode, enabled with WIKI_LANG=ko, that translates
-    the page body text and frontmatter into Korean. The wiki schema tokens — the
-    section headers and inline evidence tags the tools search for — stay in
-    English by design because they are part of the data format, not display text.
-    So Korean mode localizes the prose, not the underlying schema.
+    the page body text and the frontmatter values into Korean. The schema tokens
+    — the frontmatter keys, the section headers, and the inline evidence tags the
+    tools search for — stay in English by design because they are part of the data
+    format, not display text. So Korean mode localizes the prose, not the
+    underlying schema, and the example corpus shipped in the repository is English
+    throughout.
 
 - q: "How can I see the output before installing anything?"
   a: >-
