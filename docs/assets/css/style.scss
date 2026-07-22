@@ -112,3 +112,30 @@ body {
     color: #58a6ff;
   }
 }
+
+// Korean line breaking. Browsers break CJK at any character by default, so a
+// Korean word splits down the middle (편집국 -> 편 / 집국). keep-all breaks at
+// spaces instead, the way Korean is meant to wrap; overflow-wrap stays as the
+// escape hatch so a long URL or code token still wraps instead of overflowing.
+// Scoped by [lang] so the English pages keep normal word-based wrapping.
+html[lang^="ko"] {
+  .page-header .project-name,
+  .page-header .project-tagline,
+  .main-content {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+}
+
+// Even out wrapped headings so a long title doesn't leave one stray word on the
+// last line. Browsers without text-wrap support simply ignore these.
+.page-header .project-name,
+.page-header .project-tagline,
+.main-content h1,
+.main-content h2 {
+  text-wrap: balance;
+}
+
+.main-content p {
+  text-wrap: pretty;
+}

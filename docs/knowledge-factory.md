@@ -3,8 +3,7 @@ layout: default
 title: "The Knowledge Factory: Agents Write the Wiki, Humans Design the Newsroom"
 permalink: /knowledge-factory/
 description: >-
-  A top-down account of LLM Wiki Newsroom as a knowledge factory — the software
-  factory's three loops, plus a fourth one that knowledge work needs.
+  The software factory's three loops, plus a fourth that knowledge work needs.
 schema_inlanguage: en
 hreflang_en: "https://alfadur7.github.io/llm-wiki-newsroom/knowledge-factory/"
 hreflang_ko: "https://alfadur7.github.io/llm-wiki-newsroom/ko/knowledge-factory/"
@@ -38,8 +37,6 @@ hreflang_ko: "https://alfadur7.github.io/llm-wiki-newsroom/ko/knowledge-factory/
 </style>
 
 *Read this in [한국어]({{ '/ko/knowledge-factory/' | relative_url }}).*
-
-# The Knowledge Factory: Agents Write the Wiki, Humans Design the Newsroom
 
 "Software factory" has become one of the more useful phrases in this wave of AI-assisted development. The premise: AI agents write essentially all of the shipped code, and developers stop building features by hand and start building — and improving — the system that produces them. Dru Knox of Tessl, an AI developer-tooling company, gave the discipline a name: **harness engineering**. The harness is everything that steers and drives the agent, the way a harness steers a horse, and at the center of it sit three loops.
 
