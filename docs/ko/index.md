@@ -16,7 +16,6 @@ schema_keywords: "LLM 위키, 카파시 LLM Wiki, RAG 대안, 멀티에이전트
 hreflang_en: "https://alfadur7.github.io/llm-wiki-newsroom/"
 hreflang_ko: "https://alfadur7.github.io/llm-wiki-newsroom/ko/"
 ---
-
 *In [English]({{ '/' | relative_url }}).*
 
 **LLM Wiki Newsroom은 흩어진 문서를 사람이 읽을 수 있는 서로 연결된 마크다운 위키로 정리해 주는 오픈소스 프레임워크입니다.** 신문사 편집국을 본떠 다섯 역할로 나눈 'AI 편집국' 멀티 에이전트가 위키를 관리합니다. 신문기사·메모·PDF를 raw 폴더에 넣고 명령어 하나만 실행하면, [Claude Code](https://www.anthropic.com/claude-code) 기반 에이전트가 문서를 읽고 인물·개념·관계를 뽑아 서로 링크된 페이지로 엮습니다. RAG와 달리 지식을 미리 구조화해 쌓아 둡니다. 여느 LLM Wiki 구현과 크게 다른 점은 이렇습니다. 글 쓰는 에이전트와 검수하는 에이전트를 별도로 뒀고, 위키를 만드는 저작 지침이 스스로 조금씩 개선됩니다.
@@ -42,10 +41,12 @@ hreflang_ko: "https://alfadur7.github.io/llm-wiki-newsroom/ko/"
 
 게시 전 관문은 둘이고, 둘 다 통과해야 위키에 올라갑니다.
 
-| 관문 | 누가 | 무엇을 보나 | 성격 |
-|---|---|---|---|
-| 1관문 | 교열 | 링크·인용·구조 | LLM이 아니라 규칙대로 도는 파이썬 검사(`tools/lint.py`) |
-| 2관문 | 데스크 | 편향·논증·서사 흐름 | 채점 기준(루브릭)만 들고 처음 읽듯 하는 정성 검수 |
+
+| 관문  | 누가  | 무엇을 보나      | 성격                                       |
+| --- | --- | ----------- | ---------------------------------------- |
+| 1관문 | 교열  | 링크·인용·구조    | LLM이 아니라 규칙대로 도는 파이썬 검사(`tools/lint.py`) |
+| 2관문 | 데스크 | 편향·논증·서사 흐름 | 채점 기준(루브릭)만 들고 처음 읽듯 하는 정성 검수            |
+
 
 코드로 잡히는 건 코드가 잡고, 판단이 필요한 데만 모델을 씁니다.
 
@@ -53,13 +54,15 @@ hreflang_ko: "https://alfadur7.github.io/llm-wiki-newsroom/ko/"
 
 ## RAG와 어떻게 다른가
 
-|  | RAG | LLM Wiki Newsroom |
-|---|---|---|
-| 검색 단위 | 소스 조각 | 구조화된 위키 페이지 |
-| 상호 참조 | 없음 | 위키링크 + 백링크 색인 |
-| 모순 처리 | 질문 시점에 드러날 수 있음 | 문서를 넣을 때 표시하고 추적 |
-| 축적 효과 | 없음 | 새 소스가 기존 페이지를 보강 |
-| 탐색 | 키워드 검색 | 그래프 순회 + 연상 경로(trail) |
+
+|       | RAG             | LLM Wiki Newsroom     |
+| ----- | --------------- | --------------------- |
+| 검색 단위 | 소스 조각           | 구조화된 위키 페이지           |
+| 상호 참조 | 없음              | 위키링크 + 백링크 색인         |
+| 모순 처리 | 질문 시점에 드러날 수 있음 | 문서를 넣을 때 표시하고 추적      |
+| 축적 효과 | 없음              | 새 소스가 기존 페이지를 보강      |
+| 탐색    | 키워드 검색          | 그래프 순회 + 연상 경로(trail) |
+
 
 정확히 말하면 검색을 없앤 건 아닙니다. 카파시도 위키를 검색 대신 쓰라고 한 게 아니라, 지식을 한 번 정리해 두는 단계로 제안했습니다. 여기서 쓰는 로컬 검색도 안을 열어 보면 BM25와 벡터를 섞은 방식입니다. 달라지는 건 무엇을 꺼내 오느냐입니다. 질문할 때마다 원문 조각을 다시 긁어모으는 대신, 이미 정리해 서로 엮어 둔 페이지 몇 개를 읽습니다.
 
@@ -96,15 +99,16 @@ git clone https://github.com/alfadur7/llm-wiki-newsroom.git
 cd llm-wiki-newsroom
 ```
 
-또는 **["Use this template"](https://github.com/alfadur7/llm-wiki-newsroom/generate)** 로 내 위키 레포를 바로 만들 수 있습니다. 그런 다음 `/wiki-ingest`로 내 소스를 넣으면 됩니다. 자세한 설치, 아홉 개 슬래시 명령어, 구조는 **[README(영문)](https://github.com/alfadur7/llm-wiki-newsroom#readme)** 에 설명되어 있습니다.
+또는 [**"Use this template"**](https://github.com/alfadur7/llm-wiki-newsroom/generate) 로 내 위키 레포를 바로 만들 수 있습니다. 그런 다음 `/wiki-ingest`로 내 소스를 넣으면 됩니다. 자세한 설치, 아홉 개 슬래시 명령어, 구조는 [**README(영문)**](https://github.com/alfadur7/llm-wiki-newsroom#readme) 에 설명되어 있습니다.
 
 ## 더 알아보기
 
-- **[README(영문)](https://github.com/alfadur7/llm-wiki-newsroom#readme)**: 설치, 명령어, 구조, 기능 레퍼런스
+- [**README(영문)**](https://github.com/alfadur7/llm-wiki-newsroom#readme): 설치, 명령어, 구조, 기능 레퍼런스
 - **[FAQ(한국어)]({{ '/ko/faq/' | relative_url }})**: 자주 묻는 질문
-- **[예제 위키 둘러보기](https://github.com/alfadur7/llm-wiki-newsroom/wiki)**: 레포에 담긴 예제, clone 불필요
-- **[카파시의 원본 LLM Wiki gist](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)**: 설계 영감
-- **[외부 리뷰: 신문사 편집국처럼 굴러가는 LLM 지식 위키](https://dbhyeong.github.io/blog/llm-wiki-newsroom-multi-agent-knowledge-wiki)**: 구조를 도식으로 풀고, 이 프로젝트의 주장을 레포·원문과 대조해 한계까지 짚은 제3자 글
+- **[지식 팩토리(한국어)]({{ '/ko/knowledge-factory/' | relative_url }})**: 편집국을 움직이는 4대 루프 지식 생산 체계를 개념부터 구현까지 설명
+- [**예제 위키 둘러보기**](https://github.com/alfadur7/llm-wiki-newsroom/wiki): 레포에 담긴 예제, clone 불필요
+- [**카파시의 원본 LLM Wiki gist**](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f): 설계 영감
+- [**외부 리뷰: 신문사 편집국처럼 굴러가는 LLM 지식 위키**](https://dbhyeong.github.io/blog/llm-wiki-newsroom-multi-agent-knowledge-wiki): 구조를 도식으로 풀고, 이 프로젝트의 주장을 레포·원문과 대조해 한계까지 짚은 제3자 글
 
 ---
 
