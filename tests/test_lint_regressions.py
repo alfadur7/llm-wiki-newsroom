@@ -199,3 +199,20 @@ def test_reground_status_surfaces_superseded_but_open_claims():
     assert line is not None
     assert "1 superseded claim(s) still open" in line
     assert "c1" in line and "c2" not in line
+
+
+def test_valid_link_target_set_has_one_owner(monkeypatch):
+    """The "valid wikilink target" set was implemented three times (graph
+    structure · link_candidates · the write-time hook). When only one copy
+    changed, one check called a link broken and another did not.
+
+    A fake stem is injected rather than asserting the import binding — a test
+    that only checks `module.helper is _lib.helper` still passes after someone
+    re-inlines the glob at the call site, which is the recurrence this guards.
+    """
+    import link_candidates
+    from pathlib import Path as _P
+
+    sentinel = {"__ONLY_FROM_THE_SHARED_HELPER__": _P("x.md")}
+    monkeypatch.setattr(link_candidates, "wiki_page_paths", lambda: sentinel)
+    assert link_candidates._index_pages() == sentinel

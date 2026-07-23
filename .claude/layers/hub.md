@@ -19,6 +19,10 @@ Place freely between the two required sections — a domain judgment. Hub bodies
 
 A body (frontmatter excluded) of total length **≥ 200 characters** + adherence to the two required sections + at least 1 link in `## Connections`.
 
+### `last_updated` = the narrative date
+
+Bump `last_updated` to today **only when the body (H2 and below) actually changed**. A `sources:` append or a frontmatter tidy-up MUST NOT bump it — bumping re-dates the hub as freshly authored, which masks a lagging narrative as fresh in the staleness check. Propagating a newly ingested source downstream is the build's job, not this field's (`tools/_build/dependencies.py` composite propagation date).
+
 ### Authoring Acts — stub authoring vs full hub authoring
 
 The two authoring acts of an L2-2 hub are distinguished not by the H2 count or body length of the output but by the **cycle they go through**.

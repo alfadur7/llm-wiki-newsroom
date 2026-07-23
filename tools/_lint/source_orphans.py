@@ -28,7 +28,6 @@ import json
 import re
 import sys
 from collections import defaultdict
-from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -50,7 +49,6 @@ HUB_SUBDIRS = ("entities", "concepts", "syntheses", "trails", "timelines")
 
 SOURCES_KEY_RE = re.compile(r"^sources:")
 BLOCK_ITEM_RE = re.compile(r"^[ \t]*-\s+")
-LAST_UPDATED_RE = re.compile(r"^(last_updated:\s*).*$", re.MULTILINE)
 CONN_RE = re.compile(r"## Connections\n(.*?)(?=\n## |\Z)", re.DOTALL)
 
 _SLUG_TOKEN_RE = re.compile(r"[-_]+")
@@ -116,9 +114,13 @@ def _format_list(items: list[str]) -> str:
     return "[" + ", ".join(items) + "]"
 
 
-def _rewrite_sources(text: str, items: list[str], today: str) -> str:
+def _rewrite_sources(text: str, items: list[str]) -> str:
     """Return `text` with its frontmatter `sources:` set to the inline list
-    `items`, and `last_updated` bumped to `today` when that field exists.
+    `items`. `last_updated` is left untouched — a sources-list sync changes no
+    narrative, and a hub's frontmatter date IS its narrative date (rule SoT:
+    `.claude/layers/hub.md`). New-source arrival reaches downstream pages via
+    the composite propagation date in `tools/_build/dependencies.py`, not via a
+    bump here; bumping would re-date the hub fresh and mask its own staleness.
 
     A block-style `sources:` (a `sources:` line followed by `- item` lines) is
     normalized to inline in place — the following block lines are consumed so
@@ -153,14 +155,12 @@ def _rewrite_sources(text: str, items: list[str], today: str) -> str:
         out.append("sources: " + _format_list(items))
 
     fm_new = "\n".join(out)
-    if LAST_UPDATED_RE.search(fm_new):
-        fm_new = LAST_UPDATED_RE.sub(f"\\g<1>{today}", fm_new)
     return f"---\n{fm_new}\n---\n{body}"
 
 
 def _apply_backfill() -> int:
     """Sync each source's `## Connections` links into the referenced hub's
-    frontmatter `sources:` list. Bumps `last_updated` on modified hubs.
+    frontmatter `sources:` list.
 
     Returns the number of hub files updated.
     """
@@ -190,13 +190,12 @@ def _apply_backfill() -> int:
         print("\n[--fix] Nothing to backfill; hub sources: frontmatter is already in sync.")
         return 0
 
-    today = date.today().isoformat()
     for hub_name, new_slugs in additions.items():
         p = hubs[hub_name]
         text = read_text_cached(p)
         existing = _hub_sources(text)
         merged = existing + [s for s in new_slugs if s not in existing]
-        atomic_write_text(p, _rewrite_sources(text, merged, today))
+        atomic_write_text(p, _rewrite_sources(text, merged))
 
     total = sum(len(v) for v in additions.values())
     print(f"\n[--fix] Updated {len(additions)} hub files "
@@ -246,7 +245,6 @@ def _apply_typo_fixes(
     """
     hub_paths = _hub_paths()
 
-    today = date.today().isoformat()
     touched: set[str] = set()
     fixed_slugs: set[str] = set()
     for slug, target, _score, hubs in fixable:
@@ -263,7 +261,7 @@ def _apply_typo_fixes(
                 items = [s for s in items if s != slug]
             else:
                 items = [target if s == slug else s for s in items]
-            atomic_write_text(p, _rewrite_sources(text, items, today))
+            atomic_write_text(p, _rewrite_sources(text, items))
             touched.add(page_id)
             fixed_slugs.add(slug)
 
@@ -278,7 +276,6 @@ def _apply_conn_source_backfill(conn_unregistered: dict[str, list[str]]) -> int:
     `sources:` list. Returns the number of hub files updated."""
     hub_paths = _hub_paths()
 
-    today = date.today().isoformat()
     touched = 0
     for page_id, new_slugs in conn_unregistered.items():
         p = hub_paths.get(page_id)
@@ -287,7 +284,7 @@ def _apply_conn_source_backfill(conn_unregistered: dict[str, list[str]]) -> int:
         text = read_text_cached(p)
         existing = _hub_sources(text)
         merged = existing + [s for s in new_slugs if s not in existing]
-        atomic_write_text(p, _rewrite_sources(text, merged, today))
+        atomic_write_text(p, _rewrite_sources(text, merged))
         touched += 1
     return touched
 

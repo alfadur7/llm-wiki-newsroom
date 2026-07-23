@@ -4,7 +4,7 @@ type: entity
 kind: org
 tags: [Mozilla, open-source-ai, advocacy]
 sources: [mozilla-celebrates-osaid, osi-open-source-ai-definition, case-against-osaid]
-last_updated: 2026-06-26
+last_updated: 2026-07-19
 ---
 
 ## Overview

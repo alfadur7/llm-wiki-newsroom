@@ -191,6 +191,7 @@ Guideline-authoring voice and plan-bloat control are craft, not policy — they 
   - advisory: after editing L2-2 full hub, timeline, L2-3, or L2-4, recommend target-scope `python tools/lint.py <group> <target>` self-VERIFY₀
   - advisory: for `*/plans/*.md`, the 5-step self-check, the 4 red-flag types + for `.claude/{agents,commands,layers,policies,operations}/` SoTs and CLAUDE.md (skills·hooks·memory excluded), the Guideline Verification Ladder + a diff bullet-depth check (helper `check_bullet_depth.py`)
   - advisory: on editing a desk-judged prose-craft SoT (`.claude/layers/*.md`, `agents/desk|reporter|columnist.md`), recommend the proposal-validation measurement before adoption (SoT: `operations/proposal-validation-runbook.md` + `agents/editor-in-chief.md` step 6)
+  - advisory: after writing a `wiki/` page containing an unresolved wikilink, name the targets and require one of four resolution branches before hand-off (branch text in `dispatch.py`; page-existence uses the same `tools/_lib.py` set as `lint graph structure`)
   - advisory: on Write of a script-like temporary file directly under the project root, recommend a temp directory (structural prevention of the 2026-05-08 incident)
   - advisory: on writing or modifying `tools/**/*.py` or `.claude/hooks/*.py|sh`, recommend loading and applying the `ponytail-coding` skill (the authoring-time code-restraint reflex — the SoT is `skills/ponytail-coding/SKILL.md`; the rule body is not duplicated here)
 

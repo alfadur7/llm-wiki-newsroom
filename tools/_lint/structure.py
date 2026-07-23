@@ -17,7 +17,9 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, WIKI_SUBDIRS, MARKUP_LEAK_RE, WIKILINK_TARGET_RE as LINK_RE, atomic_write_text, korean_mode, parse_frontmatter, read_text_cached, real_source_files, strip_code  # noqa: E402
+from _lib import WIKI, MARKUP_LEAK_RE, WIKILINK_TARGET_RE as LINK_RE, atomic_write_text, korean_mode, parse_frontmatter, read_text_cached, real_source_files, strip_code, wiki_page_paths  # noqa: E402
+sys.path.insert(0, str(Path(__file__).parent))
+from _hub_common import HUB_SPECS, iter_hub_files  # noqa: E402
 
 HEADING_RE = re.compile(r"^#{1,6}\s+(.+?)\s*$")
 
@@ -239,27 +241,9 @@ def _reconnect_orphan_hubs(orphan_stems: list[str], fix: bool) -> dict[str, list
 
 
 def run(fix: bool = False) -> int:
-    all_pages: dict[str, Path] = {}
+    all_pages = wiki_page_paths()
 
-    for p in WIKI.glob("*.md"):
-        if p.name.startswith("_"):
-            continue
-        all_pages[p.stem] = p
-
-    for subdir in WIKI_SUBDIRS:
-        d = WIKI / subdir
-        if not d.exists():
-            continue
-        for p in d.glob("*.md"):
-            if p.name.startswith("_"):
-                continue
-            all_pages[p.stem] = p
-
-    hubs: set[str] = set()
-    for sub in ("entities", "concepts"):
-        for p in (WIKI / sub).glob("*.md"):
-            if not p.name.startswith("_"):
-                hubs.add(p.stem)
+    hubs: set[str] = {p.stem for d, _ in HUB_SPECS for p in iter_hub_files(d)}
 
     # Source page stems — the missing-entity-candidate tally counts *distinct
     # sources* per naming.md ("≥3 distinct source"), so only links originating

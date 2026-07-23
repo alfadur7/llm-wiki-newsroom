@@ -17,7 +17,8 @@ summary).
   * `type`: inferred from the directory (entities/→entity, concepts/→concept,
     timelines/→timeline). Either inserted when missing, or corrected when
     mismatched with the directory.
-  * `last_updated`: inferred from `git log -1 --format=%cs -- <path>`.
+  * `last_updated`: inferred from the git EDITOR-body last-commit date
+    (the narrative date — sources-sync commits excluded, `_editor_date.py`).
     Falls back to today's date when git is unavailable.
 
 `title`, `tags`, `sources` are NEVER auto-filled — each requires semantic
@@ -40,7 +41,7 @@ from _lib import FRONTMATTER_BLOCK_RE as FRONTMATTER_RE, WIKI, atomic_write_text
 sys.path.insert(0, str(Path(__file__).parent))
 from _schema_common import check_frontmatter  # noqa: E402
 from _hub_common import iter_hub_files  # noqa: E402
-from _editor_date import last_commit_date  # noqa: E402
+from _editor_date import editor_last_commit_date  # noqa: E402
 
 ENTITIES_DIR = WIKI / "entities"
 CONCEPTS_DIR = WIKI / "concepts"
@@ -175,7 +176,10 @@ def _apply_auto_fix(path: Path, fm: dict, expected_type: str) -> tuple[bool, lis
 
     # last_updated: insert if missing.
     if not fm.get("last_updated"):
-        commit_date = last_commit_date(path) or _date.today().isoformat()
+        # EDITOR-body date, not a plain `git log -1` — the last commit touching
+        # a hub is often a sources-sync commit, which would stamp exactly the
+        # non-narrative date the `last_updated` = narrative-date rule forbids.
+        commit_date = editor_last_commit_date(path) or _date.today().isoformat()
         new_content = _inject_or_set_field(new_content, "last_updated", commit_date)
         actions.append(f"last_updated=<missing> → {commit_date}")
 

@@ -56,7 +56,7 @@ The columnist's essence is **deep sequential reading + cross-source synthesis**.
 
 **Output**:
 - changes to the target file's EDITOR block (AUTO block preserved)
-- updated frontmatter `last_updated`
+- updated frontmatter `last_updated` (only when the body changed — for a hub that field is the narrative date, [`layers/hub.md`](../layers/hub.md))
 - (if needed) updated frontmatter `sources:` list
 
 **Report delivery**: finish with the Output above as your reply. As an anonymous sub-Agent (the default) the final text reaches the caller automatically; when running as a named teammate (adversarial faction authoring only), the final text does not reach main — deliver the same report via `SendMessage(to: "main")` (a deferred tool: pre-load it via `ToolSearch`). File outputs persist on the shared FS, but without the report the Editor-in-Chief cannot hand off to the next stage. (SoT: [README § Report delivery](README.md#report-delivery))
@@ -105,7 +105,7 @@ You have been invoked as this project's Columnist agent. You own authoring of <L
 ## Output
 - Edit·Write the target file
 - After authoring, run self-VERIFY₀ → confirm target-scope `python tools/lint.py` PASS (for the command, see the table in [copyeditor.md "Invocation Convention"](copyeditor.md)). On FAIL, do ≤ 2 own ADAPTs on the same cause, then PASS or forced hand-off.
-- Update frontmatter last_updated
+- Update frontmatter last_updated (only when the body changed)
 - Change summary (for the Editor-in-Chief hand-off)
 ```
 

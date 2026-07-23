@@ -22,12 +22,21 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import AUTO_BLOCK_RE  # noqa: E402
+from _lib import AUTO_BLOCK_RE, strip_frontmatter  # noqa: E402
 
 
 def editor_hash(content: str) -> str:
-    """SHA1 of the EDITOR region (AUTO blocks stripped) for change detection."""
-    editor = AUTO_BLOCK_RE.sub("", content)
+    """SHA1 of the authored narrative — AUTO blocks AND frontmatter stripped.
+
+    Frontmatter must be excluded or the hash is self-referential: bumping
+    `last_updated` alone changes it, so the page dates itself fresh on an edit
+    that never touched the narrative. That is the exact masking these helpers
+    exist to prevent — a commit that only appends a `sources:` entry and bumps
+    `last_updated` would otherwise register as an authored edit, hiding a body
+    months older than its upstream. `strip_frontmatter` is a no-op on the root
+    meta files, which carry none.
+    """
+    editor = AUTO_BLOCK_RE.sub("", strip_frontmatter(content))
     return hashlib.sha1(editor.encode("utf-8", errors="replace")).hexdigest()
 
 

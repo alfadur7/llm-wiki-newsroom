@@ -82,7 +82,7 @@ def analyze(records: list[dict], since: str | None, pages: bool = False):
     for r in records:
         if r.get("kind") != "defect":
             continue
-        if since and str(r.get("date", "")) <= since:
+        if not _review.in_window(r.get("date"), since):
             continue
         in_window += 1
         mech = r.get("cluster") or r.get("mechanism") or "(unknown)"

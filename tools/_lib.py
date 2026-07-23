@@ -142,6 +142,49 @@ WIKI_SUBDIRS = (
     "overviews", "contradictions", "syntheses", "trails",
 )
 
+
+def wiki_page_paths() -> dict[str, Path]:
+    """Valid wikilink target stem → Path (Obsidian resolves links by filename
+    globally, so the stem is the key). Root meta pages + every `WIKI_SUBDIRS`
+    page, `_`-prefixed build artifacts excluded.
+
+    **Single SoT for "does this wikilink resolve".** This set was implemented
+    separately in `_lint/structure.py` and `_lint/link_candidates.py`; when only
+    one copy changes, `graph structure` calls a link broken while the other check
+    does not, and nobody can tell which verdict is right."""
+    pages: dict[str, Path] = {}
+    for p in WIKI.glob("*.md"):
+        if not p.name.startswith("_"):
+            pages[p.stem] = p
+    for sub in WIKI_SUBDIRS:
+        d = WIKI / sub
+        if not d.is_dir():
+            continue
+        for p in d.glob("*.md"):
+            if not p.name.startswith("_"):
+                pages[p.stem] = p
+    return pages
+
+
+def unresolved_wikilinks(text: str, stems: set[str] | None = None) -> list[str]:
+    """Wikilink targets in `text` that resolve to no page, in first-seen order.
+    Code fences are stripped first (a link inside an example is not a real link).
+    `stems` defaults to the current page set — pass it to avoid a re-scan.
+
+    Target normalization matches `_lint/structure.py`'s batch walk exactly: the
+    `#anchor` is split off and a trailing `\\` (leaked from an escaped `\\|` in a
+    table row) trimmed, but a `entities/…` path prefix is NOT stripped — that
+    check treats a path-qualified target as unresolved, and a laxer rule here
+    would put the write-time advisory and the batch check in disagreement."""
+    if stems is None:
+        stems = set(wiki_page_paths())
+    out: list[str] = []
+    for m in WIKILINK_TARGET_RE.finditer(strip_code(text)):
+        target = m.group(1).partition("#")[0].rstrip("\\").strip()
+        if target and target not in stems and target not in out:
+            out.append(target)
+    return out
+
 # --- Hosted graph browser deploy constants ---
 # BASE_URL/STANDALONE_SLUG drive the standalone output filename, the RAG
 # handoff link template (export.py), and the briefing deeplink base

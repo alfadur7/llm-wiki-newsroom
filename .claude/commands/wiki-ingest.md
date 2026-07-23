@@ -74,9 +74,9 @@ Race avoidance: two sub-agents never write to the same file simultaneously. `wik
 4. **Write `wiki/sources/<slug>.md`** — body·sections in English (Korean only under `WIKI_LANG=ko`), the Phase 2 new schema is mandatory (claim atomization + citation type prefix + grade). The authoring standard is a mandatory Read of [`.claude/layers/source.md`](../layers/source.md). After writing, verify with `python tools/lint.py source <slug>`. **Preserve `source_file:`**: the raw file path character-for-character (no ASCII transliteration of typographic quotes·whitespace·special characters). If the raw has an ASCII `"`, wrap the frontmatter value in single quotes; if the raw has a `'`, wrap in double quotes.
 5. **Entity/concept pages (upsert after duplicate check)**:
    - Before creating a new one, check the existing index.md list for identical·similar pages
-   - If it already exists, update the existing page (add sources·strengthen facts)
+   - If it already exists, update the existing page (add sources·strengthen facts; bump `last_updated` only where the body changed, as in step 6)
    - **Person entity incumbency check (required)**: confirm the current role via `WebSearch`. On change, write the current role + "(formerly OOO)". For those who have stepped down, hold off on creation or ask the human reviewer to confirm.
-6. **Cascade update** — add sources + strengthen facts + update last_updated on existing hubs linked in the source's `## Connections`. On bulk ingest, this may be skipped and post-processed by lint.
+6. **Cascade update** — add sources + strengthen facts on existing hubs linked in the source's `## Connections`; bump `last_updated` only where the body changed ([`layers/hub.md`](../layers/hub.md)). On bulk ingest, this may be skipped and post-processed by lint.
 7. **Flag contradictions** — identify contradictions with existing wiki content
 8. **`log.md` append**: `## [today's date] ingest | <Title>`
 9. **Automatic verification** (required):

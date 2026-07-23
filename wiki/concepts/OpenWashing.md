@@ -3,7 +3,7 @@ title: "Open-Washing"
 type: concept
 tags: [open-washing, open-source-ai, licensing, transparency]
 sources: [mozilla-celebrates-osaid, osi-open-source-ai-definition, open-source-ai-models-how-open, case-against-osaid]
-last_updated: 2026-07-01
+last_updated: 2026-06-26
 ---
 
 ## Overview

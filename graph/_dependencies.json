@@ -49,7 +49,7 @@
       "upstream_max_date": "2026-06-26"
     },
     "entities/Mozilla.md": {
-      "last_updated": "2026-06-26",
+      "last_updated": "2026-07-19",
       "upstream": [
         "sources/mozilla-celebrates-osaid.md",
         "sources/osi-open-source-ai-definition.md",
@@ -94,7 +94,7 @@
       "upstream_max_date": "2026-06-26"
     },
     "concepts/OpenWashing.md": {
-      "last_updated": "2026-07-01",
+      "last_updated": "2026-06-26",
       "upstream": [
         "sources/mozilla-celebrates-osaid.md",
         "sources/osi-open-source-ai-definition.md",
@@ -128,7 +128,7 @@
         "concepts/OpenWashing.md",
         "entities/Meta.md"
       ],
-      "upstream_max_date": "2026-07-01"
+      "upstream_max_date": "2026-06-26"
     },
     "overviews/open-source-ai-definition.md": {
       "last_updated": "2026-07-19",

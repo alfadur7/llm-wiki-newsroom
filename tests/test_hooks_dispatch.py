@@ -5,6 +5,7 @@ advisory is exit 0 + a single stdout JSON additionalContext (simultaneous firing
 new content with an AUTO marker skips the incremental advisory, `_catalog`/`_archive` excluded.
 """
 import json
+import pathlib
 
 import check_bullet_depth
 import dispatch
@@ -146,6 +147,34 @@ def test_scratch_advisory_write_only(capsys, monkeypatch):
     # Edit does not trigger scratch (the legacy hook was limited to PreToolUse Write).
     dispatch.run_pre(_input("Edit", "/home/u/llm-wiki-newsroom/tmp.py", new_string="x"))
     assert _payload(capsys) == ""
+
+
+def test_broken_link_advisory_fires_and_stays_silent(tmp_path, capsys):
+    """Write-time detection of an unresolved wikilink. The probe re-reads from
+    disk (an Edit's new_string is only the changed hunk) and is fully guarded —
+    on any failure the safe direction is silence, not blocking the edit."""
+    vault = tmp_path / "wiki" / "concepts"
+    vault.mkdir(parents=True)
+    page = vault / "X.md"
+
+    def _post(p):
+        dispatch.run_post({"tool_name": "Edit", "tool_input": {"file_path": str(p)}})
+        return capsys.readouterr().out
+
+    page.write_text("## Overview\n\nSee [[GhostPage]].\n", encoding="utf-8")
+    out = _post(page)
+    # tmp_path has no tools/, so the guarded import fails -> silent, never a crash
+    assert "Traceback" not in out
+
+    # against the real vault the advisory fires and names the unresolved target
+    real = pathlib.Path(__file__).resolve().parent.parent / "wiki" / "concepts" / "_hooktest.md"
+    real.write_text("## Overview\n\nSee [[NoSuchPageXYZ]].\n", encoding="utf-8")
+    try:
+        out = _post(real)
+        assert "broken-link-advisory" in out
+        assert "NoSuchPageXYZ" in out
+    finally:
+        real.unlink(missing_ok=True)
 
 
 def test_unrelated_file_silent(capsys):

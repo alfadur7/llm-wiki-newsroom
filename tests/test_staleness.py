@@ -9,6 +9,7 @@ frontmatter `last_updated`. Since the body date depends on git, it is injected d
 import pytest
 
 import staleness
+from _editor_date import editor_hash
 
 
 @pytest.fixture(autouse=True)
@@ -80,3 +81,16 @@ def test_body_date_is_truth_even_when_newer_than_frontmatter():
     assert staleness._effective_date(rel, rec) == "2026-06-23"
     assert staleness._is_stale(rec, rel) is False  # 06-20 < 06-23 → FRESH
     assert staleness._is_inflated(rec, "2026-06-23") is False  # body is newer = not inflation
+
+
+def test_editor_hash_ignores_frontmatter():
+    """Regression — `editor_hash` must exclude frontmatter, or it is self-referential:
+    a commit that only appends a `sources:` entry and bumps `last_updated` changes the
+    hash and re-dates the page as freshly authored, masking a lagging body. Observed on
+    `concepts/OpenWashing.md` (2026-07-01 commit, frontmatter-only, body actually 06-26)."""
+    body = "\n# Title\n\nNarrative prose that did not change.\n"
+    before = "---\nsources: [a]\nlast_updated: 2026-06-26\n---" + body
+    after = "---\nsources: [a, b]\nlast_updated: 2026-07-01\n---" + body
+    assert editor_hash(before) == editor_hash(after)
+    # a real body edit still moves the hash
+    assert editor_hash(after) != editor_hash(after.replace("did not change", "changed"))

@@ -20,10 +20,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from _lib import (  # noqa: E402
     read_text_cached,
     WIKI,
-    WIKI_SUBDIRS,
     WIKILINK_RE as LINK_RE,
     strip_code,
+    wiki_page_paths,
 )
+sys.path.insert(0, str(Path(__file__).parent))
+from _hub_common import HUB_SPECS, iter_hub_files  # noqa: E402
 
 BACKLINKS_PATH = WIKI / "_backlinks.json"
 
@@ -35,27 +37,14 @@ DEFAULT_TOP_RESULTS = 30
 
 
 def _index_pages() -> dict[str, Path]:
-    pages: dict[str, Path] = {}
-    for p in WIKI.glob("*.md"):
-        if not p.name.startswith("_"):
-            pages[p.stem] = p
-    for sub in WIKI_SUBDIRS:
-        d = WIKI / sub
-        if not d.exists():
-            continue
-        for p in d.glob("*.md"):
-            if not p.name.startswith("_"):
-                pages[p.stem] = p
-    return pages
+    """Delegates — this module held a second copy of the same construction
+    (unified 2026-07-23). When only one copy changed, `graph structure` called a
+    link broken while this check did not."""
+    return wiki_page_paths()
 
 
 def _hub_set() -> set[str]:
-    out: set[str] = set()
-    for sub in ("entities", "concepts"):
-        for p in (WIKI / sub).glob("*.md"):
-            if not p.name.startswith("_"):
-                out.add(p.stem)
-    return out
+    return {p.stem for d, _ in HUB_SPECS for p in iter_hub_files(d)}
 
 
 def _find(

@@ -86,3 +86,18 @@ def test_recurrence_rate_across_cycles(tmp_path, monkeypatch):
 
 def test_scan_returns_none_without_transcripts(tmp_path):
     assert mf._scan(tmp_path, 0, None) is None
+
+
+def test_review_window_includes_the_boundary_day():
+    """Regression — the watermark and the records are both day-granular, so an
+    exclusive comparison drops everything logged on the checkpoint day itself,
+    permanently and with no signal. Both self-evolution channels share this
+    predicate; they previously duplicated it and diverged on the undated case."""
+    import _review
+
+    assert _review.in_window("2026-07-20", "2026-07-20") is True   # boundary day kept
+    assert _review.in_window("2026-07-21", "2026-07-20") is True
+    assert _review.in_window("2026-07-19", "2026-07-20") is False  # genuinely before
+    assert _review.in_window(None, "2026-07-20") is True           # undated: never hidden
+    assert _review.in_window("", "2026-07-20") is True
+    assert _review.in_window("2026-01-01", None) is True           # no watermark: all

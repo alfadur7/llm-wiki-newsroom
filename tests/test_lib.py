@@ -214,3 +214,38 @@ def test_non_source_page_date_uses_last_updated():
     # A hub (entity, etc.) still uses the edit date (last_updated) as its own date — for downstream rulings.
     fm = {"type": "entity", "last_updated": "2026-04-10"}
     assert dep._page_date(fm) == "2026-04-10"
+
+
+def test_hub_propagates_composite_date():
+    """A hub contributes max(its narrative date, newest cited source content
+    date) as UPSTREAM, so a newly ingested source still reaches derived pages
+    now that a `sources:` append no longer bumps the hub's `last_updated`. Its
+    own record keeps the narrative date."""
+    dep = _dep_mod()
+    meta = {
+        "entities/Hub.md": {"type": "entity", "last_updated": "2026-06-26",
+                            "sources": ["fresh-src"], "body": ""},
+        "sources/fresh-src.md": {"type": "source", "last_updated": "2026-07-19",
+                                 "sources": [], "body": ""},
+    }
+    # mirrors _scan_pages: both the bare stem and the rel are keys
+    stem_to_rel = {"fresh-src": "sources/fresh-src.md",
+                   "sources/fresh-src.md": "sources/fresh-src.md"}
+    prop = dep._hub_propagated(meta, stem_to_rel)
+    assert prop["entities/Hub.md"] == "2026-07-19"      # source pulls it forward
+    assert "sources/fresh-src.md" not in prop           # sources are not hubs
+
+
+def test_unresolved_wikilinks_matches_structure_normalization():
+    """The write-time advisory and the `graph structure` batch check must agree.
+    Anchors split, escaped-pipe backslash trimmed, code fences ignored, and a
+    path-qualified target stays unresolved (structure.py keys on bare stems)."""
+    import _lib
+    stems = {"Meta", "Mozilla"}
+    assert _lib.unresolved_wikilinks("[[Meta]] [[Mozilla#Stance]]", stems) == []
+    assert _lib.unresolved_wikilinks("[[Ghost]]", stems) == ["Ghost"]
+    assert _lib.unresolved_wikilinks("[[Meta\\|alias]]", stems) == []
+    assert _lib.unresolved_wikilinks("```\n[[Ghost]]\n```", stems) == []
+    assert _lib.unresolved_wikilinks("[[entities/Meta]]", stems) == ["entities/Meta"]
+    # first-seen order, deduplicated
+    assert _lib.unresolved_wikilinks("[[B]] [[A]] [[B]]", stems) == ["B", "A"]

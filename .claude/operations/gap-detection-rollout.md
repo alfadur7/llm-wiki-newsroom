@@ -5,7 +5,7 @@ The SoT for how the wiki diagnoses weak areas ("gaps") deterministically, then r
 ## Goals
 
 1. Diagnose wiki gaps deterministically with a single tool (`tools/lint.py graph gaps`).
-2. Handle gaps where auto-enrichment is effective (single-source · stale-hub · secondarily sparse-cluster) via a background chain keyed on the `_inbox.md` single queue.
+2. Handle gaps where auto-enrichment is effective via a background chain keyed on the `_inbox.md` single queue — per-gap effectiveness and what each one takes to close are in the table below.
 3. Route gaps where auto-enrichment is a poor fit to their owning channel: bridge → the operator decision surface (`/wiki-discover --gaps`, Track B); contradiction → the contradiction cycle (`/wiki-lint contradiction`, Track C).
 4. Unify the three entry channels (mobile · interactive · background) into a single inbox.
 
@@ -20,7 +20,7 @@ Background auto-enrichment is far more effective for some gap kinds than others.
 | Gap | Auto-enrich effectiveness | Why | Track |
 |---|---|---|---|
 | single-source hub | high | Going from 1 → 2 sources on an existing hub resolves it; passes the Safe 6 conditions naturally | **Track A (auto)** |
-| stale-hub (relative staleness) | high | Adding a source the hub cites auto-refreshes its `last_updated` | **Track A (auto)** |
+| stale-hub (relative staleness) | medium | A sources-only append no longer moves the hub's `hub_age` — `last_updated` is the narrative date ([`layers/hub.md`](../layers/hub.md)) — though a cascade that strengthens facts still does, so enrichment closes some but not all. The test is also relative (`hub_age - cluster_avg_age`), so the flag moves with cluster-average drift alone | **Track A (auto)** |
 | sparse-cluster | medium | Cluster cohesion needs sources that cite several hubs at once; creating a new hub is gated | **Track A (side effect)** |
 | bridge node | low | The two clusters don't naturally meet, which is why a bridge exists — auto-enrichment can't route around that; the real fix is a new bridge hub (gated) | **Track B (operator surface)** |
 | contradiction (orphan-claims · cap-theme · stale-theme) | very low (can backfire) | These are all theme-MD rewrite/mapping work — the `lint contradiction` cycle's domain | **Track C (separate cycle)** |

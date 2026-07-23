@@ -45,6 +45,17 @@ that cite it. (2026-06-13 recalibration — 61% of stale flags traced to the
 upstream_max_date = max content/last_updated among upstream. L2-4 root meta
 files have no frontmatter `last_updated` (null) — out of staleness scope for now
 (a git/log-based root timestamp is a future addition, not yet implemented).
+
+**Hubs propagate a composite date.** As an *upstream* of derived pages
+(overview·timeline·trail), an entity/concept hub contributes
+max(its own `last_updated`, newest cited source content date) — not its
+frontmatter date alone. A hub's `last_updated` is its narrative date and no
+longer bumps on a pure `sources:` append (rule SoT: `.claude/layers/hub.md`),
+so new-source arrival must reach the derived layer through the cited sources'
+content dates, while a narrative rewrite still travels through `last_updated`.
+A non-narrative hub edit moves neither date, so hub churn stops propagating
+phantom staleness downstream. The hub's own record keeps `last_updated` = its
+narrative date, which is the baseline for its own staleness against its sources.
 """
 from __future__ import annotations
 
@@ -165,6 +176,24 @@ def _load_json(path: Path) -> dict | list | None:
         return None
 
 
+def _hub_propagated(meta: dict, stem_to_rel: dict) -> dict[str, str | None]:
+    """Composite upstream-propagation date per entity/concept hub — see the
+    module docstring: max(narrative `last_updated`, newest cited source content
+    date). This is only the date a hub contributes AS UPSTREAM; its own
+    `deps[hub].last_updated` stays the narrative date."""
+    out: dict[str, str | None] = {}
+    for rel, m in meta.items():
+        if m["type"] not in ("entity", "concept"):
+            continue
+        dates = [m["last_updated"]] if m["last_updated"] else []
+        for s in m["sources"]:
+            r = _source_rel(s, stem_to_rel)
+            if r and r in meta and meta[r]["last_updated"]:
+                dates.append(meta[r]["last_updated"])
+        out[rel] = max(dates) if dates else None
+    return out
+
+
 def run() -> None:
     meta, stem_to_rel = _scan_pages()
 
@@ -186,10 +215,12 @@ def run() -> None:
             claim_source[cid] = src if src.startswith("sources/") else f"sources/{src}"
 
     deps: dict[str, dict] = {}
+    propagated = _hub_propagated(meta, stem_to_rel)
 
     def _emit(rel: str, last_updated: str | None, upstream: list[str]) -> None:
         upstream = [u for u in upstream if u != rel]
-        dates = [meta[u]["last_updated"] for u in upstream if u in meta and meta[u]["last_updated"]]
+        dates = [d for u in upstream if u in meta
+                 if (d := propagated.get(u) or meta[u]["last_updated"])]
         deps[rel] = {
             "last_updated": last_updated,
             "upstream": upstream,

@@ -11,6 +11,7 @@ Exit codes: 0 advisory/no-op (stdout JSON additionalContext), 2 blocking
 (stderr message — lint-report asymmetry guard only).
 """
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -200,6 +201,27 @@ If one-off scratch, retarget the temp directory.
 
 Reference: 2026-05-08 incident — temp .py at project root;
 this advisory is the structural prevention."""
+
+BROKEN_LINK_MSG_TMPL = """[broken-link-advisory] UNRESOLVED WIKILINK — {rel}
+
+Unresolved: {hits}
+
+Resolve each before hand-off — only the author knows which applies:
+  - wrong target (typo · alias · rename) → correct the link
+  - the page is planned for later this cycle → leave it; ingest fanout writes
+    sources before stubs, so an unresolved link here is expected mid-cycle
+  - entity/concept candidate → threshold check (`python tools/count_mentions.py
+    <name>` + .claude/policies/naming.md): demote `[[X]]` to plain `X`, or
+    propose the stub (creating one needs the operator gate)
+  - any other page type → create it through its own command (.claude/commands/
+    README.md Task Index), or demote the link
+
+Non-blocking advisory; `lint graph structure` is the batch backstop and resolves
+link targets against the same `tools/_lib.py` page set. Anchors (`[[Page#H]]`)
+are checked only there.
+
+Reference: .claude/policies/naming.md (entity/concept stub thresholds) +
+CLAUDE.md "Human Reviewer Gate"."""
 
 STUB_MSG_TMPL = """[stub-advisory] STUB MUTATION DETECTED — {rel}
 
@@ -419,6 +441,32 @@ def run_post(data: dict) -> int:
             group, target, scope_label = hit
             messages.append(INCR_LINT_MSG_TMPL.format(
                 scope_label=scope_label, rel=rel, group=group, target=target))
+
+    # 3) broken wikilink advisory — deterministic detection at write time.
+    #    Re-read from disk: an Edit's `new_string` is only the changed hunk, so it
+    #    cannot see the file's other links. The tools/ import and file IO must
+    #    never kill the hook, so the whole probe is guarded — the safe direction
+    #    on a check failure is silence, not blocking the edit (batch is backstop).
+    if "/wiki/" in path:
+        bad: list = []
+        try:
+            # rpartition: the repo path itself may contain `/wiki/`, so the LAST
+            # occurrence is the real vault boundary (`…/wiki/repo/wiki/x.md`).
+            sys.path.insert(0, os.path.join(path.rpartition("/wiki/")[0], "tools"))
+            from _lib import unresolved_wikilinks  # noqa: PLC0415
+            with open(path, encoding="utf-8", errors="replace") as fh:
+                bad = unresolved_wikilinks(fh.read())
+        except Exception:
+            bad = []
+        # Message assembly sits OUTSIDE the guard — swallowing a template typo
+        # (KeyError) too would make this advisory permanently silent.
+        if bad:
+            # Name the overflow — a silent cap reads as "these are all of them",
+            # so an author clears 8 of 12 and believes the page is clean.
+            hits = ", ".join(f"`[[{b}]]`" for b in bad[:8])
+            if len(bad) > 8:
+                hits += f" (+{len(bad) - 8} more)"
+            messages.append(BROKEN_LINK_MSG_TMPL.format(rel=rel, hits=hits))
 
     _emit("PostToolUse", messages)
     return 0

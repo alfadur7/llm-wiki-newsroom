@@ -25,6 +25,25 @@ def read_watermark(path: Path) -> str | None:
     return _load(path).get("last_review") or None
 
 
+def in_window(when: str | None, since: str | None) -> bool:
+    """Is `when` inside the review window — **boundary day included**. An item
+    with no date is included too (never hide it).
+
+    Both the watermark and the records are day-granular, so an exclusive
+    comparison drops anything logged on the checkpoint day itself, permanently
+    and silently: the next run's window starts after it. The cost of showing a
+    boundary-day item once more is settled at the next checkpoint; the cost of
+    losing one is that nobody ever learns it existed.
+
+    Shared by both channels because they had duplicated the comparison AND
+    diverged on the undated case (the automated channel excluded, the human
+    channel included). Fixing one alone would leave that divergence in place.
+    """
+    if not since:
+        return True
+    return not when or str(when) >= since
+
+
 def load_history(path: Path) -> list:
     """Existing review-history list (the caller computes recurrence from this history)."""
     return _load(path).get("history") or []

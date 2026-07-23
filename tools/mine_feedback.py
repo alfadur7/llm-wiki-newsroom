@@ -207,7 +207,7 @@ def _scan(transcript_dir: Path, samples_per_pattern: int, since: str | None):
                     ts = (d.get("timestamp") or "")[:10]
                     is_kickoff = not kickoff_seen  # the session's actual first utterance (decided before the window filter)
                     kickoff_seen = True
-                    if since and ts and ts <= since:
+                    if not _review.in_window(ts, since):
                         continue  # before the watermark — an already-reviewed period
                     total_user_turns += 1
                     if ts:
