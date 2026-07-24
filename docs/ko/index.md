@@ -1,6 +1,7 @@
 ---
 layout: default
 title: LLM Wiki Newsroom
+seo_title: "LLM Wiki Newsroom | 문서를 서로 연결된 AI 위키로 정리하는 멀티에이전트 편집국"
 permalink: /ko/
 lang: ko
 description: >-

@@ -3,7 +3,15 @@
   <head>
     <meta charset="UTF-8">
 
-{% seo %}
+{% comment %}
+  title=false so a page can set an SEO title independent of the <h1> the theme
+  prints in the header. Without it, jekyll-seo-tag falls back to
+  site.title | site.tagline for any page whose title equals site.title, which
+  left /ko/ with an all-English <title> — the strongest on-page signal, in the
+  wrong language for the audience it targets.
+{% endcomment %}
+{% seo title=false %}
+    <title>{% if page.seo_title %}{{ page.seo_title }}{% elsif page.title and page.title != site.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }} | {{ site.tagline }}{% endif %}</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
     <meta name="viewport" content="width=device-width, initial-scale=1">

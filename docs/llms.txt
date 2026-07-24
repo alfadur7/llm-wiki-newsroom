@@ -1,21 +1,33 @@
 # LLM Wiki Newsroom
 
-> A multi-agent "newsroom" on Claude Code that turns a folder of documents into a cross-linked, human-readable markdown wiki. The agent that writes a page is never the one that reviews it; the authoring guidelines evolve themselves; contradictions between sources get their own pages instead of being smoothed over. Local-first (the Python tools need no API keys; the agent itself runs on Claude Code) — a structured, persistent alternative to RAG.
+> Harness engineering applied to knowledge production: a multi-agent "newsroom" on Claude Code that turns a folder of documents into a cross-linked, human-readable markdown wiki. The agent that writes a page is never the one that reviews it; the authoring guidelines evolve themselves; contradictions between sources get their own pages instead of being smoothed over; and published pages come back around as input once they go stale. Local-first (the Python tools need no API keys; the agent itself runs on Claude Code) — a structured, persistent alternative to RAG.
 
 It follows Andrej Karpathy's three-layer LLM Wiki pattern: source documents, the agent-built wiki, and the agent's operating rules stay in separate layers. Ingesting one document cascades updates into ~10–15 related pages. The public repository is the idea plus a small 15-node reproducible example (the debate over what "open source" means for AI), not a battle-tested product; the writer-reviewer split and the self-evolving loop are framed as hypotheses the author is measuring, not solved claims.
+
+## The four loops
+
+The production system runs on four loops. The first three mirror the software-factory playbook for AI-assisted coding; the fourth exists because knowledge, unlike code, keeps decaying after you ship it.
+
+- **Inner** — the agent's own fast checks while drafting, before anything is submitted.
+- **Outer** — the publication gate, in two stages: deterministic lint (a Python script, no model call), then an independent desk review that sees the draft and the rubric but never the writer's reasoning.
+- **Meta** — recurring defects get promoted into the authoring rules themselves, kept only if a blind A/B against a held-out regression set shows an actual gain, and adopted only past a human gate.
+- **Reground** — published pages return as input when their sources change, when a claim's own deadline matures, or when two pages start contradicting each other.
 
 ## Core docs
 - [README](https://github.com/alfadur7/llm-wiki-newsroom/blob/main/README.md): full overview, install, all 9 slash commands, architecture, feature reference
 - [Landing page](https://alfadur7.github.io/llm-wiki-newsroom/): concise overview and a comparison table against RAG
+- [The Knowledge Factory](https://alfadur7.github.io/llm-wiki-newsroom/knowledge-factory/): the full argument for the four-loop design — what harness engineering is, why the three coding loops do not cover knowledge work, and how the fourth loop closes it
 - [FAQ](https://alfadur7.github.io/llm-wiki-newsroom/faq/): what it is, how it differs from RAG, API-key needs, agent support, writer-reviewer split, self-evolving guidelines
 - [Browsable example wiki](https://github.com/alfadur7/llm-wiki-newsroom/wiki): the shipped corpus rendered as pages, no clone required
 
 ## Korean (한국어)
 - [소개 페이지 / Landing (KO)](https://alfadur7.github.io/llm-wiki-newsroom/ko/): concise Korean overview and a comparison table against RAG
+- [지식 팩토리 / The Knowledge Factory (KO)](https://alfadur7.github.io/llm-wiki-newsroom/ko/knowledge-factory/): the four-loop argument in Korean
 - [FAQ (KO)](https://alfadur7.github.io/llm-wiki-newsroom/ko/faq/): the same FAQ in Korean, for Korean-speaking engineers
 
 ## Key concepts and code
 - [Karpathy's LLM Wiki (origin)](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f): the three-layer pattern and cascading-update idea this implements
+- [Harness engineering (source talk)](https://www.youtube.com/watch?v=D_cw-k0F1DM&t=2400): Dru Knox of Tessl at AI Engineer SF, where the software factory and its three loops are laid out
 - [Vannevar Bush's Memex (1945)](https://en.wikipedia.org/wiki/Memex): the associative-trail and serendipity inspiration
 - [tools/query.py](https://github.com/alfadur7/llm-wiki-newsroom/blob/main/tools/query.py): graph traversal plus local semantic search, used to narrow candidates before reading full pages
 - [CLAUDE.md](https://github.com/alfadur7/llm-wiki-newsroom/blob/main/CLAUDE.md): the agent's operating rules (Layer 3), including the five roles and the verification cycle
