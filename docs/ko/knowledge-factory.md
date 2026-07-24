@@ -5,7 +5,10 @@ permalink: /ko/knowledge-factory/
 lang: ko
 description: >-
   소프트웨어 팩토리의 3개의 루프에, 지식 생산에 특화된 4번째 루프를 더한 체계.
+article_schema: true
 schema_inlanguage: ko
+schema_url: "https://alfadur7.github.io/llm-wiki-newsroom/ko/knowledge-factory/"
+schema_keywords: "지식 팩토리, 하니스 엔지니어링, 소프트웨어 팩토리, 이너 루프, 아우터 루프, 메타 루프, 리그라운드 루프, 4대 루프, 에이전틱 워크플로, AI 에이전트 하네스, LLM 위키, 카파시 LLM Wiki, 작성자 검수자 분리, 컨텍스트 격리, 자기진화 지침, 휴먼 인 더 루프, 지식 노후화, Claude Code, 멀티에이전트"
 hreflang_en: "https://alfadur7.github.io/llm-wiki-newsroom/knowledge-factory/"
 hreflang_ko: "https://alfadur7.github.io/llm-wiki-newsroom/ko/knowledge-factory/"
 ---

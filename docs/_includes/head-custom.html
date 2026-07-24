@@ -32,6 +32,29 @@
 }
 </script>
 {%- endif -%}
+{%- if page.article_schema -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": {{ page.title | jsonify }},
+  "description": {{ page.schema_description | default: page.description | jsonify }},
+  "inLanguage": {{ page.schema_inlanguage | default: "en" | jsonify }},
+  "url": {{ page.schema_url | jsonify }},
+  "keywords": {{ page.schema_keywords | jsonify }},
+  "author": {
+    "@type": "Person",
+    "name": "alfadur7",
+    "url": "https://github.com/alfadur7"
+  },
+  "about": {
+    "@type": "SoftwareSourceCode",
+    "name": "LLM Wiki Newsroom",
+    "codeRepository": "https://github.com/alfadur7/llm-wiki-newsroom"
+  }
+}
+</script>
+{%- endif -%}
 {%- if page.faq_schema -%}
 {%- assign faqdata = site.data[page.faq_data] -%}
 <script type="application/ld+json">

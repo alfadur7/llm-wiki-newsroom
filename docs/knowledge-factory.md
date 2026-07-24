@@ -4,7 +4,10 @@ title: "The Knowledge Factory: Agents Write the Wiki, Humans Design the Newsroom
 permalink: /knowledge-factory/
 description: >-
   The software factory's three loops, plus a fourth that knowledge work needs.
+article_schema: true
 schema_inlanguage: en
+schema_url: "https://alfadur7.github.io/llm-wiki-newsroom/knowledge-factory/"
+schema_keywords: "knowledge factory, harness engineering, software factory, inner loop, outer loop, meta loop, reground loop, four loops, agentic workflow, AI agent harness, LLM wiki, Karpathy LLM Wiki, writer reviewer separation, context isolation, self-evolving guidelines, human in the loop, knowledge staleness, Claude Code, multi-agent"
 hreflang_en: "https://alfadur7.github.io/llm-wiki-newsroom/knowledge-factory/"
 hreflang_ko: "https://alfadur7.github.io/llm-wiki-newsroom/ko/knowledge-factory/"
 ---
