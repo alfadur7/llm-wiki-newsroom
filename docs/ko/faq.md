@@ -4,7 +4,8 @@ title: 자주 묻는 질문
 permalink: /ko/faq/
 lang: ko
 description: >-
-  LLM Wiki Newsroom 자주 묻는 질문(FAQ).
+  LLM Wiki Newsroom이 무엇인지, RAG와 무엇이 다른지, 어떤 에이전트를 지원하는지,
+  글 쓰는 에이전트와 검수하는 에이전트를 왜 따로 두는지.
 faq_schema: true
 faq_data: faq_ko
 schema_inlanguage: ko

@@ -3,7 +3,8 @@ layout: default
 title: FAQ
 permalink: /faq/
 description: >-
-  Frequently asked questions about LLM Wiki Newsroom.
+  What LLM Wiki Newsroom is, how it differs from RAG, which agents it supports,
+  and why the agent that writes a page never reviews it.
 faq_schema: true
 faq_data: faq
 schema_inlanguage: en
