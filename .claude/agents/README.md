@@ -124,11 +124,11 @@ Wiki content is the product of **dual automation** — humans do not type it dir
 
 ## Execution Mechanism (mechanism-invariant)
 
-The matrix and ADAPT chain above are independent of the execution mechanism — whichever mechanism you run on, you only need to preserve the 4 principles in § Change Procedure. The mechanism branch is a **single axis: whether `Agent` is called with a `name`**.
+The matrix and ADAPT chain above are independent of the execution mechanism — whichever mechanism you run on, you only need to preserve the 4 principles in § Change Procedure. The mechanism branch is a **single axis: whether `Agent` is called with a `name`** (resuming a call by `agentId` is a mode within the anonymous mechanism, not a third branch).
 
 | Mechanism | When | Context | `disallowedTools` | Report delivery (measured) |
 |---|---|---|---|---|
-| **sub-Agent** — anonymous `Agent(subagent_type: <role>)` | **default** for every role invocation (including parallel fanout — spawn N anonymous sub-Agents concurrently) | fresh per invocation; each ADAPT is a re-invocation that re-reads its GROUND | **enforced** — the role frontmatter applies | the final text (`end_turn`) **reaches the caller automatically** |
+| **sub-Agent** — anonymous `Agent(subagent_type: <role>)` | **default** for every role invocation (including parallel fanout — spawn N anonymous sub-Agents concurrently) | fresh per invocation; each ADAPT is a re-invocation that re-reads its GROUND. (Resuming by `agentId` carries context forward instead — never for a call whose premise is fresh eyes or isolation, since the resumed agent keeps context that premise excludes) | **enforced** — the role frontmatter applies | the final text (`end_turn`) **reaches the caller automatically** |
 | **teammate** — named `Agent(name: ..., subagent_type: <role>)` | **adversarial faction authoring only** (§ below) | persistent across turns | **NOT enforced** — the spawn brief is the only enforcement channel ([editor-in-chief.md](editor-in-chief.md) step 2) | the final text does **not** reach main — main gets only an idle notification; delivery happens only via `SendMessage(to: "main")`. `SendMessage` is a deferred tool: pre-load it via `ToolSearch` in the brief, or the teammate cannot report at all |
 
 ### Report delivery

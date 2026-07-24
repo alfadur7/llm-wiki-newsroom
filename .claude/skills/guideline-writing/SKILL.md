@@ -59,9 +59,9 @@ Absorb into an existing section, table, or matrix by default; create something n
 
 A guideline edit is reviewed by a reader who did not write it and does not know the deliberation behind it. In this project it runs as rung 3 of the Guideline Verification Ladder (`.claude/agents/editor-in-chief.md`); the protocol itself is project-agnostic:
 
-1. **Input = the diff only** — no chat context, no rationale memo. The reviewer sees exactly what a future executor will see.
+1. **Input carries no author intent** — the diff, but no chat context and no rationale memo. The reviewer sees exactly what a future executor will see. Blindness withholds the author's intent, not file access: the reviewer reads each touched file whole (post-edit) before judging, since a hunk judged in isolation invites mechanical fixes that seed the next round's defects. On a re-pass the previous round's findings come too — that is reviewer output, not author intent.
 2. **Classification reply is mandatory**: the reviewer returns, per hunk, a two-way verdict — **substantive** (an executor would act differently after this change) or **invariant** (wording/structure only, behavior unchanged) — plus any defects found against this skill's criteria.
-3. **Defect form**: criterion id (`gdl.*`) · location · one-sentence issue · one-sentence fix. Abstract criticism ("feels verbose") is not a defect.
+3. **Defect form**: criterion id (`gdl.*`) · location · one-sentence issue · one-sentence fix **direction** · severity (critical / high / medium / low — the caller's fix-now-or-defer policy keys off it). A direction is not drafted replacement text: a reviewer asked to author the remedy tends to inflate its own findings to justify it. Abstract criticism ("feels verbose") is not a defect.
 4. **Self-containment probe**: the reviewer must be able to state what the rule obliges without opening another document; if they cannot, flag `gdl.self-contained`.
 
 ## Worked Examples
