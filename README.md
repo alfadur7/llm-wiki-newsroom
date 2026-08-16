@@ -77,7 +77,10 @@ The rest — the knowledge graph, contradiction tracking, cascading updates, pla
 ```bash
 git clone https://github.com/alfadur7/llm-wiki-newsroom.git
 cd llm-wiki-newsroom
+pip install -r requirements.txt
 ```
+
+> No API keys, no accounts — the dependencies are the whole setup. If `igraph`/`leidenalg` have no wheels for your platform (e.g. Termux/Android), delete those two lines from `requirements.txt`: everything else still installs, and `tools/build.py` falls back to a pure-Python partition.
 
 > Or click **["Use this template"](https://github.com/alfadur7/llm-wiki-newsroom/generate)** to create your own wiki repo from this scaffold. To start from a clean slate, delete the example pages under `wiki/` (keep the folders and `graph/cluster_labels.json`), then ingest your own sources with `/wiki-ingest`.
 

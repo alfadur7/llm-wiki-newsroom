@@ -2,8 +2,12 @@ networkx>=3.2
 requests>=2.31.0
 beautifulsoup4>=4.12.0
 # Leiden community detection (tools/_build/clusters.py) — igraph + leidenalg.
-# Without these, the `build clusters` stage fails with ImportError (easy to miss
-# locally if they happen to be installed already).
+# Recommended, not required: PyPI ships wheels for Windows/macOS/manylinux/
+# musllinux, so keep them unless your platform has none (e.g. Termux/Android) —
+# then drop these two lines and everything else still installs. Without them
+# `build clusters` reuses the committed partition when the graph is unchanged,
+# and otherwise degrades to a NetworkX Louvain fallback (different boundaries,
+# no warm-start, marked method=louvain-fallback in the artefact).
 igraph>=0.11
 leidenalg>=0.10
 # Weekly briefing email rendering (tools/_briefing/render.py) — markdown → HTML.

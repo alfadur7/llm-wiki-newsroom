@@ -30,9 +30,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from _lib import CLUSTERS_JSON as CLUSTERS_PATH  # noqa: E402
 
-# Relative quality gap threshold. RBConfiguration quality is unnormalised
-# (scales with edge count: ~3700 for the wiki's ~16K edges), so a fixed
-# absolute number is meaningless across builds. Use ratio instead:
+# Relative quality gap threshold. RBConfiguration quality is unnormalised — it
+# scales with total edge weight (this corpus: ~15 for the 33-edge hub subgraph),
+# so a fixed absolute number is meaningless across builds and corpus sizes,
+# and absolute values are not comparable across corpora. Use ratio instead:
 #   delta / warm_quality > _resolved_threshold() → advisory.
 # 0.005 (0.5%) picked as the gap where cold-start is meaningfully better;
 # below this is partition-tie-breaking noise. Override with the
@@ -63,6 +64,9 @@ def run(json_out: bool = False, threshold: float | None = None) -> int:
         import leidenalg
         import igraph as ig
     except ImportError:
+        # Deliberately does NOT use the build's Louvain fallback: this check
+        # compares a warm partition against a transient cold one, and a
+        # cross-backend comparison measures the backend, not the drift.
         print("ERROR: leidenalg/igraph not installed. Run: python -m pip install 'igraph' 'leidenalg'", file=sys.stderr)
         return 2
 

@@ -474,7 +474,18 @@ def run(json_out: bool = False, fix: bool = False) -> int:
         print(json.dumps(out, ensure_ascii=False, indent=2))
         return 0 if issues_total == 0 else 1
 
-    print(f"Clusters: {len(clusters)}  (method={data.get('method')}, seed={data.get('seed')})")
+    # `leiden` (native) and `leiden-reused` (native partition, graph unchanged)
+    # are the trusted producers; anything else is a degraded backend whose
+    # boundaries differ from a native build. Fail-closed on unknown values so a
+    # future backend cannot be added and stay silent here. Advisory, not
+    # actionable: on a platform with no native wheels the degraded artefact is
+    # the correct local output — the reader who must act is whoever reviews it.
+    _method = data.get("method")
+    _degraded = "" if _method in ("leiden", "leiden-reused") else (
+        "  ⚠️  degraded backend — boundaries differ from a native build "
+        "(see requirements.txt)"
+    )
+    print(f"Clusters: {len(clusters)}  (method={_method}, seed={data.get('seed')}){_degraded}")
     stats = data.get("stats", {})
     print(f"  hubs: {stats.get('hub_nodes')} clustered + {stats.get('isolated_hubs')} isolated")
     print(f"  sources: {stats.get('sources_assigned')} assigned + {stats.get('sources_unassigned')} unassigned")
