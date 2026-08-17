@@ -28,6 +28,14 @@ def test_parse_empty_is_empty():
     assert ld.parse_records("   ") == []
 
 
+def test_parse_tolerates_utf8_bom():
+    """PowerShell prepends a BOM when piping to a native command, so the documented
+    `... | python tools/log_defect.py` usage arrives with one even from a BOM-less
+    file — and `.strip()` does not remove it, so json failed at char 0."""
+    assert ld.parse_records('﻿[{"kind":"defect"}]') == [{"kind": "defect"}]
+    assert ld.parse_records('﻿{"kind":"defect"}') == [{"kind": "defect"}]
+
+
 # --- log_defect: validate ---
 
 def _valid_defect(**over):

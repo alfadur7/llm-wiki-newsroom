@@ -44,9 +44,10 @@ ladder's surfaces, spanning the inner and outer loops; `desk:bundle` is the Regr
 (CLAUDE.md § Human Reviewer Gate) sits outside the matrix the way the Editor-in-Chief
 does — a stopping condition inside the other loops, not a cycle of its own — so the
 mapping above gains no fifth row. Use it **only** for a defect the gate itself caught,
-never as a fallback when the surface is unclear: it sees only what all four automated
-surfaces already missed, which is what makes those records the corpus's highest-signal
-ones and a loose value here its most expensive noise.
+never as a fallback when the surface is unclear: what reaches the gate either lies
+outside every automated surface's scope or has already passed all of them, so these
+records carry signal no other stage can supply — and a loose value here is the most
+expensive noise this corpus can take.
 
 Usage:
     echo '{"kind":"defect","target":"...","cluster":"...","caught_at":"lint:source"}' \
@@ -81,7 +82,12 @@ STAGES = ("lint", "desk", "blind", "probe", "operator")
 
 def parse_records(raw: str) -> list[dict]:
     """Parse the stdin body into a list of records — accepts either a JSON array or JSONL (one record per line)."""
-    raw = raw.strip()
+    # A BOM is not whitespace, so `.strip()` leaves it and json fails at char 0.
+    # Measured source on Windows: PowerShell prepends EF BB BF when piping to a
+    # native command, so `Get-Content records.json -Raw | python tools/log_defect.py`
+    # fails even though the file itself has no BOM (a Windows editor can also write
+    # one directly). Stripped here rather than at the CLI so every caller is covered.
+    raw = raw.lstrip("﻿").strip()
     if not raw:
         return []
     try:
