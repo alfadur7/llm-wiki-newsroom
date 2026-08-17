@@ -40,6 +40,14 @@ Four Loops): `grounded_at` is the input side (how deep the author read before wr
 ladder's surfaces, spanning the inner and outer loops; `desk:bundle` is the Reground loop;
 `blind`·`probe` the Meta loop's own verification).
 
+`operator` is the fifth surface and belongs to no loop. The Human Reviewer Gate
+(CLAUDE.md § Human Reviewer Gate) sits outside the matrix the way the Editor-in-Chief
+does — a stopping condition inside the other loops, not a cycle of its own — so the
+mapping above gains no fifth row. Use it **only** for a defect the gate itself caught,
+never as a fallback when the surface is unclear: it sees only what all four automated
+surfaces already missed, which is what makes those records the corpus's highest-signal
+ones and a loose value here its most expensive noise.
+
 Usage:
     echo '{"kind":"defect","target":"...","cluster":"...","caught_at":"lint:source"}' \
         | python tools/log_defect.py
@@ -66,7 +74,9 @@ REQUIRED = {
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*(@[a-z0-9-]+)?$")
 DECISIONS = ("accept", "reject", "defer")
 # Verification surfaces a defect can escape from / be caught at (caught_at prefix).
-STAGES = ("lint", "desk", "blind", "probe")
+# `operator` = the Human Reviewer Gate, outside the loop model — see the module docstring
+# for the narrow-use rule before reaching for it.
+STAGES = ("lint", "desk", "blind", "probe", "operator")
 
 
 def parse_records(raw: str) -> list[dict]:
