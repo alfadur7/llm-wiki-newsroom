@@ -3,8 +3,9 @@
 
 The ingest entry point for the automatic defect-to-guideline improvement loop (the
 automatic channel of the SoT self-evolution workflow). At cycle close, the
-Editor-in-Chief loads that cycle's lint FAILs + Desk actionable defects in one batch,
-and records the accept/reject transitions of guideline edits into the same corpus. The
+Editor-in-Chief loads that cycle's escaped defects in one batch — which classes, and on
+what trigger, is specified in `.claude/agents/editor-in-chief.md` — and records the
+accept/reject transitions of guideline edits into the same corpus. The
 corpus accumulates longitudinal recurrence rates; unlike the review watermarks
 (`_feedback-review.json`, `_failure-review.json`) it is committed, so a fresh clone starts
 with the recurrence history rather than blind. That makes it public — keep the free-text
@@ -40,14 +41,11 @@ Four Loops): `grounded_at` is the input side (how deep the author read before wr
 ladder's surfaces, spanning the inner and outer loops; `desk:bundle` is the Reground loop;
 `blind`·`probe` the Meta loop's own verification).
 
-`operator` is the fifth surface and belongs to no loop. The Human Reviewer Gate
-(CLAUDE.md § Human Reviewer Gate) sits outside the matrix the way the Editor-in-Chief
-does — a stopping condition inside the other loops, not a cycle of its own — so the
-mapping above gains no fifth row. Use it **only** for a defect the gate itself caught,
-never as a fallback when the surface is unclear: what reaches the gate either lies
-outside every automated surface's scope or has already passed all of them, so these
-records carry signal no other stage can supply — and a loose value here is the most
-expensive noise this corpus can take.
+`operator` is the wiki operator (CLAUDE.md § Human Reviewer Gate), a stopping condition
+inside the other loops rather than a cycle of its own, so the mapping above gains no
+entry for it. Use it for a defect the operator caught — at the gate or after everything
+shipped — and not as a fallback when the catching surface is merely unclear: no
+automated surface reports these, so a wrong value here has no correction path.
 
 Usage:
     echo '{"kind":"defect","target":"...","cluster":"...","caught_at":"lint:source"}' \
@@ -75,8 +73,7 @@ REQUIRED = {
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*(@[a-z0-9-]+)?$")
 DECISIONS = ("accept", "reject", "defer")
 # Verification surfaces a defect can escape from / be caught at (caught_at prefix).
-# `operator` = the Human Reviewer Gate, outside the loop model — see the module docstring
-# for the narrow-use rule before reaching for it.
+# `operator` carries a narrow-use rule — read the module docstring before reaching for it.
 STAGES = ("lint", "desk", "blind", "probe", "operator")
 
 

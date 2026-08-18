@@ -261,6 +261,10 @@ _CLAUDE_SECTION_RE_TMPL = r"^###\s+`\.claude/{folder}/`.*?(?=^###\s|\Z)"
 # A `<name>.md` token wrapped in backticks (CLAUDE.md bullets) or a
 # `[<name>.md](...)` markdown link (README index table).
 _MD_BASENAME_RE = re.compile(r"`([\w.-]+\.md)`|\[([\w.-]+\.md)\]")
+# skills/ is the one rostered folder whose unit is a directory name, not an `.md`
+# basename — a skill is a folder holding SKILL.md, and CLAUDE.md lists it as a bare
+# backticked slug. Requiring a hyphen keeps `jrn.*`, `SKILL.md` and `/simplify` out.
+_SKILL_SLUG_RE = re.compile(r"`([a-z0-9]+(?:-[a-z0-9]+)+)`")
 
 # Folders whose disk roster must be fully enumerated. README.md is the index
 # itself (and is excluded from the roster it lists). has_readme=False means the
@@ -269,14 +273,18 @@ ROSTER_FOLDERS = (
     ("operations", False),
     ("policies", True),
     ("layers", True),
+    ("skills", False),
 )
 
 
 def _disk_roster(folder: str) -> set[str]:
-    """`*.md` basenames on disk under .claude/<folder>/, excluding README.md."""
+    """Roster units on disk under .claude/<folder>/ — `*.md` basenames excluding
+    README.md, except skills/ where the unit is the skill's own directory name."""
     d = ROOT / ".claude" / folder
     if not d.exists():
         return set()
+    if folder == "skills":
+        return {p.name for p in d.iterdir() if (p / "SKILL.md").is_file()}
     return {
         p.name
         for p in d.glob("*.md")
@@ -306,15 +314,18 @@ def _claude_section_basenames(claude_text: str, folder: str) -> set[str] | None:
     m = sec_re.search(claude_text)
     if not m:
         return None
+    if folder == "skills":
+        return set(_SKILL_SLUG_RE.findall(m.group(0)))
     return _md_basenames(m.group(0))
 
 
 def _check_roster_completeness(claude_text: str) -> list[str]:
-    """Verify every disk file under each `ROSTER_FOLDERS` folder is enumerated in
+    """Verify every disk entry under each `ROSTER_FOLDERS` folder is enumerated in
     the CLAUDE.md "Instruction Locations" and (where that folder has one) its README index.
 
-    Reports one line per (file, missing-index) gap so the operator sees both
-    the orphaned file and which list it fell out of.
+    Reports one line per (entry, missing-index) gap so the operator sees both
+    the orphaned entry and which list it fell out of. The unit is an `*.md`
+    basename everywhere except skills/, where it is the skill's directory name.
     """
     issues: list[str] = []
     for folder, has_readme in ROSTER_FOLDERS:
@@ -1123,7 +1134,7 @@ def run() -> int:
         for u in unlisted_files:
             print(u)
         print(
-            f"Rule: every top-level *.md under .claude/{{{scoped}}}/ must be enumerated "
+            f"Rule: every entry under .claude/{{{scoped}}}/ must be enumerated "
             f"in the CLAUDE.md \"Instruction Locations\" and ({with_readme}) the "
             "folder README index. Add the missing entry."
         )
