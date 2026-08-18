@@ -26,7 +26,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, atomic_write_text, cli_slug_path, parse_frontmatter, read_text_cached, section_body, strip_code, strip_frontmatter  # noqa: E402
+from _lib import WIKI, MARKUP_LEAK_RE, atomic_write_text, cli_slug_path, parse_frontmatter, read_text_cached, section_body, strip_code, strip_frontmatter  # noqa: E402
 sys.path.insert(0, str(Path(__file__).parent))  # tools/_lint/ — sibling import
 from _advisory_common import L1_MIN_SLUG_LEN, L1_RAW_SLUG_RE, iter_md, mark as _mark, print_rewrite_block  # noqa: E402
 
@@ -68,6 +68,12 @@ def _evaluate(rel: str, slug: str, content: str) -> dict:
     l1_raw = L1_RAW_SLUG_RE.findall(body)
     slug_alias_pass = len(l1_raw) == 0
 
+    # tool-call markup leak — hard-gated even under ADVISORY_MODE, as in
+    # `synthesis.py`. A stray `</invoke>` fragment on a published page is an
+    # accident rather than a content defect, and this is the target-scoped check
+    # recommended after an edit, so a PASS here ships it.
+    markup_leaks = MARKUP_LEAK_RE.findall(body)
+
     return {
         "rel": rel,
         "slug": slug,
@@ -76,6 +82,7 @@ def _evaluate(rel: str, slug: str, content: str) -> dict:
         "path_links": (path_links_pass, n_linked, n_items),
         "path_length": (path_length_pass, n_items),
         "slug_alias": (slug_alias_pass, l1_raw[:5]),
+        "markup": (len(markup_leaks) == 0, len(markup_leaks), markup_leaks[:5]),
     }
 
 
@@ -95,6 +102,8 @@ def _print_per_file(r: dict) -> None:
         print(f"  [Rubric] frontmatter missing: {r['fm_missing']}")
     if not sa_pass and sa_samples:
         print(f"  [Rubric] L1 raw slug samples: {sa_samples}")
+    if not r["markup"][0]:
+        print(f"  [BLOCKER] tool-call markup leak (do not publish): {r['markup'][2]}")
 
 
 def _print_corpus_summary(results: list[dict]) -> None:
@@ -116,6 +125,11 @@ def _print_corpus_summary(results: list[dict]) -> None:
         print(f"\n  Non-compliant trails ({len(fails)}):")
         for r in fails:
             print(f"    {r['slug']} — {[k for k in REQUIRED_KEYS if not r[k][0]]}")
+    # markup sits outside REQUIRED_KEYS but still exits 1, so the reason has to be shown here.
+    leaks = [r["slug"] for r in results if not r["markup"][0]]
+    if leaks:
+        print()
+        print(f"  [BLOCKER] tool-call markup leak in {len(leaks)} file(s) (do not publish): {leaks}")
     if ADVISORY_MODE:
         print(
             "\n  [Advisory mode] seed calibration not yet complete — exit 0 even if "
@@ -168,6 +182,8 @@ def run(target: str | None = None, fix: bool = False, **_kwargs) -> int:
         _print_per_file(result)
         if fix:
             _print_rewrite_block(slug, path, exists=True)
+        if not result["markup"][0]:
+            return 1  # markup leak hard-gates even in advisory mode
         if ADVISORY_MODE:
             return 0
         return 1 if any(not result[k][0] for k in REQUIRED_KEYS) else 0
@@ -176,6 +192,8 @@ def run(target: str | None = None, fix: bool = False, **_kwargs) -> int:
     for path, content in iter_md(TRAILS_DIR):
         results.append(_evaluate(f"trails/{path.name}", path.name[:-3], content))
     _print_corpus_summary(results)
+    if any(not r["markup"][0] for r in results):
+        return 1  # markup leak hard-gates even in advisory mode
     if ADVISORY_MODE:
         return 0
     return 1 if any(any(not r[k][0] for k in REQUIRED_KEYS) for r in results) else 0

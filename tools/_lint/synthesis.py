@@ -285,6 +285,11 @@ def _print_corpus_summary(results: list[dict]) -> None:
         for r in fails:
             failed = [k for k in REQUIRED_KEYS if not r[k][0]]
             print(f"    {r['slug']} — {failed}")
+    # markup sits outside REQUIRED_KEYS but still exits 1, so the reason has to be shown here.
+    leaks = [r["slug"] for r in results if not r["markup"][0]]
+    if leaks:
+        print()
+        print(f"  [BLOCKER] tool-call markup leak in {len(leaks)} file(s) (do not publish): {leaks}")
     if ADVISORY_MODE:
         print(
             "\n  [Advisory mode] seed calibration not yet complete — exit 0 even if "

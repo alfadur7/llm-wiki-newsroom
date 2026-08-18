@@ -9,5 +9,8 @@
 *.md text eol=lf
 *.py text eol=lf
 *.json text eol=lf
+# .jsonl is NOT matched by *.json — without its own rule the defect ledger
+# (_defect-log.jsonl) gets committed with CRLF and the whole file shows as rewritten.
+*.jsonl text eol=lf
 *.sh text eol=lf
 *.html text eol=lf

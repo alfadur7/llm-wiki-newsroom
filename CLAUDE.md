@@ -92,7 +92,6 @@ Each folder has a **single responsibility**; when adding a new instruction, use 
 **When read**: when the corresponding role is invoked (Cognition principle 1 — full-context Read).
 
 **Instructions located here**:
-- `editor-in-chief.md` · `reporter.md` · `columnist.md` · `desk.md` · `copyeditor.md` (per-role SoT)
 - `README.md` (Layer × Cycle matrix, the four-stage definitions, the standard ADAPT chain, escalation, Authoring Responsibilities)
 
 ### `.claude/commands/` — 9 Slash Command SoT + Task Index
@@ -102,7 +101,6 @@ Each folder has a **single responsibility**; when adding a new instruction, use 
 **When read**: when the corresponding command is triggered.
 
 **Instructions located here**:
-- `wiki-ingest.md` · `wiki-query.md` · `wiki-lint.md` · `wiki-graph.md` · `wiki-news.md` · `wiki-discover.md` · `wiki-trail.md` · `wiki-timeline.md` · `wiki-export.md`
 - `README.md` (Task Index, the "Extend Before Adding" Convention, natural-language usage examples, sub-procedure locations)
 - Command sub-procedures (e.g. the contradiction theme mapping and conflict-axis sync rule in `wiki-lint.md`) are the sole responsibility of this folder.
 

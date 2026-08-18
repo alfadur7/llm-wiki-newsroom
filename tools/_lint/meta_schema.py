@@ -254,12 +254,7 @@ def _check_slash_commands(text: str) -> list[str]:
 # `ROSTER_FOLDERS` below — the folders this check has been pointed at because
 # the drift was observed there. Every message the check emits derives its folder
 # names from that tuple instead of restating them, so widening the scope cannot
-# leave a stale rule statement in front of the operator. The other `.claude/`
-# subfolders are out for three different reasons: agents/ and commands/ have not
-# drifted (every .md they gained was enumerated in the same commit); skills/ is
-# the same drift class but `_disk_roster` globs only top-level *.md and skills/
-# nests one level deeper, so this check cannot reach it — an open gap, not a
-# clean bill; hooks/ holds no *.md at all; memory/ is gitignored.
+# leave a stale rule statement in front of the operator.
 #
 # Section header per folder in CLAUDE.md, e.g. "### `.claude/policies/` — ...".
 _CLAUDE_SECTION_RE_TMPL = r"^###\s+`\.claude/{folder}/`.*?(?=^###\s|\Z)"

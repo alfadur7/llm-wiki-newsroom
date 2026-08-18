@@ -23,6 +23,14 @@ from _hub_common import HUB_SPECS, iter_hub_files  # noqa: E402
 
 HEADING_RE = re.compile(r"^#{1,6}\s+(.+?)\s*$")
 
+# The relation-description placeholder `--fix` writes into `## Connections`. It uses the
+# codebase-wide `_TODO: ..._` form (the same convention as contradiction.py·overview.py
+# `--fix`), because the earlier wording described the tool that made the line rather than
+# the relation, which is body text no reader asked for. Both spellings are counted so the
+# advisory keeps showing the backlog while old lines are still being drained.
+AUTOLINK_PLACEHOLDER = "_TODO: one line on the relation_"
+AUTOLINK_MARKERS = (AUTOLINK_PLACEHOLDER, "auto-linked based on body mention")
+
 ENGLISH_STANDARD = {
     "openai", "anthropic", "microsoft", "google", "aws", "meta", "tesla",
     "ibm", "nvidia", "apple", "amazon", "salesforce", "sap", "oracle",
@@ -220,7 +228,7 @@ def _reconnect_orphan_hubs(orphan_stems: list[str], fix: bool) -> dict[str, list
             link_text = (
                 f"[[{hub_stem}|{alias}]]" if (use_alias and alias) else f"[[{hub_stem}]]"
             )
-            new_line = f"- references: {link_text} — auto-linked based on body mention"
+            new_line = f"- references: {link_text} — {AUTOLINK_PLACEHOLDER}"
             content = src_cache[src_stem]
             conn_match = re.search(r"(^## Connections[ \t]*\n)", content, re.MULTILINE)
             if conn_match:
@@ -392,6 +400,18 @@ def run(fix: bool = False) -> int:
             )
             for hub, hits in reconnect.items():
                 print(f"    {hub}: {len(hits)} source(s)")
+    # Autolink placeholders left behind — `--fix` gets the link right but leaves the
+    # relation unwritten. Advisory, outside the tally: this is unwritten work, not a
+    # link-integrity defect.
+    ph_files, ph_lines = 0, 0
+    for _stem, _path in all_pages.items():
+        n = sum(1 for ln in read_text_cached(_path).splitlines()
+                if any(m in ln for m in AUTOLINK_MARKERS))
+        if n:
+            ph_files += 1
+            ph_lines += n
+    print(f"Autolink placeholders (relation unwritten): {ph_lines} across {ph_files} files"
+          + ("  [advisory — outside the tally]" if ph_lines else ""))
     print(f"Missing entity candidates (≥3 distinct sources): {len(missing)}")
     for n, c in missing[:15]:
         print(f"  {n} ({c} sources)")

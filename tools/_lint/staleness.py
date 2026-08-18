@@ -119,7 +119,7 @@ def _newest_upstream(rec: dict, pages: dict) -> list[str]:
     return [u for u in rec.get("upstream", []) if pages.get(u, {}).get("last_updated") == um]
 
 
-def run(target: str | None = None, **_kwargs) -> int:
+def run(target: str | None = None, top: int | None = None, **_kwargs) -> int:
     pages = _load()
     if not pages:
         print(f"ERROR: {_DEPS_PATH} not found or empty — run `python tools/build.py dependencies` first.",
@@ -184,11 +184,12 @@ def run(target: str | None = None, **_kwargs) -> int:
                 return (date.fromisoformat(rec["upstream_max_date"]) - date.fromisoformat(eff)).days
             except Exception:
                 return 0
-        for rel, rec, eff in sorted(stale, key=_gap_days, reverse=True)[:20]:
+        cap = top or 20
+        for rel, rec, eff in sorted(stale, key=_gap_days, reverse=True)[:cap]:
             tag = f" (fm last_updated={rec['last_updated']} inflated)" if _is_inflated(rec, eff) else ""
             print(f"    🔴 {rel} — authored {eff} < upstream {rec['upstream_max_date']}{tag}")
-        if len(stale) > 20:
-            print(f"    ... and {len(stale) - 20} more")
+        if len(stale) > cap:
+            print(f"    ... and {len(stale) - cap} more (widen with `--top N`)")
     if ADVISORY_MODE:
         print("\n  [Advisory mode] orthogonal upstream-freshness signal — runs alongside the "
               "per-type freshness/drift checks (overview/contradiction), which stay authoritative. Exit 0.")

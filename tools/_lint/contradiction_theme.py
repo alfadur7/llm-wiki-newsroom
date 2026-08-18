@@ -275,6 +275,28 @@ def _check_phase2(themes_doc: dict) -> tuple[list[str], list[str]]:
     return issues, warnings
 
 
+def _claims_record_count() -> int | None:
+    try:
+        doc = json.loads(CLAIMS_JSON.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError, FileNotFoundError):
+        return None
+    return len(doc) if isinstance(doc, list) else None
+
+
+def _counts_match(themes_doc: dict) -> bool:
+    """source_count snapshot == current claims-DB record count.
+
+    Equality means no claim was added or removed, so a `_contradictions.json`
+    commit date later than derived_at is a rebuild artefact (evidence_strength
+    and type_score recomputed), not derivation staleness — firing on it makes
+    the re-derivation chain spin on every ingest. Editing a claim's wording
+    changes its id (a SHA1 of the body), so a genuine stale case can survive an
+    equal count; `_check_coverage`'s claim_id existence check is the backstop.
+    """
+    declared = themes_doc.get("source_count")
+    return isinstance(declared, int) and _claims_record_count() == declared
+
+
 def is_themes_json_stale() -> tuple[bool, str | None]:
     """Return (stale, reason) for `_contradictions_themes.json` vs claims DB.
 
@@ -289,7 +311,9 @@ def is_themes_json_stale() -> tuple[bool, str | None]:
         (record-count drift — most direct staleness signal, independent of
         commit timestamps which can lag behind raw DB regeneration)
       * _contradictions.json has uncommitted edits AND derived_at < today
-      * _contradictions.json last commit date > derived_at
+      * _contradictions.json last commit date > derived_at — **suppressed when
+        the record count still equals the snapshot** (see `_counts_match`: a
+        rebuild artefact, not derivation staleness)
     """
     if not THEMES_JSON.exists():
         return False, None
@@ -301,17 +325,12 @@ def is_themes_json_stale() -> tuple[bool, str | None]:
         return False, None
 
     declared_count = themes_doc.get("source_count")
-    if isinstance(declared_count, int):
-        try:
-            claims_doc = json.loads(CLAIMS_JSON.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError, FileNotFoundError):
-            claims_doc = None
-        if isinstance(claims_doc, list) and len(claims_doc) != declared_count:
-            delta = len(claims_doc) - declared_count
-            return True, (
-                f"source_count={declared_count} but _contradictions.json has "
-                f"{len(claims_doc)} record(s) (drift {delta:+d})"
-            )
+    actual_count = _claims_record_count()
+    if isinstance(declared_count, int) and actual_count is not None and actual_count != declared_count:
+        return True, (
+            f"source_count={declared_count} but _contradictions.json has "
+            f"{actual_count} record(s) (drift {actual_count - declared_count:+d})"
+        )
 
     derived_at = themes_doc.get("derived_at")
     if not isinstance(derived_at, str) or not DATE_RE.match(derived_at):
@@ -324,6 +343,8 @@ def is_themes_json_stale() -> tuple[bool, str | None]:
             f"uncommitted edits (today={today})"
         )
 
+    if _counts_match(themes_doc):
+        return False, None
     commit_date = _claims_last_change_date()
     if commit_date and derived_at < commit_date:
         return True, (
@@ -354,6 +375,8 @@ def _check_freshness(themes_doc: dict) -> str | None:
             f"has uncommitted edits (today={today}) — regeneration recommended"
         )
 
+    if _counts_match(themes_doc):
+        return None
     commit_date = _claims_last_change_date()
     if commit_date and derived_at < commit_date:
         return (

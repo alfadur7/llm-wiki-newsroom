@@ -34,7 +34,7 @@ Read the question and classify it as 1 of 6 types, then enter the relevant proce
 | **Entity-centric** | "What does X cite·oppose?" | `cites,contradicts` | `tools/query.py graph neighbors X` |
 | **Topic** | "Overview of field X", "Definition of X" | `defines,cites` | `mcp__qmd__query` (structured: `intent`+`vec`/`lex`) |
 | **Fact** | "Did X announce Y?" | `cites` | `mcp__qmd__query` (`lex`-centered) |
-| **Relation** | "Relationship between A and B?" | (full default) | `tools/query.py graph explain A B` |
+| **Relation** | "Relationship between A and B?" | (full default) | `tools/query.py graph path A B` |
 | **Meta** | "Wiki structure", "Hub distribution" | (full default) | read root meta pages |
 
 **Additional natural-language intent mapping** (when the user does not state one of the 6 types):

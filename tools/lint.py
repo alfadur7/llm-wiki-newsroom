@@ -194,7 +194,7 @@ GROUPS: dict = {
         "_target": ("Timeline schema (L2-2 path)", timeline.run,      {"fix", "target"}),
     },
     "staleness": {
-        "_target": ("Layer-cascade staleness",   staleness.run,       {"target"}),
+        "_target": ("Layer-cascade staleness",   staleness.run,       {"target", "top"}),
     },
 }
 
@@ -326,7 +326,8 @@ def main() -> int:
                     help="(hub suggestions) minimum total mentions for mined candidates")
     ap.add_argument("--min-pages", type=int, default=5,
                     help="(hub suggestions) minimum distinct pages for mined candidates")
-    ap.add_argument("--top", type=int, default=None, help="(hub suggestions) cap results per signal")
+    ap.add_argument("--top", type=int, default=None,
+                    help="(graph gaps · hub suggestions · staleness) cap the number of results shown")
     ap.add_argument(
         "--threshold", type=float, default=None,
         help="(graph drift) override the default cold-vs-warm relative quality "
