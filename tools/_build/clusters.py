@@ -441,6 +441,13 @@ def _run_leiden(
         "weights": "weight",
         "resolution_parameter": resolution,
         "seed": seed,
+        # leidenalg defaults to n_iterations=2 — a fixed cut, not convergence.
+        # Since the warm start feeds the prior build's own partition back in as
+        # the initial membership, leaving it cut turns successive builds into a
+        # relay: one build publishes a pre-convergence partition and the next
+        # picks up where it left off. A negative value iterates until no further
+        # improvement, so a single build lands on the fixed point.
+        "n_iterations": -1,
     }
     if initial_membership is not None:
         kwargs["initial_membership"] = initial_membership
