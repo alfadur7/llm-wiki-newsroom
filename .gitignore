@@ -5,7 +5,10 @@ raw/*/
 # settings.json is tracked (team-wide config such as hooks).
 # settings.local.json is gitignored (personal trust model, MCP, and other overrides).
 .claude/settings.local.json
-.claude/memory/
+# Personal working memory: contents ignored. The folder is kept by a tracked
+# .gitkeep — CLAUDE.md names this path and lint meta requires it on disk.
+.claude/memory/*
+!.claude/memory/.gitkeep
 .mcp.json
 
 # Obsidian local settings

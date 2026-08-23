@@ -198,7 +198,7 @@ Guideline-authoring voice and plan-bloat control are craft, not policy — they 
 
 **When read**: on entering related work.
 
-> **Note:** local memory is gitignored and created on first use; notes accumulate here as you operate the wiki.
+> **Note:** a tracked `.gitkeep` keeps this folder in the repo — leave it in place. Anything else you write here stays local.
 
 **Instructions located here**:
 - Local notes such as `feedback_*.md`
