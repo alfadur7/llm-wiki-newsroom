@@ -180,8 +180,9 @@ Guideline-authoring voice and plan-bloat control are craft, not policy — they 
 
 **Instructions located here**:
 - `lint-chain-guard.sh` (detects the lint stdout chain marker → blocks writing the report)
-- `dispatch.sh` + `dispatch.py` (the single Write|Edit pre/post dispatcher — parses stdin once, merges simultaneously-firing advisories into a single payload, with a shell fallback when python3 is absent. Consolidated responsibilities:)
+- `dispatch.sh` + `dispatch.py` (the single Write|Edit pre/post + Bash commit-gate dispatcher — parses stdin once, merges simultaneously-firing advisories into a single payload, with a shell fallback when python3 is absent. Consolidated responsibilities:)
   - guard: exit-2 block when the per-target drift blocks in `lint-report.md` are asymmetric
+  - advisory — **built, not registered**: on a `Bash|PowerShell` command containing `git commit`, names the guideline files dirty in the working tree and prints the Guideline Verification Ladder. Held out of `settings.json` pending the over-fire filed under `commit-gate 2026-08-23`; re-enabling is one entry
   - guard: exit-2 block on direct Write|Edit of auto-generated build artifacts (`wiki/index.md`, `graph/_*.json`, etc.) or `raw/` originals — steering you to fix the input and regenerate (re-derivation, human-edited files, and queue files are exceptions; the full list is in `dispatch.py`)
   - advisory: after writing a stub, recommend `python tools/build.py` reconciliation + Desk VERIFY₂ (`wiki/entities·concepts·timelines/*.md` — structural prevention of the 2026-05-09 / 05-20 incidents)
   - advisory: after editing L2-2 full hub, timeline, L2-3, or L2-4, recommend the layer's `python tools/lint.py` self-VERIFY₀ — target-scoped where the group accepts a target, corpus-wide (judged on own output) where it does not
