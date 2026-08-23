@@ -4,8 +4,10 @@ Contract inherited from the 6 legacy hooks: guard (lint-report asymmetry) is exi
 advisory is exit 0 + a single stdout JSON additionalContext (simultaneous firings merged),
 new content with an AUTO marker skips the incremental advisory, `_catalog`/`_archive` excluded.
 """
+import fnmatch
 import json
 import pathlib
+import re
 
 import check_bullet_depth
 import dispatch
@@ -303,3 +305,91 @@ def test_bullet_depth_analyze_clean():
     data = {"tool_input": {"file_path": "/x/CLAUDE.md",
                            "content": "- a\n- b\n- c\n- d\n"}}
     assert check_bullet_depth.analyze(data) == ""
+
+
+# ------------------------------------------------- pre-bash phase (commit gate)
+
+def _bash(command):
+    return {"tool_name": "Bash", "tool_input": {"command": command}}
+
+
+def _fake_git(monkeypatch, porcelain):
+    """Stand in for `git status --porcelain` so the gate is tested, not the repo."""
+    class _R:
+        stdout = porcelain
+    monkeypatch.setattr(dispatch.subprocess, "run", lambda *a, **k: _R())
+
+
+def test_guideline_dirty_filter():
+    got = dispatch._guideline_dirty(
+        " M .claude/layers/hub.md\n"
+        "M  CLAUDE.md\n"
+        "R  old.md -> .claude/policies/naming.md\n"   # rename → the post-rename name
+        "?? tools/x.py\n"                             # not a guideline surface
+        " M wiki/index.md\n"
+        " M .claude/skills/guideline-writing/SKILL.md\n"   # skills is outside GUIDE_DIRS
+        " M .claude/agents/notes.txt\n")                   # not .md
+    assert got == [".claude/layers/hub.md", ".claude/policies/naming.md", "CLAUDE.md"]
+
+
+def test_commit_gate_fires_on_dirty_guideline(monkeypatch, capsys):
+    _fake_git(monkeypatch, " M .claude/layers/hub.md\n")
+    assert dispatch.run_pre_bash(_bash("git add x && git commit -F -")) == 0
+    body = _payload(capsys)
+    assert "[commit-gate]" in body
+    assert ".claude/layers/hub.md" in body
+    assert "Blind review (mandatory)" in body     # the shared rung list is carried
+
+
+def test_commit_gate_silent_when_not_a_commit(monkeypatch, capsys):
+    _fake_git(monkeypatch, " M .claude/layers/hub.md\n")
+    assert dispatch.run_pre_bash(_bash("git log --oneline | grep commit")) == 0
+    assert _payload(capsys) == ""
+
+
+def test_commit_gate_silent_when_nothing_guideline_dirty(monkeypatch, capsys):
+    _fake_git(monkeypatch, " M tools/lint.py\n M wiki/index.md\n")
+    assert dispatch.run_pre_bash(_bash("git commit -m x")) == 0
+    assert _payload(capsys) == ""
+
+
+def test_commit_gate_silent_when_git_unavailable(monkeypatch, capsys):
+    def _boom(*a, **k):
+        raise OSError("no git")
+    monkeypatch.setattr(dispatch.subprocess, "run", _boom)
+    assert dispatch.run_pre_bash(_bash("git commit -m x")) == 0
+    assert _payload(capsys) == ""
+
+
+def test_prefilter_never_narrower_than_the_regex():
+    """The shell prefilter only decides whether Python runs, so it may over-fire but must
+    never reject a command `GIT_COMMIT_RE` would advise on — an under-firing prefilter
+    leaves the gate silent on a real commit while this suite stays green, since the other
+    tests call `run_pre_bash` directly and never reach the shell layer. The glob is read
+    out of `dispatch.sh` so the two cannot drift apart."""
+    sh = (pathlib.Path(dispatch.__file__).parent / "dispatch.sh").read_text(encoding="utf-8")
+    glob = re.search(r'case "\$payload" in (\S+?)\)', sh).group(1)
+    for cmd in ("git commit -m x", "git add a && git commit -F -", "git -C . commit -m x",
+                "git -c user.name=x commit", "git --no-pager commit", "git  commit",
+                "ls -la", "git log --oneline", "echo hello"):
+        payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": cmd}})
+        if dispatch.GIT_COMMIT_RE.search(cmd):
+            assert fnmatch.fnmatchcase(payload, glob), f"prefilter rejects a real commit: {cmd}"
+
+
+def test_ladder_rungs_match_the_sot():
+    """`LADDER_RUNGS` is a hand-copy of the ladder in `editor-in-chief.md`, and both
+    payloads announce that ladder as mandatory — so a rung missing from the copy tells an
+    executor there are fewer obligations than there are. That happened: the extraction
+    stopped at four of five and no test noticed, because the only rung a test named was
+    rung 3. Titles are matched with any parenthetical stripped, so rewording a rung in the
+    SoT does not fail this, but dropping one does."""
+    sot = (pathlib.Path(dispatch.__file__).parents[2] / ".claude" / "agents"
+           / "editor-in-chief.md").read_text(encoding="utf-8")
+    section = sot.split("## Guideline Verification Ladder", 1)[1].split("\n## ", 1)[0]
+    titles = re.findall(r"^(\d+)\. \*\*(.+?)\*\*", section, re.M)
+    assert titles, "ladder section not found — the heading or rung format moved"
+    assert re.findall(r"^\s*(\d+)\. ", dispatch.LADDER_RUNGS, re.M) == [n for n, _ in titles]
+    for _, title in titles:
+        stem = title.split("(")[0].strip()
+        assert stem in dispatch.LADDER_RUNGS, f"rung missing from the payload: {stem}"

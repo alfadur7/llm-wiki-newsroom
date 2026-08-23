@@ -1,4 +1,5 @@
-"""Single-process dispatcher for every Write|Edit hook (pre + post).
+"""Single-process dispatcher for the Write|Edit hooks (pre + post) and the
+PreToolUse(Bash|PowerShell) commit gate.
 
 Replaces six per-event shell hooks (lint-report-guard · minimality-advisory ·
 scratch-location-advisory / stub-build-advisory · stub-desk-advisory ·
@@ -6,13 +7,15 @@ incremental-lint-advisory) that each spawned 2-3 `python3 -c` JSON parses per
 tool call — one stdin parse now serves all of them, and simultaneous
 advisories merge into a single additionalContext payload instead of three.
 
-Usage (from dispatch.sh): `python dispatch.py pre|post` with hook JSON on stdin.
+Usage (from dispatch.sh): `python dispatch.py pre|post|pre-bash` with hook JSON
+on stdin.
 Exit codes: 0 advisory/no-op (stdout JSON additionalContext), 2 blocking
 (stderr message — lint-report asymmetry guard only).
 """
 import json
 import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -145,12 +148,9 @@ T1 naming principle: new memory/policy/hook files default to a prescriptive
 
 Reference: .claude/skills/guideline-writing/SKILL.md (Bloat control)."""
 
-GUIDE_MSG = """[minimality-advisory] GUIDELINE EDIT DETECTED
-
-Guideline Verification Ladder required just before commit
-(SoT: .claude/agents/editor-in-chief.md § Guideline Verification Ladder):
-
-  1. Quantitative lint — python tools/lint.py meta PASS (guideline-writing skill
+# The five rungs, defined once — the edit-time advisory and the commit-time gate
+# both print them and would otherwise drift apart.
+LADDER_RUNGS = """  1. Quantitative lint — python tools/lint.py meta PASS (guideline-writing skill
      deliberation-narrative detectors + project voice patterns)
   2. Minimal-edit self-check — skill § Pruning + Bloat control; keep sibling
      voice/depth; present the check evidence (a bare "passed" is incomplete)
@@ -160,11 +160,31 @@ Guideline Verification Ladder required just before commit
   4. Effect-measurement gate — substantive ∧ measurement-obligated type →
      an accept transition must exist before commit; otherwise revert the edit
      and measure (temporary isolation — re-applied on acceptance; 3 variants)
+  5. Deliberation narrative to log.md — decision history, option comparisons and
+     measurement narratives move to log.md; the body keeps operative rules only"""
 
-Deliberation narrative moves to log.md; the body keeps operative rules only.
+GUIDE_MSG = """[minimality-advisory] GUIDELINE EDIT DETECTED
+
+Guideline Verification Ladder required just before commit
+(SoT: .claude/agents/editor-in-chief.md § Guideline Verification Ladder):
+
+""" + LADDER_RUNGS + """
 
 Reference: editor-in-chief.md § Guideline Verification Ladder +
            skills/guideline-writing/SKILL.md."""
+
+COMMIT_GATE_HEAD = """[commit-gate] GUIDELINE FILE DIRTY AT COMMIT
+
+"""
+COMMIT_GATE_TAIL = """
+
+The Guideline Verification Ladder is mandatory right before commit. If it has
+already run for these files, proceed — this is a reminder, not a block.
+
+""" + LADDER_RUNGS + """
+
+Reference: .claude/agents/editor-in-chief.md § Guideline Verification Ladder +
+           .claude/skills/guideline-writing/SKILL.md."""
 
 PROPOSAL_VALIDATION_MSG = """[proposal-validation-advisory] DESK-JUDGED PROSE GUIDELINE EDIT DETECTED
 
@@ -489,6 +509,59 @@ def run_post(data: dict) -> int:
     return 0
 
 
+GIT_COMMIT_RE = re.compile(r"\bgit\b[^|;&\n]*\bcommit\b")
+
+
+def _guideline_dirty(porcelain: str) -> list[str]:
+    """Guideline paths in `git status --porcelain` output. Pure — the subprocess
+    stays a one-liner in the caller so this filter is the testable part."""
+    out = set()
+    for line in porcelain.splitlines():
+        path = line[3:].strip()
+        if " -> " in path:                    # rename: the post-rename name is the edit
+            path = path.split(" -> ", 1)[1]
+        path = path.strip('"').replace("\\", "/")
+        if path == "CLAUDE.md" or (
+            path.endswith(".md") and any(d in "/" + path for d in GUIDE_DIRS)
+        ):
+            out.add(path)
+    return sorted(out)
+
+
+def run_pre_bash(data: dict) -> int:
+    """PreToolUse(Bash|PowerShell) — surface the ladder when a commit is about to
+    carry a guideline edit.
+
+    The ladder calls itself mandatory "right before commit", and nothing fired
+    there: the Write|Edit dispatcher only reminds at *edit* time, and an edit made
+    through Bash (`sed -i`, a heredoc, a python one-liner) reaches that matcher not
+    at all — the 2026-08-22 incident, where three rungs went unrun.
+
+    Reads the **working tree**, not the index: this repo writes its commits as
+    `git add <path> && git commit` in one call, so at PreToolUse nothing is staged
+    yet and an index-only check would be silent exactly when it is needed.
+
+    Advisory, never a block — the hook cannot observe whether the ladder already
+    ran, and blocking would stop the compliant commit along with the careless one.
+    """
+    if not GIT_COMMIT_RE.search((data.get("tool_input") or {}).get("command") or ""):
+        return 0
+    try:
+        out = subprocess.run(
+            ["git", "status", "--porcelain", "--", "CLAUDE.md", ".claude"],
+            cwd=Path(__file__).resolve().parents[2], capture_output=True,
+            text=True, timeout=5,
+        ).stdout
+    except Exception:
+        return 0          # a guard that cannot read git stays silent rather than noisy
+    hits = _guideline_dirty(out)
+    if not hits:
+        return 0
+    _emit("PreToolUse", [COMMIT_GATE_HEAD + "\n".join("  " + h for h in hits)
+                          + COMMIT_GATE_TAIL])
+    return 0
+
+
 def main() -> int:
     phase = sys.argv[1] if len(sys.argv) > 1 else ""
     try:
@@ -499,6 +572,8 @@ def main() -> int:
         return run_pre(data)
     if phase == "post":
         return run_post(data)
+    if phase == "pre-bash":
+        return run_pre_bash(data)
     return 0
 
 
