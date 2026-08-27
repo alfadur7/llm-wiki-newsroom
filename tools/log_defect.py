@@ -72,6 +72,29 @@ REQUIRED = {
 # `cluster` join key: kebab-case slug; transitions may carry an `@<stage>` suffix.
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*(@[a-z0-9-]+)?$")
 DECISIONS = ("accept", "reject", "defer")
+
+# What an accept transition actually put in place — `mine_failures` splits its
+# recurrence tier on this. Records that pile up after a new *checker* are that
+# checker working, not a treatment failing, so tiering them with prevention-after-
+# recurrence points the priority table at a solved problem.
+#   prevent    a rule·gate·hook·code change stopped the defect from occurring
+#   detect     a check·advisory was added or widened so it becomes visible
+#   both       one treatment did both (a new rule plus its lint wiring)
+#   remediate  only the existing instances were cleaned up — nothing prevents a repeat
+# A field rather than a heuristic on `surface`: guessing from the path misreads a
+# guideline SoT whose name contains `lint` as a checker.
+TREATMENTS = ("prevent", "detect", "both", "remediate")
+
+# Vocabularies for the optional grading fields. Without a check these split silently —
+# a Korean or title-case severity, a content type written into the layer slot, a
+# string `"no"` in a boolean field — and an aggregate that reads them just goes quiet.
+SEVERITIES = ("critical", "high", "medium", "low")
+# `meta` is the instruction prose (`.claude/**/*.md`, CLAUDE.md, README.md), `tools`
+# everything executable or configured around it (tools/, hooks/, skill checks, repo
+# config). Derive the value from the target, not from the topic: the two tokens this
+# repo used before (`guideline` and `meta`) each carried both kinds — 19 of one pointed
+# at code and 6 of the other at prose — so the field said nothing until it was pinned.
+LAYERS = ("L2-1", "L2-2", "L2-3", "L2-4", "meta", "tools")
 # Verification surfaces a defect can escape from / be caught at (caught_at prefix).
 # `operator` carries a narrow-use rule — read the module docstring before reaching for it.
 STAGES = ("lint", "desk", "blind", "probe", "operator")
@@ -114,8 +137,14 @@ def validate(rec: dict) -> str | None:
         return f"{kind} missing required keys: {missing}"
     if not SLUG_RE.match(str(rec["cluster"])):
         return f"cluster must be a kebab-case slug (got {rec['cluster']!r})"
-    if kind == "transition" and rec["decision"] not in DECISIONS:
-        return f"decision must be one of {list(DECISIONS)} (got {rec['decision']!r})"
+    if kind == "transition":
+        if rec["decision"] not in DECISIONS:
+            return f"decision must be one of {list(DECISIONS)} (got {rec['decision']!r})"
+        # Required on accept only — reject and defer put nothing in place, so the
+        # field has no value to carry.
+        if rec["decision"] == "accept" and rec.get("treatment") not in TREATMENTS:
+            return (f"an accept transition needs treatment as one of {list(TREATMENTS)} "
+                    f"(got {rec.get('treatment')!r}) — input to the recurrence tier")
     if kind == "defect":
         stage = str(rec["caught_at"]).split(":")[0]
         if stage not in STAGES:
@@ -123,6 +152,18 @@ def validate(rec: dict) -> str | None:
         ga = rec.get("grounded_at")
         if ga is not None and not re.fullmatch(r"R[0-4]", str(ga)):
             return f"grounded_at must be of the form R0-R4 (got {ga!r})"
+        # Optional fields, but a value that is present keeps to the vocabulary.
+        sev = rec.get("severity")
+        if sev is not None and sev not in SEVERITIES:
+            return f"severity must be one of {list(SEVERITIES)} (got {sev!r})"
+        lay = rec.get("layer")
+        if lay is not None and lay not in LAYERS:
+            return (f"layer must be one of {list(LAYERS)} (got {lay!r}) — the Layer slug, "
+                    f"not the content type (source·hub·timeline)")
+        adr = rec.get("addressable")
+        if adr is not None and not isinstance(adr, bool):
+            # A string passes the `is False` comparison, so "no" leaks in as addressable.
+            return f"addressable must be a true/false boolean (got {adr!r})"
     return None
 
 

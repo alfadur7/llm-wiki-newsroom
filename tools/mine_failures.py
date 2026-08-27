@@ -11,10 +11,19 @@ Grouping key = `cluster` (the slugified mechanism-cluster join key shared with
 transitions; legacy records without it fall back to `mechanism`). The same cluster is
 broken out by caught_at stage — which rung it escaped from signals which surface is empty.
 
-Priority = **recurrence after treatment > support count**. A mechanism that was fixed once
-(an accept transition) yet reappeared is top priority (treatment failure). The review window
-is managed by a watermark (same design as `mine_feedback`) — `--checkpoint` advances the
-boundary and records this cycle's cluster and recurrence history.
+Priority = **recurrence after *preventive* treatment > support count**. A cluster that had
+prevention put in place (`treatment` of `prevent`·`both`) and reappeared anyway is top
+priority — that is a treatment failure. Counting every accept as a treatment is wrong:
+a cluster accepted by adding a **checker** (`detect`) accumulates records because the
+checker works, and one accepted by cleaning up instances (`remediate`) never had a
+prevention. Both are held out of the recurrence tier and marked `▷unprev`.
+Vocabulary SoT: `log_defect.py` TREATMENTS; the judgment is made by a human at ingest.
+
+Support count measures **review effort, not defect rate** — a deeply reviewed batch takes
+the ranking (this corpus runs 8 to 42 defects a week). Read a large support as "looked at
+hard here" before reading it as "fails most here". The review window is managed by a
+watermark (same design as `mine_feedback`) — `--checkpoint` advances the boundary and
+records this cycle's cluster and recurrence history.
 
 Defects ingested as `addressable:false` (source quality, contested topics, tool limits) are
 surfaced separately as "won't patch" — to prevent guideline bloat.
@@ -72,9 +81,29 @@ def fixed_clusters(records: list[dict]) -> set[str]:
             if r.get("kind") == "transition" and r.get("decision") == "accept"}
 
 
+# Treatments that earn a place in the recurrence tier — only those that stop the defect
+# from occurring. `detect` (a checker was added) makes what follows the checker working,
+# and `remediate` (instances cleaned up) left no prevention behind at all.
+_PREVENTIVE = ("prevent", "both")
+
+
+def accept_clusters(records: list[dict], *treatments: str) -> set[str]:
+    """Clusters of accept transitions carrying one of the given treatments."""
+    return {str(r.get("cluster", "")).split("@")[0]
+            for r in records
+            if r.get("kind") == "transition" and r.get("decision") == "accept"
+            and r.get("treatment") in treatments}
+
+
 def analyze(records: list[dict], since: str | None, pages: bool = False):
-    """Group defects by cluster, sorted by (recurrence, support). addressable=false is split out."""
+    """Group defects by cluster, sorted by (recurrence after prevention, support).
+
+    addressable=false is split out; a non-preventive accept (detect·remediate) is
+    reported but held out of the recurrence tier.
+    """
     fixed = fixed_clusters(records)
+    recurred = accept_clusters(records, *_PREVENTIVE)   # prevented, and back anyway
+    non_preventive = fixed - recurred
     clusters: dict[str, dict] = defaultdict(
         lambda: {"count": 0, "stages": Counter(), "targets": []})
     blocked: Counter = Counter()  # addressable=false mechanism → count
@@ -95,8 +124,9 @@ def analyze(records: list[dict], since: str | None, pages: bool = False):
         if (pages or len(c["targets"]) < 3) and r.get("target"):
             c["targets"].append(r["target"])
     ranked = sorted(clusters.items(),
-                    key=lambda kv: (kv[0] in fixed, kv[1]["count"]), reverse=True)
+                    key=lambda kv: (kv[0] in recurred, kv[1]["count"]), reverse=True)
     return {"ranked": ranked, "blocked": blocked, "fixed": fixed,
+            "recurred": recurred, "non_preventive": non_preventive,
             "in_window": in_window}
 
 
@@ -121,13 +151,15 @@ def mine(since: str | None, pages: bool = False) -> int:
     a = analyze(records, since, pages=pages)
     print(f"defect corpus: {LOG_PATH.name} ({sum(1 for r in records if r.get('kind')=='defect')} defect)")
     print(f"review window: {('after ' + since) if since else 'ALL (no watermark)'}")
-    print(f"in-window defects: {a['in_window']}  ·  already-treated clusters: {len(a['fixed'])}")
+    print(f"in-window defects: {a['in_window']}  ·  prevented clusters: {len(a['recurred'])}"
+          f"  ·  non-preventive accepts: {len(a['non_preventive'])}")
     print()
-    print("=== Recurring defects (recurrence after treatment ▶ first) ===")
+    print("=== Recurring defects (recurrence after preventive treatment ▶ first) ===")
     if not a["ranked"]:
         print("  (no addressable defects in window)")
     for mech, c in a["ranked"]:
-        flag = "▶recur" if mech in a["fixed"] else "      "
+        flag = ("▶recur " if mech in a["recurred"]
+                else "▷unprev" if mech in a["non_preventive"] else "       ")
         stages = " ".join(f"{s}:{n}" for s, n in c["stages"].most_common())
         print(f"  {flag} {c['count']:4d}  {mech}  [{stages}]")
         label = 'pages' if pages else 'e.g.'
@@ -155,7 +187,9 @@ def main() -> int:
         prev = read_watermark()
         a = analyze(read_log(), prev)
         mechs = {m: c["count"] for m, c in a["ranked"]}
-        recurring = [m for m, _ in a["ranked"] if m in a["fixed"]]
+        # Non-preventive accepts are out — the history's "settling" trend must not be
+        # polluted by a cluster whose records are a new checker doing its job.
+        recurring = [m for m, _ in a["ranked"] if m in a["recurred"]]
         write_checkpoint(when, prev, args.note, mechs, recurring)
         print(f"[watermark] review complete confirmed: {when} → {WATERMARK_PATH.name} (to be committed to the repo)")
         if recurring:

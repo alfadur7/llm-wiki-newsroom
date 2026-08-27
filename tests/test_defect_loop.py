@@ -49,7 +49,7 @@ def _valid_transition(**over):
     rec = {"kind": "transition", "cluster": "density-shortfall@desk",
            "surface": "layers/overview.md", "decision": "accept",
            "rationale": "held-in improved, no slice regressed",
-           "model": "claude-sonnet-5"}
+           "model": "claude-sonnet-5", "treatment": "prevent"}
     rec.update(over)
     return rec
 
@@ -95,6 +95,47 @@ def test_append_fills_date_and_rejects_invalid(tmp_path):
         assert False, "invalid record passed validation"
     except ValueError:
         pass
+
+
+def test_validate_requires_treatment_on_accept():
+    """Without it `mine_failures` reads the accept as non-preventive and quietly drops
+    the cluster out of the recurrence tier — so the judgment is forced at ingest."""
+    rec = _valid_transition()
+    del rec["treatment"]
+    assert ld.validate(rec)
+    assert ld.validate(_valid_transition(treatment="added a checker"))   # free text refused
+    for tr in ("prevent", "detect", "both", "remediate"):
+        assert ld.validate(_valid_transition(treatment=tr)) is None
+    # reject and defer put nothing in place, so nothing is required of them
+    r = _valid_transition(decision="reject")
+    del r["treatment"]
+    assert ld.validate(r) is None
+
+
+def test_validate_enforces_severity_vocabulary():
+    assert ld.validate(_valid_defect(severity="Medium"))
+    assert ld.validate(_valid_defect(severity="med"))
+    for s in ("critical", "high", "medium", "low"):
+        assert ld.validate(_valid_defect(severity=s)) is None
+
+
+def test_validate_enforces_layer_vocabulary():
+    """Writing the content type into the layer slot was the real drift path, and the
+    two tokens this repo used before (`guideline`/`meta`) each carried both prose and
+    code — so the aggregate read a field that meant nothing."""
+    assert ld.validate(_valid_defect(layer="source"))
+    assert ld.validate(_valid_defect(layer="guideline"))
+    for lay in ("L2-1", "L2-2", "L2-3", "L2-4", "meta", "tools"):
+        assert ld.validate(_valid_defect(layer=lay)) is None
+
+
+def test_validate_rejects_a_non_boolean_addressable():
+    """A string passes the `is False` comparison, so "no" leaks in as addressable."""
+    assert ld.validate(_valid_defect(addressable="yes"))
+    assert ld.validate(_valid_defect(addressable="no"))
+    for b in (True, False):
+        assert ld.validate(_valid_defect(addressable=b)) is None
+
 
 
 # --- mine_failures: cluster + priority ---
@@ -152,3 +193,35 @@ def test_checkpoint_records_recurrence(tmp_path, monkeypatch):
                                  {"density-shortfall": 1}, ["density-shortfall"])
     assert entry["recurring_after_fix"] == ["density-shortfall"]
     assert mfa.read_watermark() == "2026-06-25"
+
+
+# --- mine_failures: the recurrence tier splits on treatment ---
+# Counting every accept as a treatment pins a cluster at the top of the priority table
+# for as long as its checker keeps working. Only prevention earns the tier.
+
+def _accept(cluster, treatment, surface="tools/_lint/source.py"):
+    return {"kind": "transition", "cluster": cluster, "surface": surface,
+            "decision": "accept", "rationale": "r", "model": "m", "treatment": treatment}
+
+
+def test_detector_only_accept_leaves_the_recurrence_tier():
+    records = [
+        _defect("detector-fixed"), _defect("detector-fixed"), _defect("detector-fixed"),
+        _defect("prevention-fixed"),
+        _accept("detector-fixed", "detect"),
+        _accept("prevention-fixed", "prevent", ".claude/layers/hub.md"),
+    ]
+    a = mfa.analyze(records, since=None)
+    assert a["non_preventive"] == {"detector-fixed"}
+    assert a["recurred"] == {"prevention-fixed"}
+    # support 1 beats support 3 — prevention-after-recurrence outranks a working checker
+    assert a["ranked"][0][0] == "prevention-fixed"
+
+
+def test_one_preventive_accept_is_enough_to_hold_the_tier():
+    records = [_defect("mixed"),
+               _accept("mixed", "detect"),
+               _accept("mixed", "prevent", ".claude/agents/reporter.md")]
+    a = mfa.analyze(records, since=None)
+    assert a["non_preventive"] == set()
+    assert "mixed" in a["recurred"]
