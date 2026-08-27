@@ -19,13 +19,13 @@ set -uo pipefail
 # cost this branch exists to avoid. Matched against the raw JSON, which is safe — the
 # pattern holds no character JSON escapes.
 #
-# The glob is deliberately WIDER than `GIT_COMMIT_RE`, which stays the authority. A
+# The glob is deliberately WIDER than `_git_segments`, which stays the authority. A
 # prefilter that over-fires costs one python spawn; one that under-fires makes the gate
 # silent on a real commit while the suite stays green, since nothing else reaches this
 # layer. `*"git commit"*` did exactly that — `git -C . commit`, `git -c user.x=y commit`
 # and `git  commit` (two spaces) never got here. Measured on a 130-call session: the
 # widening costs 6 extra spawns (~1.5s) and the superset property is pinned by
-# `tests/test_hooks_dispatch.py::test_prefilter_never_narrower_than_the_regex`.
+# `tests/test_hooks_dispatch.py::test_prefilter_never_narrower_than_the_python_judge`.
 if [ "$1" = "pre-bash" ]; then
   payload=$(cat)
   case "$payload" in *git*commit*) ;; *) exit 0 ;; esac

@@ -15,6 +15,7 @@ Exit codes: 0 advisory/no-op (stdout JSON additionalContext), 2 blocking
 import json
 import os
 import re
+import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -67,7 +68,8 @@ PONYTAIL_RE = re.compile(r"/tools/.*\.py$|/\.claude/hooks/.*\.(py|sh)$")
 SCRATCH_EXTS = {".py", ".sh", ".tmp", ".scratch", ".ipynb"}
 # Repo root derived from this hook's own location (<root>/.claude/hooks/dispatch.py)
 # so the scratch advisory fires regardless of the clone directory name.
-_REPO_ROOT = Path(__file__).resolve().parents[2].as_posix().lower()
+ROOT = Path(__file__).resolve().parents[2]
+_REPO_ROOT = ROOT.as_posix().lower()
 GUIDE_DIRS = ("/.claude/agents/", "/.claude/commands/", "/.claude/layers/",
               "/.claude/policies/", "/.claude/operations/")
 
@@ -178,8 +180,14 @@ COMMIT_GATE_HEAD = """[commit-gate] GUIDELINE FILE DIRTY AT COMMIT
 """
 COMMIT_GATE_TAIL = """
 
-The Guideline Verification Ladder is mandatory right before commit. If it has
-already run for these files, proceed — this is a reminder, not a block.
+The Guideline Verification Ladder is mandatory right before commit. This is not a
+block — the hook cannot see whether the ladder ran, and this reminder may be read
+*after* the commit command has already executed.
+
+  · If the ladder has already run for the files above, proceed.
+  · If it has not, stop here and run it now. If the commit already landed, do not
+    revert it (the revert scope is the wiki operator's call) — carry the result
+    into a follow-up commit.
 
 """ + LADDER_RUNGS + """
 
@@ -509,52 +517,236 @@ def run_post(data: dict) -> int:
     return 0
 
 
-GIT_COMMIT_RE = re.compile(r"\bgit\b[^|;&\n]*\bcommit\b")
+# ------------------------------------------- commit-time ladder surface (pre-bash)
+
+# Characters that form a shell operator. The newline belongs in here: `run lint →
+# commit` on two lines is the very flow this gate exists for, and if a newline does
+# not separate commands the gate goes silent the moment the first token is not
+# `git`. The same characters inside quotes are already folded into a token by the
+# lexer, so a commit subject is unaffected.
+_OP_CHARS = "();<>|&\n"
+# `git add` forms that stage more than their arguments name. `-u`/`--update` restage
+# tracked modifications only — the same restriction `git commit -a` carries — so an
+# untracked file under them is one the commit cannot carry.
+_ADD_ALL = frozenset({"-A", "--all", "."})
+_ADD_TRACKED = frozenset({"-u", "--update"})
+# Commit options whose value is the next token.
+_VALUE_OPTS = ("--message", "--file", "--author", "--date",
+               "--reuse-message", "--reedit-message")
+# Where a guideline file can live — the pathspec used when the command narrows to nothing.
+GUIDE_SCOPE = ("CLAUDE.md", ".claude")
 
 
-def _guideline_dirty(porcelain: str) -> list[str]:
-    """Guideline paths in `git status --porcelain` output. Pure — the subprocess
-    stays a one-liner in the caller so this filter is the testable part."""
-    out = set()
+def _is_op(tok: str) -> bool:
+    return bool(tok) and all(c in _OP_CHARS for c in tok)
+
+
+def _lex(command: str) -> list[str]:
+    """Shell tokens of a command; operators (`&&`·`;`·`|`·newline) come out as tokens.
+
+    The load-bearing property is that `punctuation_chars` splits operators only
+    **after** quotes are handled. Splitting on a regex first cuts a message like
+    `-m 'fix: a; b'` in two, and both halves then die on an unbalanced quote —
+    silencing the gate on exactly the commits it is for. 82 of this repo's 100
+    commit subjects carry `()` and 3 carry `;`·`&`·`|`·`<`·`>`.
+
+    An unbalanced quote keeps what was read rather than dropping everything: in a
+    PowerShell here-string or a heredoc-substituted message, the `git commit` has
+    already been read by the time the imbalance appears. `escape=""` stops a
+    Windows path's backslash from being eaten as an escape character.
+    """
+    lx = shlex.shlex(command, posix=True, punctuation_chars=_OP_CHARS)
+    lx.whitespace_split = True
+    lx.whitespace = " \t\r"
+    lx.escape = ""
+    toks: list[str] = []
+    try:
+        for t in lx:
+            toks.append(t)
+    except ValueError:          # unbalanced quote — the command is what came before it
+        pass
+    return toks
+
+
+def _git_segments(command: str, sub: str) -> list[list[str]]:
+    """Shell segments whose first token is git and that carry `sub` as its own token.
+
+    Matching the string `commit` anywhere calls the payload down on a grep, an echo
+    or a documentation body — measured here at eight over-fires across two review
+    rotations, which is why the gate anchors on **command position** instead. A
+    commit message body drops out for free: the lexer folds a quoted string into
+    one token.
+
+    A `<` operator **stops the scan**, at a known cost: a heredoc writing a
+    document that contains `git commit` cannot forge a segment, but a real commit
+    following a heredoc in the same call is lost along with it.
+    """
+    segs, cur = [], []
+    for t in [*_lex(command), ";"]:
+        if "<" in t and _is_op(t):
+            break
+        if _is_op(t):
+            if cur and os.path.basename(cur[0]).removesuffix(".exe") == "git" and sub in cur:
+                segs.append(cur)
+            cur = []
+        else:
+            cur.append(t)
+    return segs
+
+
+def _guideline_paths(paths) -> list[str]:
+    """Keep only guideline files — used for porcelain lines and command arguments alike."""
+    return sorted({
+        p for p in paths
+        if p == "CLAUDE.md" or (p.endswith(".md") and any(d in "/" + p for d in GUIDE_DIRS))
+    })
+
+
+def _porcelain_paths(porcelain: str, tracked_only: bool = False) -> list[str]:
+    """Paths out of `git status --porcelain`. On a rename the new name is the edit.
+
+    `tracked_only` drops `??` lines — `git commit -a` stages tracked modifications and
+    nothing else, so an untracked file listed there is a file that commit cannot carry.
+
+    No backslash conversion: porcelain always emits forward slashes, so the only
+    backslashes this could meet are `core.quotePath` C-escapes, which converting
+    mangles into a garbage path that still fires. `_git` disables that quoting.
+    """
+    out = []
     for line in porcelain.splitlines():
+        if tracked_only and line[:2] == "??":
+            continue
         path = line[3:].strip()
-        if " -> " in path:                    # rename: the post-rename name is the edit
+        if " -> " in path:
             path = path.split(" -> ", 1)[1]
-        path = path.strip('"').replace("\\", "/")
-        if path == "CLAUDE.md" or (
-            path.endswith(".md") and any(d in "/" + path for d in GUIDE_DIRS)
-        ):
-            out.add(path)
-    return sorted(out)
+        out.append(path)
+    return out
+
+
+def _staged_scope(command: str) -> tuple[list[str], bool]:
+    """(pathspec this command's `git add`s cover, whether they can stage an untracked file).
+
+    Each `git add` contributes its own scope and they union: a broad flag with a pathspec
+    is broad only inside it (`git add -A tools/`), a broad flag alone covers everything,
+    and a later narrow add does not cancel an earlier broad one. Returns ([], _) when no
+    `git add` in the command names anything.
+    """
+    paths: list[str] = []
+    untracked = False
+    for seg in _git_segments(command, "add"):
+        named = [tok.replace("\\", "/") for tok in seg[1:]
+                 if tok[:1] != "-" and tok != "add" and tok not in _ADD_ALL]
+        broad = any(tok in _ADD_ALL or tok in _ADD_TRACKED for tok in seg)
+        untracked = untracked or not any(tok in _ADD_TRACKED for tok in seg)
+        paths += named or (list(GUIDE_SCOPE) if broad else [])
+    return paths, untracked
+
+
+def _commit_flags(seg: list[str]) -> list[str]:
+    """Flag tokens of a commit segment, with option values skipped.
+
+    A quoted `-m` value is one token, so a message of `-a quick fix` is read as the `-a`
+    flag unless the value is skipped — measured naming three files on a command that
+    stages nothing. The paths decision already excludes the message body; this is the
+    flags decision.
+    """
+    out, skip = [], False
+    for tok in seg[1:]:
+        if skip:
+            skip = False
+        elif tok[:1] == "-":
+            out.append(tok)
+            # `-m`/`-F`/`-C`/`-c` and their combined short forms (`-am`) take the next
+            # token as their value; `--message` and friends take it in the long form.
+            skip = (tok in _VALUE_OPTS
+                    or (tok[:2] != "--" and tok[-1:] in "mFCc"))
+    return out
+
+
+def _commit_pathspec(seg: list[str]) -> list[str]:
+    """Paths after `--` in the commit segment — what the commit restricts itself to."""
+    return ([tok.replace("\\", "/") for tok in seg[seg.index("--") + 1:]]
+            if "--" in seg else [])
+
+
+def _git(root, *args: str) -> str | None:
+    try:
+        return subprocess.run(
+            ["git", "-C", str(root), "-c", "core.quotePath=false", *args],
+            capture_output=True, text=True, encoding="utf-8", timeout=5,
+        ).stdout
+    except Exception:
+        return None        # a guard that cannot read git stays silent rather than noisy
 
 
 def run_pre_bash(data: dict) -> int:
-    """PreToolUse(Bash|PowerShell) — surface the ladder when a commit is about to
-    carry a guideline edit.
+    """PreToolUse(Bash|PowerShell) — surface the ladder when a commit carries a guideline edit.
 
-    The ladder calls itself mandatory "right before commit", and nothing fired
-    there: the Write|Edit dispatcher only reminds at *edit* time, and an edit made
-    through Bash (`sed -i`, a heredoc, a python one-liner) reaches that matcher not
-    at all — the 2026-08-22 incident, where three rungs went unrun.
+    Every guard and advisory in this file hangs off the Write|Edit matcher, so a
+    file fixed with a heredoc or `sed` passes none of them — including the hook the
+    ladder itself cites as its "no memory dependence" basis (the 2026-08-22
+    incident, where three rungs went unrun).
 
-    Reads the **working tree**, not the index: this repo writes its commits as
-    `git add <path> && git commit` in one call, so at PreToolUse nothing is staged
-    yet and an index-only check would be silent exactly when it is needed.
-
-    Advisory, never a block — the hook cannot observe whether the ladder already
-    ran, and blocking would stop the compliant commit along with the careless one.
+    Advisory, never a block: the hook cannot observe whether the ladder already ran,
+    and blocking would stop the compliant commit along with the careless one. The
+    price of that is measured — the hook runs *before* the command, but its
+    additionalContext enters the context *after* the tool result, so the commit can
+    land first and the ladder become after-the-fact. Hence the message names the
+    not-yet-run branch too.
     """
-    if not GIT_COMMIT_RE.search((data.get("tool_input") or {}).get("command") or ""):
+    ti = data.get("tool_input")
+    command = ti.get("command") if isinstance(ti, dict) else None
+    if not isinstance(command, str):
         return 0
-    try:
-        out = subprocess.run(
-            ["git", "status", "--porcelain", "--", "CLAUDE.md", ".claude"],
-            cwd=Path(__file__).resolve().parents[2], capture_output=True,
-            text=True, timeout=5,
-        ).stdout
-    except Exception:
-        return 0          # a guard that cannot read git stays silent rather than noisy
-    hits = _guideline_dirty(out)
+    segs = _git_segments(command, "commit")
+    if not segs:
+        return 0
+
+    # `git -C <dir> commit` can commit a different repository, and pinning to this
+    # hook's own location answers it with *this* repo's dirty files (confirmed here
+    # by running the hook from another repo). Ask for the toplevel and stay silent
+    # unless it is this repo. The `-C` search stops at the subcommand: reading
+    # `git commit -C HEAD` (message reuse) as a path empties the lookup and
+    # silences the gate.
+    seg = segs[0]
+    head = seg[:seg.index("commit")]
+    at = head.index("-C") + 1 if "-C" in head else None
+    root = _git(head[at] if at and at < len(head) else ROOT, "rev-parse", "--show-toplevel")
+    if not root or Path(root.strip()) != ROOT:
+        return 0
+
+    # What the commit actually carries — the index first. A `git add X && git commit`
+    # in one call has an empty index at this point, so the working tree is narrowed
+    # to the paths the command named. Reading the whole repo names CLAUDE.md on every
+    # unrelated commit and re-fires until that file is itself committed. The
+    # exceptions are `-a` (all tracked files) and `git add -A`/a directory — nothing
+    # to narrow by, so the whole repo is right.
+    flags = _commit_flags(seg)
+    commit_all = any(t == "--all" or (t[:2] != "--" and "a" in t) for t in flags)
+    # A commit pathspec decides alone — those paths are committed and nothing else is,
+    # whatever the index holds and whatever `git add` staged before it.
+    pathspec = _commit_pathspec(seg)
+    staged = _git(ROOT, "diff", "--cached", "--name-only", "--", *(pathspec or GUIDE_SCOPE))
+    hits = _guideline_paths((staged or "").splitlines())
+    if not hits:
+        if pathspec:
+            # A commit pathspec carries tracked paths only — `git commit -- <untracked>`
+            # is an error, and over a directory it commits the tracked changes alone.
+            scope, untracked = pathspec, False
+        elif commit_all:
+            scope, untracked = list(GUIDE_SCOPE), False
+        else:
+            scope, untracked = _staged_scope(command)
+        if scope:
+            # `-uall`: without it git collapses an untracked directory to a single `??
+            # <dir>/` line, so a new guideline file in a new directory is never named.
+            dirty = _git(ROOT, "status", "--porcelain", "-uall", "--", *scope)
+            hits = _guideline_paths(_porcelain_paths(dirty or "", tracked_only=not untracked))
+    if "--amend" in flags:
+        # An amend rewrites the commit it replaces, so that commit's files are carried
+        # too — without this the gate is silent on an amend of a guideline commit.
+        head = _git(ROOT, "show", "--name-only", "--format=", "HEAD")
+        hits = sorted(set(hits) | set(_guideline_paths((head or "").split())))
     if not hits:
         return 0
     _emit("PreToolUse", [COMMIT_GATE_HEAD + "\n".join("  " + h for h in hits)

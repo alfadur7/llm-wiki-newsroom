@@ -8,6 +8,9 @@ import fnmatch
 import json
 import pathlib
 import re
+import pytest
+import shutil
+import subprocess
 
 import check_bullet_depth
 import dispatch
@@ -313,68 +316,80 @@ def _bash(command):
     return {"tool_name": "Bash", "tool_input": {"command": command}}
 
 
-def _fake_git(monkeypatch, porcelain):
-    """Stand in for `git status --porcelain` so the gate is tested, not the repo."""
-    class _R:
-        stdout = porcelain
-    monkeypatch.setattr(dispatch.subprocess, "run", lambda *a, **k: _R())
+# Command position, not the string `commit`, is what the gate anchors on — matching
+# the word anywhere fired the payload on a grep, an echo and a documentation body
+# eight times across two review rotations.
+FIRES = [
+    "git commit -m 'x'",
+    "git -C . commit -m 'x'",
+    "git  commit",                                   # two spaces
+    "git add CLAUDE.md && git commit -F /tmp/m.txt",
+    "python tools/lint.py meta; git commit -m 'x'",
+    # Shell metacharacters inside the message. 3 of this repo's 100 commit subjects
+    # carry one and 82 carry `()`; splitting on a regex before the quotes silenced
+    # the gate on every one of them.
+    "git commit -am 'refactor(hooks): tidy the Write|Edit hook'",
+    "git commit -m 'fix: a; b'",
+    "git commit -m 'feat: a && b'",
+    "git add X; git commit -m 'x'",                  # PS 5.1 chain — `;` with no space
+    "python tools/lint.py meta\ngit add CLAUDE.md\ngit commit -m fix",  # newline chain
+]
+SILENT = [
+    "git log --oneline -5",
+    "git log --grep=commit",                         # `commit` is not its own token
+    "grep -rn 'git commit' log.md",                  # the first token is not git
+    "echo 'run git commit next'",
+    "git commit -m 'docs: how to git commit'",       # the message folds into one token
+]
 
 
-def test_guideline_dirty_filter():
-    got = dispatch._guideline_dirty(
+def _segs(command):
+    return dispatch._git_segments(command, "commit")
+
+
+def test_commit_segments_anchor_on_command_position():
+    for c in FIRES:
+        assert _segs(c), c
+    for c in SILENT[:4]:
+        assert not _segs(c), c
+
+
+def test_commit_message_body_is_not_a_second_match():
+    """A `git commit` inside an `-m` value must not make its own match — the root of
+    the over-fire class."""
+    segs = _segs(SILENT[4])
+    assert len(segs) == 1, segs
+
+
+def test_heredoc_body_is_not_scanned():
+    """A command writing documentation must not fire on that document's own text."""
+    assert not _segs("cat > d.md <<'EOF'\ngit commit -m x\nEOF")
+
+
+def test_guideline_path_filter():
+    got = dispatch._guideline_paths(dispatch._porcelain_paths(
         " M .claude/layers/hub.md\n"
         "M  CLAUDE.md\n"
         "R  old.md -> .claude/policies/naming.md\n"   # rename → the post-rename name
         "?? tools/x.py\n"                             # not a guideline surface
         " M wiki/index.md\n"
         " M .claude/skills/guideline-writing/SKILL.md\n"   # skills is outside GUIDE_DIRS
-        " M .claude/agents/notes.txt\n")                   # not .md
+        " M .claude/agents/notes.txt\n"))                  # not .md
     assert got == [".claude/layers/hub.md", ".claude/policies/naming.md", "CLAUDE.md"]
 
 
-def test_commit_gate_fires_on_dirty_guideline(monkeypatch, capsys):
-    _fake_git(monkeypatch, " M .claude/layers/hub.md\n")
-    assert dispatch.run_pre_bash(_bash("git add x && git commit -F -")) == 0
-    body = _payload(capsys)
-    assert "[commit-gate]" in body
-    assert ".claude/layers/hub.md" in body
-    assert "Blind review (mandatory)" in body     # the shared rung list is carried
-
-
-def test_commit_gate_silent_when_not_a_commit(monkeypatch, capsys):
-    _fake_git(monkeypatch, " M .claude/layers/hub.md\n")
-    assert dispatch.run_pre_bash(_bash("git log --oneline | grep commit")) == 0
-    assert _payload(capsys) == ""
-
-
-def test_commit_gate_silent_when_nothing_guideline_dirty(monkeypatch, capsys):
-    _fake_git(monkeypatch, " M tools/lint.py\n M wiki/index.md\n")
-    assert dispatch.run_pre_bash(_bash("git commit -m x")) == 0
-    assert _payload(capsys) == ""
-
-
-def test_commit_gate_silent_when_git_unavailable(monkeypatch, capsys):
-    def _boom(*a, **k):
-        raise OSError("no git")
-    monkeypatch.setattr(dispatch.subprocess, "run", _boom)
-    assert dispatch.run_pre_bash(_bash("git commit -m x")) == 0
-    assert _payload(capsys) == ""
-
-
-def test_prefilter_never_narrower_than_the_regex():
+def test_prefilter_never_narrower_than_the_python_judge():
     """The shell prefilter only decides whether Python runs, so it may over-fire but must
-    never reject a command `GIT_COMMIT_RE` would advise on — an under-firing prefilter
-    leaves the gate silent on a real commit while this suite stays green, since the other
-    tests call `run_pre_bash` directly and never reach the shell layer. The glob is read
-    out of `dispatch.sh` so the two cannot drift apart."""
+    never reject a command the gate would advise on — an under-firing prefilter leaves the
+    gate silent on a real commit while this suite stays green, since the other tests call
+    `run_pre_bash` directly and never reach the shell layer. The glob is read out of
+    `dispatch.sh` so the two cannot drift apart. This is a sample check: the pattern is
+    evaluated with fnmatch rather than bash `case`, so it holds for plain wildcards only."""
     sh = (pathlib.Path(dispatch.__file__).parent / "dispatch.sh").read_text(encoding="utf-8")
     glob = re.search(r'case "\$payload" in (\S+?)\)', sh).group(1)
-    for cmd in ("git commit -m x", "git add a && git commit -F -", "git -C . commit -m x",
-                "git -c user.name=x commit", "git --no-pager commit", "git  commit",
-                "ls -la", "git log --oneline", "echo hello"):
-        payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": cmd}})
-        if dispatch.GIT_COMMIT_RE.search(cmd):
-            assert fnmatch.fnmatchcase(payload, glob), f"prefilter rejects a real commit: {cmd}"
+    for cmd in FIRES:
+        payload = json.dumps(_bash(cmd))
+        assert fnmatch.fnmatchcase(payload, glob), f"prefilter rejects a real commit: {cmd}"
 
 
 def test_ladder_rungs_match_the_sot():
@@ -393,3 +408,349 @@ def test_ladder_rungs_match_the_sot():
     for _, title in titles:
         stem = title.split("(")[0].strip()
         assert stem in dispatch.LADDER_RUNGS, f"rung missing from the payload: {stem}"
+
+
+def test_pre_bash_ignores_a_malformed_payload(capsys):
+    assert dispatch.run_pre_bash({"tool_input": []}) == 0
+    assert dispatch.run_pre_bash({"tool_input": {"command": None}}) == 0
+    assert _payload(capsys) == ""
+
+
+def test_commit_gate_silent_when_git_is_unavailable(monkeypatch, capsys):
+    def _boom(*a, **k):
+        raise OSError("no git")
+    monkeypatch.setattr(dispatch.subprocess, "run", _boom)
+    assert dispatch.run_pre_bash(_bash("git commit -m x")) == 0
+    assert _payload(capsys) == ""
+
+
+def _repo(tmp_path):
+    """A throwaway repo — the gate reads the index and the worktree, so a fake
+    subprocess would test the stub rather than the branch that picks between them."""
+    r = tmp_path / "repo"
+    (r / ".claude" / "policies").mkdir(parents=True)
+    for a in (["init", "-q"], ["config", "user.email", "t@t"], ["config", "user.name", "t"]):
+        subprocess.run(["git", "-C", str(r), *a], check=True, capture_output=True)
+    (r / "CLAUDE.md").write_text("x", encoding="utf-8")
+    (r / ".claude" / "policies" / "naming.md").write_text("x", encoding="utf-8")
+    (r / "README.md").write_text("x", encoding="utf-8")
+    subprocess.run(["git", "-C", str(r), "add", "-A"], check=True, capture_output=True)
+    subprocess.run(["git", "-C", str(r), "commit", "-qm", "base"], check=True, capture_output=True)
+    return r
+
+
+def test_pre_bash_names_the_staged_guideline_file(tmp_path, capsys, monkeypatch):
+    r = _repo(tmp_path)
+    (r / ".claude" / "policies" / "naming.md").write_text("edited", encoding="utf-8")
+    subprocess.run(["git", "-C", str(r), "add", ".claude/policies/naming.md"],
+                   check=True, capture_output=True)
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    assert dispatch.run_pre_bash(_bash("git commit -m 'x'")) == 0
+    out = _payload(capsys)
+    assert "[commit-gate]" in out and ".claude/policies/naming.md" in out
+    assert "Blind review (mandatory)" in out          # the shared rung list is carried
+
+
+def test_pre_bash_silent_when_the_commit_carries_no_guideline(tmp_path, capsys, monkeypatch):
+    """Naming a dirty CLAUDE.md while an unrelated file is being committed re-fires on
+    every commit until that file is itself committed — the real price of a repo-wide read."""
+    r = _repo(tmp_path)
+    (r / "CLAUDE.md").write_text("dirty but not in this commit", encoding="utf-8")
+    (r / "README.md").write_text("edited", encoding="utf-8")
+    subprocess.run(["git", "-C", str(r), "add", "README.md"], check=True, capture_output=True)
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    dispatch.run_pre_bash(_bash("git commit -m 'x'"))
+    assert _payload(capsys) == ""
+
+
+def test_pre_bash_reads_the_worktree_when_the_command_stages(tmp_path, capsys, monkeypatch):
+    """`git add X && git commit` in one call has an empty index at hook time."""
+    r = _repo(tmp_path)
+    (r / "CLAUDE.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    dispatch.run_pre_bash(_bash("git add CLAUDE.md && git commit -m 'x'"))
+    assert "CLAUDE.md" in _payload(capsys)
+
+
+def test_pre_bash_silent_for_another_repository(tmp_path, capsys, monkeypatch):
+    """`git -C <other repo> commit` must not be answered with this repo's staged files."""
+    r, other = _repo(tmp_path), _repo(tmp_path / "b")
+    (r / "CLAUDE.md").write_text("edited", encoding="utf-8")
+    subprocess.run(["git", "-C", str(r), "add", "CLAUDE.md"], check=True, capture_output=True)
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    dispatch.run_pre_bash(_bash(f"git -C {other.as_posix()} commit -m 'x'"))
+    assert _payload(capsys) == ""
+
+
+def test_pre_bash_commit_all_reads_the_whole_repo(tmp_path, capsys, monkeypatch):
+    """`git commit -am` names no path — with nothing to narrow by, the whole repo is right."""
+    r = _repo(tmp_path)
+    (r / "CLAUDE.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    dispatch.run_pre_bash(_bash("git commit -am 'x'"))
+    assert "CLAUDE.md" in _payload(capsys)
+
+
+def test_metachar_in_the_message_fires_end_to_end(tmp_path, capsys, monkeypatch):
+    """A real guideline commit whose message carries `|` — the gate went silent on these."""
+    r = _repo(tmp_path)
+    (r / "CLAUDE.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    dispatch.run_pre_bash(_bash("git commit -am 'refactor(hooks): tidy the Write|Edit hook'"))
+    assert "CLAUDE.md" in _payload(capsys)
+
+
+def test_quoted_metachar_does_not_forge_a_commit_segment():
+    """A command whose quotes span an operator must not forge a commit segment — without
+    quote handling first, a read-only loop calls the gate down on itself."""
+    c = ("""for x in "git commit -m 'a'" "git add CLAUDE.md && git commit"; """
+         """do echo "$x"; done""")
+    assert _segs(c) == []
+
+
+def test_powershell_semicolon_and_windows_path_are_named(tmp_path, capsys, monkeypatch):
+    """PS 5.1 chaining (`;` with no space) and a backslash path — neither loses the path."""
+    r = _repo(tmp_path)
+    (r / ".claude" / "policies" / "naming.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    for cmd in (r"git add .claude/policies/naming.md; git commit -m 'x'",
+                r"git add .claude\policies\naming.md && git commit -m 'x'"):
+        dispatch.run_pre_bash(_bash(cmd))
+        assert "naming.md" in _payload(capsys), cmd
+
+
+def test_add_all_reads_the_whole_guideline_scope(tmp_path, capsys, monkeypatch):
+    """`-A` and `.` stage everything — there is nothing to narrow by, so the whole
+    guideline scope is right."""
+    r = _repo(tmp_path)
+    (r / "CLAUDE.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    for cmd in ("git add -A && git commit -m 'x'", "git add . && git commit -m 'x'"):
+        dispatch.run_pre_bash(_bash(cmd))
+        assert "CLAUDE.md" in _payload(capsys), cmd
+
+
+def test_a_staged_directory_scopes_to_that_directory(tmp_path, capsys, monkeypatch):
+    """A directory argument is broad only *inside* that directory. Reading it as
+    whole-repo names every dirty guideline file on a commit that carries none of them —
+    the re-fire this gate exists to prevent, and it was pinned as intended behaviour."""
+    r = _repo(tmp_path)
+    (r / "tools").mkdir()
+    (r / "tools" / "x.py").write_text("x", encoding="utf-8")
+    (r / "CLAUDE.md").write_text("dirty but not in this commit", encoding="utf-8")
+    (r / ".claude" / "policies" / "naming.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+
+    dispatch.run_pre_bash(_bash("git add .claude && git commit -m 'x'"))
+    out = _payload(capsys)
+    assert "naming.md" in out and "CLAUDE.md" not in out   # CLAUDE.md is not under .claude
+
+    dispatch.run_pre_bash(_bash("git add tools/ && git commit -m 'x'"))
+    assert _payload(capsys) == ""
+
+
+def test_commit_all_does_not_name_an_untracked_file(tmp_path, capsys, monkeypatch):
+    """`git commit -a` stages tracked modifications and nothing else, so an untracked
+    guideline file is one this commit cannot carry."""
+    r = _repo(tmp_path)
+    (r / ".claude" / "policies" / "_untracked.md").write_text("new", encoding="utf-8")
+    (r / "CLAUDE.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    dispatch.run_pre_bash(_bash("git commit -am 'x'"))
+    out = _payload(capsys)
+    assert "CLAUDE.md" in out and "_untracked.md" not in out
+
+
+def test_broad_add_does_not_fire_on_an_unrelated_narrow_commit(tmp_path, capsys, monkeypatch):
+    """The widening must not bring back "names CLAUDE.md on every unrelated commit"."""
+    r = _repo(tmp_path)
+    (r / "CLAUDE.md").write_text("dirty but not in this commit", encoding="utf-8")
+    (r / "README.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    dispatch.run_pre_bash(_bash("git add README.md && git commit -m 'x'"))
+    assert _payload(capsys) == ""
+
+
+def test_newline_separates_commands(tmp_path, capsys, monkeypatch):
+    """`run lint → commit` on two lines is the very flow this gate is for — without the
+    newline as a separator it goes silent the moment the first token is not git."""
+    r = _repo(tmp_path)
+    (r / "CLAUDE.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    dispatch.run_pre_bash(_bash("python tools/lint.py meta\ngit add CLAUDE.md\ngit commit -m fix"))
+    assert "CLAUDE.md" in _payload(capsys)
+
+
+def test_unbalanced_quote_keeps_the_prefix(tmp_path, capsys, monkeypatch):
+    """Dropping every token on an unbalanced quote makes the gate vanish for PowerShell
+    here-strings and heredoc-substituted messages — the `git commit` was already read."""
+    r = _repo(tmp_path)
+    (r / "CLAUDE.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    for cmd in ("git add CLAUDE.md && git commit -m @'\nfix: don't break\n'@",
+                "git add CLAUDE.md && git commit -m \"$(cat <<'EOF'\nfix: x\nEOF\n)\""):
+        dispatch.run_pre_bash(_bash(cmd))
+        assert "CLAUDE.md" in _payload(capsys), cmd
+
+
+def test_a_message_mentioning_a_path_does_not_name_it(tmp_path, capsys, monkeypatch):
+    """A commit *message* that mentions a path must not name an unrelated file — only
+    `git add` arguments and the pathspec are read, never the raw command."""
+    r = _repo(tmp_path)
+    (r / ".claude" / "policies" / "naming.md").write_text("dirty", encoding="utf-8")
+    (r / "README.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    dispatch.run_pre_bash(_bash(
+        "git add README.md && git commit -m 'docs: mirror .claude/policies/naming.md wording'"))
+    assert _payload(capsys) == ""
+
+
+def test_commit_dash_C_is_not_a_repo_path(tmp_path, capsys, monkeypatch):
+    """`git commit -C HEAD` reuses a message; reading it as a repo path empties the
+    toplevel lookup and silences the gate."""
+    r = _repo(tmp_path)
+    (r / "CLAUDE.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    dispatch.run_pre_bash(_bash("git add -A && git commit -C HEAD"))
+    assert "CLAUDE.md" in _payload(capsys)
+
+
+def test_backslash_directory_is_still_a_directory(tmp_path, capsys, monkeypatch):
+    """PowerShell directory staging — a posix lexer that eats the backslash breaks the
+    directory test."""
+    r = _repo(tmp_path)
+    (r / ".claude" / "policies" / "naming.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    dispatch.run_pre_bash(_bash(r"git add .claude\policies && git commit -m 'x'"))
+    assert "naming.md" in _payload(capsys)
+
+
+def test_update_flag_stages_tracked_only(tmp_path, capsys, monkeypatch):
+    """`git add -u`/`--update` restage tracked modifications and nothing else, so an
+    untracked guideline file under them is one the commit cannot carry — and the long
+    form must reach the gate at all, or a real guideline commit gets no ladder."""
+    r = _repo(tmp_path)
+    (r / ".claude" / "policies" / "_untracked.md").write_text("new", encoding="utf-8")
+    (r / "CLAUDE.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    for cmd in ("git add -u && git commit -m 'x'", "git add --update && git commit -m 'x'"):
+        dispatch.run_pre_bash(_bash(cmd))
+        out = _payload(capsys)
+        assert "CLAUDE.md" in out, cmd
+        assert "_untracked.md" not in out, cmd
+
+
+def test_broad_flag_is_broad_only_inside_its_own_pathspec(tmp_path, capsys, monkeypatch):
+    """`git add -A tools/` stages nothing outside `tools/`."""
+    r = _repo(tmp_path)
+    (r / "tools").mkdir()
+    (r / "tools" / "x.py").write_text("x", encoding="utf-8")
+    (r / "CLAUDE.md").write_text("dirty but not in this commit", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    dispatch.run_pre_bash(_bash("git add -A tools/ && git commit -m 'x'"))
+    assert _payload(capsys) == ""
+
+
+def test_commit_pathspec_narrows_what_the_add_staged(tmp_path, capsys, monkeypatch):
+    """`git commit -- <paths>` commits those paths and nothing else, whatever is staged."""
+    r = _repo(tmp_path)
+    (r / "tools").mkdir()
+    (r / "tools" / "x.py").write_text("x", encoding="utf-8")
+    (r / ".claude" / "policies" / "naming.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    dispatch.run_pre_bash(_bash("git add .claude && git commit -m 'x' -- tools/x.py"))
+    assert _payload(capsys) == ""
+
+
+# --- the oracle: the named list must equal what the commit actually carries ----------
+# Predicting what `git add`/`git commit` will stage from the command string was got wrong
+# four times running, twice in the direction where the gate goes silent, each repair
+# closing one flag combination and opening the next. So the scope logic is checked
+# against git itself: every shape below is executed for real in a throwaway repo and the
+# gate's list is compared with the guideline files the resulting commit contains.
+#
+# What it does NOT cover — the asserted cases above are not redundant, and removing one
+# removes the only coverage of what it names:
+#   · the classifier. Both sides run `_guideline_paths`, so a wrong classifier agrees
+#     with itself here; `test_guideline_path_filter` is what pins it.
+#   · branches no shape reaches: the index-first read (a shape cannot pre-stage), the
+#     other-repository guard, and rename handling in `_porcelain_paths`.
+#   · under-fire on a shape whose command makes no commit — `carried` is empty then, so
+#     only an over-fire can disagree.
+#   · PowerShell forms. Shapes run through `bash`, which eats a backslash path, so such
+#     a shape would fail a correct implementation.
+
+SHAPES = [
+    "git commit -am m",
+    "git add -A && git commit -m m",
+    "git add . && git commit -m m",
+    "git add -u && git commit -m m",
+    "git add --update && git commit -m m",
+    "git add .claude && git commit -m m",
+    "git add tools && git commit -m m",
+    "git add -A tools && git commit -m m",
+    "git add CLAUDE.md && git commit -m m",
+    "git add .claude && git commit -m m -- tools/x.py",
+    "git commit -m m -- .claude/agents",
+    "git commit -m m -- .claude",                        # pathspec spanning an untracked file
+    "git add -A && git add tools/x.py && git commit -m m",
+    "git add README.md && git commit -m m",
+    "git commit -m m",                                   # nothing staged — no commit
+    "git commit -m '-a quick fix'",                      # a message must not read as a flag
+    "git commit --amend -m m",                           # rewrites the commit it replaces
+    "git add CLAUDE.md && git commit --amend -m m",
+    "git add .claude/policies/naming.md && git commit -m m",
+]
+
+
+def _oracle_repo(tmp_path):
+    """A repo with tracked-modified and untracked files on both sides of the guideline
+    line, so every shape below has something it should and should not name."""
+    r = tmp_path / "o"
+    for d in (".claude/policies", ".claude/agents", ".claude/layers", "tools"):
+        (r / d).mkdir(parents=True)
+    for f in ("CLAUDE.md", ".claude/policies/naming.md", ".claude/agents/reporter.md",
+              "README.md", "tools/x.py"):
+        (r / f).write_text("base\n", encoding="utf-8")
+    for a in (["init", "-q"], ["config", "user.email", "t@t"], ["config", "user.name", "t"],
+              ["add", "-A"], ["commit", "-qm", "base"]):
+        subprocess.run(["git", "-C", str(r), *a], check=True, capture_output=True)
+    for f in ("CLAUDE.md", ".claude/policies/naming.md", ".claude/agents/reporter.md",
+              "README.md", "tools/x.py"):
+        (r / f).write_text("edited\n", encoding="utf-8")          # tracked, modified
+    (r / ".claude/layers/new.md").write_text("new\n", encoding="utf-8")   # untracked
+    (r / "tools/y.py").write_text("new\n", encoding="utf-8")              # untracked
+    return r
+
+
+def _named(capsys):
+    """The paths the gate printed, or [] when it stayed silent."""
+    body = _payload(capsys)
+    if not body:
+        return []
+    mid = body.split(dispatch.COMMIT_GATE_HEAD, 1)[1].split(dispatch.COMMIT_GATE_TAIL, 1)[0]
+    return sorted(line.strip() for line in mid.splitlines() if line.strip())
+
+
+def _carried(repo, command):
+    """Guideline files the command's commit actually contains — [] if it made none."""
+    head = subprocess.run(["git", "-C", str(repo), "rev-parse", "HEAD"],
+                          capture_output=True, text=True).stdout.strip()
+    subprocess.run(["bash", "-c", command], cwd=str(repo), capture_output=True, text=True)
+    new = subprocess.run(["git", "-C", str(repo), "rev-parse", "HEAD"],
+                         capture_output=True, text=True).stdout.strip()
+    if new == head:
+        return []
+    out = subprocess.run(["git", "-C", str(repo), "show", "--name-only", "--format=", "HEAD"],
+                         capture_output=True, text=True).stdout
+    return dispatch._guideline_paths(out.split())
+
+
+@pytest.mark.skipif(shutil.which("bash") is None, reason="the oracle runs the shape in a shell")
+@pytest.mark.parametrize("shape", SHAPES)
+def test_the_gate_names_what_the_commit_carries(shape, tmp_path, capsys, monkeypatch):
+    repo = _oracle_repo(tmp_path)
+    monkeypatch.setattr(dispatch, "ROOT", repo)
+    dispatch.run_pre_bash(_bash(shape))
+    predicted = _named(capsys)
+    assert predicted == _carried(repo, shape), shape
