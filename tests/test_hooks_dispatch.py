@@ -325,9 +325,8 @@ FIRES = [
     "git  commit",                                   # two spaces
     "git add CLAUDE.md && git commit -F /tmp/m.txt",
     "python tools/lint.py meta; git commit -m 'x'",
-    # Shell metacharacters inside the message. 3 of this repo's 100 commit subjects
-    # carry one and 82 carry `()`; splitting on a regex before the quotes silenced
-    # the gate on every one of them.
+    # Shell metacharacters inside the message — how often, and why splitting on a
+    # regex before the quotes silenced the gate on every one, is in `_lex`'s docstring.
     "git commit -am 'refactor(hooks): tidy the Write|Edit hook'",
     "git commit -m 'fix: a; b'",
     "git commit -m 'feat: a && b'",

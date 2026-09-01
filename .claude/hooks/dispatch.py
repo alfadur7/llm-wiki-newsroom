@@ -547,8 +547,10 @@ def _lex(command: str) -> list[str]:
     The load-bearing property is that `punctuation_chars` splits operators only
     **after** quotes are handled. Splitting on a regex first cuts a message like
     `-m 'fix: a; b'` in two, and both halves then die on an unbalanced quote —
-    silencing the gate on exactly the commits it is for. 82 of this repo's 100
-    commit subjects carry `()` and 3 carry `;`·`&`·`|`·`<`·`>`.
+    silencing the gate on exactly the commits it is for. Most of this repo's commit
+    subjects carry `()` and a few carry `;`·`&`·`|`·`<`·`>` — reproduce with
+    `git log --format=%s | grep -cE '[;|&<>]'`. A count written here goes stale on
+    the next commit, which is how it got 5 out of date the first time.
 
     An unbalanced quote keeps what was read rather than dropping everything: in a
     PowerShell here-string or a heredoc-substituted message, the `git commit` has
