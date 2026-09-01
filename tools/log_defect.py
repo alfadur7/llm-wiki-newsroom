@@ -20,15 +20,17 @@ Two record kinds (`kind`):
 - defect:     {date, layer, target, caught_at, check, cluster, mechanism, severity, addressable,
                grounded_at?, run}
 - transition: {date, cluster, surface, change, held_in_delta, held_out_delta, decision,
-               rationale, model, commit, held_in_sampled, held_out_sampled}
+               rationale, model, note, commit, held_in_sampled, held_out_sampled}
+               # model = the measuring apparatus's model generation (MODELS — a join key)
+               # note  = prose about the apparatus's composition (which role, how many rotations)
 
 `cluster` is the slugified mechanism-cluster key (kebab-case; transitions may
 suffix `@<stage>`) — the join key between defects, transitions, and the
 mine_failures grouping. `mechanism` stays as an optional free-text label.
 caught_at has the form `<stage>:<detail>` (e.g. `lint:source`, `desk:density`) —
 the leading segment carries which verification surface caught it. Transition
-`rationale` (one-line why) + `model` (which model produced the measured output)
-make the accept/reject ledger auditable.
+`rationale` (one-line why) + `model` (the generation that produced the measured
+output — MODELS vocabulary) make the accept/reject ledger auditable.
 
 `grounded_at` is optional — the rung at which the authoring role stopped on the GROUND
 Ladder (`R0`-`R4`; SoT is `.claude/agents/README.md` § GROUND Ladder). Validated for form
@@ -95,6 +97,14 @@ SEVERITIES = ("critical", "high", "medium", "low")
 # repo used before (`guideline` and `meta`) each carried both kinds — 19 of one pointed
 # at code and 6 of the other at prose — so the field said nothing until it was pinned.
 LAYERS = ("L2-1", "L2-2", "L2-3", "L2-4", "meta", "tools")
+# The measuring apparatus's model generation. The self-evolution workflow hangs a
+# longitudinal comparison on this field, which free text made impossible: 13 transitions
+# carried 6 notations for 3 generations — `claude-opus-5[1m]` and `opus-5` split the same
+# generation — and 5 of them held a whole sentence describing the apparatus rather than a
+# generation. Composition prose (which role ran, how many rotations) belongs in `note`;
+# this field is a join key. A measurement mixing families is `unknown` with the
+# composition in `note` — guessing an attribution puts a wrong value in the key silently.
+MODELS = ("opus-5", "opus-4.8", "fable-5", "sonnet-5", "haiku-4.5", "unknown")
 # Verification surfaces a defect can escape from / be caught at (caught_at prefix).
 # `operator` carries a narrow-use rule — read the module docstring before reaching for it.
 STAGES = ("lint", "desk", "blind", "probe", "operator")
@@ -145,6 +155,9 @@ def validate(rec: dict) -> str | None:
         if rec["decision"] == "accept" and rec.get("treatment") not in TREATMENTS:
             return (f"an accept transition needs treatment as one of {list(TREATMENTS)} "
                     f"(got {rec.get('treatment')!r}) — input to the recurrence tier")
+        if rec["model"] not in MODELS:
+            return (f"model must be one of {list(MODELS)} (got {rec['model']!r}) — "
+                    f"apparatus composition goes in note, a mixed family is unknown")
     if kind == "defect":
         stage = str(rec["caught_at"]).split(":")[0]
         if stage not in STAGES:

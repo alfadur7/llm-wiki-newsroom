@@ -137,6 +137,17 @@ def test_validate_rejects_a_non_boolean_addressable():
         assert ld.validate(_valid_defect(addressable=b)) is None
 
 
+def test_validate_enforces_model_vocabulary():
+    """The self-evolution workflow hangs a longitudinal comparison on this field, and free
+    text made it impossible — one generation split across two notations, and whole
+    sentences describing the apparatus sitting where a join key belongs."""
+    assert ld.validate(_valid_transition(model="claude-opus-5[1m]"))
+    assert ld.validate(_valid_transition(model="opus-5 (author), general-purpose (reviewer)"))
+    for m in ld.MODELS:
+        assert ld.validate(_valid_transition(model=m)) is None
+
+
+
 # --- mine_failures: cluster + priority ---
 
 def _defect(cluster, caught_at="desk:density", target="t.md", date="2026-06-25", addressable=True):
