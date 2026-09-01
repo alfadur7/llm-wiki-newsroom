@@ -1024,8 +1024,9 @@ const renderer = new Sigma(graph, container, {
   //   1. Filtered out  → hidden
   //   2. Ego active + out-of-hood  → dim (solid dark, no label, smaller)
   //   3. Selected (popup open)  → highlighted + size boost
-  //   4. Search match  → highlighted + size boost
-  //   5. default
+  //   4. Search match  → highlighted + forced label
+  //   5. Search active, non-match  → dim (faded hue, no label, original size)
+  //   6. default
   // Called once per render pass (not per frame); state changes trigger refresh.
   nodeReducer: (node, data) => {
     if (!visibleNodesCache.has(node)) return { ...data, hidden: true };
@@ -1114,6 +1115,14 @@ const renderer = new Sigma(graph, container, {
     }
     if (searchMatchIds.size > 0 && searchMatchIds.has(node)) {
       return { ...data, highlighted: true, forceLabel: true, zIndex: 2 };
+    }
+    // Search active, this node is NOT a match → fade toward the background and drop
+    // the label, exactly the overlay non-member treatment above. Without it the
+    // handful of hits had to compete with a fully-bright, fully-labelled graph and
+    // the highlight alone did not read. Keep the ORIGINAL size (no shrink) — the
+    // fade de-emphasises enough while the cluster hue still gives context.
+    if (searchMatchIds.size > 0) {
+      return { ...data, color: fadeColor(data.color, 0.18), label: '' };
     }
     // Neighbor of currently-selected node — force label regardless of
     // size threshold. Cull outcome still applies: if this neighbor lost
