@@ -204,7 +204,7 @@ reflex even without an explicit instruction:
   Inject the Control (current passage)·Treatment (strengthening) text into the agent prompt
   (measure with the file unedited)
   → held-in same-mechanism blind raw re-author + held-out over-fire canary
-  → desk N≥2 blind scoring → judge acceptance by the step 6 rule (referenced below).
+  → desk N≥2 blind scoring → judge acceptance by the workflow's acceptance rule (referenced below).
   Only on acceptance make the confirmed edit to this file + log the transition (log_defect kind:transition).
 
 Measurement variant by guideline type (runbook): desk-judged prose → the blind batch
@@ -215,7 +215,7 @@ the ladder's blind-review rung classifies these invariant.
 Same applies regardless of origin (evolve session·desk surfacing mid-cycle·self-proposal).
 
 Reference: .claude/operations/proposal-validation-runbook.md "When to Run" +
-           .claude/agents/editor-in-chief.md self-evolution workflow steps 6-7."""
+           .claude/agents/editor-in-chief.md self-evolution workflow § Gate + § Record."""
 
 SCRATCH_MSG_TMPL = """[scratch-location-advisory] PROJECT ROOT SCRIPT WRITE — {basename}
 

@@ -170,7 +170,7 @@ Guideline-authoring voice and plan-bloat control are craft, not policy — they 
 - `codebase-audit-runbook.md` (the multi-agent batch procedure for ultrareviewing tools/ code and .claude/ instructions — group decomposition, review dimensions, adversarial verify, the mechanical/gated application policy)
 - `staleness-reground-runbook.md` (Reground **update mode** — the batch procedure for re-grounding stale derived narratives surfaced by `/wiki-lint staleness`: per-type pipeline, Desk gate, verification, recurrence pitfalls)
 - `bundle-reground-runbook.md` (Reground **correction mode** — the Desk reads a published cluster's bundle together to catch the cross-page defects single-page review cannot see: bundle assembly, defect classes, routing, cadence, deterministic-promotion candidates)
-- `proposal-validation-runbook.md` (the batch procedure for measuring the effect of self-evolved guideline changes — three variants by type (desk-judged blind rewrite × blind desk, behavioral probe task, lint-scored before/after); the acceptance rule lives in `agents/editor-in-chief.md` step 6)
+- `proposal-validation-runbook.md` (the batch procedure for measuring the effect of self-evolved guideline changes — three variants by type (desk-judged blind rewrite × blind desk, behavioral probe task, lint-scored before/after); the acceptance rule lives in `agents/editor-in-chief.md` § Gate)
 
 ### `.claude/hooks/` — Auto-Block & Guard Shell
 
@@ -187,7 +187,7 @@ Guideline-authoring voice and plan-bloat control are craft, not policy — they 
   - advisory: after writing a stub, recommend `python tools/build.py` reconciliation + Desk VERIFY₂ (`wiki/entities·concepts·timelines/*.md` — structural prevention of the 2026-05-09 / 05-20 incidents)
   - advisory: after editing L2-2 full hub, timeline, L2-3, or L2-4, recommend the layer's `python tools/lint.py` self-VERIFY₀ — target-scoped where the group accepts a target, corpus-wide (judged on own output) where it does not
   - advisory: for `*/plans/*.md`, the 5-step self-check, the 4 red-flag types + for `.claude/{agents,commands,layers,policies,operations}/` SoTs and CLAUDE.md (skills·hooks·memory excluded), the Guideline Verification Ladder + a diff bullet-depth check (helper `check_bullet_depth.py`)
-  - advisory: on editing a desk-judged prose-craft SoT (`.claude/layers/*.md`, `agents/desk|reporter|columnist.md`), recommend the proposal-validation measurement before adoption (SoT: `operations/proposal-validation-runbook.md` + `agents/editor-in-chief.md` step 6)
+  - advisory: on editing a desk-judged prose-craft SoT (`.claude/layers/*.md`, `agents/desk|reporter|columnist.md`), recommend the proposal-validation measurement before adoption (SoT: `operations/proposal-validation-runbook.md` + `agents/editor-in-chief.md` § Gate)
   - advisory: after writing a `wiki/` page containing an unresolved wikilink, name the targets and require one of four resolution branches before hand-off (branch text in `dispatch.py`; page-existence uses the same `tools/_lib.py` set as `lint graph structure`)
   - advisory: on Write of a script-like temporary file directly under the project root, recommend a temp directory (structural prevention of the 2026-05-08 incident)
   - advisory: on writing or modifying `tools/**/*.py` or `.claude/hooks/*.py|sh`, recommend loading and applying the `ponytail-coding` skill (the authoring-time code-restraint reflex — the SoT is `skills/ponytail-coding/SKILL.md`; the rule body is not duplicated here)

@@ -5,7 +5,7 @@ Sibling of `mine_feedback.py` (the operator-utterance channel). The difference i
 input source — not human utterances, but verifier-grounded defects caught by lint/Desk
 and ingested via `log_defect.py`. Being a prefilter, it prescribes nothing — it only
 aggregates and prioritizes; which surface to fix is judged by the Editor-in-Chief who
-reads it (the stage-1 input of the SoT self-evolution workflow).
+reads it (the input to the SoT self-evolution workflow's § Propose, Input analysis).
 
 Grouping key = `cluster` (the slugified mechanism-cluster join key shared with
 transitions; legacy records without it fall back to `mechanism`). The same cluster is

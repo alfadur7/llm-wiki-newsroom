@@ -1,6 +1,6 @@
 # Proposal Validation Batch Runbook
 
-Instructions for measuring whether a guideline edit actually reduces defects, using verifier evidence, when the SoT self-evolution loop proposes one. Open this file and start with "perform proposal validation per these instructions." The acceptance rule and transition logging have their single SoT in [`../agents/editor-in-chief.md`](../agents/editor-in-chief.md) self-evolution workflow steps 6–7 — this file holds the *measurement procedure*, in **three variants by guideline type**:
+Instructions for measuring whether a guideline edit actually reduces defects, using verifier evidence, when the SoT self-evolution loop proposes one. Open this file and start with "perform proposal validation per these instructions." The acceptance rule and transition logging have their single SoT in [`../agents/editor-in-chief.md`](../agents/editor-in-chief.md) self-evolution workflow § Gate and § Record — this file holds the *measurement procedure*, in **three variants by guideline type**:
 
 | Guideline type | Variant | Sections |
 |---|---|---|
@@ -10,7 +10,7 @@ Instructions for measuring whether a guideline edit actually reduces defects, us
 
 ## When to Run
 
-**Always before adoption** of a substantive change of one of the three types above — regardless of origin. It fires not only in an evolve session (editor-in-chief stage 1 proposal) but equally for a strengthening the desk surfaces mid-cycle or a self-proposal, as a self-harness reflex without an explicit instruction (editing `.claude/layers/*.md`·`agents/{desk,reporter,columnist}.md` triggers the `dispatch.py` proposal-validation advisory as a file-event reminder; behavioral/lint-scored surfaces are classified by the ladder's blind-review rung, not by file event). The held-in target is the defect pages where that mechanism manifested, drawn from the corpus (`tools/_defect-log.jsonl`, appended by `tools/log_defect.py`). The exception is § Out of Scope (typo·slimming·structural/editorial·cross-reference fixes — no measurement obligation).
+**Always before adoption** of a substantive change of one of the three types above — regardless of origin. It fires not only in an evolve session (an editor-in-chief input-analysis proposal) but equally for a strengthening the desk surfaces mid-cycle or a self-proposal, as a self-harness reflex without an explicit instruction (editing `.claude/layers/*.md`·`agents/{desk,reporter,columnist}.md` triggers the `dispatch.py` proposal-validation advisory as a file-event reminder; behavioral/lint-scored surfaces are classified by the ladder's blind-review rung, not by file event). The held-in target is the defect pages where that mechanism manifested, drawn from the corpus (`tools/_defect-log.jsonl`, appended by `tools/log_defect.py`). The exception is § Out of Scope (typo·slimming·structural/editorial·cross-reference fixes — no measurement obligation).
 
 ## Measure Without Editing the File (injection variants)
 
@@ -46,7 +46,7 @@ For a rule whose effect shows in **agent behavior** (a routing step, a hand-over
 - **Probe task**: reconstruct the failure scenario that motivated the rule (the task where the old behavior went wrong) and run it once under the Control prompt and once under the Treatment prompt — injection, not file edits, same as the desk-judged variant.
 - **Adjacent-normal held-out**: run one adjacent task where the OLD behavior was already correct, under both conditions — catches a rule that fixes the failure by over-firing on normal flow.
 - **Blind judging, N≥2**: judges receive the two transcripts under blind labels and a verdict taxonomy limited to the measured behavior (did the failure reproduce? did the normal flow regress?). Aggregate as with desk scoring.
-- Acceptance: the step 6 rule, with "defect count" read as "failure reproductions."
+- Acceptance: the acceptance rule, with "defect count" read as "failure reproductions."
 
 ## Variant — Lint-Scored (Deterministic)
 
@@ -54,11 +54,11 @@ For a rule `lint.py` scores (a `criteria.json` judge:A threshold, a quantitative
 
 - Run the affected lint group over held-in (motivating + fresh same-mechanism) and held-out (fixed set + fresh stable samples) **before and after the edit** — the file may be edited directly here, since a revert is exact.
 - Measured once (same input → same output); over-fire on held-out = any stable page newly FAILing.
-- Acceptance: the step 6 rule, applied to the deterministic score deltas.
+- Acceptance: the acceptance rule, applied to the deterministic score deltas.
 
 ## Tally & Accept
 
-Tally the average defect count for Control vs Treatment per target, **per slice** (motivating·fresh held-in·fixed/fresh held-out). The improvement verdict is judged on the motivating target, and the rule that decides acceptance from that tally is owned by [`../agents/editor-in-chief.md`](../agents/editor-in-chief.md) step 6. On acceptance, edit the guideline file → the same file § Guideline Verification Ladder → record `log_defect` `kind:transition` (fields per step 7).
+Tally the average defect count for Control vs Treatment per target, **per slice** (motivating·fresh held-in·fixed/fresh held-out). The improvement verdict is judged on the motivating target, and the rule that decides acceptance from that tally is owned by [`../agents/editor-in-chief.md`](../agents/editor-in-chief.md) § Gate. On acceptance, edit the guideline file → the same file § Guideline Verification Ladder → record `log_defect` `kind:transition` (fields per that file's § Record, Transition loading).
 
 ## Pitfalls
 
@@ -76,6 +76,6 @@ Tally the average defect count for Control vs Treatment per target, **per slice*
 
 ## SoT
 
-- Acceptance rule · held-in/held-out definitions · transition logging: [`../agents/editor-in-chief.md`](../agents/editor-in-chief.md) self-evolution workflow steps 6–7.
+- Acceptance rule · held-in/held-out definitions · transition logging: [`../agents/editor-in-chief.md`](../agents/editor-in-chief.md) self-evolution workflow § Gate (acceptance rule) and § Record (transition logging).
 - Held-out fixed set: `tools/regression_set.json` (human-edited).
 - Roles and cycle: [`../agents/README.md`](../agents/README.md) + the per-content-type [`../layers/`](../layers/).
