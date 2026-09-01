@@ -19,6 +19,19 @@ checker works, and one accepted by cleaning up instances (`remediate`) never had
 prevention. Both are held out of the recurrence tier and marked `▷unprev`.
 Vocabulary SoT: `log_defect.py` TREATMENTS; the judgment is made by a human at ingest.
 
+**A cluster carrying a closed verdict (`reject`·`defer`) drops to a lower tier.** `accept`
+does not close one — a treatment's effect is still under observation and a recurrence
+after it is this tool's top signal. The verdict is kept in the ledger (`latest_decisions`
+below does not cut by window) but never reached the screen, so an axis already rejected or
+deferred stood up as "top priority" every cycle: 6 of this corpus's clusters hold one. The
+tier reads "judged", not "settled", because a bundle disposition can cover several clusters
+at once — the marker states which proposal was judged, not that the cluster is finished.
+
+Only the **latest** verdict counts. Picking any reject from the whole history hides a later
+one — this corpus has a cluster accepted in August and rejected a week later, and another
+deferred and then accepted, which an any-verdict read would get backwards in both
+directions.
+
 Support count measures **review effort, not defect rate** — a deeply reviewed batch takes
 the ranking (this corpus runs 8 to 42 defects a week). Read a large support as "looked at
 hard here" before reading it as "fails most here". The review window is managed by a
@@ -38,6 +51,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from collections import Counter, defaultdict
 from datetime import date
@@ -81,10 +95,38 @@ def fixed_clusters(records: list[dict]) -> set[str]:
             if r.get("kind") == "transition" and r.get("decision") == "accept"}
 
 
+# The re-open condition a verdict states in its own prose — picked up as a literal, no
+# dedicated field. This corpus writes it as "Re-open when ..." in `note`; only 2 of the 6
+# closed clusters carry one, and a field for that minority would drag a backfill of the
+# rest behind it. Where it is absent, `surface` already says in one line which proposal
+# was judged, which is what the marker exists to show.
+_REOPEN_RE = re.compile(r"Re-open when\b[^\n]*")
+_REOPEN_FIELDS = ("note", "rationale")
+
+
+def latest_decisions(records: list[dict]) -> dict[str, dict]:
+    """cluster → the **latest** transition record judging it.
+
+    Several verdicts on one date: the one appended later wins (the ledger is append-only).
+    """
+    out: dict[str, dict] = {}
+    for r in records:
+        if r.get("kind") != "transition" or not r.get("decision"):
+            continue
+        c = str(r.get("cluster", "")).split("@")[0]
+        if c not in out or str(r.get("date", "")) >= str(out[c].get("date", "")):
+            out[c] = r
+    return out
+
+
 # Treatments that earn a place in the recurrence tier — only those that stop the defect
 # from occurring. `detect` (a checker was added) makes what follows the checker working,
 # and `remediate` (instances cleaned up) left no prevention behind at all.
 _PREVENTIVE = ("prevent", "both")
+
+# Verdicts that drop a cluster a tier — to pull one back up you have to refute the
+# rationale standing in the ledger.
+_CLOSED = ("reject", "defer")
 
 
 def accept_clusters(records: list[dict], *treatments: str) -> set[str]:
@@ -99,11 +141,14 @@ def analyze(records: list[dict], since: str | None, pages: bool = False):
     """Group defects by cluster, sorted by (recurrence after prevention, support).
 
     addressable=false is split out; a non-preventive accept (detect·remediate) is
-    reported but held out of the recurrence tier.
+    reported but held out of the recurrence tier. A cluster whose latest verdict is
+    closed (reject·defer) sorts below every unjudged one, whatever its support.
     """
     fixed = fixed_clusters(records)
     recurred = accept_clusters(records, *_PREVENTIVE)   # prevented, and back anyway
     non_preventive = fixed - recurred
+    judged = latest_decisions(records)                  # cluster → latest verdict record
+    closed = {c for c, r in judged.items() if r.get("decision") in _CLOSED}
     clusters: dict[str, dict] = defaultdict(
         lambda: {"count": 0, "stages": Counter(), "targets": []})
     blocked: Counter = Counter()  # addressable=false mechanism → count
@@ -124,8 +169,10 @@ def analyze(records: list[dict], since: str | None, pages: bool = False):
         if (pages or len(c["targets"]) < 3) and r.get("target"):
             c["targets"].append(r["target"])
     ranked = sorted(clusters.items(),
-                    key=lambda kv: (kv[0] in recurred, kv[1]["count"]), reverse=True)
+                    key=lambda kv: (kv[0] not in closed, kv[0] in recurred,
+                                    kv[1]["count"]), reverse=True)
     return {"ranked": ranked, "blocked": blocked, "fixed": fixed,
+            "judged": judged, "closed": closed,
             "recurred": recurred, "non_preventive": non_preventive,
             "in_window": in_window}
 
@@ -142,6 +189,23 @@ def write_checkpoint(when: str, since: str | None, note: str,
     return entry
 
 
+_DECISION_MARK = {"reject": "⊘rejected", "defer": "⏸deferred", "accept": "✓treated"}
+
+
+def verdict_lines(r: dict) -> list[str]:
+    """The verdict marker — `surface` (which proposal was judged) plus a re-open condition if stated."""
+    mark = _DECISION_MARK.get(str(r.get("decision")), str(r.get("decision")))
+    surface = str(r.get("surface") or "(surface unrecorded)").replace("\n", " ")
+    when = str(r.get("date", "?"))
+    stamp = "" if when in surface else f"{when} · "  # a bundle disposition dates its own surface
+    out = [f"            {mark} {stamp}{surface[:76]}"]
+    blob = " ".join(str(r.get(k) or "") for k in _REOPEN_FIELDS)
+    m = _REOPEN_RE.search(blob)
+    if m:
+        out.append(f"            └ {m.group(0)[:88]}")
+    return out
+
+
 def mine(since: str | None, pages: bool = False) -> int:
     records = read_log()
     if not records:
@@ -154,16 +218,30 @@ def mine(since: str | None, pages: bool = False) -> int:
     print(f"in-window defects: {a['in_window']}  ·  prevented clusters: {len(a['recurred'])}"
           f"  ·  non-preventive accepts: {len(a['non_preventive'])}")
     print()
-    print("=== Recurring defects (recurrence after preventive treatment ▶ first) ===")
+    print("=== Open — this cycle's review set (recurrence after preventive treatment ▶ first) ===")
     if not a["ranked"]:
         print("  (no addressable defects in window)")
+    elif all(mech in a["closed"] for mech, _ in a["ranked"]):
+        print("  (none — every cluster in window holds a closed verdict)")
+    tier_open = False
     for mech, c in a["ranked"]:
+        if mech in a["closed"] and not tier_open:
+            tier_open = True
+            print()
+            print("--- Judged — refute the ledger's rationale before re-deliberating the same proposal ---")
         flag = ("▶recur " if mech in a["recurred"]
                 else "▷unprev" if mech in a["non_preventive"] else "       ")
         stages = " ".join(f"{s}:{n}" for s, n in c["stages"].most_common())
         print(f"  {flag} {c['count']:4d}  {mech}  [{stages}]")
-        label = 'pages' if pages else 'e.g.'
-        print(f"            {label}: {', '.join(c['targets'])}")
+        verdict = a["judged"].get(mech)
+        if verdict:
+            for line in verdict_lines(verdict):
+                print(line)
+        if mech not in a["closed"]:
+            # Only closed clusters fold their target list away — they are not what you
+            # are about to edit. Everything else keeps its examples.
+            label = 'pages' if pages else 'e.g.'
+            print(f"            {label}: {', '.join(c['targets'])}")
     if a["blocked"]:
         print()
         print("=== Won't patch (addressable=false — source quality, contested topics, tool limits) ===")

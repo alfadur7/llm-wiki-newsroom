@@ -49,7 +49,7 @@ def _valid_transition(**over):
     rec = {"kind": "transition", "cluster": "density-shortfall@desk",
            "surface": "layers/overview.md", "decision": "accept",
            "rationale": "held-in improved, no slice regressed",
-           "model": "claude-sonnet-5", "treatment": "prevent"}
+           "model": "sonnet-5", "treatment": "prevent"}
     rec.update(over)
     return rec
 
@@ -137,7 +137,6 @@ def test_validate_rejects_a_non_boolean_addressable():
         assert ld.validate(_valid_defect(addressable=b)) is None
 
 
-
 # --- mine_failures: cluster + priority ---
 
 def _defect(cluster, caught_at="desk:density", target="t.md", date="2026-06-25", addressable=True):
@@ -201,7 +200,7 @@ def test_checkpoint_records_recurrence(tmp_path, monkeypatch):
 
 def _accept(cluster, treatment, surface="tools/_lint/source.py"):
     return {"kind": "transition", "cluster": cluster, "surface": surface,
-            "decision": "accept", "rationale": "r", "model": "m", "treatment": treatment}
+            "decision": "accept", "rationale": "r", "model": "opus-5", "treatment": treatment}
 
 
 def test_detector_only_accept_leaves_the_recurrence_tier():
@@ -225,3 +224,50 @@ def test_one_preventive_accept_is_enough_to_hold_the_tier():
     a = mfa.analyze(records, since=None)
     assert a["non_preventive"] == set()
     assert "mixed" in a["recurred"]
+
+
+# --- mine_failures: the closed-verdict ratchet ---
+# A rejected or deferred axis stood up as "top priority" every cycle because the verdict
+# lived in the ledger and never reached the screen. Only the latest verdict counts.
+
+def _transition(cluster, decision, date, surface="s", **over):
+    rec = {"kind": "transition", "cluster": cluster, "surface": surface,
+           "decision": decision, "rationale": "r", "model": "opus-5", "date": date}
+    rec.update(over)
+    return rec
+
+
+def test_unjudged_ranks_above_judged_recurrence():
+    """A judged cluster sinks below every unjudged one however large its support — it is
+    not this cycle's review set. Prevention-after-recurrence does not rescue it."""
+    records = [
+        _defect("judged-big"), _defect("judged-big"), _defect("judged-big"),
+        _defect("fresh-small"),
+        _transition("judged-big", "accept", "2026-06-01", treatment="prevent"),
+        _transition("judged-big", "reject", "2026-07-01"),
+    ]
+    a = mfa.analyze(records, since=None)
+    assert a["ranked"][0][0] == "fresh-small"
+    assert a["closed"] == {"judged-big"}
+
+
+def test_latest_decision_wins_over_earlier_verdict():
+    """Picking any verdict from the whole history hides a later one — this corpus holds
+    both directions: an accept followed by a reject, and a defer followed by an accept."""
+    reopened = [_transition("c-1", "defer", "2026-08-23"),
+                _transition("c-1", "accept", "2026-08-27", treatment="prevent")]
+    closed = [_transition("c-2", "accept", "2026-08-22", treatment="prevent"),
+              _transition("c-2", "reject", "2026-08-27")]
+    assert mfa.latest_decisions(reopened)["c-1"]["decision"] == "accept"
+    assert mfa.analyze(reopened, since=None)["closed"] == set()
+    assert mfa.analyze(closed, since=None)["closed"] == {"c-2"}
+
+
+def test_verdict_line_carries_surface_and_reopen_condition():
+    r = _transition("c-1", "reject", "2026-08-27", surface="a deterministic check — axis closed",
+                    note="Re-open when the corpus grows the structure the rule regulates")
+    lines = mfa.verdict_lines(r)
+    assert "⊘rejected" in lines[0] and "axis closed" in lines[0] and "2026-08-27" in lines[0]
+    assert "Re-open when" in lines[1] and "structure the rule regulates" in lines[1]
+    # No condition literal → the surface line alone (most of this ledger's verdicts).
+    assert len(mfa.verdict_lines(_transition("c-2", "defer", "2026-08-27"))) == 1
