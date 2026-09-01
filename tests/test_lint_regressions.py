@@ -382,3 +382,25 @@ def test_a2_exempts_plain_speaker_and_fails_broken_link():
     # several quotes in one section are scored per line: of the first four classes,
     # three are judged (linked·broken·evasion) and one is exempt (plain speaker)
     assert a2("\n".join(q for q, _ in cases[:4])) == (False, 1, 3)
+
+
+def test_link_display_text_is_not_an_unlinked_mention():
+    """`--fix` wrote bogus `[[Target]]` reconnect lines because the mention scan ran
+    against raw file text, so a term appearing only inside another link's display
+    text counted as an unlinked mention. It cannot be one — a substring of an
+    existing link is not linkable."""
+    import structure
+
+    h = structure._mention_haystack
+    # Display text is dropped; the target survives (a bare `[[hub]]` must still
+    # reconnect, which is the whole reason the target is kept rather than removed).
+    assert not re.search(r"\bMETR\b", h("see [[Study|the METR productivity claim]]"))
+    assert re.search(r"\bMETR\b", h("see [[METR]] on this"))
+    assert re.search(r"\bMETR\b", h("see [[METR|the study]]"))
+    # An anchor is consumed like an alias.
+    assert re.search(r"\bMETR\b", h("see [[METR#Findings]]"))
+    # Padding: without it the target fuses with the following character and the
+    # word-boundary search that reconnect relies on finds no boundary.
+    assert re.search(r"\bMETR\b", h("[[METR|the study]]s showed"))
+    # A genuine plain-text mention is untouched.
+    assert re.search(r"\bMETR\b", h("METR published a report"))

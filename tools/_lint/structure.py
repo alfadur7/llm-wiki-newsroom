@@ -17,7 +17,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, MARKUP_LEAK_RE, WIKILINK_TARGET_RE as LINK_RE, atomic_write_text, korean_mode, parse_frontmatter, read_text_cached, real_source_files, strip_code, wiki_page_paths  # noqa: E402
+from _lib import WIKI, MARKUP_LEAK_RE, WIKILINK_STEM_RE, WIKILINK_TARGET_RE as LINK_RE, atomic_write_text, korean_mode, parse_frontmatter, read_text_cached, real_source_files, strip_code, wiki_page_paths  # noqa: E402
 sys.path.insert(0, str(Path(__file__).parent))
 from _hub_common import HUB_SPECS, iter_hub_files  # noqa: E402
 
@@ -112,6 +112,22 @@ def _extract_title_alias(hub_path: Path) -> str | None:
     return title
 
 
+def _mention_haystack(text: str) -> str:
+    """`[[Target|Display]]` → ` Target ` — the text an unlinked-mention scan may match.
+
+    A term found only inside another link's display text is not an unlinked mention:
+    you cannot link a substring of an existing link. Scanning raw text counts it
+    anyway, and `--fix` then writes the bogus edge.
+
+    The target is kept rather than dropped, because a bare `[[hub]]` in prose must
+    still reconnect into `## Connections` — the contract the skip-check in
+    `_reconnect_orphan_hubs` states. Padding with spaces is what makes keeping it
+    safe: without it `[[METR|the study]]s` collapses to `METRs`, where `\bMETR\b`
+    finds no boundary before a letter and the reconnect silently disappears.
+    """
+    return WIKILINK_STEM_RE.sub(lambda m: f" {m.group(1)} ", text)
+
+
 def _reconnect_orphan_hubs(orphan_stems: list[str], fix: bool) -> dict[str, list[str]]:
     """Match each orphan hub's stem (and optional Korean title alias)
     against raw text in `wiki/sources/*.md` and (in --fix mode) append
@@ -143,6 +159,9 @@ def _reconnect_orphan_hubs(orphan_stems: list[str], fix: bool) -> dict[str, list
     src_cache: dict[str, str] = {
         stem: read_text_cached(path)
         for stem, path in source_files.items()
+    }
+    match_cache: dict[str, str] = {
+        stem: _mention_haystack(content) for stem, content in src_cache.items()
     }
 
     # Pre-resolve each hub's Path so we can read its title for aliases.
@@ -210,7 +229,7 @@ def _reconnect_orphan_hubs(orphan_stems: list[str], fix: bool) -> dict[str, list
                     if term_has_latin
                     else re.compile(re.escape(term))
                 )
-                if term_re.search(content):
+                if term_re.search(match_cache[src_stem]):
                     matched_alias = is_alias
                     break
             if matched_alias is None:
