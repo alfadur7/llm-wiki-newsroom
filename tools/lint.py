@@ -14,7 +14,7 @@ Organized as ten groups mapped onto the wiki's content taxonomy:
                   (target-based: <theme>; reserved subcmd: `theme`)
   source        — Phase 2 schema (claim atomization + citation type +
                   evidence grade) on wiki/sources/<slug>.md
-                  (target-based: <slug>; advisory mode until migration done)
+                  (target-based: <slug>)
   synthesis     — L2-3 Q-A synthesis schema on wiki/syntheses/<slug>.md
                   (target-based: <slug>; advisory mode until seed calibration)
   trail         — L2-3 associative trail schema on wiki/trails/<slug>.md

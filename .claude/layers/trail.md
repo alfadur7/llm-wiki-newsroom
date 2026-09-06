@@ -41,12 +41,7 @@ created: YYYY-MM-DD
 
 This guide specifies how to author and iterate on `wiki/trails/<slug>.md`. A trail is the **Layer 2-3 Path axis** (.claude/layers/README.md) — an associative path stringing existing hubs in order. The author is the Columnist. A Claude instance with no prior knowledge must be able to reproduce the same quality from this guide alone.
 
-### Read Scope (per work scenario)
-
-| Task | Page Format | This guide | Rubric | Auxiliary guide |
-|------|------------|----------|--------|------------|
-| Author 1 new trail | `.claude/layers/trail.md` | full | full | — |
-| Qualitative review after Rubric PASS | same | same | same | [`agents/desk.md` 6 lenses](../agents/desk.md) |
+**Supporting procedures**: qualitative review after a Rubric PASS is [`agents/desk.md` → the 6 lenses](../agents/desk.md).
 
 ### Which writing traditions it follows
 
@@ -65,7 +60,7 @@ A trail follows the journalism explainer-reporting·kicker traditions. Each step
 1. **Select the path line** — identify 5–12 hubs (authoring target; the lint struct.path-length band is 4–12) that run through one topic, in order (chronological·causal·learning order).
 2. **Write `## Path`** — each hop as a numbered item `N. [[Hub]] — role·transition commentary`. Each line starts with a wikilink (with `jrn.explainer`, one line of "why this connection").
 3. **Write `## Commentary`** — name the path's through-running narrative and tension in 1–2 paragraphs (`jrn.kicker`).
-3a. **self-VERIFY₀** — confirm `python tools/lint.py trail <slug>` PASS. After ≤ 2 self-attempts on the same cause, either PASS or force handoff.
+3a. **self-VERIFY₀** — run `python tools/lint.py trail <slug>`, then confirm the **automatic (A) criteria** of the Completion conditions below (manual M is Desk VERIFY₂). After ≤ 2 self-attempts on the same cause, either PASS or force handoff.
 
 ### Authoring principles
 

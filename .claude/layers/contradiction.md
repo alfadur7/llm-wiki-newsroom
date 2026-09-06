@@ -11,16 +11,7 @@ This guide specifies how to author the EDITOR block of a conflict-axis issue fil
 
 A Claude with no prior knowledge must be able to reproduce the same quality by reading this guide alone (the Claude-reproducibility principle).
 
-### Read Scope (by work scenario)
-
-When you enter a task, first identify the single row that matches your scenario, then read carefully only the four columns of that row — CLAUDE.md section · this guide · Rubric · supporting guide. No additional reading beyond the table is necessary.
-
-| Task | CLAUDE.md section | This guide | Rubric | Supporting procedure |
-|------|---------------|----------|--------|------------|
-| Author a new theme MD (`wiki/contradictions/<theme>.md`) | Roles · Universal Cycle · Human Reviewer Gate | Common Background + Part 1 | Part 1 | [`commands/wiki-lint.md` → Contradiction Theme Mapping](../commands/wiki-lint.md#sub-procedure-contradiction-theme-mapping-procedure) (claim → theme mapping procedure) |
-| Rewrite the aggregate (`wiki/contradiction.md`) | Roles · Universal Cycle · Human Reviewer Gate | Common Background + Part 2 | Part 2 | — |
-| Both tasks together (theme batch follow-up) | Union of the two rows above | Common Background + all | All | Same as above |
-| Qualitative review cycle after Rubric PASS | Same as the relevant scenario | Same as the relevant scenario | Same as the relevant scenario | [`agents/desk.md` → 6-lens qualitative review](../agents/desk.md) |
+**Supporting procedures**: claim → theme mapping is [`commands/wiki-lint-theme-mapping.md`](../commands/wiki-lint-theme-mapping.md) (full re-derivation) and [`wiki-lint.md` → `## Sub-procedure: Contradiction Theme Mapping Procedure`](../commands/wiki-lint.md#sub-procedure-contradiction-theme-mapping-procedure); qualitative review after a Rubric PASS is [`agents/desk.md` → the 6 lenses](../agents/desk.md).
 
 ### Common Background (applies to Part 1 and Part 2)
 
@@ -46,6 +37,13 @@ The table below is the **mapping** of which part of an issue page corresponds to
 | (Part 2 additional) Tension-axis completeness · drill · balance · scope | `con.mece-axes` · `enc.summary-style` · `enc.due-balance` · `enc.coatrack` |
 
 The `Claim type 4-way classification` (the `type` field in `_contradictions.json` — **real**: clear opposition · **superseded**: a resolved past issue · **related**: reference · **soft**: classification failed) is a term in this wiki's data schema, and it governs theme tone and qualifier strength (structural `struct.type-reflection`).
+
+**Judgment method**:
+- Each criterion is judged on the 3-level **PASS / PARTIAL / FAIL** (PARTIAL is excluded from the completion count — strict judgment).
+- **Automated (A)** criteria are machine-verified via the `python tools/lint.py contradiction [<theme>]` output metrics; **manual (M)** criteria are judged via body review.
+- The criterion roster · required · thresholds are in `_manifest.json` `contradiction-theme/aggregate.roster`; the definitions are owned single-SoT by the craft skill's `criteria.json` · SKILL.md (mapping-table dotted IDs) — since Part 1/Part 2 point at the same criterion, mirror duplication and drift monitoring are unnecessary.
+
+---
 
 ### Part 1 — Theme Contradiction Authoring Guide
 
@@ -238,21 +236,6 @@ This Rubric pairs with `.claude/layers/contradiction.md` defining "how to write"
 
 - **Part 1 — Theme Contradiction Rubric (L2-3)**: targets `wiki/contradictions/<theme>.md`. 28 criteria (`contradiction-theme.roster`).
 - **Part 2 — Aggregate Contradictions Rubric (L2-4)**: targets `wiki/contradiction.md`. 19 criteria (`contradiction-aggregate.roster`) — Part 1 common craft + L2-4-specific (D1·D2·D3·F1·F2).
-
-### Read Scope (by work scenario)
-
-| Task | Required reading |
-|------|---------|
-| Evaluate · iterate a theme MD | This Rubric Part 1 |
-| Evaluate aggregate `wiki/contradiction.md` | This Rubric Part 2 |
-| Both evaluations together | All |
-
-**Judgment method**:
-- Each criterion is judged on the 3-level **PASS / PARTIAL / FAIL** (PARTIAL is excluded from the completion count — strict judgment).
-- **Automated (A)** criteria are machine-verified via the `python tools/lint.py contradiction [<theme>]` output metrics; **manual (M)** criteria are judged via body review.
-- The criterion roster · required · thresholds are in `_manifest.json` `contradiction-theme/aggregate.roster`; the definitions are owned single-SoT by the craft skill's `criteria.json` · SKILL.md (mapping-table dotted IDs) — since Part 1/Part 2 point at the same criterion, mirror duplication and drift monitoring are unnecessary.
-
----
 
 ### Part 1 — Theme Contradiction Evaluation Rubric
 

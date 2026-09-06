@@ -4,7 +4,7 @@ user-invocable: false
 
 # Commands — 9 Slash Command SoT
 
-This folder gathers the project's 9 slash commands in a single place. Each command file specifies its traversal pattern (which Layer × Cycle cells it passes through, and in which cycle-stage flow) plus the Human Reviewer Gate. The nature of each role and the Layer × Cycle matrix have their SoT in [`.claude/agents/README.md`](../agents/README.md).
+This folder gathers the project's 9 slash commands in a single place, plus the sub-procedure files the [Sub-procedure Locations](#sub-procedure-locations) table rosters. **The harness lists every `.md` here as invocable regardless of `user-invocable: false`** (this README is itself listed), so a sub-procedure file states in its first line that it is not a command. Each command file specifies its traversal pattern (which Layer × Cycle cells it passes through, and in which cycle-stage flow) plus the Human Reviewer Gate. The nature of each role and the Layer × Cycle matrix have their SoT in [`.claude/agents/README.md`](../agents/README.md).
 
 ## Task Index
 
@@ -83,7 +83,8 @@ Command-specific procedures (mapping rules, sync rules, etc.) live inside the re
 
 | Sub-procedure | Location |
 |---|---|
-| Contradiction Theme Mapping (raw DB → JSON mapping procedure) | [`wiki-lint.md` → `## Sub-procedure: Contradiction Theme Mapping Procedure`](wiki-lint.md#sub-procedure-contradiction-theme-mapping-procedure) |
+| Contradiction Theme Mapping — theme lifecycle, burn criteria, new-slug gate | [`wiki-lint.md` → `## Sub-procedure: Contradiction Theme Mapping Procedure`](wiki-lint.md#sub-procedure-contradiction-theme-mapping-procedure) |
+| Contradiction Theme Mapping — full re-derivation (raw DB → JSON) | [`wiki-lint-theme-mapping.md`](wiki-lint-theme-mapping.md) — split out of `wiki-lint.md` because it is injected on every `/wiki-lint` trigger while it runs only on the `contradiction theme --fix` path |
 | Conflict Axis Sync Rule (4-tier bottom-up sync) | [`wiki-lint.md` → `## Sub-procedure: Conflict Axis Sync Rule`](wiki-lint.md#sub-procedure-conflict-axis-sync-rule) |
 | Parallel Batch Mode (ingest fanout) | [`wiki-ingest.md`](wiki-ingest.md) |
 

@@ -113,7 +113,7 @@ In the `/wiki-lint contradiction theme --fix --yes` cycle, when a new theme slug
 
 **First gate — Editor-in-Chief classification consensus (this role)**:
 1. Review Stage 2.7 (a): when `len(themes) > 15` (soft recommendation) is reached, **first assess the possibility of merging into an adjacent axis**
-   - "Adjacent axis" decision criteria (`.claude/commands/wiki-lint.md` Stage 2.7 (a)): same domain/industry·same actor·regional category·sharing one side of an opposing axis — adjacent if two or more are met
+   - "Adjacent axis" decision criteria (`.claude/commands/wiki-lint-theme-mapping.md` Stage 2.7 (a)): same domain/industry·same actor·regional category·sharing one side of an opposing axis — adjacent if two or more are met
 2. If no adjacent axis exists and the essence of a separate axis is clear, **first-tier approve the new theme slug** + escalate to the wiki-operator gate
 3. The first review is a routing·consistency check (the first-checker role of the dual authority). Body authoring·claim mapping is the columnist's area
 4. First-tier output format — proposed theme slug + name + adjacent-axis review result + separation rationale (the essence of the opposing axis) + the expected claim_ids list
@@ -162,7 +162,7 @@ Input arrives through **two channels** that ride the same flow — operator utte
 
 ## Guideline Verification Ladder
 
-Mandatory right before commit when changes to `.claude/` (agents·commands·layers·policies·operations·skills)·`CLAUDE.md` are staged — the guideline-layer counterpart of the content ladder ([agents/README.md § Content Verification Ladder](README.md#content-verification-ladder)) and the **Meta loop**'s VERIFY stage ([CLAUDE.md § The Four Loops](../../CLAUDE.md#the-four-loops)). The `dispatch.sh` hook (minimality advisory) reminds at edit time — no reliance on memory. Climb from the cheapest deterministic rung upward:
+Mandatory right before commit when staged changes touch `CLAUDE.md` or any guideline subdirectory of `.claude/` — that is, all of them except `memory/` and `hooks/`. A hook's agent-facing prose constants (the `GUIDE_MSG` class) are guideline text even so — climb rungs 2–3 on those edits by hand. This is the guideline-layer counterpart of the content ladder ([agents/README.md § Content Verification Ladder](README.md#content-verification-ladder)) and the **Meta loop**'s VERIFY stage ([CLAUDE.md § The Four Loops](../../CLAUDE.md#the-four-loops)). The `dispatch.sh` hook (minimality advisory) reminds at edit time — no reliance on memory. Climb from the cheapest deterministic rung upward:
 
 1. **Quantitative lint** — `python tools/lint.py meta` PASS (the `guideline-writing` skill's deliberation-narrative detectors + the project voice patterns + parity·integrity passes)
 2. **Minimal-edit self-check** — the craft criteria are the skill's Pruning + Bloat control sections ([skills/guideline-writing/SKILL.md](../skills/guideline-writing/SKILL.md)); locally, keep voice·depth consistency with sibling bullets and run `check_bullet_depth` on the diff. The rung is complete only when the response presents the check evidence (edit↔sibling comparison, per-item findings) — a bare "passed" declaration is incomplete

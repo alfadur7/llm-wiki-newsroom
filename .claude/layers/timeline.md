@@ -52,13 +52,7 @@ last_updated: YYYY-MM-DD
 
 This guide specifies how to author and iterate on `wiki/timelines/<slug>.md`. A timeline is a **Layer 2-2 path overlay** ([README.md](README.md)) — a chronology stringing sources in time order. The author is the Columnist. A Claude instance with no prior knowledge must be able to reproduce the same quality from this guide alone.
 
-### Read Scope (per work scenario)
-
-| Task | Page Format | This guide | Rubric | Auxiliary guide |
-|------|------------|----------|--------|------------|
-| Author 1 new timeline | `.claude/layers/timeline.md` | full | full | — |
-| Convert region → source-indexed | same | full | full | source corpus GROUND |
-| Qualitative review after Rubric PASS | same | same | same | [`agents/desk.md` 6 lenses](../agents/desk.md) |
+**Supporting procedures**: qualitative review after a Rubric PASS is [`agents/desk.md` → the 6 lenses](../agents/desk.md).
 
 ### Which writing traditions it follows
 
@@ -75,7 +69,7 @@ A timeline follows the encyclopedic summary-style and verifiable-attribution tra
 1. **GROUND — identify sources**: identify topic-related sources in `wiki/sources/` in time order (`mcp__qmd__query`, pre-loaded via `ToolSearch` — Glob where unavailable). For each event → fix the corresponding source-id **after confirming it exists** (do not invent one).
 2. **Write `## Flow Summary`** — trajectory overview (one-line arrow) + per-period phase paragraphs + latest state. Trajectory only, without restating facts·numbers (`enc.summary-style`).
 3. **Write `### YYYY` dated entries** — years descending, each entry `- **YYYY-MM-DD** [[source-id]] — one line` (only sourceless historical anchors are `[[entity]]`-first). The one-line summary must be a fact the indexed source actually supports, and beware of mis-indexing a different event on the same date — cross-check against the source body (mis-attribution is the biggest risk, caught by Desk). **Inferred indexing**: if the event date precedes the indexed source's publication date and the source mentions it only as a retrospective·prior-precedent·vendor self-report rather than first-hand reporting, attach the caveat `(recorded as a prior precedent by the YYYY source)` to the line (blocks the impression of a first-hand report that does not exist).
-3a. **self-VERIFY₀** — `python tools/lint.py timeline <slug>` → confirm `SourceIndexed … → path ✅`. After ≤ 2 self-attempts on the same cause, either PASS or force handoff.
+3a. **self-VERIFY₀** — run `python tools/lint.py timeline <slug>`, then confirm the **automatic (A) criteria** of the Completion conditions below (for a region timeline, `SourceIndexed … → path ✅` in particular). After ≤ 2 self-attempts on the same cause, either PASS or force handoff.
 
 ### Feedback loop (iterate until Rubric conditions met)
 

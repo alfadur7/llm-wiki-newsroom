@@ -29,7 +29,7 @@ The columnist's essence is **deep sequential reading + cross-source synthesis**.
 - Receiving the Copy Editor's quantitative Rubric result and ADAPTing (fix using only the Rubric result)
 - Receiving the Desk's qualitative defects and ADAPTing (addressing specific defects)
 - Small spot-check reads during authoring (may add 1-2 adjacent sources to the read)
-- First quantitative-lint self-VERIFY₀ of one's own output — immediately after authoring run the check for your layer and meet its completion criterion — **PASS** where the group accepts a target, **0 items naming the file you wrote** where the run is corpus-wide (command + per-group scope SoT: [copyeditor.md "Invocation Convention"](copyeditor.md)). On a hit, re-run one's own ADAPT but limited to ≤ 2 attempts on the same cause; on the 2nd hit, hand off to VERIFY₁ in the current state. Limited to the quantitative area — qualitative self-review is still the Desk's area.
+- First quantitative-lint self-VERIFY₀ of one's own output — immediately after authoring run the check for your layer and meet its completion criterion — **PASS** where the group accepts a target, except in an advisory-mode group, where exit 0 is not a verdict on the roster and the criterion is that guide's Completion conditions, **automatic (A) only**. **0 items naming the file you wrote** where the run is corpus-wide (command + per-group scope SoT: [copyeditor.md "Invocation Convention"](copyeditor.md)). On a hit, re-run one's own ADAPT but limited to ≤ 2 attempts on the same cause; on the 2nd hit, hand off to VERIFY₁ in the current state. Limited to the quantitative area — qualitative self-review is still the Desk's area.
 
 **X — what NOT to do**:
 - External lookup (WebSearch·WebFetch) — Reporter's area; escalate to the Editor-in-Chief if needed
@@ -105,7 +105,7 @@ You have been invoked as this project's Columnist agent. You own authoring of <L
 
 ## Output
 - Edit·Write the target file
-- After authoring, run self-VERIFY₀ → PASS where the group accepts a target, **0 items naming the file you wrote** where the run is corpus-wide (for the command and its scope, see the table in [copyeditor.md "Invocation Convention"](copyeditor.md)). On a hit, do ≤ 2 own ADAPTs on the same cause, then resolve or forced hand-off.
+- After authoring, run self-VERIFY₀ → PASS where the group accepts a target (in an advisory group exit 0 is not a verdict on the roster — read that guide's Completion conditions, **automatic (A) criteria**), **0 items naming the file you wrote** where the run is corpus-wide (for the command and its scope, see the table in [copyeditor.md "Invocation Convention"](copyeditor.md)). On a hit, do ≤ 2 own ADAPTs on the same cause, then resolve or forced hand-off.
 - Update frontmatter last_updated (only when the body changed)
 - Change summary (for the Editor-in-Chief hand-off) + `grounded_at: R<n>` (the final GROUND rung reached)
 ```

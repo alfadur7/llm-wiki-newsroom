@@ -55,12 +55,7 @@ Eligible for `wiki/syntheses/` = a **cross-source analytical answer** (has `sour
 
 This guide specifies how to author and iterate on `wiki/syntheses/<slug>.md`. A synthesis is the **Layer 2-3 Q-A axis** (.claude/layers/README.md) — an integrated analysis that answers one question across several hubs·sources·themes. The author is the Columnist (GROUND·APPLY·ADAPT). A Claude instance with no prior knowledge must be able to reproduce the same quality from this guide alone.
 
-### Read Scope (per work scenario)
-
-| Task | Page Format | This guide | Rubric | Auxiliary guide |
-|------|------------|----------|--------|------------|
-| Author 1 new synthesis | `.claude/layers/synthesis.md` | full | full | — |
-| Qualitative review after Rubric PASS | same | same | same | [`agents/desk.md` 6 lenses](../agents/desk.md) |
+**Supporting procedures**: qualitative review after a Rubric PASS is [`agents/desk.md` → the 6 lenses](../agents/desk.md).
 
 ### Which writing traditions it follows
 
@@ -86,7 +81,7 @@ A synthesis follows craft drawn from journalism explainer reporting, management-
 4. **Write `## N.` analysis sections** — develop the argument in numbered sections. Attribute each claim with inline `[[source-slug]]` in the body (`cit.grounding`). Tables·bullets per `con.bold-bullet`.
 5. **Write `## Connections`** — roster cluster overview·trail·concept·entity·theme **grouped by axis** (`enc.connection-grouping`).
 6. **Update `last_updated`** — today's date on completion.
-6a. **self-VERIFY₀** — confirm `python tools/lint.py synthesis <slug>` PASS. After ≤ 2 self-attempts on the same cause, either PASS or force handoff (SoT: [`agents/columnist.md`](../agents/columnist.md)).
+6a. **self-VERIFY₀** — run `python tools/lint.py synthesis <slug>`, then confirm the **automatic (A) criteria** of the Completion conditions below (manual M is Desk VERIFY₂). After ≤ 2 self-attempts on the same cause, either PASS or force handoff (SoT: [`agents/columnist.md`](../agents/columnist.md)).
 
 ### Authoring principles
 

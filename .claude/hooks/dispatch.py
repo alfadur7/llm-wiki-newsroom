@@ -71,7 +71,7 @@ SCRATCH_EXTS = {".py", ".sh", ".tmp", ".scratch", ".ipynb"}
 ROOT = Path(__file__).resolve().parents[2]
 _REPO_ROOT = ROOT.as_posix().lower()
 GUIDE_DIRS = ("/.claude/agents/", "/.claude/commands/", "/.claude/layers/",
-              "/.claude/policies/", "/.claude/operations/")
+              "/.claude/policies/", "/.claude/operations/", "/.claude/skills/")
 
 # Subset of GUIDE surfaces that is desk-judged wiki-content authoring/review craft
 # (NOT lint-scored) — edits here trigger the proposal-validation reflex (2b). Allowlist

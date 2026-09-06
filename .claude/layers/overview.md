@@ -11,16 +11,7 @@ This guide specifies how to author the EDITOR block of landscape-axis overview f
 
 Authoring iterates against the combined two Guides/Rubric as its basis. A Claude with no prior knowledge must be able to read this guide alone and reproduce the same quality.
 
-### Read Scope (by task scenario)
-
-When entering a task, first identify the single row matching your scenario and read only that row's four columns in full — CLAUDE.md section, this guide, Rubric, supporting guide. No additional reading beyond the table is required.
-
-| Task | CLAUDE.md section | This guide | Rubric | Supporting procedure |
-|------|---------------|----------|--------|------------|
-| Author/update a cluster overview (`wiki/overviews/<cluster>.md`) | Roles · Universal Cycle · Human Reviewer Gate | Three common blocks + Part 1 | Part 1 | — |
-| Rewrite the aggregate (`wiki/overview.md`) | Roles · Universal Cycle · Human Reviewer Gate | Three common blocks + Part 2 | Part 2 | — |
-| Both tasks together | Union of the two rows above | Three common blocks + entire guide | Entire Rubric | — |
-| Qualitative review cycle after Rubric PASS | Same as the relevant scenario | Same as the relevant scenario | Same as the relevant scenario | [`agents/desk.md` → 6-lens qualitative review](../agents/desk.md) |
+**Supporting procedures**: qualitative review after a Rubric PASS is [`agents/desk.md` → the 6 lenses](../agents/desk.md).
 
 ### Common Background (applies to Part 1 and Part 2)
 
@@ -207,14 +198,6 @@ This Rubric pairs with `.claude/layers/overview.md` defining "how to write," pro
 - **Automatic (A)** criteria are machine-verified by metrics output when `python tools/lint.py overview` runs.
 - **Manual (M)** criteria are judged by Claude or a human reviewer reading the body.
 - The criterion roster/required/threshold are owned by `_manifest.json` `overview-cluster/aggregate.roster`, and the definitions by the craft skill `criteria.json`/SKILL.md (mapping-table dotted ID) as the single SoT — since Part 1/Part 2 point at the same criterion, mirror duplication and drift monitoring are unnecessary.
-
-### Read Scope (by task scenario)
-
-| Task | Required Read |
-|------|---------|
-| Evaluate/iterate a cluster overview | This Rubric Part 1 |
-| Evaluate the aggregate `wiki/overview.md` | This Rubric Part 2 |
-| Both evaluations together | Entire Rubric |
 
 ### Part 1 — Cluster Overview Evaluation Rubric
 

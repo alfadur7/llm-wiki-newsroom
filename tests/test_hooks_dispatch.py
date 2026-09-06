@@ -371,10 +371,12 @@ def test_guideline_path_filter():
         "M  CLAUDE.md\n"
         "R  old.md -> .claude/policies/naming.md\n"   # rename → the post-rename name
         "?? tools/x.py\n"                             # not a guideline surface
-        " M wiki/index.md\n"
-        " M .claude/skills/guideline-writing/SKILL.md\n"   # skills is outside GUIDE_DIRS
+        " M wiki/index.md\n"                            # content, not guideline
+        " M .claude/skills/guideline-writing/SKILL.md\n"   # skills/ is a ladder surface
+        " M .claude/hooks/dispatch.py\n"                   # hooks/ excluded (logic, no .md)
         " M .claude/agents/notes.txt\n"))                  # not .md
-    assert got == [".claude/layers/hub.md", ".claude/policies/naming.md", "CLAUDE.md"]
+    assert got == [".claude/layers/hub.md", ".claude/policies/naming.md",
+                   ".claude/skills/guideline-writing/SKILL.md", "CLAUDE.md"]
 
 
 def test_prefilter_never_narrower_than_the_python_judge():

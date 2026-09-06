@@ -488,7 +488,7 @@ def _check_claude_voice_violations() -> list[str]:
     project-vocabulary voice antipatterns across Claude guideline SoT files.
     Scope covers `.claude/commands/*.md`, `.claude/agents/*.md`,
     `.claude/policies/*.md`, `.claude/layers/*.md`, `.claude/operations/*.md`,
-    `.claude/skills/*/SKILL.md`, and `CLAUDE.md` — wiki/ is content territory
+    `.claude/skills/*/*.md`, and `CLAUDE.md` — wiki/ is content territory
     and is unaffected.
     """
     violations: list[str] = []

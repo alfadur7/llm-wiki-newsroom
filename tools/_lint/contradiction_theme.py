@@ -5,7 +5,7 @@ This module is responsible for the **theme derivation result** as a
 self-contained JSON document and is intentionally agnostic of the MD
 file set:
 
-  * JSON schema conformance (`.claude/commands/wiki-lint.md`
+  * JSON schema conformance (`.claude/commands/wiki-lint-theme-mapping.md`
     Output Schema)
   * claim id validity vs `_contradictions.json`
   * exhaustive coverage (Core Principle 1)
@@ -39,7 +39,7 @@ from _editor_date import last_commit_date  # noqa: E402
 CONTRADICTIONS_DIR = WIKI / "contradictions"
 CLAIMS_JSON = CONTRADICTIONS_DIR / "_contradictions.json"
 THEMES_JSON = CONTRADICTIONS_DIR / "_contradictions_themes.json"
-GUIDE_PATH = Path(".claude/commands/wiki-lint.md")
+GUIDE_PATH = Path(".claude/commands/wiki-lint-theme-mapping.md")
 
 SLUG_RE = re.compile(r"^[a-z0-9-]+$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -505,7 +505,7 @@ def run(fix: bool = False) -> int:
     if hard_issues:
         print(
             "\nFAIL — _contradictions_themes.json has integrity issues. "
-            "See .claude/commands/wiki-lint.md for derivation procedure."
+            "See .claude/commands/wiki-lint-theme-mapping.md for derivation procedure."
         )
         return 1
 

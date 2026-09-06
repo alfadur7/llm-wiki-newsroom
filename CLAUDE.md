@@ -102,7 +102,7 @@ Each folder has a **single responsibility**; when adding a new instruction, use 
 
 **Instructions located here**:
 - `README.md` (Task Index, the "Extend Before Adding" Convention, natural-language usage examples, sub-procedure locations)
-- Command sub-procedures (e.g. the contradiction theme mapping and conflict-axis sync rule in `wiki-lint.md`) are the sole responsibility of this folder.
+- Command sub-procedures (e.g. the conflict-axis sync rule and the theme lifecycle·gate rules in `wiki-lint.md`, and the full theme re-derivation procedure in `wiki-lint-theme-mapping.md`) are the sole responsibility of this folder. The roster is the [`commands/README.md`](.claude/commands/README.md) Sub-procedure Locations table.
 
 ### `.claude/layers/` — Content-Type Authoring & Review SoT
 
@@ -116,7 +116,7 @@ Each folder has a **single responsibility**; when adding a new instruction, use 
 
 **What does NOT belong here**:
 - Qualitative review procedures (the 6 lenses, personas) — the Desk's sole domain, so [`.claude/agents/desk.md`](.claude/agents/desk.md).
-- Command sub-procedures (theme mapping, sync rule) — [`.claude/commands/wiki-lint.md`](.claude/commands/wiki-lint.md).
+- Command sub-procedures (theme lifecycle and gates, sync rule) — [`.claude/commands/wiki-lint.md`](.claude/commands/wiki-lint.md); the full theme re-derivation — [`.claude/commands/wiki-lint-theme-mapping.md`](.claude/commands/wiki-lint-theme-mapping.md).
 
 ### `.claude/skills/` — Agent Skills SoT (project-agnostic)
 
@@ -186,7 +186,7 @@ Guideline-authoring voice and plan-bloat control are craft, not policy — they 
   - guard: exit-2 block on direct Write|Edit of auto-generated build artifacts (`wiki/index.md`, `graph/_*.json`, etc.) or `raw/` originals — steering you to fix the input and regenerate (re-derivation, human-edited files, and queue files are exceptions; the full list is in `dispatch.py`)
   - advisory: after writing a stub, recommend `python tools/build.py` reconciliation + Desk VERIFY₂ (`wiki/entities·concepts·timelines/*.md` — structural prevention of the 2026-05-09 / 05-20 incidents)
   - advisory: after editing L2-2 full hub, timeline, L2-3, or L2-4, recommend the layer's `python tools/lint.py` self-VERIFY₀ — target-scoped where the group accepts a target, corpus-wide (judged on own output) where it does not
-  - advisory: for `*/plans/*.md`, the 5-step self-check, the 4 red-flag types + for `.claude/{agents,commands,layers,policies,operations}/` SoTs and CLAUDE.md (skills·hooks·memory excluded), the Guideline Verification Ladder + a diff bullet-depth check (helper `check_bullet_depth.py`)
+  - advisory: for `*/plans/*.md`, the 5-step self-check, the 4 red-flag types + for the guideline SoTs under `.claude/` and CLAUDE.md (scope SoT: [`agents/editor-in-chief.md`](.claude/agents/editor-in-chief.md) § Guideline Verification Ladder), the Guideline Verification Ladder + a diff bullet-depth check (helper `check_bullet_depth.py`)
   - advisory: on editing a desk-judged prose-craft SoT (`.claude/layers/*.md`, `agents/desk|reporter|columnist.md`), recommend the proposal-validation measurement before adoption (SoT: `operations/proposal-validation-runbook.md` + `agents/editor-in-chief.md` § Gate)
   - advisory: after writing a `wiki/` page containing an unresolved wikilink, name the targets and require one of four resolution branches before hand-off (branch text in `dispatch.py`; page-existence uses the same `tools/_lib.py` set as `lint graph structure`)
   - advisory: on Write of a script-like temporary file directly under the project root, recommend a temp directory (structural prevention of the 2026-05-08 incident)

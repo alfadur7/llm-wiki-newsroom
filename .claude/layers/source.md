@@ -54,15 +54,6 @@ This guide governs how to author, migrate, and iterate on `wiki/sources/<slug>.m
 
 A Claude instance with no prior knowledge should be able to reproduce the same quality by reading this guide alone (Claude reproducibility principle).
 
-### Read Scope (by work scenario)
-
-When entering a task, first identify the single row matching your scenario and read closely only the four columns of that row — the CLAUDE.md section · this guide · the Rubric · the auxiliary guide. No additional Read beyond the table is needed.
-
-| Task | Page Format | This Guide | Rubric | Auxiliary Guide |
-|------|------------|----------|--------|------------|
-| Author one new source (`wiki/sources/<slug>.md`) | `.claude/layers/source.md` | full | full | — |
-| Perform the source portion within the ingest workflow | `.claude/layers/source.md` | full | full | `.claude/commands/wiki-ingest.md` |
-
 ### Which writing tradition does it follow
 
 A source page follows the **verifiable-attribution craft** derived from the traditions of scholarly citation, journalistic attribution, and hypertext citation anchoring. The technique definitions, authoring criteria, and primary sources (claim atomization · evidence grading · claimant attribution · citation typing · anchoring) have their SoT in the [`scholarly-citation`](../skills/scholarly-citation/SKILL.md) `criteria.json` and SKILL.md, while wikilink density and slug notation live in [`encyclopedia-writing`](../skills/encyclopedia-writing/SKILL.md). Read these explicitly when entering authoring (Reporter, Columnist) or review (Desk).
