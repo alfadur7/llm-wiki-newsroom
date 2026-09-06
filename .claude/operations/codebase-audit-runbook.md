@@ -10,16 +10,15 @@ A multi-agent batch procedure for an ultrareview-grade, exhaustive pass over the
 
 ## Variant A — Python code (tools/ + hooks + graph.html)
 
-- **Group decomposition**: just before starting, enumerate `tools/**/*.py` + `.claude/hooks/**/*.{py,sh}` + `graph/graph.html` live into ~10–12 groups by submodule, ≤~8 files per group (a size one agent can fully read). No hardcoded list — files accumulate. Exclude vendored artifacts such as the obsidian plugin `main.js`.
+- **Group decomposition**: just before starting, enumerate `tools/**/*.py` + `.claude/hooks/**/*.{py,sh}` + `graph/graph.html` live into ~10–12 groups by submodule, ≤~8 files per group. No hardcoded list — files accumulate. Exclude vendored artifacts such as the obsidian plugin `main.js`.
 - **Review dimensions**: `bug` (runtime errors · wrong conditions · None/KeyError · regex · resource leaks · encoding/path · broad-except masking) · `dead-code` (unused functions/constants/imports · unreachable branches · `_lib` duplication) · `inconsistency` (not using a `_lib` helper · hand-rolled frontmatter parsing · inconsistent exit/error handling) · `over-engineering` (needless abstraction · speculative generalization · single-impl interface/factory · config for values that never change · symptom-only non-root-cause fixes — criteria SoT `.claude/skills/ponytail-coding/SKILL.md` ladder; missing reuse belongs to `inconsistency`, so it's excluded here).
 - **Application**: `fix_safe=true` (a code-variant field in FINDINGS_SCHEMA — see § Harness) is fixed directly. Verification is § Verify & gate protocol item 2 (code).
 
 ## Variant B — guidelines (.claude/ + CLAUDE.md + README + skill checks.py)
 
-- **Group decomposition**: root (CLAUDE.md + root README.md) · agents · commands · layers · policies · operations · skills-spec (SKILL.md + criteria.json) · skills-code (checks.py).
-- **Review dimensions**: `drift` (a symbol/field/CLI/output the doc describes doesn't match the actual code — confirm only after reading that code) · `contradiction` (the same rule/threshold/procedure conflicts across or within files — one policy's threshold/instruction disagrees with another guide or is mutually exclusive; confirm only after reading both originals; intentional reproducibility duplication and SoT-delegation pointers are excluded) · `duplication` (intentional reproducibility duplication is excluded, per the dedupe policy) · `stale` (removed features · dead cross-links) · `misplacement` (violates the CLAUDE.md "Instruction Locations" taxonomy) · `code-bug` (checks.py).
-- **Drift grounding is required**: inject the list of recent code changes into the reviewer prompt to catch code↔doc drift.
-- **Contradiction grounding is required**: per-group isolated review can't see cross-file conflicts — inject the cross-cutting registries where thresholds/policies converge (`.claude/layers/_manifest.json` roster · `.claude/policies/naming.md` thresholds · `graph/cluster_labels.json`) into the reviewer prompt so it checks a group's rules against those values.
+- **Group decomposition**: by review dimension, not by file — every reviewer reads the whole corpus (tracked files under `.claude/**` + `CLAUDE.md` + root `README.md`) plus the registries its rules resolve against from outside it (e.g. `graph/cluster_labels.json`), and the 2–3 groups split the dimensions (e.g. `drift` · `contradiction`+`misplacement` · `stale`+`duplication`+`code-bug`).
+- **Review dimensions**: `drift` (a symbol/field/CLI/output the doc describes doesn't match the actual code — confirm only after reading that code) · `contradiction` (the same rule/threshold/procedure conflicts across or within files — one policy's threshold/instruction disagrees with another guide or is mutually exclusive; confirm only after reading both originals; intentional reproducibility duplication and SoT-delegation pointers are excluded) · `duplication` (intentional reproducibility duplication is excluded, per the dedupe policy) · `stale` (removed features · dead cross-links — when a section has moved, search for the name each caller actually uses, often a step number or label rather than the heading) · `misplacement` (violates the CLAUDE.md "Instruction Locations" taxonomy) · `code-bug` (checks.py).
+- **Drift input is the code**: the `drift` reviewer reads the implementation behind each documented symbol/field/CLI/output — a pass that opened no code and reported no drift has not run the dimension.
 - **Exclude what lint already covers**: do not re-report what `python tools/lint.py meta` already catches (CLAUDE.md anchor/file-ref/slash-cmd/roster · voice antipattern · hook format · craft-chain closure · stale guide ref · log ordering) — the multi-agent pass owns the semantic layer lint can't reach.
 - **Application**: mechanical (stale ref · counts · scope · field names · dead code) is fixed directly. **Gated** (changes to a guide/rubric/matrix skeleton — Human Reviewer Gate) is not applied; surface it to the operator.
 
@@ -29,27 +28,34 @@ Common to both variants. `pipeline(GROUPS, review → adversarial verify)` — o
 
 ```js
 // Common skeleton — only GROUPS, the review/verify prompts, and the schema's fix classification swap per variant
+const dead = []
 const verified = await pipeline(
   GROUPS,
-  (g) => agent(reviewPrompt(g), { phase: 'Review', schema: FINDINGS_SCHEMA }),
-  (review, g) => parallel((review.findings || []).map((f) => () =>
-    agent(verifyPrompt(f), { phase: 'Verify', schema: VERDICT_SCHEMA })
-      .then((v) => ({ group: g.key, finding: f, verdict: v })))),
+  (g) => agent(reviewPrompt(g), { phase: 'Review', schema: FINDINGS_SCHEMA }).catch(() => null),
+  (review, g) => {
+    if (!review) { dead.push(`review:${g.key}`); return [] }   // a dead agent is not zero findings
+    return parallel(review.findings.map((f) => () =>
+      agent(verifyPrompt(f), { phase: 'Verify', schema: VERDICT_SCHEMA }).catch(() => null)
+        .then((v) => { if (!v) dead.push(`verify:${g.key}`); return { group: g.key, finding: f, verdict: v } })))
+  },
 )
 const confirmed = verified.flat().filter(Boolean).filter((r) => r.verdict && r.verdict.real)
+return { confirmed, failed_groups: dead, audit_complete: dead.length === 0 }
 ```
 
+- **Context precondition**: a group's stated input must fit the reviewer's context — the guideline corpus is ~800 KB, and a `drift` reviewer that also opens `tools/**` reads ~1.8 MB (~450K tokens). Route each reviewer to a model whose window covers its group's input; where none does, narrow the group rather than silently dropping the inputs its dimension names.
+- **An empty result is not a pass**: a reviewer killed by a run limit returns nothing, and a lenient per-agent fallback turns that into `confirmed: 0` — indistinguishable from a clean audit. The script must record every dead agent — reviewers **and** verifiers, the stage with the most of them — and return `failed_groups` + `audit_complete`, and recover by resuming the run (`resumeFromRunId`), which replays completed agents from cache and re-runs only the dead. `audit_complete: false` blocks § Verify & gate protocol item 5.
 - **FINDINGS_SCHEMA**: `{file, line, category, severity, confidence, title, detail, proposed_fix}` (the code variant adds `fix_safe: bool` — whether a direct fix is safe; the guideline variant adds `fix_class: mechanical|gated`).
 - **Verify prompt core**: "Default real=false. Re-read the actual file and suspect handled bugs, dynamic usage, intentional local definitions, and moved lines. If real, re-classify whether the fix is minimal/safe + the fix_class."
-- If a reviewer fails to produce schema output (e.g. the build group), re-run only that group with a single supplementary agent and merge the result.
+- If a reviewer produces malformed schema output (e.g. the build group), re-run only that group with a single supplementary agent and merge the result — a resume replays that agent as-is, so this case needs a fresh one.
 
 ## Verify & gate protocol
 
-1. Before applying, re-confirm each finding by reading it directly (don't blindly trust an agent's claim).
+1. Before applying, re-confirm each finding by reading it directly (don't blindly trust an agent's claim) — after a mid-batch death this is also what skips a fix already present in the file.
 2. Code: byte-compile → `python -m pytest tests/` PASS → `python tools/lint.py` EXIT=0 → entry-point smoke run.
 3. Guidelines: `python tools/lint.py meta` PASS (voice antipattern · craft-chain consistency · all items) → for `.claude/` and CLAUDE.md edits, present the Guideline Verification Ladder evidence (rungs 1–3).
 4. Gated items are not applied — handle separately after operator approval.
-5. On completion, after operator approval, commit + push to origin (split by logical unit: code / guidelines / regenerated artifacts).
+5. On completion (`audit_complete: true` — an incomplete run is not a completion), after operator approval, commit + push to origin (split by logical unit: code / guidelines / regenerated artifacts).
 
 ## Carry-forward
 
