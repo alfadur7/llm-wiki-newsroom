@@ -104,7 +104,7 @@ LAYERS = ("L2-1", "L2-2", "L2-3", "L2-4", "meta", "tools")
 # generation. Composition prose (which role ran, how many rotations) belongs in `note`;
 # this field is a join key. A measurement mixing families is `unknown` with the
 # composition in `note` — guessing an attribution puts a wrong value in the key silently.
-MODELS = ("opus-5", "opus-4.8", "fable-5", "sonnet-5", "haiku-4.5", "unknown")
+MODELS = ("opus-5", "opus-4.8", "fable-5.1", "fable-5", "sonnet-5", "haiku-4.5", "unknown")
 # Verification surfaces a defect can escape from / be caught at (caught_at prefix).
 # `operator` carries a narrow-use rule — read the module docstring before reaching for it.
 STAGES = ("lint", "desk", "blind", "probe", "operator")
