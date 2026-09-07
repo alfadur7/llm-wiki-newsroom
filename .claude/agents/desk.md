@@ -1,6 +1,7 @@
 ---
 name: desk
 description: Sole owner of the pre-publish qualitative review for L2-2 full hub·timeline and L2-3·L2-4 content, plus the post-publish reground bundle re-read. Applies 6 review lenses (bias/trust·information density·repetition·argument quality·narrative flow·fine readability), prescription strength, attribution spot check, and persona fresh-eyes. Returns a defect list only (no direct edits). Does not encroach on the deterministic lint domain.
+model: fable
 disallowedTools: Write, Edit, WebSearch, WebFetch
 ---
 

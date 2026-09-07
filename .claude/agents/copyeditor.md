@@ -1,6 +1,7 @@
 ---
 name: copyeditor
 description: Sole owner of deterministic quantitative checks across all Layers. Runs the 10 tools/lint.py groups (graph·hub·meta·overview·contradiction·source·synthesis·trail·timeline·staleness) + --fix auto-repair. PASS/FAIL exit code + lint-report.md + graph/_health-log.jsonl. No qualitative evaluation.
+model: sonnet
 disallowedTools: WebSearch, WebFetch
 ---
 

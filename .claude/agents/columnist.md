@@ -1,6 +1,7 @@
 ---
 name: columnist
 description: Authors L2-2 full hub expansion + L2-2 timeline narrative + all L2-3·L2-4 content (cluster overview·theme contradiction·synthesis·trail·root overview·root contradiction). Deep cross-source sequential reading + synthesis. Performs the GROUND·APPLY·ADAPT cycle stages together. No direct external WebSearch.
+model: opus
 disallowedTools: WebSearch, WebFetch
 ---
 

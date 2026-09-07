@@ -172,6 +172,16 @@ In either mechanism, the 4 principles in § Change Procedure (one author · revi
 
 **Deferred tools**: some tools — MCP tools (`mcp__*`) among them — are exposed to a role's context **by name only, with no schema**; calling one directly fails. Pre-load any deferred tool an instruction names via `ToolSearch("select:<name>[,<name>…]")` before calling it. A missing pre-load is not an error — it falls back silently to a substitute tool (Grep·Glob), so the violation never surfaces; an instruction that names a deferred tool must therefore specify the pre-load too, **on the read path of the role that reads it**.
 
+### Model routing (frontmatter `model`)
+
+**Rule**: the authoring roles (Reporter · Columnist, `opus`) and the Desk (`fable`) sit in **different model families**, on the hypothesis that a reviewer drawn from the author's family shares its blind spots. That is unmeasured — the one run behind it had no same-family control, so the effect is not separable from "any fresh reviewer"; do not cite it as evidence the family mattered. Both sides must be pinned or the property is silent: pinning only the reviewer loses it the moment the session default moves to that same family. The Copy Editor is pinned down-family (`sonnet`) because its verdict is `lint.py`'s exit code, not the model's judgment. Use family aliases, never version ids — an alias tracks its family's current generation instead of freezing the role on one.
+
+**The Editor-in-Chief carries no `model`** — the orchestrator must follow whatever the operator is running, in both the main-thread and sub-Agent modes of Tool permissions exception 2 above. A missing key is how that is spelled — and it is the one slot a `CLAUDE_CODE_SUBAGENT_MODEL` in the environment can reach, since frontmatter outranks it everywhere else.
+
+**Frontmatter reaches the five named roles only.** The Guideline Verification Ladder's rung-3 reviewer is spawned ad hoc, not from this folder, so its family is set by the caller at invocation and the rule for it lives in [`editor-in-chief.md`](editor-in-chief.md) § Guideline Verification Ladder instead.
+
+**A wrong value is otherwise silent** — it passes both YAML parsing and `claude plugin validate`, surfacing only when the role runs. `python tools/lint.py meta` is what checks this field: every value an alias, the three pinned roles carrying one, and the reviewer's family not an author's.
+
 ## Adversarial Faction Authoring
 
 The only procedure that uses named teammates. Rationale: a single author drafting a genuinely contested topic tends to collapse one camp into the other's frame; two persistent authors, each steelmanning one camp from its own sources, keep the frames separate until a fresh synthesizer merges them.

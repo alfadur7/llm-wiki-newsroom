@@ -1012,6 +1012,14 @@ AGENTS_DIR = ROOT / ".claude" / "agents"
 # in restriction prose without disallowing them.
 _AUTHORS_OWN_FILES = {"copyeditor": {"Write", "Edit"}}
 _XLIST_START_RE = re.compile(r"^\*\*X — ", re.MULTILINE)
+# Frontmatter `model` (agents/README.md § Model routing). `claude plugin validate`
+# passes a typo and a version id alike, so a misrouted role stays silent until it
+# runs. Version ids are valid to the harness but banned here — they freeze a role
+# on one generation. Checking values alone would be half a check: the failure the
+# rule actually names is an *absent* pin, which silently collapses the split.
+AGENT_MODEL_ALIASES = ("opus", "sonnet", "haiku", "fable")
+_MODEL_AUTHORS = ("reporter", "columnist")
+_MODEL_REVIEWER = "desk"
 
 
 def check_agent_tool_permissions(name: str, disallowed: list[str],
@@ -1040,6 +1048,55 @@ def check_agent_tool_permissions(name: str, disallowed: list[str],
             f"entry names it"
         )
     return violations
+
+
+def check_agent_models(models: dict[str, str]) -> list[str]:
+    """Pure routing check — `models` maps role stem to frontmatter `model` ("" if absent).
+
+    Roster-independent: every value present is a family alias, both authoring
+    roles and the reviewer carry one, and the reviewer's family is neither
+    author's. Naming the property rather than the current assignment keeps the
+    check alive if the families are all reassigned later.
+    """
+    violations: list[str] = []
+    for name, value in sorted(models.items()):
+        if value and value.split("[")[0] not in AGENT_MODEL_ALIASES:
+            violations.append(
+                f"{name}: `model: {value}` is not a family alias — one of "
+                f"{', '.join(AGENT_MODEL_ALIASES)}; a version id freezes the "
+                f"role on one generation"
+            )
+    for name in _MODEL_AUTHORS + (_MODEL_REVIEWER,):
+        if name in models and not models[name]:
+            violations.append(
+                f"{name}: no frontmatter `model` — the author/reviewer family "
+                f"split needs both sides pinned, or it dies with the session"
+            )
+    authors = {models.get(a, "").split("[")[0] for a in _MODEL_AUTHORS if models.get(a)}
+    reviewer = models.get(_MODEL_REVIEWER, "").split("[")[0]
+    if reviewer and reviewer in authors:
+        violations.append(
+            f"{_MODEL_REVIEWER}: `{reviewer}` is also an authoring role's family "
+            f"— the reviewer's family must differ from the author's"
+        )
+    return violations
+
+
+def _check_agent_models() -> list[str]:
+    """Disk wrapper — reads `model` from every role SoT (README yields "")."""
+    if not AGENTS_DIR.exists():
+        return []
+    models: dict[str, str] = {}
+    for path in sorted(AGENTS_DIR.glob("*.md")):
+        try:
+            text = read_text_cached(path)
+        except OSError:
+            continue
+        # An empty `model:` parses as a block-list start; read it as absent so the
+        # message is the presence one rather than a literal `[]`.
+        raw = parse_frontmatter(text).get("model", "")
+        models[path.stem] = "" if isinstance(raw, list) else str(raw).strip()
+    return check_agent_models(models)
 
 
 def _check_agent_tool_permissions() -> list[str]:
@@ -1252,6 +1309,19 @@ def run() -> int:
     else:
         print("OK - agent X-list <-> disallowedTools parity holds")
 
+    model_issues = _check_agent_models()
+    if model_issues:
+        print(f"\n[Agent model-routing violations: {len(model_issues)}]")
+        for v in model_issues:
+            print(v)
+        print(
+            "Rule: the authoring roles and the reviewer each carry a family "
+            "alias, and the reviewer's family differs from theirs. "
+            "See .claude/agents/README.md \"Model routing\"."
+        )
+    else:
+        print("OK - agent model routing pinned and families split")
+
     # HOOK LAUNCH pass — settings.json hook `.sh` commands must lead with
     # `bash` and anchor the path to $CLAUDE_PROJECT_DIR.
     hook_prefix_issues = _check_hook_bash_prefix()
@@ -1375,7 +1445,7 @@ def run() -> int:
     else:
         print("OK - no nested wikilinks in authored content aliases")
 
-    total = integrity_total + language_total + total_drift + len(flat_issues) + len(reserved_issues) + len(log_issues) + len(voice_issues) + len(tool_perm_issues) + len(hook_prefix_issues) + len(hook_channel_issues) + len(hook_utf8_issues) + len(regex_hoist_issues) + len(craft_issues) + len(stale_guide_issues) + len(link_issues) + len(nested_issues)
+    total = integrity_total + language_total + total_drift + len(flat_issues) + len(reserved_issues) + len(log_issues) + len(voice_issues) + len(tool_perm_issues) + len(model_issues) + len(hook_prefix_issues) + len(hook_channel_issues) + len(hook_utf8_issues) + len(regex_hoist_issues) + len(craft_issues) + len(stale_guide_issues) + len(link_issues) + len(nested_issues)
     if total == 0:
         return 0
     print(f"\nFAIL - {total} meta-schema issue(s)")

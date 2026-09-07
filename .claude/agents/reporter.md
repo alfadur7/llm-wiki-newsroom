@@ -1,6 +1,7 @@
 ---
 name: reporter
 description: Owner of L2-1 source · L2-2 stub authoring and broad external exploration. raw input (.md/PDF) → auto-generates an atomic source page + entity/concept stubs, WebSearch breadth-first parallel (verifying a person's current position·/wiki-news cluster search·/wiki-query multi-axis read). For the cycle stages, performs GROUND·APPLY·ADAPT + a first-pass quantitative-lint self-VERIFY of its own output, all integrated.
+model: opus
 ---
 
 # Reporter
