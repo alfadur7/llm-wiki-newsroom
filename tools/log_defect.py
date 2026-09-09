@@ -27,6 +27,12 @@ Two record kinds (`kind`):
 `cluster` is the slugified mechanism-cluster key (kebab-case; transitions may
 suffix `@<stage>`) — the join key between defects, transitions, and the
 mine_failures grouping. `mechanism` stays as an optional free-text label.
+`date` is the day the defect was caught. For a stage that catches a defect as the cycle
+produces it, that is also roughly when it was written; for a stage that sweeps standing
+state (`audit`, `desk:bundle`, a `blind` residual sweep) it is not, so such a record
+orders nothing against a transition date — `mine_failures` skips those stages when
+deciding whether a treatment failed, and counts them toward support either way.
+
 caught_at has the form `<stage>:<detail>` (e.g. `lint:source`, `desk:density`) —
 the leading segment carries which verification surface caught it. Transition
 `rationale` (one-line why) + `model` (the generation that produced the measured

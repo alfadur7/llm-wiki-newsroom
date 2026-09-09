@@ -128,6 +128,15 @@ _PREVENTIVE = ("prevent", "both")
 # rationale standing in the ledger.
 _CLOSED = ("reject", "defer")
 
+# Stages that sweep standing state rather than catch a defect as it is produced.
+# `log_defect` defines `prevent` as stopping the defect from occurring, so an
+# instance written long before the treatment and merely found after it is a
+# remediation gap, not a prevention failure — it still counts toward support.
+# This keys on the stage name, while the property that matters is when the
+# instance was written: `desk:bundle` and a `blind` residual sweep have the
+# same shape and are not covered.
+_SWEEP_STAGES = ("audit",)
+
 
 def accept_clusters(records: list[dict], *treatments: str) -> set[str]:
     """Clusters of accept transitions carrying one of the given treatments."""
@@ -139,6 +148,9 @@ def accept_clusters(records: list[dict], *treatments: str) -> set[str]:
 
 def recurred_after_treatment(records: list[dict], *treatments: str) -> set[str]:
     """Clusters carrying one of `treatments` that have a defect dated **after** it.
+
+    Sweep stages (`_SWEEP_STAGES`) are skipped: their date is when the sweep ran,
+    not when the instance was written, so they order nothing against a treatment.
 
     The boundary is the latest such accept: a cluster treated twice is judged
     against the treatment standing now, so defects the second one answered do
@@ -158,6 +170,8 @@ def recurred_after_treatment(records: list[dict], *treatments: str) -> set[str]:
     out: set[str] = set()
     for r in records:
         if r.get("kind") != "defect" or not r.get("date"):
+            continue
+        if str(r.get("caught_at", "")).split(":")[0] in _SWEEP_STAGES:
             continue
         c = str(r.get("cluster", "") or r.get("mechanism", "")).split("@")[0]
         if c in boundary and str(r["date"]) > boundary[c]:
@@ -250,9 +264,14 @@ def mine(since: str | None, pages: bool = False) -> int:
     a = analyze(records, since, pages=pages)
     print(f"defect corpus: {LOG_PATH.name} ({sum(1 for r in records if r.get('kind')=='defect')} defect)")
     print(f"review window: {('after ' + since) if since else 'ALL (no watermark)'}")
-    print(f"in-window defects: {a['in_window']}  ·  prevented clusters: {len(a['prevented'])}"
-          f"  ·  recurring after treatment: {len(a['recurred'])}"
-          f"  ·  non-preventive accepts: {len(a['non_preventive'])}")
+    # Counted over the review set, not the corpus: `recurred` and `prevented` are
+    # whole-corpus sets, and printing them under the review-window line put three
+    # populations — header, table flags, checkpoint list — under one label.
+    in_set = {m for m, _ in a["ranked"]}
+    print(f"in-window defects: {a['in_window']}"
+          f"  ·  prevented clusters: {len(a['prevented'] & in_set)}"
+          f"  ·  recurring after treatment: {len(a['recurred'] & in_set)}"
+          f"  ·  non-preventive accepts: {len(a['non_preventive'] & in_set)}")
     print()
     print("=== Open — this cycle's review set (recurrence after preventive treatment ▶ first) ===")
     if not a["ranked"]:
