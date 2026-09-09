@@ -340,8 +340,11 @@ def _emit(event_name: str, messages: list[str]) -> None:
 
 
 def _rel_wiki(path: str) -> str:
-    m = re.search(r"(wiki/.*)", path)
-    return m.group(1) if m else path
+    # Last `wiki/`, not the first: an ancestor directory named `wiki` (or a
+    # checkout under one) otherwise won and produced a path that resolves
+    # against nothing.
+    i = path.replace(chr(92), "/").rfind("wiki/")
+    return path.replace(chr(92), "/")[i:] if i != -1 else path
 
 
 def _protected_path(path: str, tool_name: str = "", content: str = "") -> str | None:
@@ -530,6 +533,9 @@ _OP_CHARS = "();<>|&\n"
 # untracked file under them is one the commit cannot carry.
 _ADD_ALL = frozenset({"-A", "--all", "."})
 _ADD_TRACKED = frozenset({"-u", "--update"})
+# Git options whose value is the next token, so that value is not a pathspec.
+_GIT_VALUE_OPTS = frozenset({"-C", "-c", "--git-dir", "--work-tree",
+                             "--namespace", "--exec-path", "--pathspec-from-file"})
 # Commit options whose value is the next token.
 _VALUE_OPTS = ("--message", "--file", "--author", "--date",
                "--reuse-message", "--reedit-message")
@@ -570,6 +576,26 @@ def _lex(command: str) -> list[str]:
     return toks
 
 
+# Tokens that can open a command without being one. PowerShell 5.1 has no
+# `&&`, so its chain form is `A; if ($?) { git commit ... }` — `(`/`)` are
+# already operators, so the block brace was all that hid the commit. Bourne
+# `then`/`do`/`else` are here for the same reason.
+_BLOCK_OPENERS = frozenset({"{", "}", "then", "do", "else"})
+
+
+def _segment_head(seg: list[str]) -> list[str]:
+    """`seg` with leading block/conditional openers dropped.
+
+    Over-inclusive by design: a commit inside a conditional may not actually
+    run, but this surface is an advisory, and staying silent on a commit that
+    does run is the expensive error.
+    """
+    i = 0
+    while i < len(seg) and seg[i] in _BLOCK_OPENERS:
+        i += 1
+    return seg[i:]
+
+
 def _git_segments(command: str, sub: str) -> list[list[str]]:
     """Shell segments whose first token is git and that carry `sub` as its own token.
 
@@ -588,8 +614,9 @@ def _git_segments(command: str, sub: str) -> list[list[str]]:
         if "<" in t and _is_op(t):
             break
         if _is_op(t):
-            if cur and os.path.basename(cur[0]).removesuffix(".exe") == "git" and sub in cur:
-                segs.append(cur)
+            head = _segment_head(cur)
+            if head and os.path.basename(head[0]).removesuffix(".exe") == "git" and sub in head:
+                segs.append(head)
             cur = []
         else:
             cur.append(t)
@@ -636,8 +663,19 @@ def _staged_scope(command: str) -> tuple[list[str], bool]:
     paths: list[str] = []
     untracked = False
     for seg in _git_segments(command, "add"):
-        named = [tok.replace("\\", "/") for tok in seg[1:]
-                 if tok[:1] != "-" and tok != "add" and tok not in _ADD_ALL]
+        # Skip the value of an option that takes one (`-C <dir>` most of all:
+        # its directory is not a pathspec, and treating it as one replaced the
+        # broad-flag scope with a single path that names nothing staged).
+        rest, named, skip = seg[1:], [], False
+        for tok in rest:
+            if skip:
+                skip = False
+                continue
+            if tok in _GIT_VALUE_OPTS:
+                skip = True
+                continue
+            if tok[:1] != "-" and tok != "add" and tok not in _ADD_ALL:
+                named.append(tok.replace("\\", "/"))
         broad = any(tok in _ADD_ALL or tok in _ADD_TRACKED for tok in seg)
         untracked = untracked or not any(tok in _ADD_TRACKED for tok in seg)
         paths += named or (list(GUIDE_SCOPE) if broad else [])
