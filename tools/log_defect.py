@@ -41,7 +41,9 @@ The two fields are the record's two coordinates in the four-loop model (CLAUDE.m
 Four Loops): `grounded_at` is the input side (how deep the author read before writing),
 `caught_at` the feedback side (the surface that caught it — `lint`·`desk` are the content
 ladder's surfaces, spanning the inner and outer loops; `desk:bundle` is the Reground loop;
-`blind`·`probe` the Meta loop's own verification).
+`blind`·`probe` the Meta loop's own verification, and `audit` its discovery surface — the
+periodic exhaustive pass over the standing code and instruction layer, where `blind`·`probe`
+instead verify one proposed change).
 
 `operator` is the wiki operator (CLAUDE.md § Human Reviewer Gate), a stopping condition
 inside the other loops rather than a cycle of its own, so the mapping above gains no
@@ -107,7 +109,7 @@ LAYERS = ("L2-1", "L2-2", "L2-3", "L2-4", "meta", "tools")
 MODELS = ("opus-5", "opus-4.8", "fable-5.1", "fable-5", "sonnet-5", "haiku-4.5", "unknown")
 # Verification surfaces a defect can escape from / be caught at (caught_at prefix).
 # `operator` carries a narrow-use rule — read the module docstring before reaching for it.
-STAGES = ("lint", "desk", "blind", "probe", "operator")
+STAGES = ("lint", "desk", "blind", "probe", "audit", "operator")
 
 
 def parse_records(raw: str) -> list[dict]:

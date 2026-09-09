@@ -77,6 +77,10 @@ def test_validate_enforces_caught_at_stage():
     assert ld.validate(_valid_defect(caught_at="vibes:only"))
     for s in ld.STAGES:
         assert ld.validate(_valid_defect(caught_at=f"{s}:detail")) is None
+    # Pinned by name, not just covered by the loop above: `audit` was absent for
+    # long enough that the audit runbook's yield was unfilable and the gap read
+    # as a discipline problem. Dropping it again would keep this test green.
+    assert "audit" in ld.STAGES
 
 
 def test_validate_requires_transition_audit_fields():
