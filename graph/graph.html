@@ -365,7 +365,7 @@ try {
     'python tools/build.py');
   throw e;
 }
-const { nodes: rawNodes, edges: rawEdges, stats } = GRAPH_DATA;
+const { nodes: rawNodes, edges: rawEdges } = GRAPH_DATA;
 const allClusters = CLUSTERS_DATA.clusters || [];
 const ALL_OVERLAYS = (OVERLAYS_DATA && OVERLAYS_DATA.overlays) || [];
 const NODE_OVERLAYS = (OVERLAYS_DATA && OVERLAYS_DATA.node_overlays) || {};
@@ -393,9 +393,21 @@ allClusters.forEach(c => {
 Object.entries(CLUSTERS_DATA.source_assignments || {}).forEach(([path, entry]) => {
   if (clusterBySlug[entry.primary]) CLUSTER_BY_NODE[path] = entry.primary;
 });
+// Auto-assigned cluster colours are generated as hex, not hsl(): fadeColor
+// parses '#rrggbb' only and returned its flat-grey fallback for hsl() inputs,
+// so auto-coloured clusters dimmed to grey instead of their own hue.
+function hslToHex(h, s, l) {
+  const sN = s / 100, lN = l / 100;
+  const k = (n) => (n + h / 30) % 12;
+  const a = sN * Math.min(lN, 1 - lN);
+  const f = (n) => {
+    const c = lN - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return Math.round(255 * c).toString(16).padStart(2, '0');
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
 const uniqueSlugs = [...new Set(allClusters.map(c => c.slug))];
-const slugHubSize = {};
-allClusters.forEach(c => { slugHubSize[c.slug] = (slugHubSize[c.slug] || 0) + c.size; });
 
 // Per-cluster, per-type member counts. Hubs (entity/concept) come from
 // cluster.members; sources come from source_assignments primary mapping.
@@ -418,7 +430,7 @@ uniqueSlugs.forEach((slug, i) => {
   const c = clusterBySlug[slug];
   CLUSTER_COLORS[slug] = (c && c.color)
     ? c.color
-    : `hsl(${Math.round(360 * i / uniqueSlugs.length)}, 55%, 62%)`;
+    : hslToHex(Math.round(360 * i / uniqueSlugs.length), 55, 62);
 });
 const UNCLUSTERED_COLOR = '#909399';
 
@@ -614,7 +626,15 @@ const urlInit = (() => {
   const p = new URLSearchParams(location.search);
   const r = { types: null, clusters: null, focus: null, depth: 0, fragile: false, relations: null };
   if (p.has('types')) {
-    const t = p.get('types').split(',').map(s => s.trim()).filter(Boolean);
+    // Validated against the types actually present, like `focus`/`depth` and
+    // `fragile` are: an unvalidated typo silently rendered an empty graph.
+    const known = new Set(rawNodes.map(n => n.type));
+    const raw = p.get('types').split(',').map(s => s.trim()).filter(Boolean);
+    const t = raw.filter(x => known.has(x));
+    if (raw.length && !t.length) {
+      console.warn('graph: ?types= named no known node type', raw,
+                   '- known:', [...known].join(','));
+    }
     if (t.length) r.types = t;
   }
   if (p.has('clusters')) {
@@ -1223,7 +1243,6 @@ function getClusterCount(slug) {
   for (const t of activeTypes) total += counts[t] || 0;
   return total;
 }
-const legendCountEls = {};  // slug → count <span>, updated on type toggle
 const legendEl = document.getElementById('legend');
 uniqueSlugs.forEach(slug => {
   const c = clusterBySlug[slug];
@@ -1235,7 +1254,6 @@ uniqueSlugs.forEach(slug => {
   row.innerHTML =
     `<div class="legend-dot" style="--c:${color}"></div>` +
     `<span class="legend-name">${c.name} (<span class="legend-count">${getClusterCount(slug)}</span>)</span>`;
-  legendCountEls[slug] = row.querySelector('.legend-count');
   // Click = select this cluster: pin its hull + show overviews/<slug>.md in
   // the right panel (2026-06-01 — replaced the low-value visibility toggle).
   // Re-clicking the selected cluster deselects → root overview. Click-only:
@@ -1694,7 +1712,7 @@ function _setNodeChromeVisible(show) {
 // Open the right panel on non-node markdown (overview or a meta page). Reuses
 // the node panel's markdown pipeline (splitFrontmatter→linkify→marked) but
 // clears node-specific state/chrome. `rawKey` is resolved after ensurePages.
-async function openMetaPanel({ title, typeLabel, typeColor, rawKey, headerHtml }) {
+async function openMetaPanel({ title, typeLabel, typeColor, rawKey }) {
   if (selectedNodeId) { selectedNodeId = null; selectedNeighborsCache = null; }
   infoEl.dataset.nodeId = '';
   document.getElementById('ni-title').textContent = title;
@@ -1713,7 +1731,7 @@ async function openMetaPanel({ title, typeLabel, typeColor, rawKey, headerHtml }
   document.getElementById('sidebar').classList.remove('open');
   await ensurePages();
   const raw = rawKey();
-  contentEl.innerHTML = (headerHtml || '') + (raw != null
+  contentEl.innerHTML = (raw != null
     ? marked.parse(linkifyWikilinks(splitFrontmatter(raw).body))
     : '<div style="color:#777;font-size:12px;">No content.</div>');
 }
@@ -1777,7 +1795,7 @@ function showOverlayVisual(ov, focus) {
       else if (m.order != null) badgeById.set(m.id, m.order + '.');
     });
     OVERLAY_HL = { memberIds: _overlayMemberIds(ov), badgeById,
-                   color: OVERLAY_COLOR[ov.type], focusId: null, focus: !!focus };
+                   color: OVERLAY_COLOR[ov.type], focusId: null };
     // Both trail and timeline draw the ordered chain through their members
     // (members are pre-sorted: trail by curated step, timeline chronologically).
     // Neutral muted grey — members keep their own colours, so a type-coloured
@@ -2285,7 +2303,6 @@ const hullCanvas = document.getElementById('hull-overlay');         // below Sig
 const hullCtx = hullCanvas.getContext('2d');
 const hullTopCanvas = document.getElementById('hull-overlay-top');  // above Sigma (z:2) — region/cluster fill
 const hullTopCtx = hullTopCanvas.getContext('2d');
-let hoveredCluster = null;
 
 function resizeHullCanvas() {
   const rect = hullCanvas.parentElement.getBoundingClientRect();
@@ -2355,14 +2372,17 @@ function _paintHull(pred, color) {
 
 // Two canvases, opposite z-order (see #hull-overlay / #hull-overlay-top):
 //   TOP (above Sigma) — region/cluster hull FILL:
-//     1) cluster overview — hoveredCluster (transient) or selectedCluster (pinned)
+//     1) cluster overview — selectedCluster (pinned; hover is not wired up)
 //     2) region overlay   — regionLens (a region overlay on hover or pin)
 //   BOTTOM (below Sigma) — the path connector (so it stays under labels).
 // Path-overlay node/edge highlighting is done by the reducers, not here.
 function drawHull() {
   hullCtx.clearRect(0, 0, hullCanvas.width, hullCanvas.height);
   hullTopCtx.clearRect(0, 0, hullTopCanvas.width, hullTopCanvas.height);
-  const cl = hoveredCluster || selectedCluster;
+  // Hull highlight follows the pinned selection only; cluster hover is not
+  // wired up (the former `hoveredCluster` was never assigned, so this branch
+  // always fell through to the selection).
+  const cl = selectedCluster;
   if (cl) _paintHull(n => CLUSTER_BY_NODE[n] === cl, CLUSTER_COLORS[cl]);
   if (regionLens && regionLens.memberIds) {
     _paintHull(n => regionLens.memberIds.has(n), regionLens.hullColor || regionLens.color || '#a48dff');
