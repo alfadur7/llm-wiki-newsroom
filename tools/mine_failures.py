@@ -179,7 +179,11 @@ def analyze(records: list[dict], since: str | None, pages: bool = False):
 
 def write_checkpoint(when: str, since: str | None, note: str,
                      mechs: dict, recurring: list[str]) -> dict:
-    """Advance the review boundary + append this cycle's cluster and recurrence history (to be committed to the repo)."""
+    """Advance the review boundary + append this cycle's cluster and recurrence history.
+
+    The watermark file is gitignored (it carries operator working notes), so
+    this history stays local; the committed ledger is the defect corpus.
+    """
     history = _review.load_history(WATERMARK_PATH)
     entry = {"checkpoint": when, "reviewed_since": since, "note": note,
              "cluster_counts": mechs, "cluster_total": sum(mechs.values()),
@@ -269,7 +273,7 @@ def main() -> int:
         # polluted by a cluster whose records are a new checker doing its job.
         recurring = [m for m, _ in a["ranked"] if m in a["recurred"]]
         write_checkpoint(when, prev, args.note, mechs, recurring)
-        print(f"[watermark] review complete confirmed: {when} → {WATERMARK_PATH.name} (to be committed to the repo)")
+        print(f"[watermark] review complete confirmed: {when} → {WATERMARK_PATH.name} (local only — gitignored)")
         if recurring:
             print(f"[self-improvement] {len(recurring)} mechanism(s) recurring after treatment: {', '.join(recurring)} "
                   f"(0 = settled)")

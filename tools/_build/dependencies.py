@@ -65,7 +65,7 @@ from pathlib import Path
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, WIKI_SUBDIRS, GRAPH, CLUSTERS_JSON, WIKILINK_RE, parse_frontmatter, strip_code, strip_frontmatter, atomic_write_if_changed, fm_sources  # noqa: E402
+from _lib import WIKI, WIKI_SUBDIRS, GRAPH, CLUSTERS_JSON, WIKILINK_STEM_RE as WIKILINK_RE, parse_frontmatter, strip_code, strip_frontmatter, atomic_write_if_changed, fm_sources  # noqa: E402
 
 _GYEONGNO_RE = re.compile(r"^##\s+Path\s*$.*?(?=^##\s|\Z)", re.MULTILINE | re.DOTALL)
 

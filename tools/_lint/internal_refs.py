@@ -26,15 +26,15 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import WIKI, read_text_cached  # noqa: E402
+from _lib import WIKI, WIKI_SUBDIRS, read_text_cached  # noqa: E402
 
 # Content destined for the RAG export (sources are excluded — their bodies are
 # not exported, only the one-line index). Root meta files are checked by name.
 ROOT_META = ["overview.md", "contradiction.md", "index.md"]
-CONTENT_SUBDIRS = [
-    "entities", "concepts", "overviews", "contradictions",
-    "syntheses", "timelines", "trails",
-]
+# Every wiki subdir except `sources` (source pages are raw material, not
+# governance-referencing content). Derived, not re-enumerated: a subdir added to
+# _lib.WIKI_SUBDIRS was silently missing here.
+CONTENT_SUBDIRS = [s for s in WIKI_SUBDIRS if s != "sources"]
 
 _MD_LINK_RE = re.compile(r"\[[^\]]*\]\(([^)]+)\)")
 _LEADING_DOTSLASH_RE = re.compile(r"^(?:\.\./)+|^\./")

@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # _briefing/ → tools/
-from _lib import GRAPH, REPO_ROOT, deeplink_key, graph_deeplink_base, parse_frontmatter, strip_frontmatter  # noqa: E402
+from _lib import GRAPH, deeplink_key, graph_deeplink_base, parse_frontmatter, strip_frontmatter  # noqa: E402
 
 import mistune  # noqa: E402
 

@@ -111,6 +111,25 @@ LISTING_MARKERS = (
 )
 
 
+def _marker_hit(marker: str, hay: str) -> bool:
+    """True iff `marker` occurs in `hay` as a path segment, not mid-slug.
+
+    A plain substring test discarded real articles: `/rss` matched
+    `/news/rss-explained-for-publishers`, `/search` matched
+    `/a/search-engines-in-2026`. A marker that already ends in `/` is
+    segment-bounded on its own; the rest must be followed by a boundary.
+    """
+    if not marker.startswith("/") or marker.endswith("/"):
+        return marker in hay
+    i = hay.find(marker)
+    while i != -1:
+        nxt = hay[i + len(marker):i + len(marker) + 1]
+        if nxt in ("", "/", "?", "."):
+            return True
+        i = hay.find(marker, i + 1)
+    return False
+
+
 def _is_listing(url: str) -> bool:
     """True iff the URL is a search/index/listing page, not an article.
 
@@ -122,7 +141,7 @@ def _is_listing(url: str) -> bool:
     if (p.hostname or "").lower().startswith("search."):
         return True
     hay = (p.path + "?" + (p.query or "")).lower()
-    return any(m in hay for m in LISTING_MARKERS)
+    return any(_marker_hit(m, hay) for m in LISTING_MARKERS)
 
 
 def allowed_hosts() -> set[str]:
@@ -273,7 +292,13 @@ def classify_link(url: str, anchor: str, *, vocab: dict[str, int],
     "[article](/2026/shinhan-ai)" link still matches on the slug.
     """
     host = _registrable_host(urlparse(url).hostname or "")
-    relevance_text = f"{anchor} {unquote(urlparse(url).path)}"
+    # Slug separators become spaces in an extra copy of the path: ASCII terms
+    # match on word boundaries, so a multi-word label like `open source` could
+    # never fire on `/2026/open-source-models-win`. Additive — appending the
+    # normalized copy can only add matches, never remove one.
+    _path = unquote(urlparse(url).path)
+    _path_words = _path.replace("-", " ").replace("_", " ")
+    relevance_text = f"{anchor} {_path} {_path_words}"
     score, hits = score_relevance(relevance_text, vocab)
     base = {"url": url, "anchor": anchor, "host": host, "score": score, "hits": hits}
     if not no_filter and not _host_allowed(host, allowed):

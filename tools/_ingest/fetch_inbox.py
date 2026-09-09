@@ -350,6 +350,10 @@ def main() -> int:
             archive_entries.append((ts, source, url, f"{rel} OK"))
             print(f"  -> {rel}")
             ok_count += 1
+            # Register what we just saved: the index was built from the
+            # existing corpus only, so a URL repeated inside one batch was
+            # missed by both this loop's check and fetch_one's.
+            by_url_canon[canonicalize_url(url)] = rel
         elif status.startswith("SKIPPED:"):
             # Redirect-resolved final URL matched an existing source — drop it
             # (don't retain), like the inbox-time dedup at the top of the loop.

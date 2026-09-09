@@ -18,7 +18,6 @@ Strict filters:
 """
 from __future__ import annotations
 
-import json
 import re
 import sys
 from collections import Counter, defaultdict
@@ -29,6 +28,7 @@ from _lib import (  # noqa: E402
     korean_mode,
     read_text_cached,
     WIKI,
+    WIKILINK_ANY_RE,
     WIKILINK_RE,
     strip_frontmatter,
     strip_code,
@@ -151,7 +151,10 @@ KOREAN_TAIL_NOISE = (
 
 
 def _strip_wikilinks(text: str) -> str:
-    return WIKILINK_RE.sub("", text)
+    # WIKILINK_ANY_RE, not WIKILINK_RE: the latter does not match anchored
+    # (`[[x#s]]`) links, so their heading text survived and was mined as a
+    # page candidate.
+    return WIKILINK_ANY_RE.sub("", text)
 
 
 def _normalise(s: str) -> str:
@@ -265,24 +268,22 @@ def _candidates(*,
     return payload, len(stems)
 
 
-def run(*, json_out: bool = False,
-        min_mentions: int = DEFAULT_MIN_MENTIONS,
+def run(*, min_mentions: int = DEFAULT_MIN_MENTIONS,
         min_pages: int = DEFAULT_MIN_PAGES,
         top: int = DEFAULT_TOP) -> int:
+    # No json_out parameter: `suggestions.run` is the only caller and it
+    # renders the combined JSON document itself (one doc, not two
+    # concatenated ones), returning before it reaches this function.
     payload, indexed = _candidates(min_mentions=min_mentions, min_pages=min_pages, top=top)
     candidates = payload["candidates"]
 
-    if json_out:
-        json.dump(payload, sys.stdout, ensure_ascii=False, indent=2)
-        print()
-    else:
-        print(
-            f"Plain-text mention candidates "
-            f"(>= {min_mentions} mentions, >= {min_pages} pages, top {top}):"
-        )
-        print(f"Total existing pages indexed (excluded): {indexed}")
-        for c in candidates:
-            sample = ", ".join(c["sample_pages"])
-            print(f"  [{c['mentions']:4d}/{c['page_count']:3d}p]  {c['token']}")
-            print(f"      e.g. {sample}")
+    print(
+        f"Plain-text mention candidates "
+        f"(>= {min_mentions} mentions, >= {min_pages} pages, top {top}):"
+    )
+    print(f"Total existing pages indexed (excluded): {indexed}")
+    for c in candidates:
+        sample = ", ".join(c["sample_pages"])
+        print(f"  [{c['mentions']:4d}/{c['page_count']:3d}p]  {c['token']}")
+        print(f"      e.g. {sample}")
     return 0

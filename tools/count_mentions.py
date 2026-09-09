@@ -55,7 +55,11 @@ def run(term: str, claimant_only: bool) -> int:
             cluster = sa.get(f"sources/{fp.name}", {}).get("primary", "?")
             hits.append((fp.stem, cluster))
 
-    clusters = sorted({c for _, c in hits})
+    # "?" marks a source with no cluster assignment. It is printed per-hit for
+    # visibility but must not count toward the >=2-cluster half of the stub
+    # threshold — two unassigned sources plus one real cluster is one cluster,
+    # not two, and this verdict gates entity creation (CLAUDE.md reviewer gate).
+    clusters = sorted({c for _, c in hits if c != "?"})
     scope = " [claimant lines only]" if claimant_only else ""
     print(f"'{term}': {len(hits)} real source(s){scope}  (auto-generated `_` excluded)")
     for stem, c in sorted(hits):

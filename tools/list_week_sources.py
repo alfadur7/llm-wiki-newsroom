@@ -25,7 +25,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 # _lib import also reconfigures stdout/stderr to UTF-8 (Windows cp949 console).
-from _lib import WIKI, parse_frontmatter, real_source_files  # noqa: E402
+from _lib import parse_frontmatter, real_source_files  # noqa: E402
 
 _WEEK_RE = re.compile(r"^(\d{4})-[Ww](\d{1,2})$")
 

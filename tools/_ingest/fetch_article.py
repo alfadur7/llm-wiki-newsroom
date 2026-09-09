@@ -24,7 +24,7 @@ import re
 from pathlib import Path
 from datetime import date
 from typing import Callable
-from urllib.parse import urlparse, parse_qs, unquote, urljoin
+from urllib.parse import urlparse, parse_qs, unquote, urljoin, urlunparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -87,8 +87,11 @@ def _chosun_amp(url: str) -> str:
     parsed = urlparse(url)
     if "outputType=amp" in (parsed.query or ""):
         return url
-    sep = "&" if parsed.query else "?"
-    return url + sep + "outputType=amp"
+    # Rebuild through the parsed parts: string concatenation appended the param
+    # after any `#fragment`, putting it inside the fragment where the server
+    # never sees it.
+    query = f"{parsed.query}&outputType=amp" if parsed.query else "outputType=amp"
+    return urlunparse(parsed._replace(query=query))
 
 
 def _naver_link_bridge_expand(url: str) -> str | None:
@@ -618,7 +621,7 @@ description: "{_yaml_safe_string(description)}"
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python tools/_ingest/fetch_article.py <url> [output_filename]")
+        print("Usage: python tools/_ingest/fetch_article.py <url>")
         sys.exit(1)
 
     url = unwrap_share_wrapper(sys.argv[1])
@@ -680,7 +683,10 @@ def main():
     print(f"Title: {title}")
     print(f"Content: {len(content):,} chars")
 
-    fpath = save_markdown(url, title, description, content)
+    # final_url, not url: fetch_html resolves redirects and fallback variants
+    # (and the line above prints when they differ), so `source_url` in the
+    # saved frontmatter must be the URL the content actually came from.
+    fpath = save_markdown(final_url, title, description, content)
     print(f"Saved: {fpath}")
 
 

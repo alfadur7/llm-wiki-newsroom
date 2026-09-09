@@ -441,8 +441,14 @@ def _run_group(group: str, args: argparse.Namespace) -> int:
         print("=" * 72)
         print(f"[{label}]  python tools/lint.py {disp}   (informational — does not affect pass/fail)")
         print("=" * 72)
-        fn(**_kwargs_for(accepted, args))
+        rc = fn(**_kwargs_for(accepted, args))
         print()
+        # An informational sub's advisory codes (0/1) stay advisory, but its
+        # usage code (2 — e.g. a missing build artifact) means the check never
+        # ran. Discarding it reports a false pass to anything gating on this
+        # invocation's exit status.
+        if rc == 2:
+            overall = 2
 
     return overall
 
@@ -499,8 +505,18 @@ def _run_all(args: argparse.Namespace) -> int:
         print("=" * 72)
         print(f"[{label}]  python tools/lint.py {disp}   (informational — does not affect pass/fail)")
         print("=" * 72)
-        fn(**_kwargs_for(accepted, args))
+        rc = fn(**_kwargs_for(accepted, args))
         print()
+        # An informational sub's advisory codes (0/1) stay advisory, but its
+        # usage code (2 — e.g. a missing build artifact) means the check never
+        # ran. Discarding it reports a false pass to anything gating on this
+        # invocation's exit status.
+        if rc == 2:
+            overall = 2
+
+    if overall == 2:
+        print("Overall: ERROR — an informational sub could not run "
+              "(see stderr above); the earlier \"Overall\" line predates it.")
 
     return overall
 

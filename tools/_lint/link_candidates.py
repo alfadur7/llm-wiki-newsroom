@@ -106,18 +106,12 @@ def _find(
     return results
 
 
-def run(*, json_out: bool = False,
-        min_seeds: int = DEFAULT_MIN_SEEDS,
+def run(*, min_seeds: int = DEFAULT_MIN_SEEDS,
         top: int = DEFAULT_TOP_RESULTS) -> int:
+    # No json_out parameter: `suggestions.run` is the only caller and it
+    # renders the combined JSON document itself (one doc, not two
+    # concatenated ones), returning before it reaches this function.
     results = _find(min_seeds=min_seeds)
-
-    if json_out:
-        print(json.dumps(
-            {"min_seeds": min_seeds, "results": results},
-            ensure_ascii=False,
-            indent=2,
-        ))
-        return 0 if not results else 1
 
     print(
         f"Cross-cutting concept candidates "

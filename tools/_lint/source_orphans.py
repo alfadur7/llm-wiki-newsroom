@@ -36,6 +36,7 @@ from _lib import (  # noqa: E402
     FRONTMATTER_BLOCK_RE,
     WIKILINK_TARGET_RE as LINK_RE,
     atomic_write_text,
+    fm_sources,
     parse_frontmatter,
     read_text_cached,
     real_source_files,
@@ -49,7 +50,9 @@ HUB_SUBDIRS = ("entities", "concepts", "syntheses", "trails", "timelines")
 
 SOURCES_KEY_RE = re.compile(r"^sources:")
 BLOCK_ITEM_RE = re.compile(r"^[ \t]*-\s+")
-CONN_RE = re.compile(r"## Connections\n(.*?)(?=\n## |\Z)", re.DOTALL)
+# Anchored to line start: unanchored, `## Connections` also matched inside a
+# `### Connections` subheading and returned that subsection instead.
+CONN_RE = re.compile(r"^## Connections\n(.*?)(?=\n## |\Z)", re.DOTALL | re.MULTILINE)
 
 _SLUG_TOKEN_RE = re.compile(r"[-_]+")
 
@@ -100,12 +103,9 @@ def _hub_sources(text: str) -> list[str]:
     parser, so inline (`[a, b]`) AND block (`- a` lines) forms both resolve.
     The previous inline-only reader silently saw a block-style list as empty,
     hiding those sources from detection (and risking corruption on rewrite)."""
-    val = parse_frontmatter(text).get("sources")
-    if isinstance(val, list):
-        return [s for s in val if isinstance(s, str) and s]
-    if isinstance(val, str) and val:
-        return [val]
-    return []
+    # Delegates to the shared normalizer: the local version returned a scalar
+    # `sources: a, b` as the single item "a, b" instead of splitting it.
+    return fm_sources(parse_frontmatter(text))
 
 
 def _format_list(items: list[str]) -> str:

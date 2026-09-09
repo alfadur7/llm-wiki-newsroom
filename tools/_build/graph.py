@@ -59,6 +59,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from _lib import (  # noqa: E402
     GRADE_MARKER_RE,
     GRAPH_JSON,
+    H2_RE as _H2_RE,
     HUB_PREFIXES,
     WIKI,
     WIKILINK_STEM_RE,
@@ -80,7 +81,6 @@ ROOT_META = {
 # them here drops both their nodes and their meta→member edges from
 # _graph.json.
 META_NODE_TYPES = {"overview", "contradiction", "synthesis", "timeline", "trail"}
-BASE_NODE_TYPES = {"source", "entity", "concept"}
 
 
 def _title_and_type(content: str) -> tuple[str, str]:
@@ -98,7 +98,6 @@ _ANY_LINK_RE = WIKILINK_STEM_RE
 # H2 section header at line start. Used to slice each file into
 # (start, end, section_title) spans so each wikilink can be tagged with
 # the relation_type implied by its enclosing section.
-_H2_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
 
 # Priority order for resolving multiple sections referencing the same target
 # within a single source file. Higher = wins.

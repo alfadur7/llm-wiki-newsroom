@@ -6,8 +6,8 @@ Produces `wiki-export/` with three categories of files:
     overview.md, contradiction.md, index.md — one-to-one copies from wiki/.
 
   Sub-folder merges
-    all-overviews.md, all-contradictions.md, all-concepts.md, all-entities.md,
-    all-timelines.md, all-syntheses.md, all-trails.md — each merges every
+    all-overviews.md, all-contradictions.md, all-timelines.md,
+    all-syntheses.md, all-trails.md — each merges every
     regular page in the matching sub-folder (underscore-prefixed files skipped).
 
   Source locator index (hub-centric RAG)
@@ -31,11 +31,10 @@ from collections import defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from _lib import BASE_URL, GRAPH, REPO_ROOT, STANDALONE_SLUG, WIKI, deeplink_key, graph_deeplink_base, korean_mode, parse_page_meta, reject_args  # noqa: E402
+from _lib import BASE_URL, CLUSTERS_JSON, GRAPH, REPO_ROOT, STANDALONE_SLUG, WIKI, deeplink_key, graph_deeplink_base, korean_mode, parse_page_meta, reject_args  # noqa: E402
 from _export.site import stage_site  # noqa: E402
 
 OUT = REPO_ROOT / 'wiki-export'
-CLUSTERS_JSON = GRAPH / '_clusters.json'
 
 ROOT_META = ['overview.md', 'contradiction.md', 'index.md']
 
@@ -192,8 +191,17 @@ _FILE_DESC: dict[str, tuple[str, str]] = {
 def _file_structure_table() -> str:
     names = ROOT_META + [out for _, out in FOLDER_MERGES] + ['all-sources-index.md']
     rows = ['| File | Content | Use |', '|---|---|---|']
+    # The two graph rows describe deep-links, which do not exist when BASE_URL
+    # is unset — the same condition that omits the deep-link convention section.
+    graph = bool(graph_deeplink_base())
     for n in names:
         content, use = _FILE_DESC.get(n, ('—', '—'))
+        if not graph:
+            content = content.replace(' (one line + deep-link)', ' (one line each)')
+            use = (use.replace('What exists + starting point for graph deep-links',
+                               'What exists')
+                      .replace('Which originals exist + obtain the deep-link slug',
+                               'Which originals exist'))
         rows.append(f'| {n} | {content} | {use} |')
     return '\n'.join(rows)
 
@@ -254,16 +262,21 @@ def _budget_guide() -> str:
     ~200K project context, hence the tiering."""
     core, optional = _partition_tiers()
     core_total = sum(_est_tokens(n) for n in core)
-    if core_total <= _CONTEXT_LIMIT:
+    # `_partition_tiers` fills Core only while it stays under the limit, so
+    # core_total can never exceed it — the old over-budget branch was dead.
+    # What it was reaching for is an EMPTY core: when even the top-priority
+    # file alone is over the limit it goes to Optional, and the surviving
+    # branch then announced '~0 tok, within the limit'.
+    if not core:
+        core_status = (
+            '**Core — empty: even the highest-priority file alone exceeds the '
+            '~{:,} token limit, so nothing fits. The corpus needs to be trimmed:**'
+            .format(_CONTEXT_LIMIT)
+        )
+    else:
         core_status = (
             '**Core — upload these first (total ~{:,} tok, within the ~{:,} limit):**'
             .format(core_total, _CONTEXT_LIMIT)
-        )
-    else:
-        # Only reachable if the single top-priority file alone exceeds the limit.
-        core_status = (
-            '**Core — even the single highest-priority file alone totals ~{:,} tok, '
-            'over the limit (~{:,}). The corpus needs to be trimmed:**'.format(core_total, _CONTEXT_LIMIT)
         )
     lines = [
         '## Upload Guide (Context Budget)\n',
@@ -284,7 +297,9 @@ def _budget_guide() -> str:
         lines.append(f'- `{n}` (~{_est_tokens(n):,} tok)')
     lines.append(
         '\nEntity/concept bodies and source originals are not in the RAG corpus at '
-        'all (graph-only). If a question triggers a "context limit exceeded" error, '
+        'all'
+        + (' (graph-only)' if graph_deeplink_base() else ' (they live only in the wiki)')
+        + '. If a question triggers a "context limit exceeded" error, '
         'trim the Optional files first.\n'
     )
     return '\n'.join(lines)
@@ -316,20 +331,31 @@ def _write_export_readme() -> str:
         + (' (Re-paste whenever `BASE_URL` changes.)\n' if has_graph else '\n'),
 
         '## Project Knowledge File Structure\n',
-        'This project runs on **two tiers** — the RAG corpus (the synthesis and '
-        'directory files uploaded here) synthesizes the answer, and the original '
-        'detail is served by the graph browser (deep-links). Individual entity/concept '
-        'bodies and source originals are **not in the RAG corpus**: the corpus would '
-        'exceed the context limit, and the full text all lives as nodes in the graph. '
-        '`index.md` is the directory holding every entity/concept as a one-line '
-        'description + deep-link. The count on the first line of each file reflects '
-        'the latest status.\n',
+        ('This project runs on **two tiers** — the RAG corpus (the synthesis and '
+         'directory files uploaded here) synthesizes the answer, and the original '
+         'detail is served by the graph browser (deep-links). Individual entity/concept '
+         'bodies and source originals are **not in the RAG corpus**: the corpus would '
+         'exceed the context limit, and the full text all lives as nodes in the graph. '
+         '`index.md` is the directory holding every entity/concept as a one-line '
+         'description + deep-link. The count on the first line of each file reflects '
+         'the latest status.\n'
+         if has_graph else
+         'This project runs on the RAG corpus alone — the synthesis and directory '
+         'files uploaded here. Individual entity/concept bodies and source originals '
+         'are **not in the RAG corpus** (it would exceed the context limit) and no '
+         'graph browser is published, so they cannot be linked to. `index.md` is the '
+         'directory holding every entity/concept as a one-line description. The count '
+         'on the first line of each file reflects the latest status.\n'),
         _file_structure_table() + '\n',
-        '**Detail is in the graph**: when you need the full content, quotes, '
-        'connections, or backlinks of a specific entity/concept/source, find the key '
-        'in the corresponding entry of `index.md` / `all-sources-index.md` or in a '
-        'wikilink of the synthesis body, and build a graph deep-link (convention '
-        'below).\n',
+        ('**Detail is in the graph**: when you need the full content, quotes, '
+         'connections, or backlinks of a specific entity/concept/source, find the key '
+         'in the corresponding entry of `index.md` / `all-sources-index.md` or in a '
+         'wikilink of the synthesis body, and build a graph deep-link (convention '
+         'below).\n'
+         if has_graph else
+         '**Detail is not uploaded**: when you need the full content, quotes, '
+         'connections, or backlinks of a specific entity/concept/source, name the '
+         'page in `[[page title]]` form so the reader can open it in the wiki.\n'),
 
         _budget_guide(),
 
@@ -338,27 +364,36 @@ def _write_export_readme() -> str:
          if korean_mode() else
          '1. Answer **in English**.\n') +
         '2. Exploration order: `overview` · `contradiction` · `all-overviews` '
-        '(context · synthesis) → `index` (what exists · deep-link starting point) → '
-        '`all-syntheses` · `all-contradictions` (in-depth) → detail via graph deep-link.\n'
-        '3. Build the answer body from the synthesis layer (overview, synthesis, '
+        '(context · synthesis) → `index` (what exists'
+        + (' · deep-link starting point' if has_graph else '') + ') → '
+        '`all-syntheses` · `all-contradictions` (in-depth) → '
+        + ('detail via graph deep-link.\n' if has_graph
+           else 'detail by naming the page.\n')
+        + '3. Build the answer body from the synthesis layer (overview, synthesis, '
         'contradiction, etc.) and `index`. Entity/concept/source detail is not in the '
-        'RAG corpus, so send the reader to the graph deep-link.\n'
-        f'4. {cite_rule}\n'
+        'RAG corpus, so '
+        + ('send the reader to the graph deep-link.\n' if has_graph
+           else 'name the page in `[[page title]]` form.\n')
+        + f'4. {cite_rule}\n'
         '5. **Wiki first, verify and supplement with the web when needed.** Build the '
-        'answer from the wiki (synthesis layer + graph) first, but for (a) content not '
+        'answer from the wiki ('
+        + ('synthesis layer + graph' if has_graph else 'synthesis layer')
+        + ') first, but for (a) content not '
         'in the wiki, (b) information that may have gone stale with time (recent events, '
         'changing figures, current officeholders, prices, etc.), or (c) cases where a '
         'key claim needs fact-checking, **verify with web search and fill the gaps** '
         '(the web-search tool must be enabled). The wiki is an accumulation up to a '
         'certain point in time, so the latest trends may need web supplementation.\n'
-        '6. **Distinguish your sources** — mark wiki-based content with graph deep-links '
-        'and web-search-based content with that web source\'s link, so it is clear where '
+        '6. **Distinguish your sources** — mark wiki-based content with '
+        + ('graph deep-links ' if has_graph else '`[[page title]]` citations ')
+        + 'and web-search-based content with that web source\'s link, so it is clear where '
         'each came from. When the wiki and the web disagree, present both with their '
         'timestamps. If neither the wiki nor the web confirms something, state it as '
         '"unverifiable".\n'
         '7. When sources contradict each other, present both sides.\n'
         '8. Answer concisely, but when detail is requested, include the relevant '
-        'original-source deep-links.\n',
+        + ('original-source deep-links.\n' if has_graph
+           else 'original-source page titles.\n'),
     ]
     protocol = _deeplink_protocol()
     if protocol:
@@ -373,6 +408,12 @@ def _write_export_readme() -> str:
         '- Use each entity/concept title verbatim as the deep-link `#q=` key '
         '(English TitleCase by default, e.g. Microsoft; a non-Latin-script title '
         'is used as-is when the entity has no standard Latin form).\n'
+        if has_graph else
+        '## Wiki Structure Notes\n\n'
+        '- entity/concept entries in `index.md`: `title — one-line description`.\n'
+        '- In synthesis bodies (overview, synthesis, etc.), the target of a '
+        '`[[title]]` / `[[slug|alias]]` wikilink is the entity/concept title or '
+        'source slug — cite it verbatim.\n'
     )
     name = 'README.md'
     (OUT / name).write_text('\n'.join(parts), encoding='utf-8')
@@ -505,7 +546,8 @@ def main() -> int:
     opt_tok = sum(_est_tokens(n) for n in optional)
     print(f'  RAG budget (est.): core ~{core_tok:,} tok ({len(core)} files), '
           f'optional ~{opt_tok:,} tok ({len(optional)} files) '
-          f'(Claude.ai limit ~{_CONTEXT_LIMIT // 1000}K, entity/concept bodies not generated = graph-only)')
+          f'(Claude.ai limit ~{_CONTEXT_LIMIT // 1000}K, entity/concept bodies not generated'
+          + (' = graph-only)' if graph_deeplink_base() else ', wiki-only)'))
     print(f'    core auto-selected: {", ".join(core)}')
 
     # Stage the hosted graph browser into _site/ with obscured filenames

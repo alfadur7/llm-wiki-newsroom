@@ -41,6 +41,7 @@ from _lib import (  # noqa: E402
     WIKI as wiki,
     CLUSTERS_JSON,
     GRAPH_JSON,
+    REPO_ROOT,
     WIKILINK_STEM_RE,
     atomic_write_if_changed,
     atomic_write_text,
@@ -106,7 +107,12 @@ def _sync_source_url(content: str, current_url: str, raw_url: str) -> tuple[str,
 
 
 def _extract_raw_url(raw_path: str) -> str | None:
+    # Frontmatter carries repo-relative paths, so anchor them to REPO_ROOT.
+    # Resolving against the process cwd made this silently return None
+    # whenever build.py ran from anywhere but the repo root.
     p = Path(raw_path)
+    if not p.is_absolute():
+        p = REPO_ROOT / p
     if not p.exists():
         return None
     try:

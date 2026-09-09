@@ -32,6 +32,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))  # _ingest/ → tools/ root (shared modules)
 from _lib import (  # noqa: E402
+    REPO_ROOT,
     WIKI,
     WIKILINK_STEM_RE,
     strip_frontmatter,
@@ -277,9 +278,12 @@ def scan_one(
         if c["count"] >= tiered_min_count(c["stem"], min_count)
     ]
     try:
-        rel = str(path.resolve().relative_to(Path.cwd().resolve()))
+        # REPO_ROOT-relative POSIX, like every sibling emitter: cwd-relative
+        # output changed with the caller's directory, and str(Path) emits
+        # backslashes on Windows.
+        rel = path.resolve().relative_to(REPO_ROOT).as_posix()
     except ValueError:
-        rel = str(path)
+        rel = path.as_posix()
     return {"file": rel, "unlinked": candidates}
 
 

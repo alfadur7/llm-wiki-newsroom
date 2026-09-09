@@ -43,7 +43,7 @@ def test_send_bcc_hides_recipients(monkeypatch):
     captured = {}
 
     class FakeSMTP:
-        def __init__(self, host, port):
+        def __init__(self, host, port, timeout=None):  # mirrors smtplib.SMTP
             pass
 
         def __enter__(self):

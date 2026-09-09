@@ -18,6 +18,7 @@ from email.utils import formataddr
 
 SMTP_HOST = "smtp.gmail.com"
 SMTP_PORT = 587
+SMTP_TIMEOUT = 30  # seconds
 
 # Invisible characters that str.strip() cannot remove — if they leak in from a
 # secret/address saved as UTF-8-BOM, they cause an ascii encoding error at the
@@ -63,7 +64,10 @@ def send(subject: str, html: str, text: str, recipients: list[str]) -> None:
     msg.attach(MIMEText(text, "plain", "utf-8"))
     msg.attach(MIMEText(html, "html", "utf-8"))
 
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
+    # Explicit timeout: without it smtplib inherits the global socket default
+    # (None = block forever), so an unattended send hangs instead of raising
+    # into the caller's error handling.
+    with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=SMTP_TIMEOUT) as smtp:
         smtp.starttls(context=ssl.create_default_context())
         smtp.login(user, password)
         smtp.sendmail(user, recipients, msg.as_string())

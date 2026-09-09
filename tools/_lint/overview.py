@@ -1065,6 +1065,8 @@ def _path_has_git_history(path: Path) -> bool:
     try:
         result = subprocess.run(
             ["git", "log", "--oneline", "--", str(path)],
+            cwd=_REPO_ROOT,  # else git resolved the pathspec against the
+            # process cwd and returned empty, silently suppressing the warning
             capture_output=True, timeout=5, check=False,
         )
         stdout = (result.stdout or b"").decode("utf-8", errors="replace")
@@ -1114,7 +1116,13 @@ def _execute_overview_plan(
         print(f"  + created overviews/{slug}.md (skeleton from _clusters.json)")
     actually_deleted: list[str] = []
     for slug in deletes:
-        path = safe_slug_path(OVERVIEWS_DIR, slug)
+        # Same as contradiction.py: `deletes` is derived from on-disk filenames,
+        # which are not guaranteed kebab-case.
+        try:
+            path = safe_slug_path(OVERVIEWS_DIR, slug)
+        except ValueError as e:
+            print(f"  ! skipped delete of overviews/{slug}.md — {e}")
+            continue
         if path.exists():
             path.unlink()
             actions += 1

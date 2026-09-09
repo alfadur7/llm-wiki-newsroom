@@ -130,7 +130,10 @@ def run(json_out: bool = False, top: int | None = None) -> int:
         return 1
     results, k, excluded = res
     if not results:
-        print("No hubs in graph.", file=sys.stderr)
+        # Empty is not the same as hub-less: every hub can be an isolate (removed
+        # above, counted in `excluded`) or fall under the deg<3 floor.
+        print(f"No qualifying hubs (0 of {excluded} isolated hub(s) excluded; "
+              f"the rest fall under the minimum-degree floor).", file=sys.stderr)
         return 1
 
     if json_out:

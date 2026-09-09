@@ -353,4 +353,9 @@ def wayback_snapshot(url: str, *, timeout: int = 15) -> str | None:
     m = re.search(r"/web/(\d+)/", snap_url)
     if m:
         snap_url = snap_url.replace(f"/web/{m.group(1)}/", f"/web/{m.group(1)}id_/", 1)
-    return snap_url.replace("http://", "https://", 1)
+    # Anchored: the unanchored form rewrote the *archived target* URL embedded
+    # in the path (`/web/<ts>id_/http://example.com/…`) whenever the wrapper was
+    # already https, which is the normal case.
+    if snap_url.startswith("http://"):
+        snap_url = "https://" + snap_url[len("http://"):]
+    return snap_url

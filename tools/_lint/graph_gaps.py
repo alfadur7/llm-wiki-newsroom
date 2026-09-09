@@ -49,7 +49,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import parse_frontmatter, read_text_cached, WIKILINK_RE, WIKI, CLUSTERS_JSON, GRAPH_JSON, HUB_PREFIXES, fm_sources  # noqa: E402
+from _lib import parse_frontmatter, read_text_cached, WIKILINK_STEM_RE as WIKILINK_RE, WIKI, CLUSTERS_JSON, GRAPH_JSON, HUB_PREFIXES, fm_sources  # noqa: E402
 
 GRAPH_PATH = GRAPH_JSON
 CLUSTERS_PATH = CLUSTERS_JSON
@@ -385,7 +385,7 @@ def detect_contradiction(themes_data: dict) -> dict:
         # Latest mapped source last_updated — best-effort: scan source files
         # listed in theme MD `sources:` frontmatter (cheap, mostly cached).
         latest_src = None
-        for src_path in (fm.get("sources") or []):
+        for src_path in fm_sources(fm):
             if src_path in _src_lu_cache:
                 d = _src_lu_cache[src_path]
             else:
@@ -493,7 +493,7 @@ def detect_timeline_coverage(hub_fm: dict[str, dict]) -> list[dict]:
         stem = Path(node_id).stem
         if stem in existing:
             continue
-        nsrc = len(fm.get("sources") or [])
+        nsrc = len(fm_sources(fm))
         if nsrc < TIMELINE_SOURCES_FLOOR:
             continue
         events = _timeline_section_events(node_id)

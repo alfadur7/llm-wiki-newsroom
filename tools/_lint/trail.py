@@ -28,7 +28,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from _lib import WIKI, MARKUP_LEAK_RE, atomic_write_text, cli_slug_path, parse_frontmatter, read_text_cached, section_body, strip_code, strip_frontmatter  # noqa: E402
 sys.path.insert(0, str(Path(__file__).parent))  # tools/_lint/ — sibling import
-from _advisory_common import L1_MIN_SLUG_LEN, L1_RAW_SLUG_RE, iter_md, mark as _mark, print_rewrite_block  # noqa: E402
+from _advisory_common import L1_RAW_SLUG_RE, iter_md, mark as _mark, print_rewrite_block  # noqa: E402
 
 TRAILS_DIR = WIKI / "trails"
 

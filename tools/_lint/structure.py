@@ -299,8 +299,19 @@ def run(fix: bool = False) -> int:
             page_part, _, anchor_part = target.partition("#")
             page_part = page_part.rstrip("\\").strip()
             anchor_part = anchor_part.rstrip("\\").strip()
+            if not page_part:
+                # Same-page anchor (`[[#Heading]]`): there is no target page, so
+                # it must not enter `forward` — the empty string was counted as a
+                # missing target and surfaced as a nameless entity candidate.
+                if anchor_part:
+                    if stem not in headings_cache:
+                        headings_cache[stem] = _extract_headings(raw)
+                    if anchor_part not in headings_cache[stem]:
+                        rel = path.relative_to(WIKI).as_posix()
+                        broken_anchors[rel].append(f"#{anchor_part}")
+                continue
             forward[stem].add(page_part)
-            if page_part and page_part not in all_pages:
+            if page_part not in all_pages:
                 broken[f"{path.relative_to(WIKI).as_posix()}"].append(target)
                 continue
             if anchor_part and page_part in all_pages:

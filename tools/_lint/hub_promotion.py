@@ -175,8 +175,12 @@ def run(fix: bool = False) -> int:
         )
         return 1
 
+    # `all_person` is a separate list: reporting "0 candidates" right after
+    # printing a person triage list contradicted the output above it.
+    person_note = f" · {len(all_person)} person triage entr(ies) above" if all_person else ""
     print(
-        f"OK - L2-2 hub promotion: 0 promotion candidates ({total} entity+concept files{resolved_note})"
+        f"OK - L2-2 hub promotion: 0 promotion candidates "
+        f"({total} entity+concept files{resolved_note}){person_note}"
     )
     return 0
 

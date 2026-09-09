@@ -41,7 +41,7 @@ from datetime import date as _date, datetime as _datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import AUTO_BLOCK_RE, CLUSTERS_JSON, REPO_ROOT, WIKI, WIKILINK_TARGET_RE, atomic_write_text, confirm_changes, parse_frontmatter, print_delete_cleanup_advisory, read_source_date, real_source_files, safe_slug_path, section_body, slug_only, strip_frontmatter  # noqa: E402
+from _lib import AUTO_BLOCK_RE, CLUSTERS_JSON, REPO_ROOT, fm_sources, WIKI, WIKILINK_TARGET_RE, atomic_write_text, confirm_changes, parse_frontmatter, print_delete_cleanup_advisory, read_source_date, real_source_files, safe_slug_path, section_body, slug_only, strip_frontmatter  # noqa: E402
 from _advisory_common import mark  # noqa: E402
 from _manifest_counts import _load_manifest, counts as _roster_counts, threshold_label  # noqa: E402
 
@@ -526,10 +526,12 @@ def _rubric_metrics(
     # moved (verbatim) to the scholarly-citation skill. Shared parsing
     # (claim_sources·evidence_slugs) and wiki-wide (sources_dir) are injected by the orchestrator.
     fm = parse_frontmatter(content)
-    fm_sources = fm.get("sources") or []
+    # _lib.fm_sources, not a raw .get: a scalar `sources: a, b` is a string, and
+    # iterating it yields characters. (The local name shadowed the helper.)
+    fm_source_list = fm_sources(fm)
     _cit_contra = getattr(cit_skill, _CIT_CONTRA_FN)(
         body,
-        fm_sources=fm_sources,
+        fm_sources=fm_source_list,
         claim_sources=claim_sources,
         evidence_slugs=evidence_slugs,
         source_slugs=source_slugs,
@@ -1160,7 +1162,8 @@ def _check_contradictions_md(
     return issues, metrics_lines
 
 
-def _emit_rewrite_block_aggregate(claim_count: int, theme_count: int) -> None:
+def _emit_rewrite_block_aggregate(claim_count: int, theme_count: int,
+                                  non_fragmentary_theme_count: int) -> None:
     """Print the Claude rewrite instruction block for `wiki/contradiction.md`.
 
     Parallels `_emit_rewrite_block` (theme-level) but targets the L2-4
@@ -1175,6 +1178,7 @@ def _emit_rewrite_block_aggregate(claim_count: int, theme_count: int) -> None:
     print("=" * 72)
     print("Target: wiki/contradiction.md (L2-4 aggregate contradictions)")
     print(f"Current JSON SoT: claims={claim_count} · themes={theme_count} (non-fragmentary + other-fragmentary)")
+    print(f"F2 head-matter figure: `{non_fragmentary_theme_count} topic clusters` (non-fragmentary only — NOT {theme_count})")
     print()
     print("Execution order (Claude):")
     print("  1. Read .claude/layers/contradiction.md → Part 2 (Aggregate Rubric)")
@@ -1184,7 +1188,7 @@ def _emit_rewrite_block_aggregate(claim_count: int, theme_count: int) -> None:
     print(f"  5. Read all {theme_count} theme MDs (`wiki/contradictions/<theme>.md`) — gather bottom-up consolidation material centered on each `## Opposing Positions`·`## Interpretive Direction`")
     print("  6. Decide whether to keep the tension axes — keep the current axes named in `## Per-Theme Deep Analysis` by default. Only check whether the themes can be placed, and redesign the axes only when 2+ themes don't fit the existing axes")
     print("  7. Authoring Guide Part 2 → perform execution step 6 (rewrite the whole file with the Write tool · no frontmatter, starting from `# Contradictions by Topic`)")
-    print("  8. Match head-matter statistics to SoT: `**N source-to-source contradictions**`·`M topic clusters` (F2 criterion · use the current JSON claims/themes values as-is)")
+    print(f"  8. Match head-matter statistics to SoT: `**{claim_count} source-to-source contradictions**`·`{non_fragmentary_theme_count} topic clusters` (F2 criterion — the theme figure excludes `other-fragmentary`; writing {theme_count} here is an F2 FAIL)")
     print("  9. Re-run `python tools/lint.py contradiction aggregate` → check Rubric L2-4 metrics")
     p2 = _roster_counts("contradiction-aggregate")
     print(f" 10. Iterate until {threshold_label(p2)} is achieved")
@@ -1355,7 +1359,14 @@ def _execute_mapping_plan(
         print(f"  + created contradictions/{slug}.md (skeleton from _contradictions_themes.json)")
     actually_deleted: list[str] = []
     for slug in deletes:
-        target = safe_slug_path(CONTRADICTIONS_DIR, slug)
+        # `deletes` comes from filenames on disk, so it can carry a name that is not
+        # kebab-case; safe_slug_path raises on those. Report and skip instead of
+        # aborting the whole --fix pass with a traceback.
+        try:
+            target = safe_slug_path(CONTRADICTIONS_DIR, slug)
+        except ValueError as e:
+            print(f"  ! skipped delete of contradictions/{slug}.md — {e}")
+            continue
         if target.exists():
             target.unlink()
             actions += 1
@@ -1698,9 +1709,12 @@ def run(target: str | None = None, fix: bool = False, auto_yes: bool = False) ->
     # invocation" principle from CLAUDE.md (`/wiki-lint --fix` / `all --fix`
     # never triggers a Claude rewrite; only `/wiki-lint contradiction <target> --fix` does).
     if fix and scope == "aggregate":
+        _all_slugs = list(themes_doc.get("themes", {}))
         _emit_rewrite_block_aggregate(
             claim_count=len(claims),
-            theme_count=len(themes_doc.get("themes", {})),
+            theme_count=len(_all_slugs),
+            non_fragmentary_theme_count=sum(
+                1 for s in _all_slugs if s != "other-fragmentary"),
         )
     elif fix and only_theme is not None:
         _emit_rewrite_block(only_theme, themes_doc)

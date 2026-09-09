@@ -33,6 +33,24 @@ ASSETS = ["graph.json", "clusters.json", "overlays.json", "pages.json"]
 ROBOTS_META = '<meta name="robots" content="noindex,nofollow">'
 
 
+def _prune_stale(out_dir: Path, slug: str) -> list[str]:
+    """Remove assets from a previous slug. Only the exact shapes this module
+    writes (`<slug>.html` and `<slug>-<asset>`) are considered, so anything
+    else the deploy directory carries (CNAME, _headers, ...) is left alone.
+    """
+    removed = []
+    for p in out_dir.iterdir():
+        if not p.is_file() or p.name.startswith(f"{slug}.") or p.name.startswith(f"{slug}-"):
+            continue
+        mine = p.suffix == ".html" or any(p.name.endswith(f"-{a}") for a in ASSETS)
+        if mine:
+            p.unlink()
+            removed.append(p.name)
+    for name in removed:
+        print(f"  - pruned stale asset: {name}")
+    return removed
+
+
 def stage_site(out_dir: Path, slug: str) -> list[tuple[str, int]]:
     """Write <slug>.html + <slug>-{graph,clusters,overlays,pages}.json into out_dir.
 
@@ -45,6 +63,10 @@ def stage_site(out_dir: Path, slug: str) -> list[tuple[str, int]]:
                 f"{p} missing — run `python tools/build.py` before export"
             )
     out_dir.mkdir(parents=True, exist_ok=True)
+    # Drop a previous build's assets. The slug is an access control (an
+    # unguessable prefix), so rotating it is the revocation step — leaving the
+    # old <slug>.html and its JSONs in place left the leaked URL serving.
+    _prune_stale(out_dir, slug)
 
     shell = SHELL.read_text(encoding="utf-8")
     # Inject noindex + asset prefix where the deferred module can read them

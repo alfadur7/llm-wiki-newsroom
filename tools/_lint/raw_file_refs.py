@@ -76,7 +76,14 @@ def _tokens(s: str) -> set[str]:
     trailing `md`/`pdf` extension token so ".md" itself is not a token."""
     folded = normalize_quotes(s)
     folded = _TOKEN_SPLIT_RE.sub(" ", folded)
-    return {t for t in folded.split() if t and t.lower() not in {"md", "pdf"}}
+    # The extension stays glued to its token (`foo.md`), so filtering a bare
+    # "md"/"pdf" token never fired. Strip the suffix per token instead.
+    out = set()
+    for t in folded.split():
+        t = t.removesuffix(".md").removesuffix(".pdf")
+        if t and t.lower() not in {"md", "pdf"}:
+            out.add(t)
+    return out
 
 
 def _jaccard(a: set[str], b: set[str]) -> float:

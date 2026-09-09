@@ -186,7 +186,10 @@ def _apply_auto_fix(path: Path, fm: dict, expected_type: str) -> tuple[bool, lis
     # Legacy section heading (ko-mode): rewrite the legacy `## 위키 연결` heading
     # to the canonical Connections form (CLAUDE.md canonical form). Deterministic
     # body fix — only affects the heading line; body content is preserved verbatim.
-    if korean_mode() and SECTION_LEGACY_YEONGYEOL_RE.search(new_content):
+    # Only when the canonical heading is absent: rewriting the legacy heading
+    # on a page that already carries `## Connections` produced a duplicate.
+    if (korean_mode() and SECTION_LEGACY_YEONGYEOL_RE.search(new_content)
+            and not re.search(r"^##\s+Connections\s*$", new_content, re.MULTILINE)):
         new_content = SECTION_LEGACY_YEONGYEOL_RE.sub("## Connections", new_content)
         actions.append("## 위키 연결 → ## Connections (legacy heading normalized)")
 

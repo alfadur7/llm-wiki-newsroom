@@ -18,9 +18,9 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import FRONTMATTER_BLOCK_RE, REPO_ROOT, WIKI, WIKILINK_ANY_RE, parse_frontmatter, read_text_cached, real_source_files, strip_code, strip_frontmatter  # noqa: E402
+from _lib import FRONTMATTER_BLOCK_RE, H2_RE, REPO_ROOT, cli_slug_path, WIKI, WIKILINK_ANY_RE, parse_frontmatter, read_text_cached, real_source_files, strip_code, strip_frontmatter  # noqa: E402
 sys.path.insert(0, str(Path(__file__).parent))
-from _advisory_common import L1_MIN_SLUG_LEN, L1_RAW_SLUG_RE, mark  # noqa: E402
+from _advisory_common import L1_RAW_SLUG_RE, mark  # noqa: E402
 
 import importlib.util as _ilu  # noqa: E402
 import json as _json  # noqa: E402
@@ -151,7 +151,6 @@ W1_MIN_LINKS = 5
 # L1 (raw kebab-case slug exposure) constants live in _advisory_common (shared with synthesis·trail).
 
 # Section header detector.
-H2_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
 
 # Wikilink (any) — captures inner target (without optional pipe alias).
 
@@ -423,7 +422,11 @@ def run(target: str | None = None, fix: bool = False, **_kwargs) -> int:
 
     if target:
         slug = target.removesuffix(".md")
-        path = SOURCES_DIR / f"{slug}.md"
+        # Same gate as synthesis.py / trail.py: without it any .md path,
+        # including one with `..`, could be linted as a source.
+        path = cli_slug_path(SOURCES_DIR, slug)
+        if path is None:
+            return 2
         if not path.is_file():
             print(f"ERROR: source file not found: {path}", file=sys.stderr)
             return 2

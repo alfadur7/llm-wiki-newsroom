@@ -46,7 +46,7 @@ from __future__ import annotations
 
 import json
 import sys
-from collections import Counter
+from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -131,7 +131,7 @@ def _find_fragile_bridges(graph_data: dict, clusters_data: dict) -> list[dict]:
 
     node_cluster = _node_to_cluster(clusters_data)
 
-    pair_counts: Counter[tuple[str, str]] = Counter()
+    pair_node_pairs: defaultdict[tuple[str, str], set] = defaultdict(set)
     pair_sample: dict[tuple[str, str], dict[str, str]] = {}
     for edge in graph_data.get("edges", []):
         from_id = edge.get("from") if edge.get("from") in nodes_by_id else None
@@ -143,7 +143,10 @@ def _find_fragile_bridges(graph_data: dict, clusters_data: dict) -> list[dict]:
         if not from_cluster or not to_cluster or from_cluster == to_cluster:
             continue
         pair = tuple(sorted((from_cluster, to_cluster)))
-        pair_counts[pair] += 1
+        # Count distinct node pairs, not directed edges: A→B plus B→A is one
+        # connection between the two clusters, and counting it twice hid exactly
+        # the single-link case this check exists to find.
+        pair_node_pairs[pair].add(frozenset((from_id, to_id)))
         if pair not in pair_sample:
             pair_sample[pair] = {
                 "from": from_id,
@@ -153,7 +156,8 @@ def _find_fragile_bridges(graph_data: dict, clusters_data: dict) -> list[dict]:
             }
 
     fragile = []
-    for pair, count in sorted(pair_counts.items()):
+    for pair, node_pairs in sorted(pair_node_pairs.items()):
+        count = len(node_pairs)
         if count <= FRAGILE_EDGE_THRESHOLD:
             fragile.append({
                 "cluster_a": pair[0],
