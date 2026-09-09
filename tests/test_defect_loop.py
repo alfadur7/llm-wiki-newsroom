@@ -162,8 +162,8 @@ def _defect(cluster, caught_at="desk:density", target="t.md", date="2026-06-25",
 def test_recurring_after_fix_ranks_first():
     records = [
         _defect("translationese"), _defect("translationese"), _defect("translationese"),  # support 3, untreated
-        _defect("density-shortfall"),                                      # support 1, recurring after fix
-        _valid_transition(),
+        _defect("density-shortfall", date="2026-06-25"),                   # support 1, dated after the fix
+        _valid_transition(date="2026-06-01"),
     ]
     a = mfa.analyze(records, since=None)
     # recurring-after-fix (density-shortfall) ranks ahead of translationese despite lower support
@@ -213,17 +213,17 @@ def test_checkpoint_records_recurrence(tmp_path, monkeypatch):
 # Counting every accept as a treatment pins a cluster at the top of the priority table
 # for as long as its checker keeps working. Only prevention earns the tier.
 
-def _accept(cluster, treatment, surface="tools/_lint/source.py"):
-    return {"kind": "transition", "cluster": cluster, "surface": surface,
+def _accept(cluster, treatment, surface="tools/_lint/source.py", date="2026-06-01"):
+    return {"kind": "transition", "cluster": cluster, "surface": surface, "date": date,
             "decision": "accept", "rationale": "r", "model": "opus-5", "treatment": treatment}
 
 
 def test_detector_only_accept_leaves_the_recurrence_tier():
     records = [
         _defect("detector-fixed"), _defect("detector-fixed"), _defect("detector-fixed"),
-        _defect("prevention-fixed"),
+        _defect("prevention-fixed", date="2026-06-25"),  # after its treatment
         _accept("detector-fixed", "detect"),
-        _accept("prevention-fixed", "prevent", ".claude/layers/hub.md"),
+        _accept("prevention-fixed", "prevent", ".claude/layers/hub.md", date="2026-06-01"),
     ]
     a = mfa.analyze(records, since=None)
     assert a["non_preventive"] == {"detector-fixed"}
@@ -232,13 +232,34 @@ def test_detector_only_accept_leaves_the_recurrence_tier():
     assert a["ranked"][0][0] == "prevention-fixed"
 
 
-def test_one_preventive_accept_is_enough_to_hold_the_tier():
-    records = [_defect("mixed"),
+def test_one_preventive_accept_leaves_the_non_preventive_set():
+    # A preventive accept alongside a detector accept takes the cluster out of
+    # `non_preventive` — but prevention existing is not recurrence, so the tier
+    # stays empty until a defect is dated after it.
+    records = [_defect("mixed", date="2026-05-01"),
                _accept("mixed", "detect"),
-               _accept("mixed", "prevent", ".claude/agents/reporter.md")]
+               _accept("mixed", "prevent", ".claude/agents/reporter.md", date="2026-06-01")]
     a = mfa.analyze(records, since=None)
     assert a["non_preventive"] == set()
-    assert "mixed" in a["recurred"]
+    assert "mixed" in a["prevented"]
+    assert a["recurred"] == set()
+
+
+def test_defect_predating_its_treatment_is_not_a_recurrence():
+    # The tier read as "recurrence after preventive treatment" while testing only
+    # that a preventive accept existed, so a cluster whose defects all predate its
+    # fix ranked as a treatment failure. On the corpus at the time, 12 clusters
+    # held the tier and 3 had actually recurred.
+    before = [_defect("early", date="2026-05-01"), _accept("early", "prevent", date="2026-06-01")]
+    after = [_defect("late", date="2026-07-01"), _accept("late", "prevent", date="2026-06-01")]
+    assert mfa.analyze(before, since=None)["recurred"] == set()
+    assert mfa.analyze(after, since=None)["recurred"] == {"late"}
+    # Treated twice: the boundary is the treatment standing now, so a defect the
+    # second one answered does not keep the cluster in the tier.
+    retreated = [_defect("twice", date="2026-06-15"),
+                 _accept("twice", "prevent", date="2026-06-01"),
+                 _accept("twice", "prevent", date="2026-07-01")]
+    assert mfa.analyze(retreated, since=None)["recurred"] == set()
 
 
 # --- mine_failures: the closed-verdict ratchet ---

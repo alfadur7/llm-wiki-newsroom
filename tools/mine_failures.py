@@ -137,16 +137,47 @@ def accept_clusters(records: list[dict], *treatments: str) -> set[str]:
             and r.get("treatment") in treatments}
 
 
+def recurred_after_treatment(records: list[dict], *treatments: str) -> set[str]:
+    """Clusters carrying one of `treatments` that have a defect dated **after** it.
+
+    The boundary is the latest such accept: a cluster treated twice is judged
+    against the treatment standing now, so defects the second one answered do
+    not keep it in the tier. A record without a date establishes no ordering
+    and is skipped on both sides — an undated treatment cannot be shown to
+    predate anything, and an undated defect cannot be shown to follow.
+    """
+    boundary: dict[str, str] = {}
+    for r in records:
+        if (r.get("kind") != "transition" or r.get("decision") != "accept"
+                or r.get("treatment") not in treatments or not r.get("date")):
+            continue
+        c = str(r.get("cluster", "")).split("@")[0]
+        d = str(r["date"])
+        if c not in boundary or d > boundary[c]:
+            boundary[c] = d
+    out: set[str] = set()
+    for r in records:
+        if r.get("kind") != "defect" or not r.get("date"):
+            continue
+        c = str(r.get("cluster", "") or r.get("mechanism", "")).split("@")[0]
+        if c in boundary and str(r["date"]) > boundary[c]:
+            out.add(c)
+    return out
+
+
 def analyze(records: list[dict], since: str | None, pages: bool = False):
     """Group defects by cluster, sorted by (recurrence after prevention, support).
 
-    addressable=false is split out; a non-preventive accept (detect·remediate) is
-    reported but held out of the recurrence tier. A cluster whose latest verdict is
+    The recurrence tier holds a cluster only when a defect is dated after its
+    latest preventive treatment — carrying one is not the same as it having
+    failed. addressable=false is split out; a non-preventive accept
+    (detect·remediate) is reported but held out of the recurrence tier. A cluster whose latest verdict is
     closed (reject·defer) sorts below every unjudged one, whatever its support.
     """
     fixed = fixed_clusters(records)
-    recurred = accept_clusters(records, *_PREVENTIVE)   # prevented, and back anyway
-    non_preventive = fixed - recurred
+    prevented = accept_clusters(records, *_PREVENTIVE)  # a preventive treatment exists
+    non_preventive = fixed - prevented
+    recurred = recurred_after_treatment(records, *_PREVENTIVE)  # and it came back after it
     judged = latest_decisions(records)                  # cluster → latest verdict record
     closed = {c for c, r in judged.items() if r.get("decision") in _CLOSED}
     clusters: dict[str, dict] = defaultdict(
@@ -172,7 +203,7 @@ def analyze(records: list[dict], since: str | None, pages: bool = False):
                     key=lambda kv: (kv[0] not in closed, kv[0] in recurred,
                                     kv[1]["count"]), reverse=True)
     return {"ranked": ranked, "blocked": blocked, "fixed": fixed,
-            "judged": judged, "closed": closed,
+            "judged": judged, "closed": closed, "prevented": prevented,
             "recurred": recurred, "non_preventive": non_preventive,
             "in_window": in_window}
 
@@ -219,7 +250,8 @@ def mine(since: str | None, pages: bool = False) -> int:
     a = analyze(records, since, pages=pages)
     print(f"defect corpus: {LOG_PATH.name} ({sum(1 for r in records if r.get('kind')=='defect')} defect)")
     print(f"review window: {('after ' + since) if since else 'ALL (no watermark)'}")
-    print(f"in-window defects: {a['in_window']}  ·  prevented clusters: {len(a['recurred'])}"
+    print(f"in-window defects: {a['in_window']}  ·  prevented clusters: {len(a['prevented'])}"
+          f"  ·  recurring after treatment: {len(a['recurred'])}"
           f"  ·  non-preventive accepts: {len(a['non_preventive'])}")
     print()
     print("=== Open — this cycle's review set (recurrence after preventive treatment ▶ first) ===")
