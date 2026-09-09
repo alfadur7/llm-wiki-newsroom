@@ -58,7 +58,7 @@ return { confirmed, failed_groups: dead, audit_complete: dead.length === 0 }
 2. Code: byte-compile → `python -m pytest tests/` PASS → `python tools/lint.py` EXIT=0 → entry-point smoke run.
 3. Guidelines: `python tools/lint.py meta` PASS (voice antipattern · craft-chain consistency · all items) → for `.claude/` and CLAUDE.md edits, present the Guideline Verification Ladder evidence (rungs 1–3).
 4. Gated items are not applied — handle separately after operator approval.
-5. On completion (`audit_complete: true` — an incomplete run is not a completion), after operator approval, commit + push to origin (split by logical unit: code / guidelines / regenerated artifacts).
+5. On completion (`audit_complete: true` — an incomplete run is not a completion), file the findings item 1 confirmed through `log_defect` with `caught_at` stage `audit`, one record per finding; then, after operator approval, commit + push to origin (split by logical unit: code / guidelines / corpus / regenerated artifacts).
 
 ## Carry-forward
 
