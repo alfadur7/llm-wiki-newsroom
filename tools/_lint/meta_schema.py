@@ -92,6 +92,17 @@ Concerns bundled here because all target meta-docs, all are read-only
                      `]]`, rendering a truncated alias + stray `]]`. Fix: flatten
                      the inner link to plain text. sources/ and `_`-prefixed
                      generated files are out of scope.
+
+  DEFECT LEDGER — every `tools/_defect-log.jsonl` record must pass
+                     `log_defect.validate()`. The validating entrance exists
+                     (`log_defect.py`) but write paths can bypass it — Write,
+                     Edit, a bash append and a whole-file script rewrite all
+                     land in the same file, and the Write|Edit guard never sees
+                     the bash form. Validating the artifact instead of sealing
+                     every write path catches all of them while still allowing
+                     the in-place corrections a ledger legitimately needs. The
+                     only other net is pytest, which runs before a commit
+                     rather than at the cycle gate.
 """
 from __future__ import annotations
 
@@ -102,6 +113,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from _lib import CLUSTERS_JSON, REPO_ROOT as ROOT, WIKI as WIKI_DIR, parse_frontmatter, read_text_cached  # noqa: E402
+import log_defect  # noqa: E402
 
 CLAUDE_MD = ROOT / "CLAUDE.md"
 COMMANDS_DIR = ROOT / ".claude" / "commands"
@@ -945,6 +957,41 @@ def _check_obsidian_link_safety() -> list[str]:
     return issues
 
 
+def _check_defect_ledger() -> list[str]:
+    """Every `tools/_defect-log.jsonl` record passes `log_defect.validate()`.
+
+    The ledger has a validating entrance (`log_defect.py`), but nothing forces
+    a writer through it: Write, Edit, a bash heredoc append and a whole-file
+    rewrite all reach the same file, and the Write|Edit guard in
+    `.claude/hooks/dispatch.py` cannot see the bash form at all. So the
+    artifact is validated rather than the write path sealed — that catches
+    every tool, and it does not block the in-place corrections a ledger
+    legitimately needs.
+
+    Not a duplicate of `tests/test_defect_loop.py::test_real_corpus_validates`:
+    same target, different firing point (a pre-commit development test vs. the
+    cycle gate). An out-of-vocabulary record silently skews `mine_failures`
+    ranking for as long as it survives.
+    """
+    try:
+        lines = log_defect.LOG_PATH.read_text(encoding="utf-8").splitlines()
+    except OSError as e:
+        return [f"{log_defect.LOG_PATH.name}: unreadable ({e})"]
+    out = []
+    for i, line in enumerate(lines, 1):
+        if not line.strip():
+            continue
+        try:
+            rec = json.loads(line)
+        except ValueError as e:
+            out.append(f"_defect-log.jsonl:{i}: JSON parse failed - {e}")
+            continue
+        err = log_defect.validate(rec)
+        if err:
+            out.append(f"_defect-log.jsonl:{i}: {err}")
+    return out
+
+
 def _check_nested_wikilinks() -> list[str]:
     """Flag wikilinks whose alias contains a nested `[[` in authored content.
 
@@ -1445,7 +1492,22 @@ def run() -> int:
     else:
         print("OK - no nested wikilinks in authored content aliases")
 
-    total = integrity_total + language_total + total_drift + len(flat_issues) + len(reserved_issues) + len(log_issues) + len(voice_issues) + len(tool_perm_issues) + len(model_issues) + len(hook_prefix_issues) + len(hook_channel_issues) + len(hook_utf8_issues) + len(regex_hoist_issues) + len(craft_issues) + len(stale_guide_issues) + len(link_issues) + len(nested_issues)
+    # DEFECT LEDGER pass — did a direct edit bypass the validating entrance?
+    ledger_issues = _check_defect_ledger()
+    if ledger_issues:
+        print(f"\n[Defect ledger vocabulary violations: {len(ledger_issues)}]")
+        for v in ledger_issues:
+            print(v)
+        print(
+            "Rule: write `tools/_defect-log.jsonl` with `python tools/log_defect.py` "
+            "— a direct append or rewrite bypasses controlled-vocabulary validation. "
+            "Correcting an existing row is allowed, but it must still pass this check "
+            "(vocabulary SoT: tools/log_defect.py)."
+        )
+    else:
+        print("OK - defect ledger records all pass log_defect.validate()")
+
+    total = integrity_total + language_total + total_drift + len(flat_issues) + len(reserved_issues) + len(log_issues) + len(voice_issues) + len(tool_perm_issues) + len(model_issues) + len(hook_prefix_issues) + len(hook_channel_issues) + len(hook_utf8_issues) + len(regex_hoist_issues) + len(craft_issues) + len(stale_guide_issues) + len(link_issues) + len(nested_issues) + len(ledger_issues)
     if total == 0:
         return 0
     print(f"\nFAIL - {total} meta-schema issue(s)")

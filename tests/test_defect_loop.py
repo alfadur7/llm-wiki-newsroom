@@ -307,3 +307,34 @@ def test_verdict_line_carries_surface_and_reopen_condition():
     assert "Re-open when" in lines[1] and "structure the rule regulates" in lines[1]
     # No condition literal → the surface line alone (most of this ledger's verdicts).
     assert len(mfa.verdict_lines(_transition("c-2", "defer", "2026-08-27"))) == 1
+
+
+# --- lint meta schema: the ledger gate ---
+
+def test_lint_meta_catches_ledger_bypass(tmp_path, monkeypatch):
+    """`lint meta schema` catches out-of-vocabulary records that bypassed the entrance.
+
+    Distinct from validating `log_defect.validate()` directly: this guards the
+    *lint path*, which is what fires at the cycle gate. A writer reaching the
+    ledger through Write, Edit or a bash append never touches `log_defect.py`,
+    and the Write|Edit hook guard cannot see the bash form at all. Asserted on
+    the returned issue count, not on message text.
+    """
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools" / "_lint"))
+    import meta_schema
+
+    log = tmp_path / "_defect-log.jsonl"
+    good = {"kind": "defect", "date": "2026-09-11", "layer": "tools", "target": "t.py",
+            "cluster": "x", "caught_at": "lint:meta", "mechanism": "m",
+            "severity": "high", "addressable": True}
+    log.write_text(json.dumps(good, ensure_ascii=False) + "\n", encoding="utf-8")
+    monkeypatch.setattr(meta_schema.log_defect, "LOG_PATH", log)
+    assert meta_schema._check_defect_ledger() == []
+
+    bad = dict(good, layer="code")          # a value outside LAYERS
+    log.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in (good, bad)),
+                   encoding="utf-8")
+    assert len(meta_schema._check_defect_ledger()) == 1
+
+    log.write_text("{not json}\n", encoding="utf-8")   # a broken line is not silence either
+    assert len(meta_schema._check_defect_ledger()) == 1
