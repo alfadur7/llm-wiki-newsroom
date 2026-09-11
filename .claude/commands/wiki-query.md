@@ -98,5 +98,5 @@ If the wiki is empty, say so and suggest `/wiki-ingest`.
 
 ## Human Reviewer Gate
 
-- Synthesis save decision (memory git-approval — new page creation)
+- Synthesis save decision — new page creation ([`CLAUDE.md`](../../CLAUDE.md) § Human Reviewer Gate)
 - Desk qualitative-review defects of critical/high

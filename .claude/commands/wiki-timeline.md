@@ -40,5 +40,5 @@ L2-2 timeline content. The page format·authoring standard·Rubric have their So
 
 ## Human Reviewer Gate
 
-- New person entity stub (only for key people cited multiple times — hub-stub-threshold).
+- New person entity stub (only for key people cited multiple times — [`policies/naming.md`](../policies/naming.md) entity-stub threshold).
 - Desk qualitative defects of critical/high.

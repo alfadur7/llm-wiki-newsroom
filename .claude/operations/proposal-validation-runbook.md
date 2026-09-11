@@ -45,6 +45,7 @@ For a rule whose effect shows in **agent behavior** (a routing step, a hand-over
 
 - **Probe task**: reconstruct the failure scenario that motivated the rule (the task where the old behavior went wrong) and run it once under the Control prompt and once under the Treatment prompt — injection, not file edits, same as the desk-judged variant.
 - **Adjacent-normal held-out**: run one adjacent task where the OLD behavior was already correct, under both conditions — catches a rule that fixes the failure by over-firing on normal flow.
+- **No prompt contamination**: do not enumerate the output fields being observed in the probe prompt. Listing them is injection, and listing a subset is suppression — point at the role SoT's § I/O Contract **Output** and require that. A reply-channel instruction is not contamination (drop it and the output is lost, so nothing can be observed at all).
 - **Blind judging, N≥2**: judges receive the two transcripts under blind labels and a verdict taxonomy limited to the measured behavior (did the failure reproduce? did the normal flow regress?). Aggregate as with desk scoring.
 - Acceptance: the acceptance rule, with "defect count" read as "failure reproductions."
 

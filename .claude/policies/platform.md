@@ -22,6 +22,8 @@ The default stdout encoding of Windows `python`/`python3` is cp949 — printing 
 
 Per the Claude Code environment memo, this project's Primary Shell is PowerShell. Run POSIX scripts with the Bash tool, but general system calls (file listing, git, python, etc.) can use either. Read non-Latin filenames via the Bash + Python workaround above.
 
+To pass multi-line text (a commit message, say) through the Bash tool, write it to a temporary file and hand over the file — `git commit -F <file>`. A PowerShell here-string (`@'…'@`) given to the Bash tool has its `@'` parsed as a literal, which breaks the first line. When building that file with a heredoc, **quote the delimiter** (`<<'EOF'`): unquoted, the shell expands the body — `$VAR` empties out and a backtick or `$(…)` runs as command substitution and **succeeds silently**, planting its output in the text.
+
 ## Bash-Tool Redirect/Path Arguments Must Use Forward Slashes
 
 When invoking a command with the Bash tool, redirect targets (`>` `2>&1` `>>`) and file-path arguments **must use forward slashes** (`/`). Passing a Windows backslash path (`c:\tmp\file.txt`) unquoted causes Bash (MSYS, Git Bash, etc.) to interpret the backslash as an escape character and the characters disappear — e.g., `c:\tmp\theme_verify.txt` collapses to `c:tmptheme_verify.txt` and gets created with a malformed filename in the working directory (the wiki project root).

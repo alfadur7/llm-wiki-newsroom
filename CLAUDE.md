@@ -194,7 +194,7 @@ Guideline-authoring voice and plan-bloat control are craft, not policy — they 
 
 ### `.claude/memory/` — Local Memory
 
-**Responsibility**: project-specific local records of feedback and decisions (separate from the system auto-memory).
+**Responsibility**: project-specific local records of feedback and decisions (separate from the system auto-memory). A convention or threshold that another file must reference to hold belongs in the tracked SoT file that uses it — not here and not in the auto-memory. Both are unreachable from a fresh clone or a cloud routine: this folder's contents are gitignored (only `.gitkeep` is tracked) and the auto-memory sits outside the repo entirely.
 
 **When read**: on entering related work.
 

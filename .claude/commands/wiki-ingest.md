@@ -46,7 +46,7 @@ Setup guide: [`.claude/operations/mobile-inbox-setup.md`](../operations/mobile-i
 ## Prefilter (Folder Mode)
 
 - **Automation first** — `python tools/_ingest/prefilter_ingest.py <raw-folder>`. by_url first + by_path second fallback + Raindrop exclusion + 0-byte skip, deterministic classification → counts and a new-candidate list of (a) URL-dup / (b) Path-dup / (c) Genuine new. **Only "Genuine new" are true candidates.**
-- **Manual fallback** (when the tool is unavailable): (a) frontmatter `source:`/`url:`/`source_url:` → `by_url` match → SKIP, (b) on URL non-match, raw path (Unicode quotes normalized) → `by_path` match → SKIP, (c) only those that match neither and are not 0-byte are genuine. **No `by_path`-only prefilter** (memory `feedback_ingest_prefilter_url_first` — Obsidian re-scrape variants permanently miss).
+- **Manual fallback** (when the tool is unavailable): (a) frontmatter `source:`/`url:`/`source_url:` → `by_url` match → SKIP, (b) on URL non-match, raw path (Unicode quotes normalized) → `by_path` match → SKIP, (c) only those that match neither and are not 0-byte are genuine. **No `by_path`-only prefilter** — a re-scrape varies the path, so the URL is the key (SoT: `prefilter_ingest.py`).
 - Scan extensions: `.md` + `.pdf`
 - Exclude under `raw/NewsScrap/Raindrop/` (already-ingested legacy)
 - Empty files (0-byte) auto-skipped
@@ -83,7 +83,7 @@ Race avoidance: two sub-agents never write to the same file simultaneously. `wik
     - Check for broken wikilinks (use the canonical entity title, not a translated display name — `[[Anthropic]]` ✓)
     - Filename script: an English filename is the default; use a native-script filename only for an entity with no standard Latin form
     - Check the new hub's tags
-    - **Detect missing quote-speaker stubs**: `## Key Quotes` speakers → confirm `wiki/entities/<name>.md` exists. If absent, suggest creating a stub (subject to the hub-stub-threshold policy)
+    - **Detect missing quote-speaker stubs**: `## Key Quotes` speakers → confirm `wiki/entities/<name>.md` exists. If absent, suggest creating a stub (subject to the [`policies/naming.md`](../policies/naming.md) entity-stub threshold)
     - **Strengthen in-body wikilinks**: `python tools/_ingest/suggest_links.py --file wiki/sources/<slug>.md` — surfaces existing entity/concept stems that appear as plain text
     - **Suggest tag candidates**: `python tools/_ingest/suggest_tags.py --file wiki/sources/<slug>.md` — surfaces thematic tag candidates based on `## Connections` hubs (an empty `tags: []` is blocked by the source lint T1 hard gate)
 10. **Full rebuild + cluster diagnosis**:
@@ -100,7 +100,7 @@ Report on completion: pages added · pages created/updated · contradictions fou
 
 ## Human Reviewer Gate
 
-- New person entity stub (memory hub-stub-threshold — only for key people cited multiple times across multiple sources)
+- New person entity stub ([`policies/naming.md`](../policies/naming.md) entity-stub threshold — only for key people cited multiple times across multiple sources)
 - New cluster slug / unnamed group label (no automatic Claude edits)
-- Commit·push after ingest (memory git-approval)
+- Commit·push after ingest ([`CLAUDE.md`](../../CLAUDE.md) § Human Reviewer Gate, external commit/push)
 - A contradiction flag strongly affecting an existing theme (potential theme-MD rewrite trigger)

@@ -10,7 +10,7 @@ Outside the matrix — Meta layer (deterministic). The Editor-in-Chief calls `to
 |---|---|
 | Trigger | Editor-in-Chief |
 | Export | `tools/export.py` (deterministic) |
-| Commit·Push | Editor-in-Chief → explicit approval from the wiki operator (memory git-approval) |
+| Commit·Push | Editor-in-Chief → explicit approval from the wiki operator ([`CLAUDE.md`](../../CLAUDE.md) § Human Reviewer Gate, external commit/push) |
 
 ## Output (`wiki-export/` Folder)
 

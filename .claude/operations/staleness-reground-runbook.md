@@ -26,6 +26,7 @@ Run these directly in the main session after ADAPT (don't trust an agent's self-
 
 - Per-type lint (`python tools/lint.py <overview|contradiction|synthesis|timeline|trail> [<slug>]`) required metrics PASS + `python tools/lint.py graph` broken links 0 + AUTO blocks and frontmatter preserved.
 - **One clean rebuild before committing** (`python tools/build.py`) — build artifacts an agent ran concurrently during re-grounding can otherwise get mixed in.
+- **If the update deletes anything, pull every deleted segment with `git diff --word-diff -U0 HEAD -- <page>` and check each against that page's current body** (one page at a time — a repo-wide diff buries the page in the rebuild's churn). An author's self-report cannot close this: the set it checks is the set they remembered. Neither can the checks above — a deleted anchor leaves broken links at 0 and the AUTO blocks intact.
 - After committing, re-run `python tools/lint.py staleness` to confirm resolution. The body date is git-based, so a page **stays STALE until you commit, and clears on commit** (expected behavior).
 
 ## Human Reviewer Gate
