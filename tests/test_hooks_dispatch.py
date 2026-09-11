@@ -379,6 +379,57 @@ def test_guideline_path_filter():
                    ".claude/skills/guideline-writing/SKILL.md", "CLAUDE.md"]
 
 
+def test_option_value_is_not_a_pathspec():
+    """Without `--`, the operands are the pathspec — but an option value is not one.
+
+    Reading `-C <dir>` or a `--fixup` sha as a path replaces a broad flag's scope
+    with a path that names nothing, and the gate goes silent instead of widening.
+    """
+    root = pathlib.Path(dispatch.__file__).resolve().parents[2]
+    ps = lambda seg: dispatch._commit_pathspec(seg, root)
+    assert ps(["git", "commit", "-m", "msg", "CLAUDE.md"]) == ["CLAUDE.md"]
+    assert ps(["git", "commit", "--only", ".claude/agents/desk.md"]) == [".claude/agents/desk.md"]
+    assert ps(["git", "-C", "/some/dir", "commit", "-m", "msg"]) == []
+    assert ps(["git", "commit", "--fixup", "HEAD"]) == []
+    assert ps(["git", "commit", "-am", "-a quick fix"]) == []
+    # A leftover message word from an unbalanced quote is not an operand — trusting
+    # it narrows the scope to nothing and the gate goes silent.
+    assert ps(["git", "commit", "-m", "@" + chr(10) + "fix: dont", "break"]) == []
+    # `--` still wins where it is present, message and all.
+    assert ps(["git", "commit", "-m", "msg", "--", "tools/x.py"]) == ["tools/x.py"]
+
+
+def test_pathspec_is_resolved_against_the_shell_cwd(tmp_path):
+    """git reads a pathspec relative to the cwd; the lookups run under `git -C ROOT`.
+
+    Resolving against the root instead makes `git commit -m m README.md` issued from
+    `.claude/commands/` narrow the scope to the ROOT README — which names nothing the
+    commit carries, so the gate goes silent. That is the direction this surface exists
+    to prevent, so a set that will not re-express against the root voids itself.
+    """
+    root = pathlib.Path(dispatch.__file__).resolve().parents[2]
+    seg = ["git", "commit", "-m", "m", "README.md"]
+    assert dispatch._commit_pathspec(seg, root) == ["README.md"]
+    assert dispatch._commit_pathspec(seg, root, str(root / ".claude" / "commands")) == [
+        ".claude/commands/README.md"]
+    # An operand resolving outside the repository voids the whole set (wider read).
+    # It must exist there, or the existence guard would void it before this one.
+    (tmp_path / "README.md").write_text("x", encoding="utf-8")
+    assert dispatch._commit_pathspec(seg, root, str(tmp_path)) == []
+
+
+def test_guideline_path_covers_a_new_claude_subdir():
+    """The ladder's scope is a subtraction, so a folder whitelist drops a new
+    directory silently — and a new directory is where a new guideline lands."""
+    assert dispatch.is_guideline_path(".claude/newdir/thing.md")
+    assert dispatch.is_guideline_path("/abs/repo/.claude/agents/desk.md")
+    assert dispatch.is_guideline_path("CLAUDE.md")
+    assert not dispatch.is_guideline_path(".claude/memory/feedback_x.md")
+    assert not dispatch.is_guideline_path(".claude/hooks/README.md")
+    assert not dispatch.is_guideline_path(".claude/agents/notes.txt")
+    assert not dispatch.is_guideline_path("wiki/index.md")
+
+
 def test_prefilter_never_narrower_than_the_python_judge():
     """The shell prefilter only decides whether Python runs, so it may over-fire but must
     never reject a command the gate would advise on — an under-firing prefilter leaves the
@@ -701,6 +752,13 @@ SHAPES = [
     "git commit --amend -m m",                           # rewrites the commit it replaces
     "git add CLAUDE.md && git commit --amend -m m",
     "git add .claude/policies/naming.md && git commit -m m",
+    # A commit that names its own pathspec without `--`. Both forms were invisible
+    # to the gate, and `--only` is what a parallel session uses to keep its commit
+    # off another session's files.
+    "git commit -m m --only .claude/policies/naming.md",
+    "git commit -m m .claude/policies/naming.md",
+    "git commit -m m tools/x.py",                        # operand form, nothing guideline
+    "git add -A && git commit -m m .claude/agents/reporter.md",   # operand narrows the index
 ]
 
 

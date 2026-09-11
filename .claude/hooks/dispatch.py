@@ -70,8 +70,21 @@ SCRATCH_EXTS = {".py", ".sh", ".tmp", ".scratch", ".ipynb"}
 # so the scratch advisory fires regardless of the clone directory name.
 ROOT = Path(__file__).resolve().parents[2]
 _REPO_ROOT = ROOT.as_posix().lower()
-GUIDE_DIRS = ("/.claude/agents/", "/.claude/commands/", "/.claude/layers/",
-              "/.claude/policies/", "/.claude/operations/", "/.claude/skills/")
+# Guideline-file test. The ladder SoT states its scope as a derivation — every
+# guideline subdirectory of `.claude/` except `memory/` and `hooks/`
+# (`agents/editor-in-chief.md` § Guideline Verification Ladder) — so the code
+# subtracts rather than enumerating. A folder whitelist drops a newly created
+# directory silently, and a new directory is exactly where a new guideline lands.
+GUIDE_EXCLUDED_DIRS = ("/.claude/memory/", "/.claude/hooks/")
+
+
+def is_guideline_path(path: str) -> bool:
+    """Is this a guideline file the ladder binds? Takes absolute or repo-relative."""
+    q = "/" + path.replace('\\', "/").lstrip("/")
+    if q.endswith("/CLAUDE.md"):
+        return True
+    return (q.endswith(".md") and "/.claude/" in q
+            and not any(d in q for d in GUIDE_EXCLUDED_DIRS))
 
 # Subset of GUIDE surfaces that is desk-judged wiki-content authoring/review craft
 # (NOT lint-scored) — edits here trigger the proposal-validation reflex (2b). Allowlist
@@ -430,9 +443,7 @@ def run_pre(data: dict) -> int:
     # 2) minimality advisory — plan files / guideline SoT.
     if "/plans/" in path and path.endswith(".md"):
         messages.append(PLAN_MSG)
-    elif path.endswith(".md") and (
-        path.endswith("/CLAUDE.md") or any(d in path for d in GUIDE_DIRS)
-    ):
+    elif is_guideline_path(path):
         msg = GUIDE_MSG
         try:
             depth = check_bullet_depth.analyze(data)
@@ -538,7 +549,17 @@ _GIT_VALUE_OPTS = frozenset({"-C", "-c", "--git-dir", "--work-tree",
                              "--namespace", "--exec-path", "--pathspec-from-file"})
 # Commit options whose value is the next token.
 _VALUE_OPTS = ("--message", "--file", "--author", "--date",
-               "--reuse-message", "--reedit-message")
+               "--reuse-message", "--reedit-message",
+               # None of these takes a *pathspec* as its value (`--template` and
+               # `--pathspec-from-file` do take file paths, just not paths to commit).
+               # They matter to the pathspec read below, which would otherwise carry a
+               # sha or a template name into the scope and narrow it to nothing.
+               "--fixup", "--squash", "--template", "--cleanup", "--trailer",
+               "--pathspec-from-file")
+# Combined short forms take their value in the next token too (`-am <msg>`); the
+# last letter decides. `-S` is absent on purpose — its keyid attaches (`-S<id>`),
+# so skipping after it would swallow a real path.
+_VALUE_SHORT = "mFCct"
 # Where a guideline file can live — the pathspec used when the command narrows to nothing.
 GUIDE_SCOPE = ("CLAUDE.md", ".claude")
 
@@ -625,10 +646,7 @@ def _git_segments(command: str, sub: str) -> list[list[str]]:
 
 def _guideline_paths(paths) -> list[str]:
     """Keep only guideline files — used for porcelain lines and command arguments alike."""
-    return sorted({
-        p for p in paths
-        if p == "CLAUDE.md" or (p.endswith(".md") and any(d in "/" + p for d in GUIDE_DIRS))
-    })
+    return sorted({p for p in paths if is_guideline_path(p)})
 
 
 def _porcelain_paths(porcelain: str, tracked_only: bool = False) -> list[str]:
@@ -699,14 +717,61 @@ def _commit_flags(seg: list[str]) -> list[str]:
             # `-m`/`-F`/`-C`/`-c` and their combined short forms (`-am`) take the next
             # token as their value; `--message` and friends take it in the long form.
             skip = (tok in _VALUE_OPTS
-                    or (tok[:2] != "--" and tok[-1:] in "mFCc"))
+                    or (tok[:2] != "--" and tok[-1:] in _VALUE_SHORT))
     return out
 
 
-def _commit_pathspec(seg: list[str]) -> list[str]:
-    """Paths after `--` in the commit segment — what the commit restricts itself to."""
-    return ([tok.replace("\\", "/") for tok in seg[seg.index("--") + 1:]]
-            if "--" in seg else [])
+def _commit_pathspec(seg: list[str], root: Path, cwd: str | None = None) -> list[str]:
+    """Paths the commit restricts itself to — after `--`, else the bare operands.
+
+    Reading only the `--` form leaves `git commit --only <path>` and plain
+    `git commit <path>` entirely invisible, and those are the forms a parallel
+    session uses to keep its commit off another session's files — so the gate
+    was silent on exactly the commits that name their own scope. Option values
+    are skipped by the same rule `_commit_flags` uses, so a `-m` message or a
+    `--fixup` sha is not read as a path.
+    """
+    explicit = "--" in seg
+    if explicit:
+        raw = [tok.replace("\\", "/") for tok in seg[seg.index("--") + 1:]]
+    else:
+        raw, skip = [], False
+        for tok in seg[seg.index("commit") + 1:]:
+            if skip:
+                skip = False
+            elif tok[:1] == "-":
+                skip = (tok in _VALUE_OPTS
+                        or (tok[:2] != "--" and tok[-1:] in _VALUE_SHORT))
+            else:
+                raw.append(tok.replace("\\", "/"))
+    # git resolves a pathspec against the invoking directory, not the repo root, while
+    # the lookups below run under `git -C ROOT` — so every operand is re-expressed
+    # relative to the root before it is used, and one that lands outside the repo voids
+    # the whole set. `cwd` is the hook payload's working directory, which is where the
+    # Bash tool starts the command; a `cd` *inside* the command is not visible here, so
+    # a same-named file at the root can still win. That residual is filed, not fixed —
+    # closing it means parsing the chain's own directory changes.
+    #
+    # Bare operands are additionally all-or-nothing on existence. Without `--` there
+    # is no declaration that these are paths: an unbalanced quote (a PowerShell
+    # here-string, a heredoc-substituted message) leaves message words standing where
+    # operands would be, and trusting one of those narrows the scope to a path naming
+    # nothing — the gate then goes silent on a commit it should advise on. A pathspec
+    # naming a deleted file fails the same test and falls back to the wider read,
+    # which over-fires; that is the cheap error.
+    if not raw:
+        return []
+    base = Path(cwd) if cwd else root
+    out = []
+    for q in raw:
+        p = base / q
+        if not explicit and not p.exists():
+            return []
+        try:
+            out.append(p.resolve().relative_to(root.resolve()).as_posix())
+        except (ValueError, OSError):
+            return []
+    return out
 
 
 def _git(root, *args: str) -> str | None:
@@ -765,7 +830,7 @@ def run_pre_bash(data: dict) -> int:
     commit_all = any(t == "--all" or (t[:2] != "--" and "a" in t) for t in flags)
     # A commit pathspec decides alone — those paths are committed and nothing else is,
     # whatever the index holds and whatever `git add` staged before it.
-    pathspec = _commit_pathspec(seg)
+    pathspec = _commit_pathspec(seg, ROOT, data.get("cwd"))
     staged = _git(ROOT, "diff", "--cached", "--name-only", "--", *(pathspec or GUIDE_SCOPE))
     hits = _guideline_paths((staged or "").splitlines())
     if not hits:
