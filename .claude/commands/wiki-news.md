@@ -1,24 +1,23 @@
 Search for latest news related to the LLM Wiki's key topics.
 
-Usage: `/wiki-news [cluster|keyword | --gap [<slug>] [--batch] [--no-filter]]` — argument optional
+Usage: `/wiki-news [cluster|keyword | --gap [<slug>] [--no-filter]]` — argument optional
 
 **If `$ARGUMENTS` is empty**: show the usage below, then proceed with an all-cluster search (do not stop).
 
 ```
-Usage: /wiki-news [cluster|keyword | --gap [<slug>] [--batch] [--no-filter]]
+Usage: /wiki-news [cluster|keyword | --gap [<slug>] [--no-filter]]
 
 Examples:
   /wiki-news                          # search all clusters (default)
   /wiki-news open-source-ai-definition  # a specific cluster (slug)
   /wiki-news open weights             # a specific cluster (name)
   /wiki-news DeepSeek open model      # free keyword
-  /wiki-news --gap                    # gap fill: hub-gaps crawl, cluster-gaps search → _inbox.md (Track A)
+  /wiki-news --gap                    # gap fill: deterministic hub crawl → _inbox.md (Track A)
   /wiki-news --gap single-source      # enrich a single gap type
-  /wiki-news --gap single-source --batch  # skip the gate (operator pre-approved batch mode)
   /wiki-news --gap --no-filter        # disable the domain filter
 ```
 
-The `--gap` slug is Track A only: `sparse-cluster` · `single-source` · `stale-hub`.
+The `--gap` slug is Track A only: `single-source` · `stale-hub`.
 
 ## Traversal Pattern
 
@@ -50,27 +49,22 @@ Cluster slug list SoT: `graph/_clusters.json::clusters[].slug` (single SoT, vari
 6. **Recommend top articles** — suggest ingest + wait for the user's decision
 7. **After the user's decision** — append the chosen article URLs to `_inbox.md` as `# source=interactive` (fetch·ingest is the separate `/wiki-ingest inbox`), or save the report to `wiki/syntheses/`
 
-## Gap Mode (`--gap [<slug>] [--batch] [--no-filter]`)
+## Gap Mode (`--gap [<slug>] [--no-filter]`)
 
-Perform Track A enrichment via **two channels** by gap type — hub-level gaps (single-source·stale-hub) follow the adjacent pages cited by existing sources via a **deterministic crawl** (the Editor-in-Chief calls `crawl.py` internally), while cluster-level gaps (sparse-cluster) use a **WebSearch query** (Reporter). Both converge into `_inbox.md`, and ingest is delegated to `/wiki-ingest inbox`.
+Every Track A enrichment is hub-level: a **deterministic crawl** (the Editor-in-Chief calls `crawl.py` internally) follows the adjacent pages cited by existing sources into `_inbox.md`, and ingest is delegated to `/wiki-ingest inbox`. The cluster-level `sparse-cluster` gap was removed (rationale in the `NON_BACKLOG_BUCKETS` comment in [`tools/_lint/graph_gaps.py`](../../tools/_lint/graph_gaps.py)), and with it the automatic WebSearch path — operator-run WebSearch reinforcement stays valid through `tools/_news/gap_queries.py` (procedure: [`operations/gap-detection-rollout.md`](../operations/gap-detection-rollout.md) § Enrichment channels).
 
 Definitions, thresholds, and domain set have their SoT in [`.claude/operations/gap-detection-rollout.md`](../operations/gap-detection-rollout.md) + [`tools/_news/domains.py`](../../tools/_news/domains.py). Crawl seed derivation, relevance lexicon, and cap have their SoT in [`tools/_news/crawl.py`](../../tools/_news/crawl.py).
 
 ### Procedure
 
-1. Call `python tools/lint.py graph gaps --json [--gap-type <slug>] --top 5` — Track A diagnosis (bridge·contradiction are outside this mode's domain).
-2. **hub-level gaps (single-source·stale-hub)** → call `python tools/_news/crawl.py --gap-seed --append-inbox` internally. Seeds are auto-derived hub→backlinks→`source_url`; the adjacent pages cited by each hub's existing sources are appended to `_inbox.md` as `source=auto-crawl` after passing the domain allowlist·`by_url` dedup check (no external search·query gate needed — the seeds are already trusted sources).
-3. **cluster-level gaps (sparse-cluster)** → generate queries with `python tools/_news/gap_queries.py --json --limit 5` → interactive gate (skipped with `--batch`) → WebSearch in parallel with the editor-selected domain set (`GLOBAL_IT_FINANCE_NEWS` for global/English topics, `KOREAN_IT_FINANCE_NEWS` for Korean-entity gaps, or their union for a broad sweep — the lists live in `tools/_news/domains.py`; the filter is lifted with `--no-filter`) → `by_url` dedup → append to `_inbox.md` in the form `URL  # source=auto-gap gap=<slug> cluster=<slug> ts=<iso>`.
-4. Report the crawl hub/candidate counts + WebSearch new count + `_inbox.md` queue length. Ingest is the explicit `/wiki-ingest inbox`.
+1. Call `python tools/_news/crawl.py --gap-seed --append-inbox [--gap-type <slug>] [--no-filter]` internally. **Do not call `lint graph gaps` separately** — `crawl.py` runs that diagnosis inside itself. Seeds are auto-derived hub→backlinks→`source_url`; the adjacent pages cited by each hub's existing sources are appended to `_inbox.md` as `source=auto-crawl` after passing the domain allowlist·`by_url` dedup check (no external search needed — the seeds are already trusted sources).
+2. Report the crawl hub/candidate counts + `_inbox.md` queue length. Ingest is the explicit `/wiki-ingest inbox`.
 
 ### Hard Cap
 
 | Item | Value |
 |---|---|
-| (WebSearch) queries per gap | 2–3 (varies by gap type) |
-| (WebSearch) result cap per query | 6 |
-| (WebSearch) new-source cap per gap | 8 |
-| gaps processed per cycle (`--batch`) | 5 |
+| `--gap-limit` (hubs per gap type) | 5 |
 | (crawl) `--max-pages`·`--max-depth`·`--per-domain-cap`·`--min-score` | `tools/_news/crawl.py` defaults SoT |
 | `_inbox.md` queue length alarm | 30 |
 
@@ -83,4 +77,4 @@ This command is responsible only up to WebSearch·report·`_inbox.md` append. Th
 - Discovery of a new cluster slug (an external keyword does not fit existing clusters)
 - Person entity stub candidate (memory hub-stub-threshold policy — only for key people cited multiple times)
 - Ingest decision (chain into `/wiki-ingest` — explicit approval)
-- **`--gap` mode query approval** (when `--batch` is absent) — the human reviewer edits·approves the `tools/_news/gap_queries.py` output. `--batch` is used only with operator pre-approval
+- **`--gap` mode** — no per-query gate: the automatic channel is a link crawl with no queries to approve. Ingest is still the explicit `/wiki-ingest inbox`

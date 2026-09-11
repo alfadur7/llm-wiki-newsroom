@@ -3,7 +3,7 @@
 Accumulated results of `python tools/_ingest/fetch_inbox.py` runs. Grouped by date, with the most recent date at the end of the file.
 
 Each line format: `- HH:MM [<source>] <URL> → <result>`
-- `[<source>]` — entry channel (`mobile`/`interactive`/`auto-gap`/`cron-news`/`hook-adapt`). An entry without metadata is `[mobile]`.
+- `[<source>]` — entry channel (`mobile`/`interactive`/`auto-crawl`/`cron-news`/`hook-adapt`). An entry without metadata is `[mobile]`.
 - `<path> OK` — fetch succeeded
 - `SKIPPED (duplicate of <slug>)` — URL already ingested
 - `FAILED:<reason>` — failed (URL retained in the inbox, retried on the next run)

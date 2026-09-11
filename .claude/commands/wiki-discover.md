@@ -12,11 +12,11 @@ Examples:
   /wiki-discover AgenticAI        # start from a concept page
   /wiki-discover --random         # random seed among mid-band backlink hubs
   /wiki-discover --surprising     # auto-rank top N bridge hubs by composite score
-  /wiki-discover --gaps           # 10-type gap diagnosis + Track A/B/C/D split commentary
+  /wiki-discover --gaps           # 9-type gap diagnosis + Track A/B/C/D split commentary
   /wiki-discover --gaps synthesis # only a specific gap type
 ```
 
-gap slug: sparse-cluster · single-source · stale-hub (A) · bridge (B) · orphan-claims · cap-theme · stale-theme (C) · synthesis · trail · timeline (D).
+gap slug: single-source · stale-hub (A) · bridge (B) · orphan-claims · cap-theme · stale-theme (C) · synthesis · trail · timeline (D).
 
 ## Traversal Pattern
 
@@ -61,18 +61,18 @@ Automatically rank, among existing hubs, the bridge nodes that cross cluster bou
 
 ## Mode 3: Gap Inventory (`--gaps [<slug>]`)
 
-Deterministically diagnose 10 gap types and surface them split by Track. Read-only — no auto-enrichment or authoring trigger. Follow-up actions are explicitly invoked by the human reviewer (`/wiki-news --gap` · `/wiki-lint contradiction` · a Columnist authoring chain).
+Deterministically diagnose 9 gap types and surface them split by Track. Read-only — no auto-enrichment or authoring trigger. Follow-up actions are explicitly invoked by the human reviewer (`/wiki-news --gap` · `/wiki-lint contradiction` · a Columnist authoring chain).
 
 Definitions, thresholds, and priorities have their SoT in [`.claude/operations/gap-detection-rollout.md`](../operations/gap-detection-rollout.md).
 
 1. Call `python tools/lint.py graph gaps --json [--gap-type <slug>] [--top 8]`
 2. Split the output JSON into 4 zones — Track A·B·C·D — with commentary:
 
-   **Track A — auto-enrichment targets** (sparse-cluster·single-source·stale-hub) — bring in external sources
-   - Recommended follow-up: `/wiki-news --gap [<slug>] [--batch]`
+   **Track A — auto-enrichment targets** (single-source·stale-hub) — bring in external sources
+   - Recommended follow-up: `/wiki-news --gap [<slug>]`
 
-   **Track B — human-decision domain** (bridge + hub candidates held back from Track A)
-   - Recommended follow-up: create a new bridge hub or redesign the cluster (unsuitable for auto-enrichment)
+   **Track B — human-decision domain** (bridge)
+   - Recommended follow-up: create a new bridge hub (unsuitable for auto-enrichment)
 
    **Track C — separate cycle** (orphan-claims·cap-theme·stale-theme)
    - Recommended follow-up: `/wiki-lint contradiction theme --fix` (JSON re-derivation: orphan-claim → theme mapping) · theme-MD rewrite via `/wiki-lint contradiction <theme-slug> --fix` · theme burn via the periodic-review dual gate

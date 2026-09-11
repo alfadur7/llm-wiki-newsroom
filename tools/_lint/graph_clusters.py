@@ -7,9 +7,8 @@ alongside the builder.
 Reports:
   - [A] Isolated hubs (entities/concepts with no edges → excluded from clustering)
   - [B] Small clusters (size < MIN_SIZE) — likely over-split, candidate for merge
-  - [C] Mixed clusters (coherence='mixed' and size >= MIN_MIXED_SIZE) — tag
-    distribution too dispersed; either refine label anchors or accept as
-    cross-cutting theme (informational — not counted in actionable total)
+  - [C] removed — it scored the partition against frontmatter `tags`; the letters of
+    the surviving codes are kept so existing references still resolve (see run())
   - [D] Unlabeled clusters — no match in graph/cluster_labels.json; human
     review needed to add a stable label
   - [E] Unassigned sources — sources with no outbound edges to any clustered hub
@@ -59,7 +58,6 @@ GRAPH_PATH = GRAPH_JSON
 HEALTH_LOG_PATH = GRAPH / "_health-log.jsonl"
 
 MIN_SIZE = 3          # below this, cluster is over-split
-MIN_MIXED_SIZE = 10   # mixed clusters smaller than this are ignored (noise)
 FRAGILE_EDGE_THRESHOLD = 1  # cluster-pair with <= this many edges is fragile
 
 # G3 health thresholds (2026-04-30) — advisory only, do not affect actionable
@@ -407,7 +405,6 @@ def run(json_out: bool = False, fix: bool = False) -> int:
     unassigned = data.get("unassigned_sources", [])
 
     small = [c for c in clusters if c["size"] < MIN_SIZE]
-    mixed = [c for c in clusters if c["coherence"] == "mixed" and c["size"] >= MIN_MIXED_SIZE]
     unlabeled = [c for c in clusters if c["matched_label_slug"] is None]
 
     # [G] Fragile bridges — inter-cluster edges where a community pair is
@@ -448,12 +445,13 @@ def run(json_out: bool = False, fix: bool = False) -> int:
     cluster_slugs = {c["slug"] for c in clusters}
     orphan_labels = [s for s in labels_defined if s not in cluster_slugs]
 
-    # [C] Mixed clusters reflect cross-cutting themes (top-tag share < 25%),
-    # which is often a natural domain characteristic rather than a defect.
-    # Reported below as informational with anchor-refinement suggestions,
-    # but excluded from the pass/fail count so reviewers aren't forced to
-    # flatten genuine cross-cutting taxonomies. Use `graph/cluster_labels.json`
-    # anchor_members edits to shift a cluster's center of gravity when desired.
+    # The [C] mixed-cluster report (top-tag share < 25%) was removed: it scored the
+    # partition against frontmatter `tags`, which are page metadata and not a
+    # ground-truth community labelling (rationale and citation in `_build/clusters.py`,
+    # where COHERENCE_THRESHOLD was removed).
+    # Label agreement is read from each cluster's `containment` — the placement
+    # rate of the anchors a human declared — and partition stability from the
+    # consensus check in `lint graph drift`.
     issues_total = len(isolated) + len(small) + len(unlabeled) + len(unassigned)
 
     if json_out:
@@ -462,10 +460,6 @@ def run(json_out: bool = False, fix: bool = False) -> int:
             "health": health,
             "isolated_hubs": isolated,
             "small_clusters": [{"slug": c["slug"], "size": c["size"], "members": c["member_labels"]} for c in small],
-            "mixed_clusters": [
-                {"slug": c["slug"], "size": c["size"], "top_tags": c["top_tags"], "coherence": c["coherence"]}
-                for c in mixed
-            ],
             "unlabeled_clusters": [
                 {"id": c["id"], "size": c["size"], "top_tags": c["top_tags"], "sample_members": c["member_labels"][:5]}
                 for c in unlabeled
@@ -533,34 +527,11 @@ def run(json_out: bool = False, fix: bool = False) -> int:
         print("     Informational — severing the single edge would split the two domains. Reinforce with cross-references if the relation is real, or accept it if they are genuinely distant domains.")
         print()
 
-    def _print_mixed_clusters() -> None:
-        if not mixed:
-            return
-        print(f"[C] Mixed clusters (coherence='mixed', size>={MIN_MIXED_SIZE}) — {len(mixed)}:")
-        for c in mixed:
-            tags = ", ".join(f"{t}({n})" for t, n in c["top_tags"][:3])
-            print(f"     #{c['id']} [{c['slug']}] size={c['size']} tags: {tags}")
-            # Anchor refinement proposal — show members representing each of
-            # the top 3 tags so the reviewer sees candidate anchor hubs
-            # without leaving the report. Actual anchor_members edit stays
-            # human-approved (naming = domain judgment, per CLAUDE.md).
-            top_members = c.get("member_labels", [])[:6]
-            if top_members:
-                print(f"        sample members: {', '.join(top_members)}")
-            print(
-                f"        suggestion: pick 5~10 hubs from this cluster aligned with "
-                f"'{c['top_tags'][0][0] if c.get('top_tags') else '<focus tag>'}' and "
-                f"add to `anchor_members` in {LABELS_PATH} (no automatic editing by Claude · human approval required)."
-            )
-        print(f"     Action: refine anchor_members in {LABELS_PATH}, or accept as cross-cutting theme.")
-        print()
-
     if not issues_total:
         print("OK — no actionable cluster issues.")
-        if orphan_labels or mixed or fragile:
+        if orphan_labels or fragile:
             print()
             _print_orphan_labels()
-            _print_mixed_clusters()
             _print_fragile_bridges()
         return 0
 
@@ -578,8 +549,6 @@ def run(json_out: bool = False, fix: bool = False) -> int:
             print(f"     #{c['id']} [{c['slug']}] size={c['size']}: {', '.join(c['member_labels'][:5])}")
         print("     Tuning suggestion: consider merging with a neighbor, or adjusting resolution.")
         print()
-
-    _print_mixed_clusters()
 
     if unlabeled:
         print(f"[D] Unlabeled clusters (no match in {LABELS_PATH}) — {len(unlabeled)}:")

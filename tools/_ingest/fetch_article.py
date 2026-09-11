@@ -585,7 +585,7 @@ def save_markdown(url: str, title: str, description: str, content: str,
     `ingest_meta` carries channel-of-entry metadata from `_inbox.md` (source,
     gap, hub, cluster, query, priority, ts). When present, two extra
     frontmatter keys are emitted: `ingest_source` (the channel — mobile /
-    interactive / auto-gap / cron-news / hook-adapt) and `ingest_meta` (the
+    interactive / auto-crawl / cron-news / hook-adapt) and `ingest_meta` (the
     remaining key=value pairs joined into a single inline mapping). This lets
     downstream wiki ingest trace why a source was acquired without parsing
     `_archive.md` retrospectively.

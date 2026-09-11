@@ -1,8 +1,8 @@
 """Link-following crawl enrichment — an OKF-style web pass for gap augmentation.
 
-Complements `/wiki-news --gap` (WebSearch). Instead of querying a search engine,
-this follows the *outbound links* of known-good seed pages and surfaces the ones
-that
+This **is** `/wiki-news --gap`'s automatic channel. Instead of querying a search
+engine, it follows the *outbound links* of known-good seed pages and surfaces the
+ones that
 
   (a) live on an allowlisted news domain (`tools/_news/domains.py`),
   (b) are not already a wiki source (`_source_map.json::by_url`, canonical), and
@@ -13,11 +13,12 @@ the hub/tag vocabulary the wiki already holds — hub labels score 2, tags 1, so
 single concrete entity mention clears the default threshold while a lone generic
 tag does not.
 
-Why a second channel beside `--gap`: a search engine surfaces pages that match a
+Why a crawl rather than a search: a search engine surfaces pages that match a
 *query*; a link crawl surfaces pages that known sources *cite* — adjacency a
-query never reaches (the OKF web-pass value proposition). Both feed the same
-`raw/_inbox.md` queue, so fetch + ingest + the desk publish gate stay downstream
-unchanged. This tool NEVER writes wiki pages: editorial judgment is deferred to
+query never reaches (the OKF web-pass value proposition). Operator-run search
+reinforcement is still available through `tools/_news/gap_queries.py`, and feeds
+the same `raw/_inbox.md` queue, so fetch + ingest + the desk publish gate stay
+downstream unchanged. This tool NEVER writes wiki pages: editorial judgment is deferred to
 the reporter (source authoring) and the desk (publish gate). It is read-only by
 default; `--append-inbox` is the one opt-in side effect.
 
@@ -66,8 +67,10 @@ SOURCE_MAP = WIKI / "sources" / "_source_map.json"
 BACKLINKS = WIKI / "_backlinks.json"
 
 # Track-A gap types that map to a specific hub (so their existing sources give a
-# crawl seed). sparse-cluster is cluster-scoped — no single seed URL — so it
-# stays on the WebSearch path (`/wiki-news --gap`), not the crawl path.
+# crawl seed). This is now the whole of Track A: `sparse-cluster` was the one
+# cluster-scoped gap, with no single seed URL, and it was the only gap the
+# automatic WebSearch channel covered — removing it left that channel with
+# nothing to do. Operator-run search reinforcement moved to `gap_queries.py`.
 HUB_GAP_TYPES = ("single-source", "stale-hub")
 
 # Concept-relevance weights. A hub label is a specific entity/concept name

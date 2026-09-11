@@ -14,7 +14,7 @@ raw/_archive.md.
 Inbox line format (single-queue model — see .claude/operations/gap-detection-rollout.md):
 
     https://example.com/article-A
-    https://example.com/article-B  # source=auto-gap gap=single-source hub=AICC ts=2026-05-15T02:00Z
+    https://example.com/article-B  # source=auto-crawl found_on=example.com score=3 ts=2026-05-15T02:00Z
 
 Two spaces + `#` separates the URL from inline metadata so URL fragments (`#anchor`,
 no preceding space) remain part of the URL. Lines without metadata default to
@@ -27,7 +27,7 @@ This honors the "commit/push requires the wiki operator's approval" project rule
 Channels of entry that populate this queue:
   - Mobile share-sheet (HTTP Shortcuts → GitHub Contents API, no metadata)
   - Interactive /wiki-news (source=interactive)
-  - /wiki-news --gap --batch (source=auto-gap, gap=sparse-cluster|single-source|stale-hub)
+  - /wiki-news --gap (source=auto-crawl, found_on=<host> score=<n>)
   - Background cron / /schedule (source=cron-news or hook-adapt)
 
 See .claude/operations/mobile-inbox-setup.md for the one-time mobile setup.
@@ -64,14 +64,14 @@ SOURCE_MAP = REPO_ROOT / "wiki" / "sources" / "_source_map.json"
 INBOX_HEADER = """# Inbox
 
 Multi-channel URL queue. One line = one URL, optionally with `  # key=value ...` metadata attached.
-Entry channels: mobile share-sheet · `/wiki-news` interactive · `/wiki-news --gap --batch` · background cron.
+Entry channels: mobile share-sheet · `/wiki-news` interactive · `/wiki-news --gap` · background cron.
 
 Emptied by running `python tools/_ingest/fetch_inbox.py` or `/wiki-ingest inbox`
 (failed URLs are retained so the next run retries them).
 
 Line format:
   https://example.com/article-A
-  https://example.com/article-B  # source=auto-gap gap=single-source hub=AICC ts=2026-05-15T02:00Z
+  https://example.com/article-B  # source=auto-crawl found_on=example.com score=3 ts=2026-05-15T02:00Z
 
 The separator between the URL and the metadata is **two spaces + `#`**. A URL fragment (`#anchor`) attaches with no space, so it stays safe.
 A URL without metadata defaults to `source=mobile`.
@@ -87,7 +87,7 @@ ARCHIVE_HEADER = """# Archive
 Accumulated results of `python tools/_ingest/fetch_inbox.py` runs. Grouped by date, with the most recent date at the end of the file.
 
 Each line format: `- HH:MM [<source>] <URL> → <result>`
-- `[<source>]` — entry channel (`mobile`/`interactive`/`auto-gap`/`cron-news`/`hook-adapt`). An entry without metadata is `[mobile]`.
+- `[<source>]` — entry channel (`mobile`/`interactive`/`auto-crawl`/`cron-news`/`hook-adapt`). An entry without metadata is `[mobile]`.
 - `<path> OK` — fetch succeeded
 - `SKIPPED (duplicate of <slug>)` — URL already ingested
 - `FAILED:<reason>` — failed (URL retained in the inbox, retried on the next run)
@@ -196,7 +196,7 @@ _DATE_SECTION_RE = re.compile(r"^## \d{4}-\d{2}-\d{2}\s*$", re.MULTILINE)
 def append_archive(entries: list[tuple[str, str, str, str]]) -> None:
     """entries: `[(ts, source, url, result), ...]`.
 
-    `source` is the inbox-metadata channel (e.g. `mobile`, `auto-gap`,
+    `source` is the inbox-metadata channel (e.g. `mobile`, `auto-crawl`,
     `interactive`); when no metadata accompanied the URL we synthesize
     `mobile` so the archive always carries a channel tag."""
     if not entries:

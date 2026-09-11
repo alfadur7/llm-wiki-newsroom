@@ -249,7 +249,6 @@ def test_seeds_from_gaps_derives_from_hub_backlinks():
     gaps = _gaps({
         "single-source": [{"id": "entities/카카오뱅크.md"}],
         "stale-hub": [{"id": "concepts/MSP.md"}],
-        "sparse-cluster": [{"slug": "bank-it-digital"}],  # must be ignored
     })
     backlinks = {
         "카카오뱅크": [{"from": "sources/kakaobank-ai.md"}],

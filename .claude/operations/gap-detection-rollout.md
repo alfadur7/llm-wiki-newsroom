@@ -21,7 +21,6 @@ Background auto-enrichment is far more effective for some gap kinds than others.
 |---|---|---|---|
 | single-source hub | high | Going from 1 → 2 sources on an existing hub resolves it; passes the Safe 6 conditions naturally | **Track A (auto)** |
 | stale-hub (relative staleness) | medium | A sources-only append no longer moves the hub's `hub_age` — `last_updated` is the narrative date ([`layers/hub.md`](../layers/hub.md)) — though a cascade that strengthens facts still does, so enrichment closes some but not all. The test is also relative (`hub_age - cluster_avg_age`), so the flag moves with cluster-average drift alone | **Track A (auto)** |
-| sparse-cluster | medium | Cluster cohesion needs sources that cite several hubs at once; creating a new hub is gated | **Track A (side effect)** |
 | bridge node | low | The two clusters don't naturally meet, which is why a bridge exists — auto-enrichment can't route around that; the real fix is a new bridge hub (gated) | **Track B (operator surface)** |
 | contradiction (orphan-claims · cap-theme · stale-theme) | very low (can backfire) | These are all theme-MD rewrite/mapping work — the `lint contradiction` cycle's domain | **Track C (separate cycle)** |
 | derived coverage (synthesis · trail · timeline) | — | A missing page that **integrates** already-ingested material; filled by columnist authoring, not external search — a different problem from an input gap | **Track D (derivation)** |
@@ -29,15 +28,15 @@ Background auto-enrichment is far more effective for some gap kinds than others.
 ### Track model
 
 ```
-Track A (background auto: single-source · stale-hub main + sparse-cluster secondary)
-  lint graph gaps → wiki-news --gap [sparse-cluster|single-source|stale-hub] --batch
+Track A (background auto: single-source · stale-hub)
+  wiki-news --gap [single-source|stale-hub]   (the diagnosis is built into crawl.py)
     → append meta to _inbox.md
     → /wiki-ingest inbox --safe (once L2 is stable)
 
-Track B (operator decision surface: bridge + auto-deferred candidates)
+Track B (operator decision surface: bridge)
   /wiki-discover --gaps
-    → combined report of bridges + items the Track A gate deferred
-    → operator decision → new hub / cluster redesign
+    → bridge ranking
+    → operator decision → new bridge hub
 
 Track C (separate cycle, contradiction: orphan-claims · cap-theme · stale-theme)
   /wiki-lint contradiction theme --fix
@@ -55,7 +54,6 @@ Input gaps (Track A·B·C — external source ingest · operator decision · the
 
 | Track | Gap | Definition | Threshold | severity |
 |---|---|---|---|---|
-| A | **sparse-cluster** | weak label cohesion, size ≥ 20 | `coherence == "mixed"` AND `size >= 20` (containment feeds only the severity score) | `1 - containment` |
 | A | **single-source** | 1 source but normal influence | `len(sources) == 1` AND `hub_hub_degree >= 9` AND `cluster_count >= 2` | `0.5` (constant) |
 | A | **stale-hub** | cluster active but this hub alone stagnant | `(hub_age - cluster_avg_age) >= 14d` AND `cluster_avg_age <= 10d` | `(hub_age - cluster_avg_age) / 14` |
 | B | **bridge** | multi-cluster junction | `discover.py surprising` composite-score top-N (default 10 via `detect_bridge_nodes` / 15 via the standalone CLI) | normalized composite score |
@@ -78,17 +76,23 @@ A novelty weight can be added later, once `_health-log.jsonl` trend data has acc
 
 ### Enrichment channels (per gap kind)
 
-Two complementary channels fill `_inbox.md` for Track A — a **link crawl** (following adjacent pages an existing source cited) and a **web-search query** (contract below). `/wiki-news --gap` default routing:
+One **automatic** channel fills `_inbox.md` for Track A — a **link crawl** following the adjacent pages an existing source cited. The automatic web-search channel is gone: `sparse-cluster` was the only gap it covered, so removing that gap emptied the path (`crawl.py` `HUB_GAP_TYPES` comment). `/wiki-news --gap` routing:
 - **hub-level gaps** (single-source · stale-hub) → `tools/_news/crawl.py --gap-seed`. The seed derives automatically from hub → backlinks → `source_url`, so no query gate is needed (the seed is already a trusted source). After a domain-allowlist and `by_url` dedup check, it appends with `source=auto-crawl`. Seed derivation, the relevance lexicon, and the cap are SoT in [`tools/_news/crawl.py`](../../tools/_news/crawl.py).
-- **cluster-level gaps** (sparse-cluster) → web search. There is no single seed URL, so a query pulls in new sources.
 
-### Query-generation contract (Track A only)
+Web-search reinforcement remains as an **operator-run manual path**, and this CLI is its only entry point — no program path calls the query builder:
+
+```
+python tools/_news/gap_queries.py [--gap-type <slug>] [--limit N] [--json]
+```
+
+It prints queries per the contract below; the operator has the Reporter run them through WebSearch (the only role whose frontmatter allows that tool) and appends a chosen URL to `_inbox.md` as `<url>` + **two spaces** + `# source=interactive gap=<slug> hub=<hub>`, per § Meta-line format. The channel value is `interactive` because the operator picked the result — no new value is introduced. The caps below apply unchanged.
+
+### Query-generation contract (operator manual path — Track A gap kinds)
 
 Queries are generated in **English by default**; the Korean-language variants below fire only under `WIKI_LANG=ko` (see [`tools/_news/gap_queries.py`](../../tools/_news/gap_queries.py)). Tune the intent words for your domain.
 
 | Gap | Q1 | Q2 | Q3 (optional) |
 |---|---|---|---|
-| **sparse-cluster** | `<cluster_name> 2026 trends` | `<cluster_name> <top_tag1> <top_tag2> 2026` (dedup words already in the cluster name) | — |
 | **single-source** | `<hub> <cluster_top_hub> 2026` | `<hub> 2026 announcement` | `<hub> <cluster_name> trends` |
 | **stale-hub** | `<hub> 2026 announcement update` | `<hub> <cluster_top_hub> 2026` | — |
 
@@ -98,17 +102,19 @@ Normalization:
 
 ### Domain filter
 
-Web search applies a curated allowlist of trusted, non-aggregator news domains as the default set, with an interactive `--no-filter` opt-out; `--batch` forces the filter (to guarantee background quality). The set is SoT in [`tools/_news/domains.py`](../../tools/_news/domains.py) — validate and adjust it for your corpus and language.
+One curated allowlist of trusted, non-aggregator news domains serves both channels, SoT in [`tools/_news/domains.py`](../../tools/_news/domains.py) — validate and adjust it for your corpus and language. The crawl channel enforces it and takes `--no-filter` as the opt-out (`crawl.py`); on the operator manual path the allowlist is what the operator passes to WebSearch as `allowed_domains`, since `gap_queries.py` only prints queries.
 
-### Hard caps
+### Hard caps (operator manual path)
+
+The crawl channel's caps are SoT in `crawl.py`'s defaults — `--gap-limit` is **hubs per gap type** and the fetch budget is the separate `--max-pages` (total pages). The per-query arithmetic below does not apply to it.
 
 | Item | Value | Rationale |
 |---|---|---|
 | queries per gap | 2–3 (varies by gap kind) | 1 lacks diversity, 4+ is excessive |
 | results per query | 6 | keeps a cycle's volume manageable |
 | new sources per gap | 8 | overflow is sorted by priority, then cut |
-| gaps processed per cycle (`--batch`) | 5 | bounds the per-cycle enrichment volume |
-| `_inbox.md` queue-length alarm | 30 | sized to operator review capacity |
+| candidates per gap type (`gap_queries.py --limit`) | 5 | two Track-A types, so up to 10 per run |
+| `_inbox.md` queue-length alarm | 30 | sized to operator review capacity — shared by both channels (`crawl.py INBOX_ALARM`) |
 
 ## Single inbox
 
@@ -118,7 +124,7 @@ The three entry channels — mobile share-sheet, interactive `/wiki-news`, and b
 
 ```
 https://example.com/article-A
-https://example.com/article-B  # source=auto-gap gap=single-source hub=AICC ts=2026-05-15T02:00Z
+https://example.com/article-B  # source=auto-crawl found_on=example.com score=3 ts=2026-05-15T02:00Z
 https://example.com/article-C  # source=interactive query="..."
 ```
 
@@ -136,7 +142,7 @@ https://example.com/article-C  # source=interactive query="..."
 
 | Level | Auto scope | Operator gate |
 |---|---|---|
-| **L1** Search-only | `lint gaps` → `wiki-news --batch` → `_inbox.md` append | explicit `/wiki-ingest inbox` call |
+| **L1** Collect-only | `wiki-news --gap` → `_inbox.md` append (the diagnosis is built into `crawl.py`) | explicit `/wiki-ingest inbox` call |
 | **L2** Safe Auto-Ingest | L1 + automatic `/wiki-ingest inbox --safe` for raw that passes the Safe 6 | gate-triggered raw is split to `raw/_review_queue.md` for operator review; commit/push stays manual |
 | ~~L3~~ Full Auto + Commit | — | **rejected** — an agent must never commit on its own |
 
@@ -158,9 +164,8 @@ Otherwise it moves to `raw/_review_queue.md` for operator review.
 |---|---|
 | background auto-ingest pollutes the wiki | Safe 6 conditions + alarm when `_health-log.jsonl` gap trend worsens |
 | `_review_queue.md` grows unbounded | report queue length daily at the tail of log.md; auto-stop background when it exceeds the threshold (e.g. ≥30) |
-| repeatedly searching the same gap | compare against the previous cycle's gap state → diversify the query or skip an unresolved gap |
 | concurrent background runs | a `raw/.bg_cycle.lock` file lock |
-| web-search cost blowup | hard caps: ≤3 queries per gap, ≤5 candidates per gap type |
+| crawl fetch-volume blowup | `crawl.py` caps: `--max-pages` · `--per-domain-cap` · `--min-score` |
 | background commit violates policy | the code never calls `git commit` |
 
 ## SoT

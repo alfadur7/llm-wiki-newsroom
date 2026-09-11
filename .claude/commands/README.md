@@ -16,7 +16,7 @@ The slash-argument notation in each row quotes the child file's `Usage` line as 
 | Query | `/wiki-query <question>` | "query: ..." | [`wiki-query.md`](wiki-query.md) |
 | Lint | `/wiki-lint [<group>] [<subcmd\|target>] [--fix]` | "lint the wiki" | [`wiki-lint.md`](wiki-lint.md) |
 | Build graph | `/wiki-graph` | — | [`wiki-graph.md`](wiki-graph.md) |
-| News search | `/wiki-news [cluster\|keyword \| --gap [<slug>] [--batch] [--no-filter]]` | — | [`wiki-news.md`](wiki-news.md) |
+| News search | `/wiki-news [cluster\|keyword \| --gap [<slug>] [--no-filter]]` | — | [`wiki-news.md`](wiki-news.md) |
 | Export | `/wiki-export` | (for Claude.ai Project Knowledge) | [`wiki-export.md`](wiki-export.md) |
 | Discover | `/wiki-discover <seed \| --random \| --surprising \| --gaps [<slug>]>` | "diagnose gaps" → `--gaps` | [`wiki-discover.md`](wiki-discover.md) |
 | Trail | `/wiki-trail <create\|follow\|list> [args]` | — | [`wiki-trail.md`](wiki-trail.md) |
@@ -88,7 +88,7 @@ Command-specific procedures (mapping rules, sync rules, etc.) live inside the re
 | Conflict Axis Sync Rule (4-tier bottom-up sync) | [`wiki-lint.md` → `## Sub-procedure: Conflict Axis Sync Rule`](wiki-lint.md#sub-procedure-conflict-axis-sync-rule) |
 | Parallel Batch Mode (ingest fanout) | [`wiki-ingest.md`](wiki-ingest.md) |
 
-The [A]–[G] code definitions of the Cluster Health Diagnostic are not a separate sub-procedure; the per-code definitions · action guides are SoT in `tools/_lint/graph_clusters.py` (module docstring + report output — single SoT), with the pass/fail posture noted in the `graph clusters` row of the [`wiki-lint.md` → `## Group Structure`](wiki-lint.md#group-structure) table.
+The [A]·[B]·[D]–[G] code definitions of the Cluster Health Diagnostic are not a separate sub-procedure; the per-code definitions · action guides are SoT in `tools/_lint/graph_clusters.py` (module docstring + report output — single SoT), with the pass/fail posture noted in the `graph clusters` row of the [`wiki-lint.md` → `## Group Structure`](wiki-lint.md#group-structure) table.
 
 ## Invocation Flow
 

@@ -4,9 +4,7 @@ Each gap is named by what it *is* (a semantic slug), not an opaque number.
 Slugs are partitioned across four tracks per
 `.claude/operations/gap-detection-rollout.md`:
 
-  Track A (auto-backfill targets — wiki-news --gap [...] --batch)
-    sparse-cluster   coherence == "mixed" AND size >= 20
-                     (domain-ambiguity signal)
+  Track A (auto-backfill targets — wiki-news --gap [...])
     single-source    len(sources) == 1 AND degree >= 9
                      AND neighbor-cluster count >= 2
                      (influential single-source hub)
@@ -31,7 +29,7 @@ Slugs are partitioned across four tracks per
 Output: a single Gap Inventory section with the four tracks separated so
 the operator sees at a glance which gaps are auto-fillable vs. which need
 human / theme-management / derivation attention. JSON mode for programmatic
-consumers (wiki-discover --gaps, wiki-news --gap --batch).
+consumers (wiki-discover --gaps, wiki-news --gap).
 
 Exit code 0 if the backlog is empty, 1 otherwise — the standing rankings
 (`NON_BACKLOG_BUCKETS`) sit outside both the total and the exit code, so a state
@@ -64,7 +62,7 @@ TIMELINES_DIR = WIKI / "timelines"
 # Canonical gap slugs grouped by track. Order within each track is the
 # display order. The flat list (VALID_GAP_TYPES) is the `--gap-type` /
 # `--gaps` choice set and the single source of truth for valid slugs.
-TRACK_A_SLUGS = ["sparse-cluster", "single-source", "stale-hub"]
+TRACK_A_SLUGS = ["single-source", "stale-hub"]
 TRACK_B_SLUGS = ["bridge"]
 TRACK_C_SLUGS = ["orphan-claims", "cap-theme", "stale-theme"]
 TRACK_D_SLUGS = ["synthesis", "trail", "timeline"]
@@ -73,7 +71,6 @@ VALID_GAP_TYPES = TRACK_A_SLUGS + TRACK_B_SLUGS + TRACK_C_SLUGS + TRACK_D_SLUGS
 # Thresholds — derived from current wiki measurements (568 hubs, median
 # hub-hub degree 16, p25 9, age median 9d max 35d, 9 clusters size 25-115).
 # See gap-detection-rollout.md "Calibrating thresholds".
-SPARSE_CLUSTER_MIN_SIZE = 20
 SINGLE_SOURCE_MIN_DEGREE = 9         # p25 of hub-hub degree — floor for "normal influence"
 SINGLE_SOURCE_MIN_CLUSTER_COUNT = 2  # adjacent to multiple clusters
 STALE_HUB_AGE_GAP_DAYS = 14          # hub_age - cluster_avg_age
@@ -101,8 +98,15 @@ TIMELINE_SECTION_RE = re.compile(r"^##[^#\n]*(Timeline|시간축|연대기|타�
 # bridge is a standing top-N ranking, not a queue: work one and the next candidate
 # takes its slot, so summing it into the total lets a constant bury the real backlog.
 # Every other bucket is a threshold predicate that can be driven to zero, so it stays
-# in the total — including sparse-cluster, which `gap-detection-rollout.md` routes to
-# the Track A auto-enrich channel.
+# in the total.
+#
+# `sparse-cluster` was removed from the gap set rather than moved here. Its trigger
+# was `coherence == "mixed"`, and `coherence` was deleted from `_build/clusters.py` in
+# the same change, so the detector had no trigger left. It was not given a replacement:
+# upstream re-anchored it on `containment < 1.0` and then retired it on measurements
+# this corpus is far too small to reproduce. What it reported is read instead from each
+# cluster's `containment` in `graph/_clusters.json`, and partition instability from the
+# consensus check in `lint graph drift`.
 NON_BACKLOG_BUCKETS = {"bridge"}
 # Bridge slice trail coverage reads. Fixed, so the backlog total and the exit code
 # do not move with the `--top` display cap.
@@ -191,34 +195,6 @@ def _impact_score(degree: int, cluster_size: int, max_cluster_size: int) -> floa
     """Common impact multiplier — log(degree+1) × cluster_size_norm."""
     norm = (cluster_size / max_cluster_size) if max_cluster_size else 1.0
     return math.log(degree + 1) * norm
-
-
-def detect_sparse_cluster(clusters: dict) -> list[dict]:
-    """sparse-cluster: mixed coherence with size >= 20 (severity = 1 - containment)."""
-    out: list[dict] = []
-    for cl in clusters.get("clusters", []):
-        if cl.get("coherence") != "mixed":
-            continue
-        if cl.get("size", 0) < SPARSE_CLUSTER_MIN_SIZE:
-            continue
-        # clusters.py always writes the `containment` key but its value is
-        # None for auto-labelled clusters (no anchors). A mixed, size≥20
-        # auto-labelled cluster reaches here, so coerce None → 1.0 (severity 0)
-        # rather than crashing on `1.0 - None`.
-        containment = cl.get("containment")
-        containment = 1.0 if containment is None else containment
-        severity = round(1.0 - containment, 3)
-        out.append({
-            "slug": cl["slug"],
-            "name": cl.get("name", cl["slug"]),
-            "size": cl["size"],
-            "coherence": cl["coherence"],
-            "containment": containment,
-            "severity": severity,
-            "priority": round(math.log(cl["size"] + 1) * (1.0 - containment + 0.1), 4),
-        })
-    out.sort(key=lambda r: r["priority"], reverse=True)
-    return out
 
 
 def detect_single_source(hub_fm: dict[str, dict],
@@ -546,8 +522,6 @@ def run(*, json_out: bool = False,
         return gap_type is None or gap_type == slug
 
     track_a: dict = {}
-    if _want("sparse-cluster"):
-        track_a["sparse-cluster"] = detect_sparse_cluster(clusters)
     if _want("single-source"):
         track_a["single-source"] = detect_single_source(
             hub_fm, nbrs, hub_to_cluster, max_cluster_size, cluster_size
@@ -607,7 +581,6 @@ def run(*, json_out: bool = False,
     if json_out:
         print(json.dumps({
             "thresholds": {
-                "sparse-cluster.min_size": SPARSE_CLUSTER_MIN_SIZE,
                 "single-source.min_degree": SINGLE_SOURCE_MIN_DEGREE,
                 "single-source.min_cluster_count": SINGLE_SOURCE_MIN_CLUSTER_COUNT,
                 "stale-hub.age_gap_days": STALE_HUB_AGE_GAP_DAYS,
@@ -634,13 +607,7 @@ def run(*, json_out: bool = False,
           f"({'·'.join(sorted(NON_BACKLOG_BUCKETS))} — outside the total) · {len(counts)} buckets")
     print()
     if track_a:
-        print("─── Track A — auto-backfill targets (wiki-news --gap [...] --batch) ───")
-        if "sparse-cluster" in track_a:
-            print(f"\n[sparse-cluster] Sparse / Mixed Cluster — {len(track_a['sparse-cluster'])}")
-            _print_table(track_a["sparse-cluster"], [
-                ("cluster", "slug", 32), ("size", "size", 6),
-                ("coh", "coherence", 8), ("cont", "containment", 7), ("prio", "priority", 8),
-            ], limit=cap)
+        print("─── Track A — auto-backfill targets (wiki-news --gap [...]) ───")
         if "single-source" in track_a:
             print(f"\n[single-source] Single-source hub — {len(track_a['single-source'])}")
             _print_table(track_a["single-source"], [

@@ -62,9 +62,14 @@ RESOLUTION = 1.0  # Leiden RB-Configuration resolution (Louvain-equivalent defau
                   # fixed seed. Resolution semantics match Louvain.
 SEED = 42
 SOURCE_WEIGHT_THRESHOLD = 0.3  # sources list under every cluster with weight >= this
-COHERENCE_THRESHOLD = 0.25      # top tag share required for "single"-tag coherence
-                                # (wiki tag vocabulary is deliberately broad;
-                                # 25% coverage already signals a dominant theme)
+# `coherence` (single/mixed by top-tag share) is gone. It was an attribute-purity
+# check scoring the partition against frontmatter `tags`, and Peel, Larremore & Clauset
+# (Sci Adv 2017) name that trap directly: "metadata are not the same as ground truth" —
+# page metadata is not a community labelling to be scored against, whatever else it is
+# good for. The replacement signal is `containment`, the placement rate of the anchors
+# a human declared, whose control sits outside the objective function and so does not
+# circle back on itself (modularity does — Leiden maximises it). Partition stability is
+# the consensus check in `lint graph drift`.
 HYSTERESIS_THRESHOLD = 0.5      # Jaccard similarity threshold for treating a new
                                 # community as continuation of a previous-build
                                 # cluster — added 2026-04-30 to keep stable label
@@ -621,12 +626,6 @@ def run(cold: bool = False) -> None:
             la = _auto_label(top_tags, members, used_slugs)
             used_slugs.add(la["slug"])
 
-        if top_tags and members:
-            dominant = top_tags[0][1]
-            coherence = "single" if dominant / len(members) >= COHERENCE_THRESHOLD else "mixed"
-        else:
-            coherence = "untagged"
-
         for m in members:
             hub_assignments[m] = la["slug"]
 
@@ -644,7 +643,6 @@ def run(cold: bool = False) -> None:
             "members": members,
             "member_labels": [hub_labels.get(m, m) for m in members],
             "top_tags": top_tags,
-            "coherence": coherence,
         })
 
     # Propagate to sources via weighted vote of linked hubs (approach B).
@@ -673,7 +671,6 @@ def run(cold: bool = False) -> None:
         if n["id"].startswith("sources/") and n["id"] not in source_assignments
     ]
 
-    mixed_clusters = sum(1 for c in clusters_out if c["coherence"] == "mixed")
     unlabeled = sum(1 for c in clusters_out if c["matched_label_slug"] is None)
 
     out = {
@@ -682,14 +679,12 @@ def run(cold: bool = False) -> None:
         "resolution": RESOLUTION,
         "seed": SEED,
         "source_weight_threshold": SOURCE_WEIGHT_THRESHOLD,
-        "coherence_threshold": COHERENCE_THRESHOLD,
         "hysteresis_threshold": HYSTERESIS_THRESHOLD,
         "stats": {
             "hub_nodes": G.number_of_nodes(),
             "hub_edges": G.number_of_edges(),
             "isolated_hubs": len(isolated_hubs),
             "cluster_count": len(clusters_out),
-            "mixed_clusters": mixed_clusters,
             "unlabeled_clusters": unlabeled,
             "hysteresis_carried": hyst_count,
             "sources_assigned": len(source_assignments),
@@ -710,13 +705,13 @@ def run(cold: bool = False) -> None:
     for c in clusters_out:
         tag_str = ", ".join(f"{t}({n})" for t, n in c["top_tags"][:3]) or "—"
         tag_marker = "○" if c["matched_label_slug"] else "✎"  # ✎ = needs labeling
-        print(f"  {tag_marker} #{c['id']:2d}  [{c['slug']:30s}]  size={c['size']:3d}  {c['coherence']:8s}  tags: {tag_str}")
+        cont = c.get("containment")
+        cont_str = f"cont={cont:.2f}" if isinstance(cont, (int, float)) else "cont=—"
+        print(f"  {tag_marker} #{c['id']:2d}  [{c['slug']:30s}]  size={c['size']:3d}  {cont_str:9s}  tags: {tag_str}")
 
     print(f"\nSources: {len(source_assignments)} assigned, {len(unassigned_sources)} unassigned")
     if unlabeled:
         print(f"\n{unlabeled} cluster(s) have no label match — review graph/cluster_labels.json")
-    if mixed_clusters:
-        print(f"{mixed_clusters} cluster(s) flagged 'mixed' (top tag <{int(COHERENCE_THRESHOLD*100)}% coverage) — candidates for label refinement")
 
 
 # ============================================================

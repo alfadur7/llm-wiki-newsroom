@@ -18,7 +18,7 @@ The copy editor's role is classified as an agent, but its execution is determini
 ## Capability Boundary
 
 **O — what to do** (`tools/lint.py [<group>] [<subcmd|target>] [--fix]`, a single entry point):
-- **graph group** — clusters (isolated hub·too-small·mixed-topic·unnamed·unassigned source·orphan label·fragile bridge, 7 codes) · gaps (informational — counts the backlog only, the standing bridge ranking held apart) · drift (**only** this one is opt-in — cold-start comparison)
+- **graph group** — clusters (isolated hub·too-small·unnamed·unassigned source·orphan label·fragile bridge, 6 codes) · gaps (informational — counts the backlog only, the standing bridge ranking held apart) · drift (**only** this one is opt-in — cold-start quality gap · consensus ARI · per-cluster split rate)
 - **hub group** — entity·concept body schema (`## Overview` + `## Connections`, 2 H2s · body ≥ 200 chars) · timeline schema
 - **meta group** — meta-doc schema (section headers in English·flat-path guard·craft-skill integrity·anchor·file-ref·slash-cmd integrity·reserved-filename collision (wiki/ basenames case-folding to CLAUDE.md/README.md)·log ordering·defect-ledger vocabulary)
 - **overview group** — Layer 2-3 cluster overview·Layer 2-4 root overview Rubric (criteria per the `overview-cluster`·`overview-aggregate` roster in `.claude/layers/_manifest.json`)

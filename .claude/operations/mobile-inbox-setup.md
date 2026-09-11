@@ -2,7 +2,7 @@
 
 A one-time setup to commit a URL straight from your phone's share sheet into the wiki inbox queue (`raw/_inbox.md`). On the desktop, `/wiki-ingest inbox` then processes the queue.
 
-**Position in the single-queue model** — `_inbox.md` is the shared queue for three channels: mobile, interactive `/wiki-news`, and background auto-enrichment (`/wiki-news --gap --batch`). A mobile entry appends a plain URL with no meta line, and `fetch_inbox.py` gives meta-less entries a `source=mobile` default. The JS shortcut in this guide works regardless of the other channels. The single-queue policy is SoT in [`gap-detection-rollout.md`](gap-detection-rollout.md).
+**Position in the single-queue model** — `_inbox.md` is the shared queue for three channels: mobile, interactive `/wiki-news`, and background auto-enrichment (`/wiki-news --gap`). A mobile entry appends a plain URL with no meta line, and `fetch_inbox.py` gives meta-less entries a `source=mobile` default. The JS shortcut in this guide works regardless of the other channels. The single-queue policy is SoT in [`gap-detection-rollout.md`](gap-detection-rollout.md).
 
 **Architecture** — the mobile side needs no Obsidian or vault sync. HTTP Shortcuts (FOSS) → GitHub Contents API commits directly.
 

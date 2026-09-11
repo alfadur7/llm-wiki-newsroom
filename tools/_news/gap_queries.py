@@ -1,9 +1,8 @@
 """Generate search queries from `lint graph gaps --json` output.
 
-Three Track-A gap types are auto-fillable per the Phase 2C design
+Two Track-A gap types are auto-fillable per the Phase 2C design
 (`.claude/operations/gap-detection-rollout.md`):
 
-  sparse-cluster  → cluster-scope query for overview refresh
   single-source   → hub-specific query with cluster context
   stale-hub       → hub-specific query with "announcement update" intent
 
@@ -24,7 +23,7 @@ from __future__ import annotations
 
 import json
 import sys
-from collections import Counter, defaultdict
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -33,7 +32,7 @@ YEAR = str(datetime.now().year)  # recency token for generated search queries
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from _lib import CLUSTERS_JSON, GRAPH_JSON, HUB_PREFIXES, REPO_ROOT, WIKI, korean_mode, parse_frontmatter  # noqa: E402
-from _news.normalize import hub_korean_label, normalize_tags  # noqa: E402
+from _news.normalize import hub_korean_label  # noqa: E402
 
 GRAPH_PATH = GRAPH_JSON
 CLUSTERS_PATH = CLUSTERS_JSON
@@ -57,10 +56,8 @@ def _qt() -> dict[str, str]:
         "announcement_update": "announcement update",
     }
 
-# Per-gap query count cap. sparse-cluster scope queries are intrinsically
-# broader so 2 variants suffice; single-source/stale-hub hub-specific queries
-# benefit from a 3rd context variant when cluster data is available.
-QUERIES_PER_SPARSE_CLUSTER = 2
+# Per-gap query count cap. Hub-specific queries benefit from a 3rd context
+# variant when cluster data is available.
 QUERIES_PER_SINGLE_SOURCE = 3
 QUERIES_PER_STALE_HUB = 2
 
@@ -113,55 +110,6 @@ def _cluster_top_hubs(clusters: dict, graph: dict, hub_fm: dict[str, dict]) -> d
     for slug, members in by_cluster.items():
         members.sort(key=lambda h: len(nbrs.get(h, ())), reverse=True)
         out[slug] = [_hub_label(h, hub_fm) for h in members]
-    return out
-
-
-def _cluster_top_tags(clusters: dict, hub_fm: dict[str, dict]) -> dict[str, list[str]]:
-    """Top-N tags per cluster after `normalize_tags` collapse, ordered by frequency."""
-    out: dict[str, list[str]] = {}
-    for c in clusters.get("clusters", []):
-        counter: Counter = Counter()
-        for hub_id in c.get("members", []):
-            fm = hub_fm.get(hub_id)
-            if not fm:
-                continue
-            tags = fm.get("tags") or []
-            for t in normalize_tags(tags):
-                counter[t] += 1
-        out[c["slug"]] = [t for t, _ in counter.most_common(5)]
-    return out
-
-
-def build_queries_for_sparse_cluster(rows: list[dict],
-                                     cluster_info: dict[str, dict],
-                                     cluster_tags: dict[str, list[str]]) -> list[dict]:
-    """sparse-cluster → cluster-scope queries (2 per gap).
-
-    The second query drops tags that already appear inside the cluster name
-    so a cluster like `LLM·파운데이션 모델` (LLMs·foundation models) doesn't
-    re-emit `LLM` and `AI` as the top tags."""
-    out: list[dict] = []
-    for row in rows:
-        slug = row["slug"]
-        name = cluster_info.get(slug, {}).get("name", slug)
-        name_lower = name.lower()
-        tags = cluster_tags.get(slug, [])
-        # Drop tags already represented in the cluster name (case-insensitive,
-        # substring match — Korean tags rarely collide, English acronyms do).
-        unique_tags = [t for t in tags if t.lower() not in name_lower]
-        qt = _qt()
-        queries = [f"{name} {YEAR} {qt['issue_trends']}"]
-        if unique_tags:
-            tag_part = " ".join(unique_tags[:2])
-            queries.append(f"{name} {tag_part} {YEAR}")
-        queries = queries[:QUERIES_PER_SPARSE_CLUSTER]
-        out.append({
-            "gap": "sparse-cluster",
-            "target": slug,
-            "target_label": name,
-            "queries": queries,
-            "priority": row.get("priority", 0),
-        })
     return out
 
 
@@ -262,7 +210,7 @@ def build_all(gaps_json: dict[str, Any], *, limit_per_type: int | None = None) -
 
     `gaps_json` is the parsed object from the lint command. Returns one entry
     per gap candidate, ordered: single-source (highest hit rate in validation)
-    → stale-hub → sparse-cluster. `limit_per_type` caps each gap type's
+    → stale-hub. `limit_per_type` caps each gap type's
     candidate count — pass the operator's batch budget to keep the inbox
     queue bounded.
     """
@@ -273,14 +221,11 @@ def build_all(gaps_json: dict[str, Any], *, limit_per_type: int | None = None) -
     cluster_info = {c["slug"]: c for c in clusters.get("clusters", [])}
     hub_fm = _load_hub_fm()
     top_hubs = _cluster_top_hubs(clusters, graph, hub_fm)
-    top_tags = _cluster_top_tags(clusters, hub_fm)
 
     track_a = gaps_json.get("track_a", {})
-    sparse = track_a.get("sparse-cluster", []) or []
     single = track_a.get("single-source", []) or []
     stale = track_a.get("stale-hub", []) or []
     if limit_per_type is not None:
-        sparse = sparse[:limit_per_type]
         single = single[:limit_per_type]
         stale = stale[:limit_per_type]
 
@@ -288,12 +233,12 @@ def build_all(gaps_json: dict[str, Any], *, limit_per_type: int | None = None) -
     # single-source first — validation showed highest novel-source yield (80%)
     plan.extend(build_queries_for_single_source(single, cluster_info, top_hubs, hub_fm))
     plan.extend(build_queries_for_stale_hub(stale, cluster_info, top_hubs, hub_fm))
-    plan.extend(build_queries_for_sparse_cluster(sparse, cluster_info, top_tags))
     return plan
 
 
-# CLI for sanity checking — `python -m tools._news.gap_queries` or
-# `python tools/_news/gap_queries.py` reads from stdin or runs lint inline.
+# CLI — the operator's manual web-search path (SoT: gap-detection-rollout.md).
+# `python tools/_news/gap_queries.py [--gap-type <slug>] [--limit N] [--json]` runs the
+# gap diagnosis inline and prints the queries; it reads no stdin.
 def main() -> int:
     import argparse
 
@@ -302,7 +247,7 @@ def main() -> int:
     ap.add_argument("--limit", type=int, default=5,
                     help="cap on candidates per gap type (default 5)")
     ap.add_argument("--gap-type",
-                    choices=["sparse-cluster", "single-source", "stale-hub"],
+                    choices=["single-source", "stale-hub"],
                     default=None,
                     help="restrict to a single Track-A gap slug")
     ap.add_argument("--json", action="store_true",

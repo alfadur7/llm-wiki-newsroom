@@ -4,14 +4,12 @@
   "resolution": 1.0,
   "seed": 42,
   "source_weight_threshold": 0.3,
-  "coherence_threshold": 0.25,
   "hysteresis_threshold": 0.5,
   "stats": {
     "hub_nodes": 11,
     "hub_edges": 33,
     "isolated_hubs": 0,
     "cluster_count": 3,
-    "mixed_clusters": 0,
     "unlabeled_clusters": 0,
     "hysteresis_carried": 3,
     "sources_assigned": 4,
@@ -64,8 +62,7 @@
           "OSAID",
           1
         ]
-      ],
-      "coherence": "single"
+      ]
     },
     {
       "id": 1,
@@ -109,8 +106,7 @@
           "adaptation",
           1
         ]
-      ],
-      "coherence": "single"
+      ]
     },
     {
       "id": 2,
@@ -154,8 +150,7 @@
           "open-washing",
           1
         ]
-      ],
-      "coherence": "single"
+      ]
     }
   ],
   "hub_assignments": {

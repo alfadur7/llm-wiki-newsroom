@@ -40,7 +40,7 @@ Usage:
   python tools/lint.py graph structure              # single subcommand
   python tools/lint.py graph orphans --fix          # subcommand with --fix
   python tools/lint.py graph gaps                   # gap inventory (informational in `all`; backlog only)
-  python tools/lint.py graph drift                  # warm vs cold partition quality (opt-in; expensive)
+  python tools/lint.py graph drift                  # partition stability: quality gap · consensus ARI · split rate (opt-in; expensive)
   python tools/lint.py hub                          # speakers + suggestions + schema + voice + body + timeline
   python tools/lint.py hub speakers --min-quotes 3 --min-sources 3
   python tools/lint.py hub schema
@@ -338,7 +338,7 @@ def main() -> int:
         "--gap-type", dest="gap_type",
         choices=graph_gaps.VALID_GAP_TYPES, default=None,
         help="(graph gaps) restrict diagnosis to a single gap slug "
-             "(Track A auto-backfill: sparse-cluster·single-source·stale-hub; "
+             "(Track A auto-backfill: single-source·stale-hub; "
              "Track B operator-decision: bridge; Track C contradiction: orphan-claims·"
              "cap-theme·stale-theme; Track D derivation coverage: synthesis·trail·"
              "timeline. see .claude/operations/gap-detection-rollout.md).",
