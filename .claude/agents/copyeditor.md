@@ -24,9 +24,9 @@ The copy editor's role is classified as an agent, but its execution is determini
 - **overview group** — Layer 2-3 cluster overview·Layer 2-4 root overview Rubric (criteria per the `overview-cluster`·`overview-aggregate` roster in `.claude/layers/_manifest.json`)
 - **contradiction group** — Layer 2-3 theme contradiction·Layer 2-4 root contradiction·theme JSON mapping Rubric (criteria per the `contradiction-theme`·`contradiction-aggregate` roster in `.claude/layers/_manifest.json`)
 - **source group** — Layer 2-1 source page Rubric (criteria per the `source` roster in `.claude/layers/_manifest.json`)
-- **synthesis group** — Layer 2-3 Q-A synthesis Rubric (S1 schema·source coverage·source existence·slug-alias, advisory)
-- **trail group** — Layer 2-3 associative trail Rubric (S1 schema·`## Path` (Path) links·path length 4-12·slug-alias, advisory)
-- **timeline group** — Layer 2-2 standalone timeline schema (`wiki/timelines/<slug>.md`, source-indexed→path flavor·region-regression guard, advisory; separate from the hub-embedded `## Timeline` check)
+- **synthesis group** — Layer 2-3 Q-A synthesis Rubric (S1 schema·source coverage·source existence·slug-alias, advisory; MarkupLeak·Type hard-gate even so)
+- **trail group** — Layer 2-3 associative trail Rubric (S1 schema·`## Path` (Path) links·path length 4-12·slug-alias, advisory; MarkupLeak·Type hard-gate even so)
+- **timeline group** — Layer 2-2 standalone timeline schema (`wiki/timelines/<slug>.md`, source-indexed→path flavor·region-regression guard, advisory; MarkupLeak·Type hard-gate even so; separate from the hub-embedded `## Timeline` check)
 - **staleness group** — Layer-cascade staleness (upstream > last_updated diagnostic, informational·non-gating)
 - on `--fix`, process the auto-fixable areas (formattable items)
 - generate·update `lint-report.md` (for the user to read)
@@ -62,11 +62,11 @@ The copy editor's role is classified as an agent, but its execution is determini
 | L2-1 source VERIFY | source-group Rubric (criteria per the `source` roster in `_manifest.json`) |
 | L2-2 stub VERIFY | hub group (`hub schema` + `hub body`) |
 | L2-2 full hub VERIFY | hub group — `hub voice` + `hub timeline` + `hub body` (corpus-wide) |
-| L2-2 timeline VERIFY | timeline group (standalone timeline schema·source-indexed·region-regression guard, advisory) |
+| L2-2 timeline VERIFY | timeline group (standalone timeline schema·source-indexed·region-regression guard, advisory; MarkupLeak·Type hard-gate) |
 | L2-3 cluster overview VERIFY₁ | overview group (criteria per the `overview-cluster` roster) |
 | L2-3 theme contradiction VERIFY₁ | contradiction group (criteria per the `contradiction-theme` roster) |
-| L2-3 synthesis VERIFY₁ | synthesis group (S1·source coverage·source existence·slug-alias, advisory) |
-| L2-3 trail VERIFY₁ | trail group (S1·`## Path` (Path) links·path length 4-12·slug-alias, advisory) |
+| L2-3 synthesis VERIFY₁ | synthesis group (S1·source coverage·source existence·slug-alias, advisory; MarkupLeak·Type hard-gate) |
+| L2-3 trail VERIFY₁ | trail group (S1·`## Path` (Path) links·path length 4-12·slug-alias, advisory; MarkupLeak·Type hard-gate) |
 | L2-4 root overview VERIFY₁ | overview group Part 2 (criteria per the `overview-aggregate` roster) |
 | L2-4 root contradiction VERIFY₁ | contradiction group aggregate |
 | Meta VERIFY | meta·graph groups |
@@ -90,7 +90,7 @@ python tools/lint.py [<group>] [<subcmd|target>] [--fix] [--json]
 | full-wiki health check | `python tools/lint.py` (all groups by default) |
 | ADAPT regression check | same as the immediately preceding call |
 
-**Scope differs by group.** `source`·`overview`·`contradiction`·`synthesis`·`trail`·`timeline`·`staleness` accept a target and check that target only — omit it and they run corpus-wide, which is how the `all` run invokes them. `graph`·`hub`·`meta` take a subcommand instead and are corpus-wide always. Pass your target whenever the group accepts one — then PASS is the self-VERIFY₀ criterion, except in an advisory-mode group (`synthesis`·`trail`·`timeline`), where the criterion is that layer guide's Completion conditions, **automatic (A) only** — exit 0 there does not mean the roster criteria passed. Where the run is corpus-wide (`graph`·`hub`·`meta`, or a target-less call), it is instead satisfied by **0 items naming the author's own file** — not by a clean global run, which pre-existing drift elsewhere can block indefinitely.
+**Scope differs by group.** `source`·`overview`·`contradiction`·`synthesis`·`trail`·`timeline`·`staleness` accept a target and check that target only — omit it and they run corpus-wide, which is how the `all` run invokes them. `graph`·`hub`·`meta` take a subcommand instead and are corpus-wide always. Pass your target whenever the group accepts one — then PASS is the self-VERIFY₀ criterion, except in an advisory-mode group (`synthesis`·`trail`·`timeline`), where the criterion is that layer guide's Completion conditions, **automatic (A) only** — exit 0 there does not mean the roster criteria passed, and exit 1 is still reachable, since MarkupLeak and Type hard-gate in those three groups. Where the run is corpus-wide (`graph`·`hub`·`meta`, or a target-less call), it is instead satisfied by **0 items naming the author's own file** — not by a clean global run, which pre-existing drift elsewhere can block indefinitely.
 
 ## Risk Mitigation Design
 

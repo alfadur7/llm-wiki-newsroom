@@ -1,5 +1,6 @@
 """Audit regression target tests — catches recurrences of the "copy then edit only
 one side" class, such as divergent lint verdicts and F4 lint-ification."""
+import pytest
 import re
 import subprocess
 import sys
@@ -404,3 +405,62 @@ def test_link_display_text_is_not_an_unlinked_mention():
     assert re.search(r"\bMETR\b", h("[[METR|the study]]s showed"))
     # A genuine plain-text mention is untouched.
     assert re.search(r"\bMETR\b", h("METR published a report"))
+
+
+@pytest.mark.parametrize("mod_name,subdir,expect,skeleton", [
+    ("synthesis", "syntheses", "synthesis",
+     'title: "t"\ntype: {t}\nsources: [s]\nlast_updated: 2026-09-09\n---\n\n'
+     '# t\n\n## Summary\n\nx\n\n## 1. a\n\nx\n\n## Connections\n\n- [[s]]\n'),
+    ("timeline", "timelines", "timeline",
+     'title: "Timeline: t"\ntype: {t}\nlast_updated: 2026-09-09\n---\n\n'
+     '## Timeline: [[t]] (1 entries)\n\n## Flow Summary\n\nx\n\n### 2026 (1)\n'
+     '- **2026-01-01** [[s]] - x\n'),
+    ("trail", "trails", "trail",
+     'title: "t"\ntype: {t}\ncreated: 2026-09-09\n---\n\n'
+     '## Path\n\n1. [[A]] - x\n2. [[B]] - x\n\n## Commentary\n\nx\n'),
+])
+def test_frontmatter_type_hard_gates_even_in_advisory_mode(
+        mod_name, subdir, expect, skeleton, tmp_path, monkeypatch):
+    """A `type` outside `_build/graph.py` META_NODE_TYPES pulls the page into the graph
+    as a node and silences staleness on it, so it gates like a markup leak,
+    ADVISORY_MODE included. A missing value fails the same way (`_title_and_type` fills
+    `unknown`, outside both sets). For `timelines` the field is also checked by
+    `hub schema`, but the author's self-VERIFY0 runs this group alone."""
+    sys.path.insert(0, str(ROOT / "tools" / "_lint"))
+    import _lib
+    mod = __import__(mod_name)
+    assert mod.ADVISORY_MODE, "the gate is only interesting while the group is advisory"
+
+    d = tmp_path / subdir
+    d.mkdir()
+    const = {"synthesis": "SYNTHESES_DIR", "timeline": "TIMELINES_DIR", "trail": "TRAILS_DIR"}[mod_name]
+    monkeypatch.setattr(mod, const, d)
+
+    def write(type_line):
+        (d / "t.md").write_text("---\n" + skeleton.format(t=type_line), encoding="utf-8")
+        _lib._TEXT_CACHE.clear()
+
+    write(expect)
+    assert mod.run() == 0, "a correct type must not gate"
+    write("briefing")
+    assert mod.run() == 1, "a type outside the expected value must gate"
+    (d / "t.md").write_text(
+        "---\n" + skeleton.format(t=expect).replace("type: " + expect + "\n", ""),
+        encoding="utf-8")
+    _lib._TEXT_CACHE.clear()
+    assert mod.run() == 1, "a missing type must gate too"
+
+
+def test_ari_boundaries():
+    """`_ari` is hand-rolled (sklearn is not a dependency), so its boundaries are pinned.
+
+    A silently wrong ARI would make the consensus gate either never fire or always
+    fire, and both read as "the partition is fine".
+    """
+    sys.path.insert(0, str(ROOT / "tools" / "_lint"))
+    from cluster_drift import _ari
+    assert _ari([0, 0, 1, 1], [0, 0, 1, 1]) == 1.0          # identical partitions
+    assert _ari([0, 0, 1, 1], [1, 1, 0, 0]) == 1.0          # invariant to label permutation
+    assert _ari([0, 0, 0, 0], [0, 1, 2, 3]) == 0.0          # one lump vs all singletons
+    assert _ari([0, 1, 2, 3], [0, 1, 2, 3]) == 1.0          # all singletons, identical
+    assert 0.0 < _ari([0, 0, 1, 1], [0, 0, 1, 2]) < 1.0     # partial agreement

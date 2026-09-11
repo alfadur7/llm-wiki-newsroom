@@ -86,7 +86,7 @@ This Rubric pairs with "how to write" (Authoring) to judge "how well it was writ
 
 **Judgment method**:
 - Each criterion is 3-tier: **PASS / PARTIAL / FAIL** (PARTIAL is excluded from the completion count).
-- **Automatic (A)** = metrics from `python tools/lint.py timeline [<slug>]` output. What timeline lint measures automatically is **structural (schema-sections·source-indexed)**.
+- **Automatic (A)** = metrics from `python tools/lint.py timeline [<slug>]` output. What timeline lint measures automatically is **structural (schema-sections·source-indexed) + MarkupLeak (tool-call markup leak) + Type (frontmatter `type`) — the last two hard-gate even in advisory mode**.
 - **Manual (M)** = judged by Claude·Desk reading the body (`enc.summary-style`·`enc.first-mention`, etc.).
 
 **Criteria SoT**: the criterion roster·required are `_manifest.json` `timeline.roster` (7 criteria); craft definitions are the mapping-table skills' `criteria.json`·SKILL.md. Structural criteria with no external craft source are in the section below.
@@ -107,17 +107,19 @@ This Rubric pairs with "how to write" (Authoring) to judge "how well it was writ
 
 ```
 timelines/<slug>.md:
-  [Rubric] S1 schema=FlowSummary+YYYY ✅  SourceIndexed src=25/hub=7/total=32 → path ✅
+  [Rubric] S1 schema=FlowSummary+YYYY ✅  SourceIndexed src=25/hub=7/total=32 → path ✅  MarkupLeak=0 ✅  Type=✅
 ```
 
 - **✅ = PASS**, **⚠️ = FAIL**
 - **S1**: `## Flow Summary` + ≥ 1 `### YYYY` section present
 - **SourceIndexed**: classification of dated entries' first links — if `src` (source-led) > `hub` (entity-led), classified as `path` and PASS. If `region`, it's a conversion target (make the first link `[[source-id]]`)
+- **MarkupLeak** (blocker): count of tool-call XML fragments in the body — hard-gates (exit 1) even in advisory mode
+- **Type** (blocker): frontmatter `type` is `timeline` — hard-gates (exit 1) even in advisory mode (see Migration for its scope)
 - broken-link is delegated to `python tools/lint.py graph structure`
 
 #### Migration
 
-This lint is in **advisory mode** (`timeline.py` `ADVISORY_MODE = True`) — until the seed-calibration batch (converting the remaining region timelines to source-indexed), it shows only the FAIL count and keeps exit 0. After calibration, hard-switch to `ADVISORY_MODE = False`. Conversion is lossless on principle (historical anchors preserved).
+This lint is in **advisory mode** (`timeline.py` `ADVISORY_MODE = True`) — until the seed-calibration batch (converting the remaining region timelines to source-indexed), it shows only the FAIL count and keeps exit 0 — except a tool-call markup leak (MarkupLeak) and a frontmatter `type` that is not `timeline` (Type), each a publish blocker that hard-gates (exit 1) even in advisory mode. Type cannot fire under `/wiki-lint all --fix`, where `hub schema` runs first and auto-fills the field from the directory; the gate is for the self-VERIFY₀ command above, which runs this group alone. After calibration, hard-switch to `ADVISORY_MODE = False`. Conversion is lossless on principle (historical anchors preserved).
 
 ## Sources
 

@@ -16,6 +16,11 @@ NOTE — trail frontmatter divergence: existing trails use `created:` (no
 recommended owner-gate default (match reality, not force the common schema).
 Broken-link is delegated to `python tools/lint.py graph structure`.
 
+Two checks hard-gate even under ADVISORY_MODE — MarkupLeak (tool-call XML
+in the body) and Type (frontmatter `type` not matching the group). Both are silent
+corruption: nothing rewrites the page on either, and no other lint group checks the
+`type` of a `wiki/trails/` page, so this gate is the only one that sees it.
+
 Advisory rollout: `ADVISORY_MODE = True` until the seed calibration batch
 (plan step 2). Mirrors `source.py` / `synthesis.py`.
 """
@@ -74,6 +79,15 @@ def _evaluate(rel: str, slug: str, content: str) -> dict:
     # recommended after an edit, so a PASS here ships it.
     markup_leaks = MARKUP_LEAK_RE.findall(body)
 
+    # frontmatter `type` value — hard-gated in the MarkupLeak tier. Outside
+    # `_build/graph.py` META_NODE_TYPES the page is pulled in as a graph **node**
+    # (invisible in the UI, but it skews degree and pathfinding); outside the
+    # `_build/dependencies.py` upstream branch staleness goes quiet on it. No other
+    # lint group checks the `type` of a `wiki/trails/` page, so this gate is the only
+    # one that sees it. A missing value fails too — `_title_and_type` fills `unknown`,
+    # outside both sets.
+    actual_type = fm.get("type")
+
     return {
         "rel": rel,
         "slug": slug,
@@ -83,6 +97,7 @@ def _evaluate(rel: str, slug: str, content: str) -> dict:
         "path_length": (path_length_pass, n_items),
         "slug_alias": (slug_alias_pass, l1_raw[:5]),
         "markup": (len(markup_leaks) == 0, len(markup_leaks), markup_leaks[:5]),
+        "page_type": (actual_type == "trail", actual_type, "trail"),
     }
 
 
@@ -96,7 +111,9 @@ def _print_per_file(r: dict) -> None:
         f"  [Rubric] S1 sections={s_n}/{s_total} {_mark(schema_pass)}  "
         f"PathLinks={pl_n}/{pl_total} {_mark(pl_pass)}  "
         f"PathLen={plen_n} (4–12) {_mark(plen_pass)}  "
-        f"L1 raw_slugs={len(sa_samples)} {_mark(sa_pass)}"
+        f"L1 raw_slugs={len(sa_samples)} {_mark(sa_pass)}  "
+        f"MarkupLeak={r['markup'][1]} {_mark(r['markup'][0])}  "
+        f"Type={_mark(r['page_type'][0])}"
     )
     if r["fm_missing"]:
         print(f"  [Rubric] frontmatter missing: {r['fm_missing']}")
@@ -104,6 +121,9 @@ def _print_per_file(r: dict) -> None:
         print(f"  [Rubric] L1 raw slug samples: {sa_samples}")
     if not r["markup"][0]:
         print(f"  [BLOCKER] tool-call markup leak (do not publish): {r['markup'][2]}")
+    if not r["page_type"][0]:
+        print(f"  [BLOCKER] frontmatter `type` is `{r['page_type'][1] or '(missing)'}` — "
+              f"expected `{r['page_type'][2]}` (do not publish)")
 
 
 def _print_corpus_summary(results: list[dict]) -> None:
@@ -125,15 +145,22 @@ def _print_corpus_summary(results: list[dict]) -> None:
         print(f"\n  Non-compliant trails ({len(fails)}):")
         for r in fails:
             print(f"    {r['slug']} — {[k for k in REQUIRED_KEYS if not r[k][0]]}")
-    # markup sits outside REQUIRED_KEYS but still exits 1, so the reason has to be shown here.
+    # markup and type sit outside REQUIRED_KEYS but still exit 1, so the reasons have
+    # to be shown here — and before the advisory notice, or the line saying "exit 0" is
+    # followed by the reason the run actually exits 1.
     leaks = [r["slug"] for r in results if not r["markup"][0]]
     if leaks:
         print()
         print(f"  [BLOCKER] tool-call markup leak in {len(leaks)} file(s) (do not publish): {leaks}")
+    for r in [r for r in results if not r["page_type"][0]]:
+        print()
+        print(f"  [BLOCKER] {r['rel']}: frontmatter `type` is `{r['page_type'][1] or '(missing)'}` — "
+              f"expected `{r['page_type'][2]}` (do not publish)")
     if ADVISORY_MODE:
         print(
-            "\n  [Advisory mode] seed calibration not yet complete — exit 0 even if "
-            "files fail. See .claude/layers/trail.md → Migration."
+            "\n  [Advisory mode] seed calibration not yet complete — a Rubric FAIL does "
+            "not change the exit code; a MarkupLeak or Type blocker above still exits 1. "
+            "See .claude/layers/trail.md → Migration."
         )
 
 
@@ -184,6 +211,8 @@ def run(target: str | None = None, fix: bool = False, **_kwargs) -> int:
             _print_rewrite_block(slug, path, exists=True)
         if not result["markup"][0]:
             return 1  # markup leak hard-gates even in advisory mode
+        if not result["page_type"][0]:
+            return 1  # type mismatch hard-gates even in advisory mode
         if ADVISORY_MODE:
             return 0
         return 1 if any(not result[k][0] for k in REQUIRED_KEYS) else 0
@@ -194,6 +223,8 @@ def run(target: str | None = None, fix: bool = False, **_kwargs) -> int:
     _print_corpus_summary(results)
     if any(not r["markup"][0] for r in results):
         return 1  # markup leak hard-gates even in advisory mode
+    if any(not r["page_type"][0] for r in results):
+        return 1  # type mismatch hard-gates even in advisory mode
     if ADVISORY_MODE:
         return 0
     return 1 if any(any(not r[k][0] for k in REQUIRED_KEYS) for r in results) else 0

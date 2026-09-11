@@ -14,8 +14,13 @@ Three structural (layers-owned, craft-free) criteria are auto-measured here:
 Plus advisory W1 (link density) · F1 (last_updated) · [Placement] (mis-filed
 news/briefing detection) · J1 (conflation surface — claim lines joining ≥2
 declared sources, so the desk verifies each span-by-span rather than spot-
-checking 1–2; lint surfaces WHERE, the join's validity stays desk-judged). All
-advisory only, never gate the exit code.
+checking 1–2; lint surfaces WHERE, the join's validity stays desk-judged). Those
+four are advisory only and never gate the exit code.
+
+Two checks hard-gate even under ADVISORY_MODE — MarkupLeak (tool-call XML in the
+body) and Type (frontmatter `type` not matching the group). Both are silent
+corruption: nothing rewrites the page on either, and no other lint group checks the
+`type` of a `wiki/syntheses/` page, so this gate is the only one that sees it.
 
 Craft criteria (jrn.lede·con.scr·cit.* etc.) in the manifest roster are
 manual (M) — judged by desk VERIFY₂, not auto-measured here (same split as
@@ -132,6 +137,18 @@ def _evaluate(rel: str, slug: str, content: str) -> dict:
     # frontmatter completeness (folded into schema reporting).
     fm_missing = sorted(f for f in REQUIRED_FRONTMATTER if not fm.get(f))
 
+    # frontmatter `type` value. What a wrong value costs depends on which set it
+    # falls out of: outside `_build/graph.py` META_NODE_TYPES the page is pulled in
+    # as a graph **node** (no colour or filter in the UI, so it is invisible while it
+    # skews degree and pathfinding), and outside the `_build/dependencies.py` upstream
+    # branch staleness goes quiet on it. Neither surface rejects the page, so only a
+    # gate stops it — hence the MarkupLeak tier. A missing value is a FAIL too:
+    # `_title_and_type` fills `unknown`, which is outside both sets. A wrong value
+    # that stays inside both sets costs nothing downstream but still splits the file
+    # from what its folder says it is, so it is blocked with the rest.
+    actual_type = fm.get("type")
+    type_pass = actual_type == "synthesis"
+
     # struct.source-coverage — frontmatter sources that re-appear as body links.
     src = _sources_list(fm)
     body_stems = {m.group(1).strip().split("/")[-1] for m in WIKILINK_STEM_RE.finditer(body)}
@@ -205,6 +222,7 @@ def _evaluate(rel: str, slug: str, content: str) -> dict:
         "w1": (w1_pass, w1_links),
         "f1": (f1_pass,),
         "markup": (markup_pass, len(markup_leaks), markup_leaks[:5]),
+        "page_type": (type_pass, actual_type, "synthesis"),
     }
 
 
@@ -217,6 +235,7 @@ def _print_per_file(r: dict) -> None:
     w1_pass, w1_n = r["w1"]
     (f1_pass,) = r["f1"]
     markup_pass, markup_count, markup_samples = r["markup"]
+    type_pass, actual_type, expect_type = r["page_type"]
 
     cov_str = "—" if cov_ratio < 0 else f"{cov_n}/{cov_total} ({int(cov_ratio * 100)}%)"
     print(f"{r['rel']}:")
@@ -233,8 +252,21 @@ def _print_per_file(r: dict) -> None:
         f"J1 joins={join_n}  "
         f"W1 links={w1_n} {_mark(w1_pass)}  "
         f"F1 last_updated={_mark(f1_pass)}  "
-        f"MarkupLeak={markup_count} {_mark(markup_pass)}"
+        f"MarkupLeak={markup_count} {_mark(markup_pass)}  "
+        f"Type={_mark(type_pass)}"
     )
+    # A misfiled page is exempt from the gate (see run()), so it gets no BLOCKER
+    # either — printing one would say "do not publish" and then exit 0.
+    if not type_pass:
+        if r["misfile"]:
+            # Exempt from the gate (see run()), so this is a note, not a blocker —
+            # labelling it "do not publish" beside exit 0 splits label from verdict.
+            print(f"  [Placement] frontmatter `type` is `{actual_type or '(missing)'}` — "
+                  f"expected `{expect_type}`; the Type gate is waived while the page is "
+                  f"flagged mis-filed")
+        else:
+            print(f"  [BLOCKER] frontmatter `type` is `{actual_type or '(missing)'}` — "
+                  f"expected `{expect_type}` (do not publish)")
     if join_n:
         print(f"  [Join] {join_n} conflation surface(s) (claims joining ≥2 sources) — desk must verify span-by-span (no spot check):")
         for text, slugs in join_samples:
@@ -285,15 +317,22 @@ def _print_corpus_summary(results: list[dict]) -> None:
         for r in fails:
             failed = [k for k in REQUIRED_KEYS if not r[k][0]]
             print(f"    {r['slug']} — {failed}")
-    # markup sits outside REQUIRED_KEYS but still exits 1, so the reason has to be shown here.
+    # markup and type sit outside REQUIRED_KEYS but still exit 1, so the reasons have
+    # to be shown here — and before the advisory notice, or the line saying "exit 0" is
+    # followed by the reason the run actually exits 1.
     leaks = [r["slug"] for r in results if not r["markup"][0]]
     if leaks:
         print()
         print(f"  [BLOCKER] tool-call markup leak in {len(leaks)} file(s) (do not publish): {leaks}")
+    for r in [r for r in results if not r["misfile"] and not r["page_type"][0]]:
+        print()
+        print(f"  [BLOCKER] {r['rel']}: frontmatter `type` is `{r['page_type'][1] or '(missing)'}` — "
+              f"expected `{r['page_type'][2]}` (do not publish)")
     if ADVISORY_MODE:
         print(
-            "\n  [Advisory mode] seed calibration not yet complete — exit 0 even if "
-            "files fail. See .claude/layers/synthesis.md → Migration."
+            "\n  [Advisory mode] seed calibration not yet complete — a Rubric FAIL does "
+            "not change the exit code; a MarkupLeak or Type blocker above still exits 1. "
+            "See .claude/layers/synthesis.md → Migration."
         )
 
 
@@ -346,6 +385,8 @@ def run(target: str | None = None, fix: bool = False, **_kwargs) -> int:
             _print_rewrite_block(slug, path, exists=True)
         if not result["markup"][0]:
             return 1  # markup leak hard-gates even in advisory mode
+        if not result["page_type"][0] and not result["misfile"]:
+            return 1  # type mismatch hard-gates even in advisory mode
         if ADVISORY_MODE or result["misfile"]:
             return 0
         return 1 if any(not result[k][0] for k in REQUIRED_KEYS) else 0
@@ -357,6 +398,8 @@ def run(target: str | None = None, fix: bool = False, **_kwargs) -> int:
     _print_corpus_summary(results)
     if any(not r["markup"][0] for r in results):
         return 1  # markup leak hard-gates even in advisory mode
+    if any(not r["page_type"][0] and not r["misfile"] for r in results):
+        return 1  # type mismatch hard-gates even in advisory mode
     if ADVISORY_MODE:
         return 0
     genuine_fail = [r for r in results if not r["misfile"] and any(not r[k][0] for k in REQUIRED_KEYS)]

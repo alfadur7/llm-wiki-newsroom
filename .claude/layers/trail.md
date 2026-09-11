@@ -86,7 +86,7 @@ This Rubric pairs with "how to write" (Authoring) to judge "how well it was writ
 
 **Judgment method**:
 - Each criterion is 3-tier: **PASS / PARTIAL / FAIL** (PARTIAL is excluded from the completion count).
-- **Automatic (A)** = metrics from `python tools/lint.py trail [<slug>]` output. What trail lint measures automatically is **structural (schema-sections·path-links·path-length) + enc.slug-alias (L1)**.
+- **Automatic (A)** = metrics from `python tools/lint.py trail [<slug>]` output. What trail lint measures automatically is **structural (schema-sections·path-links·path-length) + enc.slug-alias (L1) + MarkupLeak (tool-call markup leak) + Type (frontmatter `type`) — the last two hard-gate even in advisory mode**.
 - **Manual (M)** = judged by Claude·Desk reading the body (`jrn.explainer`·`jrn.kicker`·`struct.through-line`, etc.).
 
 **Criteria SoT**: the criterion roster·required are `_manifest.json` `trail.roster` (12 criteria); craft definitions are the mapping-table skills' `criteria.json`·SKILL.md. Structural criteria with no external craft source are in the section below.
@@ -109,7 +109,7 @@ This Rubric pairs with "how to write" (Authoring) to judge "how well it was writ
 
 ```
 trails/<slug>.md:
-  [Rubric] S1 sections=2/2 ✅  PathLinks=10/10 ✅  PathLen=10 (4–12) ✅  L1 raw_slugs=0 ✅
+  [Rubric] S1 sections=2/2 ✅  PathLinks=10/10 ✅  PathLen=10 (4–12) ✅  L1 raw_slugs=0 ✅  MarkupLeak=0 ✅  Type=✅
 ```
 
 - **✅ = PASS**, **⚠️ = FAIL**
@@ -117,11 +117,13 @@ trails/<slug>.md:
 - **PathLinks**: share of `## Path` numbered items starting with `N. [[...]]` = PASS when all
 - **PathLen**: hop count 4–12
 - **L1**: 0 raw kebab slugs ≥ 10 chars (without alias) exposed in the body
+- **MarkupLeak** (blocker): count of tool-call XML fragments in the body — hard-gates (exit 1) even in advisory mode
+- **Type** (blocker): frontmatter `type` matches this group — hard-gates (exit 1) even in advisory mode
 - broken-link is delegated to `python tools/lint.py graph structure`
 
 #### Migration
 
-This lint is in **advisory mode** (`trail.py` `ADVISORY_MODE = True`) — until the seed-calibration batch (consolidated-layer standardization plan, step 2), it shows only the FAIL count and keeps exit 0. After calibration, hard-switch to `ADVISORY_MODE = False`.
+This lint is in **advisory mode** (`trail.py` `ADVISORY_MODE = True`) — until the seed-calibration batch (consolidated-layer standardization plan, step 2), it shows only the FAIL count and keeps exit 0 — except a tool-call markup leak (MarkupLeak) and a frontmatter `type` that is not `trail` (Type), each a publish blocker that hard-gates (exit 1) even in advisory mode. After calibration, hard-switch to `ADVISORY_MODE = False`.
 
 ## Sources
 
