@@ -397,3 +397,62 @@ I proposed excluding audit-stage records and, for the first time this cycle, sen
 The larger finding is the one I would not have reached. The tier claims a treatment failed while joining defects to transitions on the mechanism cluster alone, discarding the surface each transition records in its `@stage` suffix. Both entries surviving the exclusion are of that kind — a claimant-misattribution record in runbook prose ranked against a lint check on wiki source pages, a guidance-not-actionable record in the same runbook ranked against deleted tables in the layer guides. The tier asks whether a treatment failed and its join cannot tell whether the treatment covered the defect's surface at all. Filed, not fixed: deciding scope overlap needs more than the suffix carries.
 
 Two orders were tested this cycle and they are not equivalent. Reviewing after writing corrected text that had already shipped, twice. Reviewing before writing replaced the reasoning, exposed the proxy, and surfaced a defect in the tier that no amount of reviewing my own draft would have found, because my draft did not contain it.
+
+## [2026-09-11] meta | four reasons, none of them checked
+
+A porting round brought seven units across from the sibling implementation. The
+code converged on the first pass — every check ran, every mutation died, the
+suite stayed green from the first commit to the last. What would not converge
+was the prose I wrote around the ported rules, and three blind rotations spent
+themselves almost entirely on it.
+
+Four rationale clauses were refuted, each by a reviewer who simply went and
+looked. The inbox meta separator had to be two spaces "because one space lets
+the meta be swallowed into the URL" — the regex here is `\s+` and accepts one,
+which a reviewer established by parsing the line. The `--gap` call was said to
+satisfy a Human Reviewer Gate approval for the crawler; this repository's gate
+lists seven items and none is a crawler, so the sentence claimed to satisfy a
+gate that does not exist while creating a second approval obligation with no
+approver. The cohesion metric was deleted "because the tag vocabulary is a
+news-crawl matching list, not a taxonomy", a characterisation no shipped file
+here supports and which three files now carried. And the gap removal was
+justified by a prescription that "cannot move its own trigger", when the trigger
+was computed from tags rather than from the thing the sentence named.
+
+Every one of the four was imported reasoning. The rules they sat under were
+sound and stayed; the sentences explaining them had been measured on a corpus of
+2,356 sources and restated here over nine. This is the third entry recording the
+same shape against me, and the standing prescription — after two failed
+rewrites, delete or wire a check rather than write a third — fired twice this
+round. The speaker-threshold sentence lost its attribution entirely and now says
+only what the check counts. The gap-removal reason was replaced rather than
+reworded, with the one fact that needs no corpus: its trigger was the field the
+same change had just deleted.
+
+The reviews also found two silent-direction defects in code I had just written
+to prevent silence. A commit gate taught to read bare operands would trust a
+message word left standing by an unbalanced quote, narrowing its scope to a path
+that names nothing; and it resolved those operands against the repository root
+while git resolves a pathspec against the invoking directory, so a commit issued
+from a subdirectory could point the gate at a same-named file it does not carry.
+Both were found by reviewers reading the whole file rather than the hunk. The
+second one the existence guard could not catch, because the wrong path exists.
+
+The ladder hit its three-rotation cap without converging and went to the
+operator, who instructed treatment rather than a fourth rotation. Nineteen, then
+twenty-one, then twenty-one findings; the last rotation closed fourteen of the
+previous round's eighteen and opened five highs of its own, three of them in
+text the previous rotation's fix had written. That is the churn the cap exists
+to bound, and the bound held: the round ends with the reviewed remainder named
+rather than with a fourth pass finding a fifth reason to rewrite.
+
+Two ported clauses were declined on measurement rather than taste. A hub-churn
+rule named a helper this repository does not have, and an isolation procedure
+prescribed swapping a config directory for sub-agents that share the parent
+process. Porting a procedure with no launch path would have shipped a step
+nobody could run.
+
+One thing the round produced that the source did not: the guideline-file test in
+the commit gate is now a subtraction rather than a folder whitelist, matching
+how the ladder already stated its own scope. A whitelist drops a newly created
+directory silently, and a new directory is exactly where a new guideline lands.
