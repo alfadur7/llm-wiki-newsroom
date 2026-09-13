@@ -128,9 +128,6 @@ def run(target: str | None = None, top: int | None = None, **_kwargs) -> int:
         print(f"ERROR: {_DEPS_PATH} not found or unreadable — run `python tools/build.py dependencies` first.",
               file=sys.stderr)
         return 2
-    if not pages:
-        print("Layer-cascade staleness — no dated pages (empty wiki / no dependencies yet).")
-        return 0
 
     if target:
         # Resolve a slug/path to dependency key(s) (accept stem, rel, or rel.md).

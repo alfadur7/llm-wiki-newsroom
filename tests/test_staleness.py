@@ -98,19 +98,34 @@ def test_editor_hash_ignores_frontmatter():
     assert editor_hash(after) != editor_hash(after.replace("did not change", "changed"))
 
 
+def _empty_deps(tmp_path, monkeypatch) -> None:
+    """Point the lint at a freshly-built EMPTY wiki's `_dependencies.json` — a valid file
+    whose `pages` is `{}` (what `build.py dependencies` emits with no pages to index)."""
+    deps = tmp_path / "_dependencies.json"
+    deps.write_text(json.dumps({"_meta": {"phase": "dependencies", "page_count": 0},
+                                "pages": {}}), encoding="utf-8")
+    monkeypatch.setattr(staleness, "_DEPS_PATH", deps)
+
+
 def test_empty_pages_dict_is_exit_0_not_build_error(tmp_path, monkeypatch, capsys):
     """Regression — `build.py dependencies` on an empty (or source-only) wiki legitimately
     emits `{"pages": {}}`. `_load()` used to collapse that into the same `{}` as a missing
     file, so `lint staleness` exited 2 with "run build.py first" on a freshly-built empty
     wiki — a valid state must not read as a build-step failure."""
-    deps = tmp_path / "_dependencies.json"
-    deps.write_text(json.dumps({"_meta": {"phase": "dependencies", "page_count": 0},
-                                "pages": {}}), encoding="utf-8")
-    monkeypatch.setattr(staleness, "_DEPS_PATH", deps)
+    _empty_deps(tmp_path, monkeypatch)
     assert staleness.run() == 0
     out = capsys.readouterr().out
-    assert "no dated pages" in out
+    assert "0 dated pages, 0 STALE" in out
     assert "build.py" not in out
+
+
+def test_empty_wiki_still_errors_on_an_unknown_target(tmp_path, monkeypatch, capsys):
+    """The empty-wiki exit 0 must not swallow the target branch — a targeted query for a page
+    with no dependency record stays exit 2 whether or not the corpus is empty. Pins the
+    ordering: an empty-pages guard placed before `if target:` returns 0 here (false clean)."""
+    _empty_deps(tmp_path, monkeypatch)
+    assert staleness.run(target="anything") == 2
+    assert "no dependency record" in capsys.readouterr().err
 
 
 def test_missing_deps_file_still_exits_2(tmp_path, monkeypatch, capsys):
