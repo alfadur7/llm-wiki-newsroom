@@ -64,11 +64,14 @@ _BODY_DATED_ROOTS = ("overview.md", "contradiction.md")
 _BODY_DATE_CACHE: dict[str, str | None] = {}
 
 
-def _load() -> dict:
+def _load() -> tuple[dict, bool]:
+    """Return (pages, file_found). An empty `pages` dict from a freshly-built
+    empty wiki must not read as "dependencies not built yet" — that is a valid,
+    exit-0 state, not a build-step failure."""
     try:
-        return json.loads(_DEPS_PATH.read_text(encoding="utf-8")).get("pages", {})
+        return json.loads(_DEPS_PATH.read_text(encoding="utf-8")).get("pages", {}), True
     except (OSError, json.JSONDecodeError):
-        return {}
+        return {}, False
 
 
 def _is_body_dated(rel: str) -> bool:
@@ -120,11 +123,14 @@ def _newest_upstream(rec: dict, pages: dict) -> list[str]:
 
 
 def run(target: str | None = None, top: int | None = None, **_kwargs) -> int:
-    pages = _load()
-    if not pages:
-        print(f"ERROR: {_DEPS_PATH} not found or empty — run `python tools/build.py dependencies` first.",
+    pages, deps_found = _load()
+    if not deps_found:
+        print(f"ERROR: {_DEPS_PATH} not found or unreadable — run `python tools/build.py dependencies` first.",
               file=sys.stderr)
         return 2
+    if not pages:
+        print("Layer-cascade staleness — no dated pages (empty wiki / no dependencies yet).")
+        return 0
 
     if target:
         # Resolve a slug/path to dependency key(s) (accept stem, rel, or rel.md).
