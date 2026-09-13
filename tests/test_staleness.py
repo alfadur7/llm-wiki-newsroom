@@ -6,6 +6,8 @@ root meta), staleness is judged against the git edit date of the EDITOR body, no
 frontmatter `last_updated`. Since the body date depends on git, it is injected directly into
 `_BODY_DATE_CACHE` so the branching logic can be verified without git.
 """
+import json
+
 import pytest
 
 import staleness
@@ -94,3 +96,27 @@ def test_editor_hash_ignores_frontmatter():
     assert editor_hash(before) == editor_hash(after)
     # a real body edit still moves the hash
     assert editor_hash(after) != editor_hash(after.replace("did not change", "changed"))
+
+
+def test_empty_pages_dict_is_exit_0_not_build_error(tmp_path, monkeypatch, capsys):
+    """Regression — `build.py dependencies` on an empty (or source-only) wiki legitimately
+    emits `{"pages": {}}`. `_load()` used to collapse that into the same `{}` as a missing
+    file, so `lint staleness` exited 2 with "run build.py first" on a freshly-built empty
+    wiki — a valid state must not read as a build-step failure."""
+    deps = tmp_path / "_dependencies.json"
+    deps.write_text(json.dumps({"_meta": {"phase": "dependencies", "page_count": 0},
+                                "pages": {}}), encoding="utf-8")
+    monkeypatch.setattr(staleness, "_DEPS_PATH", deps)
+    assert staleness.run() == 0
+    out = capsys.readouterr().out
+    assert "no dated pages" in out
+    assert "build.py" not in out
+
+
+def test_missing_deps_file_still_exits_2(tmp_path, monkeypatch, capsys):
+    """Contrast — a genuinely missing/unreadable _dependencies.json is a real error:
+    exit 2 with the actionable message (behavior unchanged by the empty-wiki fix)."""
+    monkeypatch.setattr(staleness, "_DEPS_PATH", tmp_path / "nope.json")
+    assert staleness.run() == 2
+    err = capsys.readouterr().err
+    assert "build.py dependencies" in err
