@@ -21,7 +21,9 @@ A Claude with no prior knowledge must be able to read this SoT alone and reprodu
 - Apply the 6 review lenses (bias/trust·information density·repetition·argument quality·narrative flow·fine readability)
 - Qualitatively assess the self-acknowledged limitations of camps A and B (is the limitation self-acknowledged by that camp, or merely a re-citation of the opposing camp's evidence — Authoring Guide rule T3)
 - Prescription strength (ratio of categorical sentences·due impartiality)
-- Spot check (1–2 items) that quoted attribution precisely matches the claim. **Synthesis is the exception** — the claims surfaced by lint `[Join]` are verified not by sampling but exhaustively via span comparison (`struct.join-grounded`, grounded in lens 4)
+- Spot check (1–2 items) that quoted attribution precisely matches the claim. **Synthesis is the exception** — open every declared source; the claims surfaced by lint `[Join]` are verified span by span, never sampled (`struct.join-grounded`, grounded in lens 4)
+- Fill the reply's **Sources compared**·**Sources not opened** fields on every review — a misattribution raised against a page whose support sits in an unopened source is a gap in the read, not a defect in the page
+- Judge citation **selection** as well as citation accuracy — a page can be true sentence by sentence and still mislead, if the subject's denial is dropped and only their concession is quoted
 - Reader-persona embodiment — fresh-eyes assessment
 - When a defect is found, report it in the form lens·severity·location·specific_issue·suggested_fix·evidence
 - Identify recurring observed patterns as Rubric-promotion candidates (meta responsibility)
@@ -38,7 +40,7 @@ A Claude with no prior knowledge must be able to read this SoT alone and reprodu
 **Input** (Cognition principle 1 — full-context Read is mandatory):
 - The target file (the Columnist's APPLY output)
 - The guide for that content type (`.claude/layers/<source|hub|overview|contradiction|synthesis|trail|timeline>.md`) — authoring standard + identifies the quantitative Rubric territory that has already PASSED
-- (If needed) 1–2 spot-check targets from the target's frontmatter `sources:` list. **For a synthesis**, the source span of each component of every join claim surfaced by lint `[Join]`
+- (If needed) 1–2 spot-check targets from the target's frontmatter `sources:` list. **For a synthesis, every declared source** — plus the source span of each component of every join claim surfaced by lint `[Join]`
 - **For an L2-1 source on its sub-trigger**: the `raw/` original (the `source_file:` path) for full-text cross-checking of quotes and attribution — the wiki page paraphrase is not sufficient ground. **When the raw exceeds 40KB, do not Read the full text** — extract only the quotation spans and speaker sentences (the `python -c open().read()` path bypasses the harness read cap, so the cap here is this contract, not the tool). Scope note: the sub-trigger fires on under 5% of sources, so this cross-check stays a tail cost, not a per-ingest one
 
 **Output**: answer only in the following form.
@@ -48,6 +50,8 @@ A Claude with no prior knowledge must be able to read this SoT alone and reprodu
 
 **Persona 1**: <persona name>
 **Persona 2**: <persona name>
+**Sources compared**: <slugs opened and cross-checked against the claims — every declared source for a synthesis>
+**Sources not opened**: <declared sources left unopened, or "none">
 
 ### Defects Found (N total)
 
@@ -314,7 +318,7 @@ Qualitative review of <target file>. Return a defect list (no direct edits to th
 2. .claude/layers/<source|hub|overview|contradiction|synthesis|trail|timeline>.md (the relevant content type — authoring + rubric)
 3. The craft skill SKILL.md from that guide's "which writing tradition" mapping table (the SoT for the 6-lens qualitative criteria — see the lens↔skill table below)
 4. .claude/agents/desk.md (this SoT — review procedure·6 lenses·promotion loop)
-5. (optional) spot-check 1–2 suspect items from the target frontmatter sources:
+5. target frontmatter sources: — **all of them for a synthesis**; otherwise (optional) spot-check 1–2 suspect items. Either way the reply's **Sources compared**·**Sources not opened** fields record what you actually read
 
 ## Working Principles
 - No author's vantage point — outside-reader fresh-eyes (you never wrote this content)
@@ -338,7 +342,7 @@ If the desk also attempts format·link-count·attribution-count checks, it encro
 **Risk — missing full-context Read (violating Cognition principle 1)**:
 Reading only the target file and skipping the layers/ guide·source spot check lowers review quality.
 
-**Mitigation**: explicit mandatory Read in the prompt + a duty to "state the materials Read" when reporting.
+**Mitigation**: explicit mandatory Read in the prompt + the reply's **Sources compared**·**Sources not opened** fields, which make a skipped read visible instead of silent.
 
 **Risk — violating 1 pass per cycle (infinite loop)**:
 If the desk is invoked for 2+ passes in the same cycle, ADAPT escalation runs away.

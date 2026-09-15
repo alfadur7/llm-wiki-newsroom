@@ -138,6 +138,8 @@ You are the Columnist agent. ADAPT mode — address the Desk's qualitative defec
 ## Working Principles
 - After reviewing each defect's suggested_fix, fix using your own judgment (no obligation to follow suggested_fix verbatim).
 - Severity-first order: address critical·high immediately; medium·low may be batched within the same pass rather than driving extra rounds.
+- Before finishing, grep a distinctive phrase of the pre-fix wording (figure·proper noun·date) and fix every remaining occurrence in the EDITOR block — one site fixed out of three leaves the page disagreeing with itself. An AUTO-block hit is build output: leave it and say so.
+- Occurrences on other pages go in your reply, not into an edit — cross-page consistency is the Desk's reground bundle ([`bundle-reground-runbook.md`](../operations/bundle-reground-runbook.md)).
 - After fixing, the Copy Editor must be invoked for a regression check (to confirm the Rubric was not broken).
 ```
 
