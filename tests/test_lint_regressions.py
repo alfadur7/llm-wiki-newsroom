@@ -451,6 +451,38 @@ def test_frontmatter_type_hard_gates_even_in_advisory_mode(
     assert mod.run() == 1, "a missing type must gate too"
 
 
+def test_j1_hands_the_desk_every_join_not_a_sample():
+    """J1's whole purpose is that the desk verifies joins span-by-span instead of
+    spot-checking, and the printed line says so — truncating the list to 5 turned the
+    exhaustive check back into a sample on exactly the pages that need it most."""
+    sys.path.insert(0, str(ROOT / "tools" / "_lint"))
+    import synthesis
+
+    joins = chr(10).join(f"- claim {i}: [[src-0|a]] with [[src-1|b]]" for i in range(7))
+    content = """---
+type: synthesis
+sources:
+  - src-0
+  - src-1
+---
+
+## Summary
+
+s
+
+## 1. x
+
+{joins}
+
+## Connections
+
+c
+""".format(joins=joins)
+    n, units = synthesis._evaluate("wiki/syntheses/t.md", "t", content)["join"]
+    assert n == 7, n
+    assert len(units) == n, "the desk is handed a sample, not every join"
+
+
 def test_ari_boundaries():
     """`_ari` is hand-rolled (sklearn is not a dependency), so its boundaries are pinned.
 

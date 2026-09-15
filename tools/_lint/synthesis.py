@@ -218,7 +218,9 @@ def _evaluate(rel: str, slug: str, content: str) -> dict:
         "source_coverage": (coverage_pass, covered, len(src), coverage_ratio),
         "source_exists": (source_exists_pass, src_missing),
         "slug_alias": (slug_alias_pass, len(l1_raw), l1_raw[:5]),
-        "join": (len(join_units), join_units[:5]),
+        # Every join, not a sample: the desk contract below is span-by-span over all
+        # of them, so a truncated list turns the exhaustive check back into a spot check.
+        "join": (len(join_units), join_units),
         "w1": (w1_pass, w1_links),
         "f1": (f1_pass,),
         "markup": (markup_pass, len(markup_leaks), markup_leaks[:5]),
@@ -231,7 +233,7 @@ def _print_per_file(r: dict) -> None:
     cov_pass, cov_n, cov_total, cov_ratio = r["source_coverage"]
     exists_pass, src_missing = r["source_exists"]
     sa_pass, sa_count, sa_samples = r["slug_alias"]
-    join_n, join_samples = r["join"]
+    join_n, joins = r["join"]
     w1_pass, w1_n = r["w1"]
     (f1_pass,) = r["f1"]
     markup_pass, markup_count, markup_samples = r["markup"]
@@ -269,7 +271,7 @@ def _print_per_file(r: dict) -> None:
                   f"expected `{expect_type}` (do not publish)")
     if join_n:
         print(f"  [Join] {join_n} conflation surface(s) (claims joining ≥2 sources) — desk must verify span-by-span (no spot check):")
-        for text, slugs in join_samples:
+        for text, slugs in joins:
             print(f"    {slugs} · {text}")
     if not markup_pass:
         print(f"  [BLOCKER] tool-call markup leak (do not publish): {markup_samples}")

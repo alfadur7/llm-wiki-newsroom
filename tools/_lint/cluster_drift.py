@@ -19,7 +19,7 @@ suite, so we keep it explicit. Designed to be run periodically (e.g.,
 monthly) or after suspect changes.
 
 CLI:
-    python tools/lint.py graph drift           # quality comparison
+    python tools/lint.py graph drift           # partition stability signals
     python tools/lint.py graph drift --json    # machine output
 
 Exit codes:
