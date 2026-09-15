@@ -27,9 +27,9 @@ Details: [[open-source-ai-definition|the Open-Source AI Definition field]].
 
 ## 2. [[open-weights|Open Weights]]
 
-[[DeepSeek]]'s R1, released 2025-01 under the MIT license with public weights but a withheld training corpus, is the defining case of the weights-only middle ground. It drew attention partly on a roughly $6 million training-cost claim that made a cheap-to-adapt release commercially compelling.
+[[DeepSeek]]'s R1, released 2025-01 under the MIT license with public weights but a withheld training corpus, is the defining case of the weights-only middle ground. It drew attention partly on a roughly $6 million training-cost claim — a fraction of what similarly performing LLMs cost to train — that made a cheap-to-adapt release commercially compelling.
 
-The grouping centers on [[DeepSeek]] as provider and on two concepts: [[OpenWeights]], the posture of publishing parameters while keeping data secret, and [[FineTuning]], the adaptation capability that makes such a release useful. It is defined by contrast with the fuller [[OpenSourceAI]] standard rather than by a dense actor roster.
+The grouping centers on [[DeepSeek]] as provider and on two concepts: [[OpenWeights]], the posture of publishing parameters while keeping data secret, and [[FineTuning]], the adaptation capability that makes such a release useful. It is defined by contrast with the fuller [[OpenSourceAI]] standard rather than by the size of its roster; the source counts three further releases as open weights that this wiki does not yet document.
 
 The tension is practical adaptability against genuine transparency. Publishing weights lets users fine-tune without retraining, but the withheld data and algorithms mean the model cannot be fully audited, reproduced, or inspected for bias — which is precisely the partial release the strict definition was written to exclude.
 

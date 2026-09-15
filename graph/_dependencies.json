@@ -26,7 +26,7 @@
       "upstream_max_date": null
     },
     "entities/DeepSeek.md": {
-      "last_updated": "2026-06-26",
+      "last_updated": "2026-09-15",
       "upstream": [
         "sources/open-source-ai-models-how-open.md"
       ],
@@ -142,13 +142,13 @@
       "upstream_max_date": "2026-07-19"
     },
     "overviews/open-weights.md": {
-      "last_updated": "2026-06-26",
+      "last_updated": "2026-09-15",
       "upstream": [
         "concepts/FineTuning.md",
         "concepts/OpenWeights.md",
         "entities/DeepSeek.md"
       ],
-      "upstream_max_date": "2026-06-26"
+      "upstream_max_date": "2026-09-15"
     },
     "contradictions/open-training-data-requirement.md": {
       "last_updated": "2026-07-19",
@@ -179,7 +179,7 @@
         "overviews/open-source-ai-definition.md",
         "overviews/open-weights.md"
       ],
-      "upstream_max_date": "2026-07-19"
+      "upstream_max_date": "2026-09-15"
     },
     "contradiction.md": {
       "last_updated": null,
