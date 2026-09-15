@@ -24,6 +24,11 @@ def _payload(capsys) -> str:
 
 
 def _input(tool, path, **fields):
+    """`/r/…` is this suite's spelling for a repo-root-relative path. It resolves to
+    the real root because the hook anchors there — against a synthetic root the
+    guideline ladder reads the path as out-of-repo and stays silent."""
+    if path.startswith("/r/"):
+        path = str(dispatch.ROOT / path[3:])
     return {"tool_name": tool, "tool_input": {"file_path": path, **fields}}
 
 
@@ -422,12 +427,27 @@ def test_guideline_path_covers_a_new_claude_subdir():
     """The ladder's scope is a subtraction, so a folder whitelist drops a new
     directory silently — and a new directory is where a new guideline lands."""
     assert dispatch.is_guideline_path(".claude/newdir/thing.md")
-    assert dispatch.is_guideline_path("/abs/repo/.claude/agents/desk.md")
+    assert dispatch.is_guideline_path(str(dispatch.ROOT / ".claude/agents/desk.md"))
     assert dispatch.is_guideline_path("CLAUDE.md")
     assert not dispatch.is_guideline_path(".claude/memory/feedback_x.md")
     assert not dispatch.is_guideline_path(".claude/hooks/README.md")
     assert not dispatch.is_guideline_path(".claude/agents/notes.txt")
     assert not dispatch.is_guideline_path("wiki/index.md")
+
+
+def test_guideline_path_stops_at_the_repo_root():
+    """`.claude/` is not unique to this repo. As a bare substring it also matched the
+    user-level tree, so writing an auto-memory note — which CLAUDE.md places outside
+    the repo — demanded the 5-rung ladder. `GUIDE_EXCLUDED_DIRS` cannot close this:
+    `/.claude/memory/` never matches `/.claude/projects/<proj>/memory/`."""
+    for home in ("/home/someone", "C:/Users/someone"):
+        assert not dispatch.is_guideline_path(f"{home}/.claude/projects/a-proj/memory/note.md")
+        assert not dispatch.is_guideline_path(f"{home}/.claude/plans/plan.md")
+        assert not dispatch.is_guideline_path(f"{home}/.claude/agents/other.md")
+        assert not dispatch.is_guideline_path(f"{home}/.claude/CLAUDE.md")
+    # The repo's own files still bind, in either form.
+    assert dispatch.is_guideline_path(str(dispatch.ROOT / ".claude/layers/hub.md"))
+    assert dispatch.is_guideline_path(".claude/layers/hub.md")
 
 
 def test_prefilter_never_narrower_than_the_python_judge():

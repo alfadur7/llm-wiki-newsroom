@@ -76,14 +76,31 @@ _REPO_ROOT = ROOT.as_posix().lower()
 # subtracts rather than enumerating. A folder whitelist drops a newly created
 # directory silently, and a new directory is exactly where a new guideline lands.
 GUIDE_EXCLUDED_DIRS = ("/.claude/memory/", "/.claude/hooks/")
+# Absolute-path prefix, POSIX or Windows-drive — tells an out-of-repo absolute
+# path from a repo-relative one.
+_ABS_RE = re.compile(r"^(?:/|[A-Za-z]:/)")
 
 
 def is_guideline_path(path: str) -> bool:
-    """Is this a guideline file the ladder binds? Takes absolute or repo-relative."""
-    q = "/" + path.replace('\\', "/").lstrip("/")
+    """Is this a guideline file the ladder binds? Takes absolute or repo-relative.
+
+    The `.claude/` must be *this repo's*, so the match is anchored at the repo
+    root (absolute form) or at the start of the path (relative form). As a bare
+    substring it also matched the user-level tree — `~/.claude/projects/<proj>/`
+    (the system auto-memory, which CLAUDE.md places outside the repo),
+    `~/.claude/plans/`, `~/.claude/agents/` — and so demanded the 5-rung ladder for
+    writing a memory note. No GUIDE_EXCLUDED_DIRS entry reaches those:
+    `/.claude/memory/` does not match `/.claude/projects/<proj>/memory/`.
+    """
+    q = path.replace('\\', "/")
+    if q.lower().startswith(_REPO_ROOT + "/"):
+        q = q[len(_REPO_ROOT) + 1:]
+    elif _ABS_RE.match(q):
+        return False
+    q = "/" + q.lstrip("/")
     if q.endswith("/CLAUDE.md"):
         return True
-    return (q.endswith(".md") and "/.claude/" in q
+    return (q.endswith(".md") and q.startswith("/.claude/")
             and not any(d in q for d in GUIDE_EXCLUDED_DIRS))
 
 # Subset of GUIDE surfaces that is desk-judged wiki-content authoring/review craft
