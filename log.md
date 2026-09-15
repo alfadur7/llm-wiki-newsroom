@@ -456,3 +456,49 @@ One thing the round produced that the source did not: the guideline-file test in
 the commit gate is now a subtraction rather than a folder whitelist, matching
 how the ladder already stated its own scope. A whitelist drops a newly created
 directory silently, and a new directory is exactly where a new guideline lands.
+
+## [2026-09-15] guideline | the rule that did nothing, and the three that were already the default
+
+Four columnist ADAPT rules came over from the sibling repository. A behavioural
+probe kept one.
+
+The apparatus was two columnist agents given the same page, the same raw, the
+same two-defect list, and prompts identical but for the Working Principles
+block; the guideline SoTs were held at HEAD for the run so the control could not
+read the treatment text off disk. Two desk agents scored the outputs blind
+against six properties, with "cannot tell them apart" stated as a legitimate
+answer so the scoring did not have to manufacture a difference.
+
+On four properties it was unable to. Both drafts rewrote rather than appended,
+both fixed all three sites, neither narrated its own revision in the body. The
+control did all of that without being told. The governing-line rule fared worse:
+the instruction was present and the behaviour still did not appear, both drafts
+leaving "made the release commercially compelling" at full strength under
+evidence they had just narrowed. A rule whose absence changes nothing and whose
+presence changes nothing is not a close call.
+
+What separated the two was the occurrence sweep. The treated draft reported two
+other pages carrying the same defective wording, and the repository confirmed
+both; the control reported none. Out-of-scope edits ran the other way, two
+against zero, so the rule the review had warned would push toward over-rewriting
+was, in the one condition that carried it, the one that did not over-rewrite.
+
+The three deletions are the round's real content. Each was plausible, each read
+as good practice, and each bought nothing measurable — one of them at the price
+of a misfire the blind review had already named, since stated unconditionally it
+fires on omission defects too, where adding a sentence is the correct minimal
+fix.
+
+The desk changes were adopted on different grounds. Rung 3 found the edit had
+written two reply obligations into a file whose contract says to answer only in
+a given form, and whose form had nowhere to put them. The gap was older than the
+edit: a mitigation had been demanding that the desk "state the materials Read"
+with no slot to state them in. Giving the form two fields closed the new
+obligations and the old one together. That is structure, not effect, and it is
+recorded as adopted without measurement rather than as measured.
+
+The ladder converged at the third rotation, the deletions themselves having
+carried new claims the second rotation never saw — an AUTO-block hit being build
+output, cross-page consistency belonging to the desk's bundle — both of which
+the reviewer verified against the build code and the runbook rather than against
+the wording that asserted them.
