@@ -502,3 +502,59 @@ carried new claims the second rotation never saw — an AUTO-block hit being bui
 output, cross-page consistency belonging to the desk's bundle — both of which
 the reviewer verified against the build code and the runbook rather than against
 the wording that asserted them.
+
+## [2026-09-17] public | the gate that applied to a minority, and the rate that grew with every rule
+
+The question that started this was whether the private instance's operating data
+could close the hedges the public surfaces carry. Reading the ledger to answer it
+turned up something else first: the surfaces described an adoption gate the ledger
+does not record. Five of them said a guideline change is kept only if a blind A/B
+shows it helped. The ledger says a measurement is cited in 16 of 107 adoptions,
+40 were adopted on an operator directive that waives it against a codified
+runbook exemption, and 51 are changes no variant covers. The claim was not a
+rounding error on the rule; it was a rule the project does not run.
+
+The first repair reproduced the defect in a narrower form. Written as an
+exhaustive either/or — cleared the A/B, or waived by directive — it published a
+breakdown beside itself that left 47 adoptions in neither branch, and three
+independent persona readers did that arithmetic without being asked to. The
+original count had come from a regex that could not tell a blind *A/B* from a
+blind *review*: one compares two arms, the other is a reviewer reading a diff.
+Reading all 107 rationales by hand gave the split the surfaces now carry.
+
+The recurrence figure went the same way, twice, and was retired rather than
+rewritten a third time. "45% of logged defects were filed after their class had
+already been amended" takes its denominator from every defect while the sentence
+around it claims something about whether written rules hold — so the number rises
+mechanically with each rule written, and it named three different quantities in
+its three appearances. Measurement replaced it: 44 of the 70 classes that ever
+got a fix came back afterwards, and five of them produced 451 of the 823
+recurrences. Concentration is the finding, and it is the opposite of what a
+general rate implies.
+
+A separate measurement was run and is not published. Whether accepted guideline
+changes reduce recurrence was tested across three window sizes and three null
+arms, including a within-cluster placebo conditioned on the same pre-window count.
+Nothing survived: sign-test p between 0.18 and 1.00, and under the fair control
+the direction itself flips with the window. The instructive part is that the
+control population moved the answer further than the treatment did — unrestricted
+matching made the treatment look actively harmful, and removing one-shot clusters
+from the pool made it null. A causal claim from design choices that unstable has
+no business on a public page before a blind re-analysis.
+
+Four rotations of blind persona readers were run against the six surfaces, whole
+files rather than diffs, with no access to intent, figures or history. Each
+rotation found that the last rotation's repair had introduced a defect at the
+same site: an arithmetic gap, then a Korean landing page whose rewrite dropped the
+operator gate and left adoption reading as automatic, then a provenance phrase
+whose nearest antecedent was a different deployment. That is the churn the
+three-rotation cap exists to bound, and the fourth rotation ran scoped to closure
+under an extension rather than open to new findings.
+
+What did not close is the enumeration. Three times the claim was declared
+exhaustively swept, and three times a further site survived, because each sweep
+searched one phrasing: "only if a blind A/B" missed "must show a measured
+effect", which missed "effect-measurement gate". A claim carried in prose offers
+no literal to enumerate against, so a grep reports a completeness it cannot
+establish. The prescription is not a fourth sweep but a check that compares how
+the public surfaces describe the adoption gate, and it does not exist yet.
