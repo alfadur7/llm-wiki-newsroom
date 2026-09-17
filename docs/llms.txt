@@ -10,7 +10,7 @@ The production system runs on four loops. The first three mirror the software-fa
 
 - **Inner** — the agent's own fast checks while drafting, before anything is submitted.
 - **Outer** — the publication gate, in two stages: deterministic lint (a Python script, no model call), then an independent desk review that sees the draft and the rubric but never the writer's reasoning.
-- **Meta** — recurring defects get promoted into the authoring rules themselves, kept only if a blind A/B against a held-out regression set shows an actual gain, and adopted only past a human gate.
+- **Meta** — recurring defects get promoted into the authoring rules themselves. A blind A/B against a held-out regression set gates the subset that touches judge-scored prose; the rest is verified deterministically, and an operator directive can waive the A/B on a recorded reason. Everything ends at a human gate. Thirteen weeks of that ledger on the author's private instance: 107 adopted, 72 rejected, 18 deferred; over the same window 44 of the 70 defect classes that ever got a fix came back afterwards, five of them producing 451 of the 823 recurrences.
 - **Reground** — published pages return as input when their sources change, when a claim's own deadline matures, or when two pages start contradicting each other.
 
 ## Core docs

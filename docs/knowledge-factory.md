@@ -52,11 +52,11 @@ This article asks the same question of knowledge work. What should the factory l
 - **Four loops build that trust.**
   - Inner loop: self-checks that run while a draft is being written
   - Outer loop: a two-gate review right before publication
-  - Meta loop: turning repeat mistakes into permanent rules
+  - Meta loop: turning a repeat mistake into a rule — though 44 defect classes have come back after theirs was written
   - Reground loop: re-verifying and rewriting knowledge that has gone stale
 - **Not everything is a loop.** The newest mechanism is a **GROUND Ladder** that decides how much the writer reads before drafting, widening only on named signals of insufficient evidence — input discipline rather than feedback, and still unmeasured.
 - **Human-in-the-loop by checklist, not by gut feeling.** The situations that require operator approval are enumerated rather than judged case by case.
-- **Stated limits.** What the deterministic checks can't reach, follow-up items that never close, review history spread across several files, and the fact that the design's advantage is still a hypothesis under test.
+- **Stated limits.** What the deterministic checks can't reach, follow-up items that never close, review history spread across several files, a meta loop that has not yet stopped defects from recurring, and the fact that the design's advantage is still a hypothesis under test.
 
 ## 1. What a knowledge factory is
 
@@ -137,12 +137,15 @@ This is the same two-layer shape as the software factory's **Verifier** and **Ch
 
 One design choice does most of the work here. **The Desk receives the finished draft and the rubric — never the writer's reasoning about why it was written that way.** Reviewing your own work inside the same context makes you generous with yourself, so the fix is to cut the information off entirely. The real lever in this system isn't how many agents are running; it's that isolation. Drafts that fail either gate go back to their author; three rejections for the same cause halt automatic progress and hand the decision to the operator.
 
-### 3-3. Meta loop: every mistake happens only once
+### 3-3. Meta loop: turning a repeat mistake into a rule
 
 The meta loop wraps both loops below it, watches how they perform, and then improves the system itself. The rule it follows: don't teach an agent the same thing twice — once you've said it, encode it somewhere as a rule.
 
+That's the rule, not yet the result. On a private instance over thirteen weeks, **44 of the 70 defect classes that ever got a fix came back afterwards, and five of them produced 451 of the 823 recurrences** — the rule amended most often has been rewritten 19 times and still fires. Recurrence is concentrated rather than general, and the concentration is the finding: a handful of mechanisms are the ones no rule has made stick.
+
 - **A defect ledger.** Defects caught in review and corrections from the operator accumulate through a logging tool (`tools/log_defect.py`), and mining scripts trace the recurring failure patterns.
-- **Proposals, then measurement.** When the same defect keeps surfacing, the system drafts an amendment to its own authoring guidelines. Each proposal goes through a **blind comparison — which draft came from the amended rule is hidden from the judge** — plus a test on held-out failures never used in validation before. It's adopted only if the score actually improves, and only with **the operator's final approval**. The loop proposes and measures; it never adopts on its own.
+- **Proposals, then measurement.** When the same defect keeps surfacing, the system drafts an amendment to its own authoring guidelines. Amendments to the prose rules an LLM judge scores are supposed to clear a **blind comparison — which draft came from the amended rule is hidden from the judge** — plus a test on held-out failures never used in validation before. Three things narrow that in practice: most amendments aren't of that kind (tool code, fact corrections, structural moves, verified deterministically instead); the operator can direct a change outright, which waives the comparison on a reason recorded in the ledger; and some records simply carry no measurement statement. Every route ends at **the operator's approval**; the loop proposes and measures, but never adopts on its own.
+- **What the ledger says about that.** Thirteen weeks of it on the same private instance: **107 amendments adopted, 72 rejected, 18 deferred.** Of the 107, **16 cite a measurement** (11 an arms-based comparison, 5 a deterministic before-and-after) and **40 were adopted on a recorded waiver**. The remaining 51 are the residual above: changes the comparison does not cover, plus a tail that records no measurement statement — the ledger does not separate the two, which is itself a gap. The gate is real where it applies; it applies to a minority.
 - **Hardening into code.** Recurring findings get promoted into a Python hook or a Gate 1 rule, which moves the problem out of the judgment layer and into the deterministic one. The point is to keep the Desk permanently pointed at problems nobody has seen before.
 
 ### 3-4. Reground loop: the fourth loop knowledge work needs
@@ -159,9 +162,9 @@ Every loop above is feedback — something exists, gets checked, gets corrected.
 
 - **The rungs.** Start from what the page itself declares it depends on. Widen to the index, then to the links the build has already computed, then to content search for the relations no link declares — and, while the whole wiki still fits in a single read, to reading all of it.
 - **The signal to widen.** A writer climbs only when a named signal says the evidence in hand is thin: a claim with no source passage secured, a wikilink that doesn't resolve, searches coming back empty. The signal also picks the rung — an unresolved link sends you straight to the computed links, not through every step in between.
-- **The recorded rung.** Every hand-off notes where the writer stopped, and the defect ledger keeps that next to the gate that later caught the defect. Without the pair, a defect born from reading too little looks exactly like bad writing, and the meta loop's only available prescription is "fix the writing rules" — never "read wider, earlier."
+- **The recorded rung.** Every hand-off notes where the writer stopped, and the defect ledger keeps that next to the gate that later caught the defect. The pair is what a diagnosis would need: without it, a defect born from reading too little looks exactly like bad writing, and the meta loop's only available prescription is "fix the writing rules" — never "read wider, earlier." Recording it is the part that exists; drawing the diagnosis is not built yet — and with 343 hand-offs logged against 1,810 defects, at most a fifth of the ledger currently carries the pair at all.
 
-It sits outside the diagram deliberately. A ladder that runs once, at the start of a draft, is input discipline rather than feedback; calling it a fifth loop would blur the very distinction the other four are built on. The design follows the ablation result from an independently built and benchmarked system of the same wiki shape (["Retrieval as Reasoning", arXiv:2605.25480](https://arxiv.org/abs/2605.25480)), where removing multi-round traversal cost roughly twice the accuracy that removing the wiki structure did. That ordering — how you read mattering more than how the wiki is built — is what prompted the ladder here. Those are their numbers for their system; this ladder is new, its stopping rules are provisional, and its effect is unmeasured.
+It sits outside the diagram deliberately. A ladder that runs once, at the start of a draft, is input discipline rather than feedback; calling it a fifth loop would blur the very distinction the other four are built on. The design follows the ablation result from an independently built and benchmarked system of the same wiki shape (["Retrieval as Reasoning", arXiv:2605.25480](https://arxiv.org/abs/2605.25480)), where removing multi-round traversal cost roughly twice the accuracy that removing the wiki structure did. That ordering — how you read mattering more than how the wiki is built — is what prompted the ladder here. Those are their numbers for their system; this ladder is new, its stopping rules are provisional, and its effect is unmeasured. What exists so far is the record: **343 hand-offs, 87% of them never leaving the bottom rung, the top rung never once reached.** A lopsided distribution is not yet a verdict. It could mean the ladder is correctly cheap, that it rarely fires, or that the signals meant to trigger a climb go unchecked — and until something reads those records back, there is no way to tell which.
 
 ## 4. Control plane: keeping the trail legible
 
@@ -198,7 +201,8 @@ For transparency, the structural limits as they currently stand:
 - **What rule checks can't reach.** Gate 1 is pure Python with no AI calls at all. That makes it cheap and fast enough to run on everything, but any check that requires reading for meaning and intent can't be automated there, so it falls to the Desk. That makes the Desk's load wider here than in Knox's version, where the verifier layer is itself LLM-driven.
 - **Follow-up items that never close.** There's no procedure yet for marking a surfaced follow-up as resolved, so once an item is flagged it comes back on every run. The plan is to build an adjudication ledger once items actually start accumulating.
 - **Review history is scattered.** Unlike a pull request, where every review comment stays attached to one object, the history here is spread across the work log, the reports, and the defect ledger.
-- **Still a hypothesis.** Whether the four loops and the separate qualitative review actually produce better knowledge is still under test, through blind comparisons and operational data. It's a design argument, not a measured result. The GROUND Ladder is earlier still: provisional caps, and nothing measured yet.
+- **Still a hypothesis.** Whether the four loops and the separate qualitative review actually produce better knowledge is still under test, through blind comparisons and operational data. It's a design argument, not a measured result. The GROUND Ladder is earlier still: provisional caps, and no effect measured yet.
+- **The meta loop has not stopped recurrence.** 44 of the 70 defect classes that ever got a fix came back afterwards, five of them producing 55% of those recurrences (§3-3). Whether a written rule then holds is the open question, and for a stubborn minority of mechanisms it plainly doesn't.
 
 ## Closing: what actually changes is the human role
 
@@ -206,7 +210,7 @@ The message at the center of the software factory story is that a developer's jo
 
 Fixing a page by hand improves one page. Converting a defect the Desk keeps flagging into a rule improves **every page the system will ever produce**.
 
-And the most valuable thing the knowledge factory takes from the software factory isn't throughput. It's the meta loop that stops a mistake from happening twice, and the reground loop that stops published knowledge from quietly rotting — **rules that improve themselves, and pages that rewrite themselves when they go stale**. That is what this factory is really built to produce.
+And the most valuable thing the knowledge factory takes from the software factory isn't throughput. It's the meta loop that converts a recurring mistake into a rule, and the reground loop that stops published knowledge from quietly rotting — **rules that improve themselves, and pages that rewrite themselves when they go stale**. That is what this factory is really built to produce.
 
 ---
 
