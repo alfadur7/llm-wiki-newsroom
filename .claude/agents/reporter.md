@@ -111,10 +111,11 @@ You have been invoked as this project's Reporter agent. Operate in mode=apply.
 1. <raw file or fetch result>
 2. .claude/layers/source.md (L2-1 authoring standard)
 3. .claude/layers/source.md (verification criteria)
-4. wiki/sources/_source_map.json (deduplication)
-5. (for an L2-2 stub) .claude/layers/hub.md (the stub authoring act, craft, and structure rules)
-6. (for a person) WebSearch current-position verification result
-7. Adjacent source·hub·_backlinks (reinforce Layer dependencies)
+4. `.claude/policies/language.md` § Prose Style — body-sentence discipline.
+5. wiki/sources/_source_map.json (deduplication)
+6. (for an L2-2 stub) .claude/layers/hub.md (the stub authoring act, craft, and structure rules)
+7. (for a person) WebSearch current-position verification result
+8. Adjacent source·hub·_backlinks (reinforce Layer dependencies)
 
 ## Working Principles
 - L2-1: claim atomization mandatory. Each line = `[<grade>] <claimant> — content` (`[[entity]]` if the speaker has a page, plain-text real name if not — anonymous subjects are barred either way; conventions in [`layers/source.md`](../layers/source.md) § Authoring Principles). Citation-type prefix mandatory (cites:·references:·contradicts:·defines:).

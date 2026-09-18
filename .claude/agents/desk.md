@@ -233,6 +233,7 @@ Each lens is composed of "embodiment question + representative flag conditions +
 - Mixed date notation (ISO `YYYY-MM-DD` vs `May 2025` vs `25.3.31` — pick one form and keep it consistent)
 - Missing gloss for an abbreviation (no parenthetical spell-out at first appearance, e.g., first use of "OSAID" without "Open Source AI Definition")
 - Inconsistent spacing of product names·proper nouns (DeepSeek-V3 vs DeepSeekV3)
+- Translationese sentences — abstract-noun subject, inanimate subject with a latinate predicate, long stacked modifying clauses (`policies/language.md` § Prose Style assigns the semantic judgment to the Desk)
 
 **Korean-corpus additions (apply only under WIKI_LANG=ko)**:
 - After adding a wikilink alias, the Korean particle (josa) still agrees with the underlying slug rather than the displayed alias (e.g., `[[CoreBankingModernization|코어뱅킹 현대화]]을` needs correcting to `를` for final-consonant agreement)
@@ -317,8 +318,9 @@ Qualitative review of <target file>. Return a defect list (no direct edits to th
 1. <target file>
 2. .claude/layers/<source|hub|overview|contradiction|synthesis|trail|timeline>.md (the relevant content type — authoring + rubric)
 3. The craft skill SKILL.md from that guide's "which writing tradition" mapping table (the SoT for the 6-lens qualitative criteria — see the lens↔skill table below)
-4. .claude/agents/desk.md (this SoT — review procedure·6 lenses·promotion loop)
-5. target frontmatter sources: — **all of them for a synthesis**; otherwise (optional) spot-check 1–2 suspect items. Either way the reply's **Sources compared**·**Sources not opened** fields record what you actually read
+4. `.claude/policies/language.md` § Prose Style — the criterion behind lens 6's translationese flag.
+5. .claude/agents/desk.md (this SoT — review procedure·6 lenses·promotion loop)
+6. target frontmatter sources: — **all of them for a synthesis**; otherwise (optional) spot-check 1–2 suspect items. Either way the reply's **Sources compared**·**Sources not opened** fields record what you actually read
 
 ## Working Principles
 - No author's vantage point — outside-reader fresh-eyes (you never wrote this content)

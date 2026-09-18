@@ -89,11 +89,12 @@ You have been invoked as this project's Columnist agent. You own authoring of <L
 1. <target file> (existing output — empty file if new)
 2. .claude/layers/<source|hub|overview|contradiction|synthesis|trail|timeline>.md (authoring standard + verification Rubric combined)
 3. the craft skill SKILL.md from that guide's "which writing tradition" mapping table (whichever of jrn·con·enc·cit applies — authoring-standard SoT, criteria.json dotted-ID definitions)
-4. <each source page in the frontmatter sources: list>
-5. <adjacent hubs — via _backlinks.json>
-6. (L2-3 contradiction) wiki/contradictions/_contradictions_themes.json
-7. (L2-3 cluster overview) graph/_clusters.json
-8. (L2-4) the entire set of L2-3 files being aggregated
+4. `.claude/policies/language.md` § Prose Style — body-sentence discipline.
+5. <each source page in the frontmatter sources: list>
+6. <adjacent hubs — via _backlinks.json>
+7. (L2-3 contradiction) wiki/contradictions/_contradictions_themes.json
+8. (L2-3 cluster overview) graph/_clusters.json
+9. (L2-4) the entire set of L2-3 files being aggregated
 
 ## Working Principles
 - Read it yourself, in your own context — do not rely on summaries produced by another agent (avoid the telephone game).

@@ -70,8 +70,8 @@ The meta files at the `wiki/` root (`index.md`·`overview.md`·`contradiction.md
 ## Invocation Conventions
 
 - **GROUND·APPLY·ADAPT stages** (Reporter · Columnist) → read 1 relevant content file (e.g. the `contradiction.md` Authoring section when writing a contradiction theme).
-- **APPLY-stage body prose** (common to all content types) → follow the translationese-avoidance discipline in [`../policies/language.md`](../policies/language.md) `## Prose Style` (verb-centric · avoid inanimate subjects · short sentences · reduce double passives).
-- **VERIFY qualitative stage** (Desk) → the relevant content file + `.claude/agents/desk.md` (the SoT for the 6 qualitative-review lenses and the promotion loop — Cognition principle 1, full context).
+- **APPLY-stage body prose** (common to all content types) → follow [`../policies/language.md`](../policies/language.md) `## Prose Style`.
+- **VERIFY qualitative stage** (Desk) → the relevant content file + `.claude/agents/desk.md` (the SoT for the 6 qualitative-review lenses and the promotion loop — Cognition principle 1, full context) + [`../policies/language.md`](../policies/language.md) `## Prose Style` (the criterion behind lens 6's translationese flag).
 - **VERIFY quantitative stage** (Copy Editor) → `tools/lint.py` evaluates against the `_manifest.json` roster plus the craft skills' `criteria.json`/`checks.py`; the Evaluation Rubric H2 documents those criteria for authors/Desk but is not parsed by lint.
 
 For per-role capability boundaries, see the [`.claude/agents/`](../agents/) SoT. For the Universal Cycle and the standard ADAPT chain, see the [`.claude/agents/README.md`](../agents/README.md) SoT.
