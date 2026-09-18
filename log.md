@@ -558,3 +558,59 @@ effect", which missed "effect-measurement gate". A claim carried in prose offers
 no literal to enumerate against, so a grep reports a completeness it cannot
 establish. The prescription is not a fourth sweep but a check that compares how
 the public surfaces describe the adoption gate, and it does not exist yet.
+
+## [2026-09-18] guideline | the probe that told the control the answer, and the rule that fired where nothing was due
+
+Four units came across from the sibling repository this round. Two were
+deterministic and closed on their own evidence: the policies file index, which had
+aged until one of its twenty-one sections was still named in the table that indexes
+them, now has a check that compares each row against the file it points at; and a
+docstring in the gap scanner that claimed to reuse the cap-theme count while
+counting a different denominator was corrected along with the column label that
+carried the same error. The other two changed behaviour, so they were measured
+before adoption, and both measurements returned something the edit did not
+anticipate.
+
+The behavioural probe failed first, and it failed in the writing rather than the
+running. The scenario handed to both conditions said that two of the incoming
+contradiction claims would be downgraded after the Desk pass — which is the failure
+mechanism itself, stated as a premise. The control read that and ordered the
+consolidation correctly without being told to, so the round measured nothing and was
+discarded. Removing one sentence reversed the result: the control then assigned the
+claims before the pass that can rewrite them, which is exactly the orphaning the rule
+exists to prevent. The runbook already forbids listing the output fields under
+observation, on the reasoning that naming them is injection. It says nothing about a
+scenario that narrates the failure mechanism, and that is the wider hole.
+
+The treatment then failed its own held-out slice. Written as an unconditional closing
+sequence — rebuild, consolidate, rebuild, full lint, whether or not the Desk had
+changed anything — it fixed the failure and also fired on a batch that had added no
+contradiction claims at all, where it bought two rebuilds, a full re-lint, and a
+by-hand comparison of claim ids against theme assignments that the deterministic
+theme check already performs in both directions. Both judges named it. The repair was
+to condition the sequence on what actually re-keys a claim, since a claim id hashes
+the `contradicts:` line and nothing else — not the claimant tokens, not a stub, not a
+theme page. Only the held-out slice caught this. The motivating slice passed
+throughout, and would have shipped the rule that over-fires.
+
+The prose-discipline wiring returned a split the acceptance rule cannot resolve by
+itself. On the target that motivated it, the treatment was better on the mechanism
+that motivated it — stacked modifying clauses, halved under both judges — and worse
+on nominalisation, for a total that came out even. On stable published pages the new
+Desk flag raised roughly fifteen findings where the control could raise none, and the
+question of whether that is a rule firing too loosely or a corpus that does not meet
+its own policy is not one the counts can answer. Two independent desks converged on
+the same sentences, the quotes were real and correctly attributed, and the policy
+those sentences violate already names the Desk as its enforcer while giving it no
+lens to enforce with. The operator adopted it on that reading, knowing the review load
+it carries.
+
+What did not close is smaller and worth naming. The revision that conditioned the
+consolidation added the qualifier at two of the three places that state it, leaving
+the ordering bullet reading as unconditional to anyone who stops there; the blind
+re-pass caught it at medium and it carries to the corpus rather than opening another
+edit round. Two sampling constraints also stand: the corpus holds exactly one
+content-layer prose defect of the measured mechanism, so generalisation is
+unverified, and the only synthesis in the wiki is simultaneously the motivating
+target and the fixed regression entry, which left the held-out population for that
+content type at zero and forced the sample to widen to any authored type.
