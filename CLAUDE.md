@@ -77,7 +77,7 @@ SoT: workflow + acceptance rule = [`agents/editor-in-chief.md`](.claude/agents/e
 
 ## Directory Structure
 
-The detailed directory layout + the auto-generated vs. human-edited split + placement rules: [`.claude/policies/directory-layout.md`](.claude/policies/directory-layout.md) is the SoT.
+The directory structure: [`.claude/policies/directory-layout.md`](.claude/policies/directory-layout.md) is the SoT.
 
 ---
 
@@ -148,12 +148,8 @@ Each folder has a **single responsibility**; when adding a new instruction, use 
 **When read**: when creating a new file, renaming, or making a language decision (policy changes require explicit approval from the wiki operator).
 
 **Instructions located here**:
-- `directory-layout.md` (directory structure + the `_` prefix and placement rules + the `cluster_labels.json` human-edit convention)
-- `naming.md` (slug and filename conventions + Reserved meta-doc names + the entity/concept stub thresholds)
-- `language.md` (English body text + English frontmatter keys + Meta-Doc English headers + Prose Style avoidance of translationese; Korean body text is an optional `WIKI_LANG=ko` mode)
-- `platform.md` (Windows non-Latin filename encoding workaround)
-- `index-log-format.md` (the two-tier structure of `wiki/index.md` + `log.md` append-at-bottom)
-- `README.md` (file index + invocation convention)
+- `directory-layout.md` (directories·placement) · `naming.md` (slugs·filenames·addition thresholds) · `language.md` (language·prose style) · `platform.md` (Windows·shell·hooks) · `index-log-format.md` (index·log format)
+- The sections each file holds: [`policies/README.md`](.claude/policies/README.md) § File Index is the SoT — restated here, the two indexes drift apart
 
 Guideline-authoring voice and plan-bloat control are craft, not policy — they live in the `guideline-writing` skill (`gdl.*`).
 

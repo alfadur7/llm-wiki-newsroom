@@ -331,6 +331,53 @@ def _claude_section_basenames(claude_text: str, folder: str) -> set[str] | None:
     return _md_basenames(m.group(0))
 
 
+_INDEX_ROW_RE = re.compile(r"^\|\s*\[([^\]]+\.md)\]")
+_HEADING_PAREN_TAIL_RE = re.compile(r"\s*\([^()]*\)\s*$")
+
+
+def _check_policy_index_coverage() -> list[str]:
+    """Verify each `policies/README.md` File Index row names every `##` section of
+    the policy file it points at.
+
+    An index that silently ages is the measured failure: at introduction, 1 of 21
+    sections appeared in the table. `CLAUDE.md` carries a short tag per file and
+    delegates the section list here (the same shape `layers/` uses), so once this
+    table ages, the whole classification index ages with it.
+
+    The comparison asks whether the row contains the heading **with its trailing
+    parenthetical stripped** — requiring the supplementary parens (`(global)`,
+    `(people, companies, SW solutions)`) verbatim would turn the index into a copy
+    of the body. Fenced `##` lines are excluded: `index-log-format.md` carries the
+    template headers of the generated index inside a code block.
+
+    The direction is section -> row only. The reverse (splitting a row into items to
+    catch a ghost entry) is not deterministic, because the separator also occurs
+    inside heading text (`Bash-Tool Redirect/Path Arguments Must Use Forward Slashes`).
+    """
+    readme = ROOT / ".claude" / "policies" / "README.md"
+    if not readme.exists():
+        return []
+    rows: dict[str, str] = {}
+    for _, line in _iter_non_fenced_lines(read_text_cached(readme)):
+        m = _INDEX_ROW_RE.match(line)
+        if m:
+            rows[m.group(1)] = line
+
+    issues: list[str] = []
+    for path in sorted((ROOT / ".claude" / "policies").glob("*.md")):
+        row = rows.get(path.name)
+        if row is None:
+            continue  # an unlisted file is _check_roster_completeness's business (README.md included)
+        for _, line in _iter_non_fenced_lines(read_text_cached(path)):
+            m = HEADING_RE.match(line)
+            if not m or len(m.group(1)) != 2:
+                continue
+            stem = _HEADING_PAREN_TAIL_RE.sub("", m.group(2))
+            if stem not in row:
+                issues.append(f"  policies/README.md: `{path.name}` row omits `## {stem}`")
+    return issues
+
+
 def _check_roster_completeness(claude_text: str) -> list[str]:
     """Verify every disk entry under each `ROSTER_FOLDERS` folder is enumerated in
     the CLAUDE.md "Instruction Locations" and (where that folder has one) its README index.
@@ -1507,7 +1554,22 @@ def run() -> int:
     else:
         print("OK - defect ledger records all pass log_defect.validate()")
 
-    total = integrity_total + language_total + total_drift + len(flat_issues) + len(reserved_issues) + len(log_issues) + len(voice_issues) + len(tool_perm_issues) + len(model_issues) + len(hook_prefix_issues) + len(hook_channel_issues) + len(hook_utf8_issues) + len(regex_hoist_issues) + len(craft_issues) + len(stale_guide_issues) + len(link_issues) + len(nested_issues) + len(ledger_issues)
+    # POLICY INDEX pass — does the folder README index hold every policy section?
+    policy_index_issues = _check_policy_index_coverage()
+    if policy_index_issues:
+        print(f"\n[Policy index gaps: {len(policy_index_issues)}]")
+        for v in policy_index_issues:
+            print(v)
+        print(
+            "Rule: `.claude/policies/README.md` § File Index is the single SoT for "
+            "the policy descriptions (CLAUDE.md carries a short tag + delegation) — when "
+            "adding a new `##` section, put its heading in that row. The trailing "
+            "parenthetical may be dropped."
+        )
+    else:
+        print("OK - policies README index covers every policy section")
+
+    total = integrity_total + language_total + total_drift + len(flat_issues) + len(reserved_issues) + len(log_issues) + len(voice_issues) + len(tool_perm_issues) + len(model_issues) + len(hook_prefix_issues) + len(hook_channel_issues) + len(hook_utf8_issues) + len(regex_hoist_issues) + len(craft_issues) + len(stale_guide_issues) + len(link_issues) + len(nested_issues) + len(ledger_issues) + len(policy_index_issues)
     if total == 0:
         return 0
     print(f"\nFAIL - {total} meta-schema issue(s)")
