@@ -87,7 +87,7 @@ STALE_THEME_DAYS = 7                 # theme MD vs latest mapped source
 # Track D (derivation coverage — material has accumulated but the integration page
 # is absent). Unlike the input gaps (Track A-C), this is filled by columnist
 # authoring rather than external search (gap-detection-rollout 2nd boundary).
-SYNTHESIS_CLAIM_FLOOR = 30           # theme ≥30 claims but no integrating synthesis (reuses the cap-theme signal)
+SYNTHESIS_CLAIM_FLOOR = 30           # theme ≥30 claims (whole `claim_ids`) but no integrating synthesis
 TIMELINE_SOURCES_FLOOR = 25          # hub ≥25 sources (chronicle-volume floor — auxiliary gate)
 TIMELINE_MIN_SECTION_EVENTS = 18     # year (20YY) mentions ≥ N inside the hub body's `## Timeline` section
 # timeline split signal: has the `## Timeline` section already grown in the hub
@@ -418,7 +418,8 @@ def _referenced_stems(dir_path: Path) -> set[str]:
 def detect_synthesis_coverage(themes_data: dict) -> list[dict]:
     """synthesis (Track D): contradiction theme with ≥SYNTHESIS_CLAIM_FLOOR claims
     but no synthesis integrating it (no synthesis references `[[<theme-slug>]]`).
-    Reuses the cap-theme claim-count signal + a synthesis-existence linkage check."""
+    Counts the theme's whole `claim_ids` — a different denominator from cap-theme's
+    real-only count — plus a synthesis-existence linkage check."""
     covered = _referenced_stems(SYNTHESES_DIR)
     out: list[dict] = []
     for slug, td in themes_data.get("themes", {}).items():
@@ -641,7 +642,7 @@ def run(*, json_out: bool = False,
         if track_c.get("cap-theme"):
             print(f"\n[cap-theme] Cap-approaching theme — {len(track_c['cap-theme'])}")
             _print_table(track_c["cap-theme"], [
-                ("theme", "slug", 40), ("claims", "claim_count", 7), ("prio", "priority", 8),
+                ("theme", "slug", 40), ("real claims", "claim_count", 12), ("prio", "priority", 8),
             ], limit=cap)
         if track_c.get("stale-theme"):
             print(f"\n[stale-theme] Stale theme MD — {len(track_c['stale-theme'])}")
