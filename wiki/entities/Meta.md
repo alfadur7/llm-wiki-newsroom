@@ -3,7 +3,7 @@ title: "Meta"
 type: entity
 kind: org
 tags: [Meta, Llama, open-weights, licensing]
-sources: [mozilla-celebrates-osaid, osi-open-source-ai-definition, open-source-ai-models-how-open]
+sources: [mozilla-celebrates-osaid, osi-open-source-ai-definition, open-source-ai-models-how-open, hello-olmo-truly-open-llm, joint-statement-ai-safety-openness, llama-2-meta-microsoft, llama-3-1-community-license, open-future-osaid-step-forward, open-source-ai-path-forward, open-source-ai-uniquely-dangerous, open-weights-american-ai-leadership, osaid-take-it-or-leave-it, osi-meta-llama-2-license-not-open-source, osi-meta-llama-license-still-not-open-source, rethinking-open-source-generative-ai, senators-question-meta-llama-leak, sfc-osaid-erodes-open-source, societal-impact-open-foundation-models, techcrunch-osaid-official-definition, what-does-open-source-ai-mean]
 last_updated: 2026-06-26
 ---
 

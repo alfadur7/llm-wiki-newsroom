@@ -2,7 +2,7 @@
 title: "Fine-Tuning"
 type: concept
 tags: [fine-tuning, open-weights, model-weights, adaptation]
-sources: [open-source-ai-models-how-open]
+sources: [open-source-ai-models-how-open, deepseek-r1-release, eu-gpai-provider-guidelines, llama-2-meta-microsoft, llama-3-1-community-license, open-source-ai-path-forward, open-weight-models-frontier-safety-gap, osi-open-weights-good-open-source-better, osi-readies-controversial-osaid, red-hat-open-source-ai-point-of-view, rethinking-open-source-generative-ai, techcrunch-osaid-official-definition, welcome-gpt-oss-openai]
 last_updated: 2026-06-26
 ---
 

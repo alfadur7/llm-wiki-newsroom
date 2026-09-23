@@ -2,7 +2,7 @@
 title: "Model Licensing"
 type: concept
 tags: [licensing, open-source-ai, governance, copyleft]
-sources: [open-source-ai-models-how-open, case-against-osaid, osi-open-source-ai-definition]
+sources: [open-source-ai-models-how-open, case-against-osaid, osi-open-source-ai-definition, debian-ai-models-dfsg, deepseek-r1-release, eu-gpai-provider-guidelines, llama-2-meta-microsoft, llama-3-1-community-license, mistral-ai-non-production-license, open-future-osaid-step-forward, openmdw-1-1-nvidia-adoption, osaid-take-it-or-leave-it, osi-meta-llama-2-license-not-open-source, osi-meta-llama-license-still-not-open-source, red-hat-open-source-ai-point-of-view, rethinking-open-source-generative-ai, sfc-osaid-erodes-open-source, techcrunch-osaid-official-definition, welcome-gpt-oss-openai, what-does-open-source-ai-mean]
 last_updated: 2026-06-26
 ---
 

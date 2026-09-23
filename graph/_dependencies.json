@@ -2,11 +2,61 @@
   "_meta": {
     "phase": "dependencies",
     "note": "layer-cascade upstream index — page → {upstream pages it derives from, newest upstream date}. Consumed by tools/_lint/staleness.py (uniform staleness rule). Additive; no existing behavior changed.",
-    "page_count": 23
+    "page_count": 63
   },
   "pages": {
+    "sources/anthropic-position-open-weights-models.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
     "sources/case-against-osaid.md": {
       "last_updated": "2026-06-26",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/debian-ai-models-dfsg.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/deepseek-r1-release.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/eu-gpai-provider-guidelines.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/fsf-free-ml-application-criteria.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/hello-olmo-truly-open-llm.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/joint-statement-ai-safety-openness.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/llama-2-meta-microsoft.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/llama-3-1-community-license.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/mistral-ai-non-production-license.md": {
+      "last_updated": "2026-09-23",
       "upstream": [],
       "upstream_max_date": null
     },
@@ -15,8 +65,58 @@
       "upstream": [],
       "upstream_max_date": null
     },
+    "sources/ntia-open-model-weights-report.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/open-future-osaid-step-forward.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
     "sources/open-source-ai-models-how-open.md": {
       "last_updated": "2026-06-26",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/open-source-ai-path-forward.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/open-source-ai-uniquely-dangerous.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/open-weight-models-frontier-safety-gap.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/open-weights-american-ai-leadership.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/openmdw-1-1-nvidia-adoption.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/osaid-take-it-or-leave-it.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/osi-meta-llama-2-license-not-open-source.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/osi-meta-llama-license-still-not-open-source.md": {
+      "last_updated": "2026-09-23",
       "upstream": [],
       "upstream_max_date": null
     },
@@ -25,37 +125,166 @@
       "upstream": [],
       "upstream_max_date": null
     },
+    "sources/osi-open-weights-good-open-source-better.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/osi-readies-controversial-osaid.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/red-hat-open-source-ai-point-of-view.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/rethinking-open-source-generative-ai.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/senators-question-meta-llama-leak.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/sfc-osaid-erodes-open-source.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/societal-impact-open-foundation-models.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/techcrunch-osaid-official-definition.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/welcome-gpt-oss-openai.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "sources/what-does-open-source-ai-mean.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [],
+      "upstream_max_date": null
+    },
+    "entities/Anthropic.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [
+        "sources/anthropic-position-open-weights-models.md",
+        "sources/open-weight-models-frontier-safety-gap.md",
+        "sources/senators-question-meta-llama-leak.md",
+        "sources/open-weights-american-ai-leadership.md"
+      ],
+      "upstream_max_date": "2026-09-23"
+    },
     "entities/DeepSeek.md": {
       "last_updated": "2026-09-15",
       "upstream": [
-        "sources/open-source-ai-models-how-open.md"
+        "sources/open-source-ai-models-how-open.md",
+        "sources/deepseek-r1-release.md",
+        "sources/osaid-take-it-or-leave-it.md",
+        "sources/red-hat-open-source-ai-point-of-view.md"
       ],
-      "upstream_max_date": "2026-06-26"
+      "upstream_max_date": "2026-09-23"
     },
     "entities/FreeSoftwareFoundation.md": {
       "last_updated": "2026-06-26",
       "upstream": [
-        "sources/case-against-osaid.md"
+        "sources/case-against-osaid.md",
+        "sources/fsf-free-ml-application-criteria.md",
+        "sources/osi-meta-llama-license-still-not-open-source.md",
+        "sources/osi-readies-controversial-osaid.md",
+        "sources/techcrunch-osaid-official-definition.md"
       ],
-      "upstream_max_date": "2026-06-26"
+      "upstream_max_date": "2026-09-23"
+    },
+    "entities/HuggingFace.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [
+        "sources/hello-olmo-truly-open-llm.md",
+        "sources/joint-statement-ai-safety-openness.md",
+        "sources/llama-2-meta-microsoft.md",
+        "sources/open-source-ai-uniquely-dangerous.md",
+        "sources/open-weight-models-frontier-safety-gap.md",
+        "sources/open-weights-american-ai-leadership.md",
+        "sources/welcome-gpt-oss-openai.md"
+      ],
+      "upstream_max_date": "2026-09-23"
     },
     "entities/Meta.md": {
       "last_updated": "2026-06-26",
       "upstream": [
         "sources/mozilla-celebrates-osaid.md",
         "sources/osi-open-source-ai-definition.md",
-        "sources/open-source-ai-models-how-open.md"
+        "sources/open-source-ai-models-how-open.md",
+        "sources/hello-olmo-truly-open-llm.md",
+        "sources/joint-statement-ai-safety-openness.md",
+        "sources/llama-2-meta-microsoft.md",
+        "sources/llama-3-1-community-license.md",
+        "sources/open-future-osaid-step-forward.md",
+        "sources/open-source-ai-path-forward.md",
+        "sources/open-source-ai-uniquely-dangerous.md",
+        "sources/open-weights-american-ai-leadership.md",
+        "sources/osaid-take-it-or-leave-it.md",
+        "sources/osi-meta-llama-2-license-not-open-source.md",
+        "sources/osi-meta-llama-license-still-not-open-source.md",
+        "sources/rethinking-open-source-generative-ai.md",
+        "sources/senators-question-meta-llama-leak.md",
+        "sources/sfc-osaid-erodes-open-source.md",
+        "sources/societal-impact-open-foundation-models.md",
+        "sources/techcrunch-osaid-official-definition.md",
+        "sources/what-does-open-source-ai-mean.md"
       ],
-      "upstream_max_date": "2026-06-26"
+      "upstream_max_date": "2026-09-23"
+    },
+    "entities/MistralAI.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [
+        "sources/mistral-ai-non-production-license.md",
+        "sources/techcrunch-osaid-official-definition.md",
+        "sources/open-future-osaid-step-forward.md",
+        "sources/rethinking-open-source-generative-ai.md",
+        "sources/open-source-ai-uniquely-dangerous.md",
+        "sources/joint-statement-ai-safety-openness.md",
+        "sources/open-weights-american-ai-leadership.md"
+      ],
+      "upstream_max_date": "2026-09-23"
     },
     "entities/Mozilla.md": {
       "last_updated": "2026-07-19",
       "upstream": [
         "sources/mozilla-celebrates-osaid.md",
         "sources/osi-open-source-ai-definition.md",
-        "sources/case-against-osaid.md"
+        "sources/case-against-osaid.md",
+        "sources/joint-statement-ai-safety-openness.md",
+        "sources/open-future-osaid-step-forward.md",
+        "sources/open-weights-american-ai-leadership.md",
+        "sources/osi-readies-controversial-osaid.md"
       ],
-      "upstream_max_date": "2026-06-26"
+      "upstream_max_date": "2026-09-23"
+    },
+    "entities/OpenAI.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [
+        "sources/welcome-gpt-oss-openai.md",
+        "sources/open-source-ai-uniquely-dangerous.md",
+        "sources/open-future-osaid-step-forward.md",
+        "sources/osaid-take-it-or-leave-it.md",
+        "sources/rethinking-open-source-generative-ai.md",
+        "sources/senators-question-meta-llama-leak.md",
+        "sources/open-weights-american-ai-leadership.md",
+        "sources/open-weight-models-frontier-safety-gap.md",
+        "sources/deepseek-r1-release.md"
+      ],
+      "upstream_max_date": "2026-09-23"
     },
     "entities/OpenSourceInitiative.md": {
       "last_updated": "2026-07-19",
@@ -63,25 +292,126 @@
         "sources/osi-open-source-ai-definition.md",
         "sources/case-against-osaid.md",
         "sources/mozilla-celebrates-osaid.md",
-        "sources/open-source-ai-models-how-open.md"
+        "sources/open-source-ai-models-how-open.md",
+        "sources/debian-ai-models-dfsg.md",
+        "sources/joint-statement-ai-safety-openness.md",
+        "sources/open-future-osaid-step-forward.md",
+        "sources/osaid-take-it-or-leave-it.md",
+        "sources/osi-meta-llama-2-license-not-open-source.md",
+        "sources/osi-meta-llama-license-still-not-open-source.md",
+        "sources/osi-open-weights-good-open-source-better.md",
+        "sources/osi-readies-controversial-osaid.md",
+        "sources/red-hat-open-source-ai-point-of-view.md",
+        "sources/rethinking-open-source-generative-ai.md",
+        "sources/sfc-osaid-erodes-open-source.md",
+        "sources/techcrunch-osaid-official-definition.md",
+        "sources/what-does-open-source-ai-mean.md"
       ],
-      "upstream_max_date": "2026-06-26"
+      "upstream_max_date": "2026-09-23"
+    },
+    "entities/StefanoMaffulli.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [
+        "sources/osi-meta-llama-2-license-not-open-source.md",
+        "sources/what-does-open-source-ai-mean.md",
+        "sources/osi-readies-controversial-osaid.md",
+        "sources/techcrunch-osaid-official-definition.md",
+        "sources/societal-impact-open-foundation-models.md",
+        "sources/joint-statement-ai-safety-openness.md"
+      ],
+      "upstream_max_date": "2026-09-23"
+    },
+    "concepts/AISafety.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [
+        "sources/anthropic-position-open-weights-models.md",
+        "sources/joint-statement-ai-safety-openness.md",
+        "sources/llama-2-meta-microsoft.md",
+        "sources/ntia-open-model-weights-report.md",
+        "sources/open-source-ai-path-forward.md",
+        "sources/open-source-ai-uniquely-dangerous.md",
+        "sources/open-weight-models-frontier-safety-gap.md",
+        "sources/open-weights-american-ai-leadership.md",
+        "sources/rethinking-open-source-generative-ai.md",
+        "sources/senators-question-meta-llama-leak.md",
+        "sources/societal-impact-open-foundation-models.md"
+      ],
+      "upstream_max_date": "2026-09-23"
+    },
+    "concepts/Distillation.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [
+        "sources/open-weights-american-ai-leadership.md",
+        "sources/deepseek-r1-release.md",
+        "sources/open-source-ai-path-forward.md",
+        "sources/anthropic-position-open-weights-models.md"
+      ],
+      "upstream_max_date": "2026-09-23"
+    },
+    "concepts/EUAIAct.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [
+        "sources/eu-gpai-provider-guidelines.md",
+        "sources/open-future-osaid-step-forward.md",
+        "sources/open-source-ai-uniquely-dangerous.md",
+        "sources/osaid-take-it-or-leave-it.md",
+        "sources/rethinking-open-source-generative-ai.md"
+      ],
+      "upstream_max_date": "2026-09-23"
     },
     "concepts/FineTuning.md": {
       "last_updated": "2026-06-26",
       "upstream": [
-        "sources/open-source-ai-models-how-open.md"
+        "sources/open-source-ai-models-how-open.md",
+        "sources/deepseek-r1-release.md",
+        "sources/eu-gpai-provider-guidelines.md",
+        "sources/llama-2-meta-microsoft.md",
+        "sources/llama-3-1-community-license.md",
+        "sources/open-source-ai-path-forward.md",
+        "sources/open-weight-models-frontier-safety-gap.md",
+        "sources/osi-open-weights-good-open-source-better.md",
+        "sources/osi-readies-controversial-osaid.md",
+        "sources/red-hat-open-source-ai-point-of-view.md",
+        "sources/rethinking-open-source-generative-ai.md",
+        "sources/techcrunch-osaid-official-definition.md",
+        "sources/welcome-gpt-oss-openai.md"
       ],
-      "upstream_max_date": "2026-06-26"
+      "upstream_max_date": "2026-09-23"
     },
     "concepts/ModelLicensing.md": {
       "last_updated": "2026-06-26",
       "upstream": [
         "sources/open-source-ai-models-how-open.md",
         "sources/case-against-osaid.md",
-        "sources/osi-open-source-ai-definition.md"
+        "sources/osi-open-source-ai-definition.md",
+        "sources/debian-ai-models-dfsg.md",
+        "sources/deepseek-r1-release.md",
+        "sources/eu-gpai-provider-guidelines.md",
+        "sources/llama-2-meta-microsoft.md",
+        "sources/llama-3-1-community-license.md",
+        "sources/mistral-ai-non-production-license.md",
+        "sources/open-future-osaid-step-forward.md",
+        "sources/openmdw-1-1-nvidia-adoption.md",
+        "sources/osaid-take-it-or-leave-it.md",
+        "sources/osi-meta-llama-2-license-not-open-source.md",
+        "sources/osi-meta-llama-license-still-not-open-source.md",
+        "sources/red-hat-open-source-ai-point-of-view.md",
+        "sources/rethinking-open-source-generative-ai.md",
+        "sources/sfc-osaid-erodes-open-source.md",
+        "sources/techcrunch-osaid-official-definition.md",
+        "sources/welcome-gpt-oss-openai.md",
+        "sources/what-does-open-source-ai-mean.md"
       ],
-      "upstream_max_date": "2026-06-26"
+      "upstream_max_date": "2026-09-23"
+    },
+    "concepts/ModelOpennessFramework.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [
+        "sources/open-future-osaid-step-forward.md",
+        "sources/osaid-take-it-or-leave-it.md",
+        "sources/what-does-open-source-ai-mean.md"
+      ],
+      "upstream_max_date": "2026-09-23"
     },
     "concepts/OpenSourceAI.md": {
       "last_updated": "2026-07-19",
@@ -89,9 +419,50 @@
         "sources/osi-open-source-ai-definition.md",
         "sources/mozilla-celebrates-osaid.md",
         "sources/case-against-osaid.md",
-        "sources/open-source-ai-models-how-open.md"
+        "sources/open-source-ai-models-how-open.md",
+        "sources/debian-ai-models-dfsg.md",
+        "sources/deepseek-r1-release.md",
+        "sources/eu-gpai-provider-guidelines.md",
+        "sources/fsf-free-ml-application-criteria.md",
+        "sources/hello-olmo-truly-open-llm.md",
+        "sources/joint-statement-ai-safety-openness.md",
+        "sources/llama-2-meta-microsoft.md",
+        "sources/mistral-ai-non-production-license.md",
+        "sources/ntia-open-model-weights-report.md",
+        "sources/open-future-osaid-step-forward.md",
+        "sources/open-source-ai-path-forward.md",
+        "sources/open-source-ai-uniquely-dangerous.md",
+        "sources/open-weight-models-frontier-safety-gap.md",
+        "sources/open-weights-american-ai-leadership.md",
+        "sources/openmdw-1-1-nvidia-adoption.md",
+        "sources/osaid-take-it-or-leave-it.md",
+        "sources/osi-meta-llama-2-license-not-open-source.md",
+        "sources/osi-meta-llama-license-still-not-open-source.md",
+        "sources/osi-open-weights-good-open-source-better.md",
+        "sources/osi-readies-controversial-osaid.md",
+        "sources/red-hat-open-source-ai-point-of-view.md",
+        "sources/rethinking-open-source-generative-ai.md",
+        "sources/senators-question-meta-llama-leak.md",
+        "sources/sfc-osaid-erodes-open-source.md",
+        "sources/techcrunch-osaid-official-definition.md",
+        "sources/welcome-gpt-oss-openai.md",
+        "sources/what-does-open-source-ai-mean.md"
       ],
-      "upstream_max_date": "2026-06-26"
+      "upstream_max_date": "2026-09-23"
+    },
+    "concepts/OpenSourceDefinition.md": {
+      "last_updated": "2026-09-23",
+      "upstream": [
+        "sources/osi-meta-llama-2-license-not-open-source.md",
+        "sources/osi-meta-llama-license-still-not-open-source.md",
+        "sources/sfc-osaid-erodes-open-source.md",
+        "sources/debian-ai-models-dfsg.md",
+        "sources/what-does-open-source-ai-mean.md",
+        "sources/osi-readies-controversial-osaid.md",
+        "sources/open-future-osaid-step-forward.md",
+        "sources/case-against-osaid.md"
+      ],
+      "upstream_max_date": "2026-09-23"
     },
     "concepts/OpenWashing.md": {
       "last_updated": "2026-06-26",
@@ -99,17 +470,48 @@
         "sources/mozilla-celebrates-osaid.md",
         "sources/osi-open-source-ai-definition.md",
         "sources/open-source-ai-models-how-open.md",
-        "sources/case-against-osaid.md"
+        "sources/case-against-osaid.md",
+        "sources/open-future-osaid-step-forward.md",
+        "sources/osaid-take-it-or-leave-it.md",
+        "sources/osi-meta-llama-2-license-not-open-source.md",
+        "sources/osi-meta-llama-license-still-not-open-source.md",
+        "sources/rethinking-open-source-generative-ai.md",
+        "sources/sfc-osaid-erodes-open-source.md",
+        "sources/techcrunch-osaid-official-definition.md",
+        "sources/welcome-gpt-oss-openai.md",
+        "sources/what-does-open-source-ai-mean.md"
       ],
-      "upstream_max_date": "2026-06-26"
+      "upstream_max_date": "2026-09-23"
     },
     "concepts/OpenWeights.md": {
       "last_updated": "2026-06-26",
       "upstream": [
         "sources/open-source-ai-models-how-open.md",
-        "sources/osi-open-source-ai-definition.md"
+        "sources/osi-open-source-ai-definition.md",
+        "sources/anthropic-position-open-weights-models.md",
+        "sources/debian-ai-models-dfsg.md",
+        "sources/deepseek-r1-release.md",
+        "sources/fsf-free-ml-application-criteria.md",
+        "sources/hello-olmo-truly-open-llm.md",
+        "sources/joint-statement-ai-safety-openness.md",
+        "sources/llama-2-meta-microsoft.md",
+        "sources/llama-3-1-community-license.md",
+        "sources/ntia-open-model-weights-report.md",
+        "sources/open-future-osaid-step-forward.md",
+        "sources/open-source-ai-path-forward.md",
+        "sources/open-source-ai-uniquely-dangerous.md",
+        "sources/open-weight-models-frontier-safety-gap.md",
+        "sources/open-weights-american-ai-leadership.md",
+        "sources/openmdw-1-1-nvidia-adoption.md",
+        "sources/osi-open-weights-good-open-source-better.md",
+        "sources/red-hat-open-source-ai-point-of-view.md",
+        "sources/rethinking-open-source-generative-ai.md",
+        "sources/senators-question-meta-llama-leak.md",
+        "sources/societal-impact-open-foundation-models.md",
+        "sources/welcome-gpt-oss-openai.md",
+        "sources/what-does-open-source-ai-mean.md"
       ],
-      "upstream_max_date": "2026-06-26"
+      "upstream_max_date": "2026-09-23"
     },
     "concepts/TrainingData.md": {
       "last_updated": "2026-07-19",
@@ -117,38 +519,63 @@
         "sources/case-against-osaid.md",
         "sources/osi-open-source-ai-definition.md",
         "sources/open-source-ai-models-how-open.md",
-        "sources/mozilla-celebrates-osaid.md"
+        "sources/mozilla-celebrates-osaid.md",
+        "sources/debian-ai-models-dfsg.md",
+        "sources/fsf-free-ml-application-criteria.md",
+        "sources/hello-olmo-truly-open-llm.md",
+        "sources/open-future-osaid-step-forward.md",
+        "sources/open-source-ai-uniquely-dangerous.md",
+        "sources/open-weight-models-frontier-safety-gap.md",
+        "sources/openmdw-1-1-nvidia-adoption.md",
+        "sources/osaid-take-it-or-leave-it.md",
+        "sources/osi-open-weights-good-open-source-better.md",
+        "sources/osi-readies-controversial-osaid.md",
+        "sources/red-hat-open-source-ai-point-of-view.md",
+        "sources/rethinking-open-source-generative-ai.md",
+        "sources/sfc-osaid-erodes-open-source.md",
+        "sources/techcrunch-osaid-official-definition.md",
+        "sources/welcome-gpt-oss-openai.md",
+        "sources/what-does-open-source-ai-mean.md"
       ],
-      "upstream_max_date": "2026-06-26"
+      "upstream_max_date": "2026-09-23"
     },
     "overviews/licensing-open-washing.md": {
       "last_updated": "2026-07-17",
-      "upstream": [
-        "concepts/ModelLicensing.md",
-        "concepts/OpenWashing.md",
-        "entities/Meta.md"
-      ],
-      "upstream_max_date": "2026-06-26"
+      "upstream": [],
+      "upstream_max_date": null
     },
     "overviews/open-source-ai-definition.md": {
       "last_updated": "2026-07-19",
       "upstream": [
+        "concepts/EUAIAct.md",
+        "concepts/ModelOpennessFramework.md",
         "concepts/OpenSourceAI.md",
+        "concepts/OpenSourceDefinition.md",
+        "concepts/OpenWashing.md",
         "concepts/TrainingData.md",
         "entities/FreeSoftwareFoundation.md",
         "entities/Mozilla.md",
-        "entities/OpenSourceInitiative.md"
+        "entities/OpenSourceInitiative.md",
+        "entities/StefanoMaffulli.md"
       ],
-      "upstream_max_date": "2026-07-19"
+      "upstream_max_date": "2026-09-23"
     },
     "overviews/open-weights.md": {
       "last_updated": "2026-09-15",
       "upstream": [
+        "concepts/AISafety.md",
+        "concepts/Distillation.md",
         "concepts/FineTuning.md",
+        "concepts/ModelLicensing.md",
         "concepts/OpenWeights.md",
-        "entities/DeepSeek.md"
+        "entities/Anthropic.md",
+        "entities/DeepSeek.md",
+        "entities/HuggingFace.md",
+        "entities/Meta.md",
+        "entities/MistralAI.md",
+        "entities/OpenAI.md"
       ],
-      "upstream_max_date": "2026-09-15"
+      "upstream_max_date": "2026-09-23"
     },
     "contradictions/open-training-data-requirement.md": {
       "last_updated": "2026-07-19",

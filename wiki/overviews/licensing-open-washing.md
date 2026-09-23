@@ -60,21 +60,35 @@ The **custom-license problem** is where [[OpenWashing]] enters. [[Meta]]'s Llama
 <!-- AUTO:MEMBERS BEGIN -->
 ## Key Members (auto-extracted, top 15 by intra-cluster connectivity)
 
-**Entities** (1)
+**Entities** (2)
 - [[Meta]]
+- [[MistralAI]]
 
-**Concepts** (2)
+**Concepts** (3)
 - [[ModelLicensing]]
 - [[OpenWashing]]
+- [[EUAIAct]]
 <!-- AUTO:MEMBERS END -->
 
 <!-- AUTO:SOURCES BEGIN -->
 ## Sources
 
-3 total — see [Licensing & Open-Washing catalog](../sources/_catalog-licensing-open-washing.md).
+16 total — see [Licensing & Open-Washing catalog](../sources/_catalog-licensing-open-washing.md).
 
-Top 3 by weight:
+Top 15 by weight:
+- [[mistral-ai-non-production-license]] _(w=0.67)_
+- [[eu-gpai-provider-guidelines]] _(w=0.50)_
+- [[llama-3-1-community-license]] _(w=0.50)_
+- [[osi-meta-llama-license-still-not-open-source]] _(w=0.43)_
+- [[sfc-osaid-erodes-open-source]] _(w=0.43)_
 - [[osi-open-source-ai-definition]] _(w=0.43)_
+- [[osi-meta-llama-2-license-not-open-source]] _(w=0.43)_
+- [[osaid-take-it-or-leave-it]] _(w=0.40)_
+- [[llama-2-meta-microsoft]] _(w=0.33)_
 - [[case-against-osaid]] _(w=0.33)_
+- [[open-future-osaid-step-forward]] _(w=0.33)_
 - [[mozilla-celebrates-osaid]] _(w=0.33)_
+- [[techcrunch-osaid-official-definition]] _(w=0.33)_
+- [[rethinking-open-source-generative-ai]] _(w=0.33)_
+- [[societal-impact-open-foundation-models]] _(w=0.33)_
 <!-- AUTO:SOURCES END -->

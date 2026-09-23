@@ -2,7 +2,7 @@
 title: "Open-Washing"
 type: concept
 tags: [open-washing, open-source-ai, licensing, transparency]
-sources: [mozilla-celebrates-osaid, osi-open-source-ai-definition, open-source-ai-models-how-open, case-against-osaid]
+sources: [mozilla-celebrates-osaid, osi-open-source-ai-definition, open-source-ai-models-how-open, case-against-osaid, open-future-osaid-step-forward, osaid-take-it-or-leave-it, osi-meta-llama-2-license-not-open-source, osi-meta-llama-license-still-not-open-source, rethinking-open-source-generative-ai, sfc-osaid-erodes-open-source, techcrunch-osaid-official-definition, welcome-gpt-oss-openai, what-does-open-source-ai-mean]
 last_updated: 2026-06-26
 ---
 

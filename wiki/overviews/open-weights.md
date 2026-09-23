@@ -60,19 +60,41 @@ The **licensing-vs-completeness distinction** matters because a permissive licen
 <!-- AUTO:MEMBERS BEGIN -->
 ## Key Members (auto-extracted, top 15 by intra-cluster connectivity)
 
-**Entities** (1)
+**Entities** (6)
+- [[Meta]]
+- [[OpenAI]]
 - [[DeepSeek]]
+- [[HuggingFace]]
+- [[MistralAI]]
+- [[Anthropic]]
 
-**Concepts** (2)
+**Concepts** (5)
 - [[OpenWeights]]
+- [[ModelLicensing]]
 - [[FineTuning]]
+- [[Distillation]]
+- [[AISafety]]
 <!-- AUTO:MEMBERS END -->
 
 <!-- AUTO:SOURCES BEGIN -->
 ## Sources
 
-1 total — see [Open Weights catalog](../sources/_catalog-open-weights.md).
+27 total — see [Open Weights catalog](../sources/_catalog-open-weights.md).
 
-Top 1 by weight:
-- [[open-source-ai-models-how-open]] _(w=0.43)_
+Top 15 by weight:
+- [[anthropic-position-open-weights-models]] _(w=1.00)_
+- [[llama-3-1-community-license]] _(w=1.00)_
+- [[societal-impact-open-foundation-models]] _(w=1.00)_
+- [[deepseek-r1-release]] _(w=0.86)_
+- [[llama-2-meta-microsoft]] _(w=0.83)_
+- [[open-source-ai-path-forward]] _(w=0.83)_
+- [[senators-question-meta-llama-leak]] _(w=0.83)_
+- [[open-weight-models-frontier-safety-gap]] _(w=0.71)_
+- [[open-weights-american-ai-leadership]] _(w=0.71)_
+- [[ntia-open-model-weights-report]] _(w=0.67)_
+- [[mistral-ai-non-production-license]] _(w=0.67)_
+- [[welcome-gpt-oss-openai]] _(w=0.62)_
+- [[joint-statement-ai-safety-openness]] _(w=0.57)_
+- [[open-source-ai-models-how-open]] _(w=0.57)_
+- [[red-hat-open-source-ai-point-of-view]] _(w=0.57)_
 <!-- AUTO:SOURCES END -->

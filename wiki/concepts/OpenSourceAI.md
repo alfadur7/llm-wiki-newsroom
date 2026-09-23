@@ -2,7 +2,7 @@
 title: "Open Source AI"
 type: concept
 tags: [open-source-ai, OSAID, licensing, governance]
-sources: [osi-open-source-ai-definition, mozilla-celebrates-osaid, case-against-osaid, open-source-ai-models-how-open]
+sources: [osi-open-source-ai-definition, mozilla-celebrates-osaid, case-against-osaid, open-source-ai-models-how-open, debian-ai-models-dfsg, deepseek-r1-release, eu-gpai-provider-guidelines, fsf-free-ml-application-criteria, hello-olmo-truly-open-llm, joint-statement-ai-safety-openness, llama-2-meta-microsoft, mistral-ai-non-production-license, ntia-open-model-weights-report, open-future-osaid-step-forward, open-source-ai-path-forward, open-source-ai-uniquely-dangerous, open-weight-models-frontier-safety-gap, open-weights-american-ai-leadership, openmdw-1-1-nvidia-adoption, osaid-take-it-or-leave-it, osi-meta-llama-2-license-not-open-source, osi-meta-llama-license-still-not-open-source, osi-open-weights-good-open-source-better, osi-readies-controversial-osaid, red-hat-open-source-ai-point-of-view, rethinking-open-source-generative-ai, senators-question-meta-llama-leak, sfc-osaid-erodes-open-source, techcrunch-osaid-official-definition, welcome-gpt-oss-openai, what-does-open-source-ai-mean]
 last_updated: 2026-07-19
 ---
 

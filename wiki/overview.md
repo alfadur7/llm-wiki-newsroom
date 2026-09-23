@@ -1,9 +1,9 @@
 # Overview
 
 <!-- AUTO:STATS BEGIN -->
-This wiki is a knowledge base comprising **4 source documents** (2024~2025), **5 entities**, **6 concepts**, **3 field overviews**, **1 analysis reports**, **0 associative trails**, and **0 timelines**.
+This wiki is a knowledge base comprising **34 source documents** (2023~2026), **10 entities**, **11 concepts**, **3 field overviews**, **1 analysis reports**, **0 associative trails**, and **0 timelines**.
 
-Sources are automatically classified into 3 topic clusters via Leiden topology clustering: **Open-Source AI Definition(4)**, **Open Weights(1)**, **Licensing & Open-Washing(3)**. A single source may span multiple clusters (listed in every catalog where its weight is ≥0.3); for the full cluster list and members, see [[index]] or `graph/_clusters.json`.
+Sources are automatically classified into 2 topic clusters via Leiden topology clustering: **Open Weights(27)**, **Open-Source AI Definition(25)**. A single source may span multiple clusters (listed in every catalog where its weight is ≥0.3); for the full cluster list and members, see [[index]] or `graph/_clusters.json`.
 <!-- AUTO:STATS END -->
 
 This wiki maps the debate over what "open source" should mean for AI systems. The corpus gathers the [[OpenSourceInitiative]]'s 2024 attempt to fix a definition, the endorsement and criticism it drew, and the looser "open weights" releases that dominate the market in practice. Three groupings organize the field: the formal definition and its data dispute, the weights-only middle ground, and the licensing terms and open-washing that surround both. The strongest evidence base sits with the definition grouping, where the [[OpenSourceInitiative]] is the recurring claimant across multiple sources.

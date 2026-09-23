@@ -3,7 +3,7 @@ title: "Mozilla"
 type: entity
 kind: org
 tags: [Mozilla, open-source-ai, advocacy]
-sources: [mozilla-celebrates-osaid, osi-open-source-ai-definition, case-against-osaid]
+sources: [mozilla-celebrates-osaid, osi-open-source-ai-definition, case-against-osaid, joint-statement-ai-safety-openness, open-future-osaid-step-forward, open-weights-american-ai-leadership, osi-readies-controversial-osaid]
 last_updated: 2026-07-19
 ---
 

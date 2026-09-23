@@ -614,3 +614,54 @@ content-layer prose defect of the measured mechanism, so generalisation is
 unverified, and the only synthesis in the wiki is simultaneously the motivating
 target and the fixed regression entry, which left the held-out population for that
 content type at zero and forced the sample to widen to any authored type.
+
+## [2026-09-23] ingest | thirty sources in, and the review gate held open on purpose
+
+The example corpus grew from four sources to thirty-four. The candidates were scouted
+for viewpoint balance across each sub-debate (the Llama label, the training-data
+requirement, open-weights safety, model licensing), for a 2023–2026 date spread, and
+for a deliberate mix of shapes — press releases, license text, news, interviews,
+opinion, policy analysis, papers, government pages; thin and dense, quote-heavy and
+quote-light — so that a later measurement has a realistic population to work on. All
+thirty URLs fetched. One did not fetch cleanly while reporting success: the IEEE
+Spectrum page came back as its header only, because the extractor's selector list has
+no match for that site's body container. The body was re-extracted from the same HTML
+with the frontmatter left byte-identical. That gap in the fetcher is unfixed.
+
+Ten stubs were created with operator approval after a mention count — five entities
+(Mistral AI, Hugging Face, OpenAI, Anthropic, Stefano Maffulli) and five concepts
+(Open Source Definition, AI Safety, EU AI Act, Distillation, Model Openness
+Framework); several candidates that cleared the numeric threshold were kept as plain
+text because they appear only in lists and partnerships. The incumbency check found
+that Maffulli left the OSI in 2025; the stub says so and marks the fact as coming
+from outside the corpus, and the operator chose to keep it.
+
+**The L2-1 Desk pass was withheld on purpose.** Twenty of the thirty-four sources meet
+the sub-trigger, and none of them was sent to the Desk. The next step is to
+blind-label every source page for defects and score them with an external judge
+model, to test in English whether that judge ranks defective pages above clean ones
+and whether it beats the sub-trigger as a selector. A Desk pass over part of the
+population would have repaired the stratum the comparison needs untouched. The source
+pages are therefore committed as authored, and known issues in them were left in
+place for the same reason. The stubs are not part of that measurement and went
+through the Desk as the matrix requires: thirty defects across the ten, two high,
+all fixed; two more were flagged incidentally on older hubs and filed for Reground.
+The Desk also found three citation conventions in one batch of five entity stubs;
+the fix followed the existing hubs, and whether `hub.md` should state the convention
+is filed rather than decided.
+
+**The cluster count fell from three to two, and the operator approved retiring
+`licensing-open-washing`.** Before the stub fixes, `lint graph drift` reported the
+warm-start partition 5.35% below cold and the twenty-run consensus at two clusters
+(ARI 0.554), with licensing-open-washing splitting in 60% of cold runs; the operator
+chose to keep three rather than force a cold rebuild. The citation-convention fix
+then removed the source links from the new stubs' Connections, and the warm start
+itself converged to two. Holding three from there would have meant restoring links
+to satisfy a label. The cluster's hubs split between the other two, its catalog was
+regenerated away, and its overview page is left orphaned until the next commit.
+
+**Deferred to a Reground commit, so `lint.py` exits 1 until it lands:** contradiction
+theme consolidation (claims went from one to twenty-three, and new themes need the
+two-phase mapping and slug approval), the two remaining cluster overviews (both
+flagged for rewrite after five- to twenty-seven-fold source growth), the orphaned
+licensing-open-washing overview, and the root pages that summarize them.

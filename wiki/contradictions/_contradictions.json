@@ -1,5 +1,14 @@
 [
   {
+    "id": "290b2e1f",
+    "source": "sources/anthropic-position-open-weights-models.md",
+    "claim": "[[open-weights-american-ai-leadership|Open weights letter]] — rejects the letter's claims that open weights make safeguards easier and help defenders more than attackers, while agreeing with its access, competition, and distillation points",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.31
+  },
+  {
     "id": "08b6d663",
     "source": "sources/case-against-osaid.md",
     "claim": "[[OpenSourceAI]] — argues the OSAID dilutes the open-source brand and is \"less than Open Source\"",
@@ -7,5 +16,194 @@
     "type": "soft",
     "type_score": 0.0,
     "evidence_strength": 0.35
+  },
+  {
+    "id": "e58ac91a",
+    "source": "sources/debian-ai-models-dfsg.md",
+    "claim": "[[OpenSourceAI]] — the GR would deny free-software status to models without training data, which the OSAID admits as open-source AI",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.36
+  },
+  {
+    "id": "af196221",
+    "source": "sources/llama-2-meta-microsoft.md",
+    "claim": "[[osi-open-source-ai-definition|The Open Source AI Definition 1.0]] — Meta calls Llama 2 open source, while the OSI judged Llama 2 non-compliant with the OSAID",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.53
+  },
+  {
+    "id": "db4e440b",
+    "source": "sources/open-future-osaid-step-forward.md",
+    "claim": "[[OpenSourceInitiative]] — argues the OSI should have reserved the name \"open source\" for AI systems that include open training data",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.32
+  },
+  {
+    "id": "fd7fe870",
+    "source": "sources/open-future-osaid-step-forward.md",
+    "claim": "[[Meta]] — rejects Meta's \"open source\" label for Llama, citing non-OSI-compliant licenses and no training-data information",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.32
+  },
+  {
+    "id": "fb98dd8f",
+    "source": "sources/open-source-ai-path-forward.md",
+    "claim": "[[osi-meta-llama-2-license-not-open-source|OSI: Meta's LLaMa License Is Not Open Source]] — Meta again calls Llama \"open source,\" the label OSI said Meta should correct for Llama 2",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.34
+  },
+  {
+    "id": "a55f49c0",
+    "source": "sources/open-source-ai-uniquely-dangerous.md",
+    "claim": "[[joint-statement-ai-safety-openness|Joint Statement on AI Safety and Openness]] — the statement calls openness an antidote for AI safety, while Harris calls unsecured release uniquely dangerous and proposes pausing it",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.19
+  },
+  {
+    "id": "4511cf29",
+    "source": "sources/open-weight-models-frontier-safety-gap.md",
+    "claim": "[[open-weights-american-ai-leadership|Open Weights and American AI Leadership]] — the letter argues defenders need open models comparable to attackers', while Papadatos calls that defensive benefit overstated",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.39
+  },
+  {
+    "id": "74636332",
+    "source": "sources/osaid-take-it-or-leave-it.md",
+    "claim": "[[OpenSourceAI]] — argues a tiered notion of openness may be preferable to the OSAID's binary \"take it or leave it\" test",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.26
+  },
+  {
+    "id": "fb1a019e",
+    "source": "sources/osi-meta-llama-2-license-not-open-source.md",
+    "claim": "[[Meta]] — rebuts Meta's description of LLaMa 2 as \"open source\" and asks Meta to correct it",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.29
+  },
+  {
+    "id": "5ce812a6",
+    "source": "sources/osi-meta-llama-license-still-not-open-source.md",
+    "claim": "[[Meta]] — rebuts Meta's promotion of Llama as \"Open Source\" and asks it to change the license",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.28
+  },
+  {
+    "id": "ad0e9a83",
+    "source": "sources/osi-readies-controversial-osaid.md",
+    "claim": "[[OpenSourceInitiative]] — reports critics who oppose making training data optional and say the definition sets the bar too low",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.33
+  },
+  {
+    "id": "b88775a5",
+    "source": "sources/red-hat-open-source-ai-point-of-view.md",
+    "claim": "[[case-against-osaid|The Case Against OSI's Open Source AI Definition]] — rejects the critics' premise that training data is the equivalent of a model's source code",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.27
+  },
+  {
+    "id": "ec2343f1",
+    "source": "sources/rethinking-open-source-generative-ai.md",
+    "claim": "[[Meta]] — rejects Meta's \"open source\" billing of Llama 2 and Llama 3, judging them open weights at best",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.32
+  },
+  {
+    "id": "cec6e13f",
+    "source": "sources/rethinking-open-source-generative-ai.md",
+    "claim": "[[OpenSourceAI]] — argues openness is composite and gradient, and that a binary or licence-only test invites open-washing",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.26
+  },
+  {
+    "id": "2c9da7fd",
+    "source": "sources/senators-question-meta-llama-leak.md",
+    "claim": "[[open-source-ai-uniquely-dangerous|Open-Source AI Is Uniquely Dangerous]] — Harris calls for pausing unsecured releases over spam and disinformation risks, while Manning judges LLaMA's release not an unacceptable risk and Prakash calls the spam concern a straw man",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.29
+  },
+  {
+    "id": "f53fe134",
+    "source": "sources/sfc-osaid-erodes-open-source.md",
+    "claim": "[[OpenSourceAI]] — argues OSAID 1.0 should be repealed as a definition and republished as recommendations",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.3
+  },
+  {
+    "id": "f9dd3690",
+    "source": "sources/sfc-osaid-erodes-open-source.md",
+    "claim": "[[OpenSourceInitiative]] — rebuts OSI's urgency rationale and its claim that the OSAID is humble",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.36
+  },
+  {
+    "id": "8db8a2ff",
+    "source": "sources/techcrunch-osaid-official-definition.md",
+    "claim": "[[OpenSourceAI]] — Meta states it disagrees with OSI's new definition and defends its restrictive Llama license",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.39
+  },
+  {
+    "id": "9b189557",
+    "source": "sources/techcrunch-osaid-official-definition.md",
+    "claim": "[[osi-open-source-ai-definition|The Open Source AI Definition 1.0]] — Luca Antiga argues the definition leaves a \"gaping hole\" by not dealing with training-data licensing",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.38
+  },
+  {
+    "id": "1428e4bc",
+    "source": "sources/what-does-open-source-ai-mean.md",
+    "claim": "[[OpenSourceAI]] — Joseph Jacks argues there is no such thing as open-source AI, since open source was written for source code",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.33
+  },
+  {
+    "id": "ed3c0654",
+    "source": "sources/what-does-open-source-ai-mean.md",
+    "claim": "[[Meta]] — Maffulli says Llama cannot be considered open source, against Meta's own \"open source\" labeling",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.39
   }
 ]

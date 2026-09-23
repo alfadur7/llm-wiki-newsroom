@@ -1,32 +1,136 @@
 {
-  "OpenSourceInitiative": [
+  "OpenWeights": [
     {
-      "from": "sources/case-against-osaid.md",
-      "title": "The Case Against OSI's Open Source AI Definition"
+      "from": "sources/anthropic-position-open-weights-models.md",
+      "title": "Our position on open-weights models"
     },
     {
-      "from": "sources/mozilla-celebrates-osaid.md",
-      "title": "Celebrating an Important Step Forward for Open Source AI (Mozilla)"
+      "from": "sources/debian-ai-models-dfsg.md",
+      "title": "Debian Debates AI Models and the DFSG"
+    },
+    {
+      "from": "sources/deepseek-r1-release.md",
+      "title": "DeepSeek-R1 Release"
+    },
+    {
+      "from": "sources/fsf-free-ml-application-criteria.md",
+      "title": "FSF is working on freedom in machine learning applications"
+    },
+    {
+      "from": "sources/hello-olmo-truly-open-llm.md",
+      "title": "Hello OLMo: A Truly Open LLM"
+    },
+    {
+      "from": "sources/joint-statement-ai-safety-openness.md",
+      "title": "Joint Statement on AI Safety and Openness"
+    },
+    {
+      "from": "sources/llama-2-meta-microsoft.md",
+      "title": "Meta and Microsoft Introduce the Next Generation of Llama"
+    },
+    {
+      "from": "sources/llama-3-1-community-license.md",
+      "title": "Llama 3.1 Community License Agreement"
+    },
+    {
+      "from": "sources/ntia-open-model-weights-report.md",
+      "title": "NTIA Supports Open Models to Promote AI Innovation"
+    },
+    {
+      "from": "sources/open-future-osaid-step-forward.md",
+      "title": "The Open Source AI Definition is a step forward in defining openness in AI"
     },
     {
       "from": "sources/open-source-ai-models-how-open.md",
       "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
     },
     {
+      "from": "sources/open-source-ai-path-forward.md",
+      "title": "Open Source AI Is the Path Forward"
+    },
+    {
+      "from": "sources/open-source-ai-uniquely-dangerous.md",
+      "title": "Open-Source AI Is Uniquely Dangerous"
+    },
+    {
+      "from": "sources/open-weight-models-frontier-safety-gap.md",
+      "title": "Open-Weight AI Models Are Catching Up to the Frontier. The Safety Gap Remains."
+    },
+    {
+      "from": "sources/open-weights-american-ai-leadership.md",
+      "title": "Open Weights and American AI Leadership"
+    },
+    {
+      "from": "sources/openmdw-1-1-nvidia-adoption.md",
+      "title": "Linux Foundation Releases OpenMDW-1.1; NVIDIA Adopts OpenMDW for Cosmos, Isaac GR00T, Ising and Nemotron, AI Model Families"
+    },
+    {
       "from": "sources/osi-open-source-ai-definition.md",
       "title": "The Open Source AI Definition 1.0"
     },
     {
-      "from": "entities/FreeSoftwareFoundation.md",
-      "title": "Free Software Foundation"
+      "from": "sources/osi-open-weights-good-open-source-better.md",
+      "title": "Open Weights Are Good. Open Source Is Better."
+    },
+    {
+      "from": "sources/red-hat-open-source-ai-point-of-view.md",
+      "title": "Open Source AI: Red Hat's Point-of-View"
+    },
+    {
+      "from": "sources/rethinking-open-source-generative-ai.md",
+      "title": "Rethinking open source generative AI: open-washing and the EU AI Act"
+    },
+    {
+      "from": "sources/senators-question-meta-llama-leak.md",
+      "title": "Senators Question Meta's LLaMA Leak Impact"
+    },
+    {
+      "from": "sources/societal-impact-open-foundation-models.md",
+      "title": "On the Societal Impact of Open Foundation Models"
+    },
+    {
+      "from": "sources/welcome-gpt-oss-openai.md",
+      "title": "Welcome GPT OSS, the New Open-Source Model Family from OpenAI"
+    },
+    {
+      "from": "sources/what-does-open-source-ai-mean.md",
+      "title": "What does 'open source AI' mean, anyway?"
+    },
+    {
+      "from": "entities/Anthropic.md",
+      "title": "Anthropic"
+    },
+    {
+      "from": "entities/DeepSeek.md",
+      "title": "DeepSeek"
+    },
+    {
+      "from": "entities/HuggingFace.md",
+      "title": "Hugging Face"
     },
     {
       "from": "entities/Meta.md",
       "title": "Meta"
     },
     {
-      "from": "entities/Mozilla.md",
-      "title": "Mozilla"
+      "from": "entities/MistralAI.md",
+      "title": "Mistral AI"
+    },
+    {
+      "from": "entities/OpenAI.md",
+      "title": "OpenAI"
+    },
+    {
+      "from": "concepts/AISafety.md",
+      "title": "AI Safety"
+    },
+    {
+      "from": "concepts/Distillation.md",
+      "title": "Distillation"
+    },
+    {
+      "from": "concepts/FineTuning.md",
+      "title": "Fine-Tuning"
     },
     {
       "from": "concepts/ModelLicensing.md",
@@ -45,86 +149,162 @@
       "title": "Training Data"
     }
   ],
-  "FreeSoftwareFoundation": [
+  "open-weights-american-ai-leadership": [
     {
-      "from": "sources/case-against-osaid.md",
-      "title": "The Case Against OSI's Open Source AI Definition"
+      "from": "sources/anthropic-position-open-weights-models.md",
+      "title": "Our position on open-weights models"
     },
     {
-      "from": "entities/OpenSourceInitiative.md",
-      "title": "Open Source Initiative"
-    },
-    {
-      "from": "concepts/OpenSourceAI.md",
-      "title": "Open Source AI"
-    },
-    {
-      "from": "concepts/TrainingData.md",
-      "title": "Training Data"
+      "from": "sources/open-weight-models-frontier-safety-gap.md",
+      "title": "Open-Weight AI Models Are Catching Up to the Frontier. The Safety Gap Remains."
     }
   ],
-  "TrainingData": [
+  "Anthropic": [
+    {
+      "from": "sources/anthropic-position-open-weights-models.md",
+      "title": "Our position on open-weights models"
+    },
+    {
+      "from": "sources/open-weight-models-frontier-safety-gap.md",
+      "title": "Open-Weight AI Models Are Catching Up to the Frontier. The Safety Gap Remains."
+    },
+    {
+      "from": "sources/senators-question-meta-llama-leak.md",
+      "title": "Senators Question Meta's LLaMA Leak Impact"
+    }
+  ],
+  "AISafety": [
+    {
+      "from": "sources/anthropic-position-open-weights-models.md",
+      "title": "Our position on open-weights models"
+    },
+    {
+      "from": "sources/joint-statement-ai-safety-openness.md",
+      "title": "Joint Statement on AI Safety and Openness"
+    },
+    {
+      "from": "sources/llama-2-meta-microsoft.md",
+      "title": "Meta and Microsoft Introduce the Next Generation of Llama"
+    },
+    {
+      "from": "sources/ntia-open-model-weights-report.md",
+      "title": "NTIA Supports Open Models to Promote AI Innovation"
+    },
+    {
+      "from": "sources/open-source-ai-path-forward.md",
+      "title": "Open Source AI Is the Path Forward"
+    },
+    {
+      "from": "sources/open-source-ai-uniquely-dangerous.md",
+      "title": "Open-Source AI Is Uniquely Dangerous"
+    },
+    {
+      "from": "sources/open-weight-models-frontier-safety-gap.md",
+      "title": "Open-Weight AI Models Are Catching Up to the Frontier. The Safety Gap Remains."
+    },
+    {
+      "from": "sources/open-weights-american-ai-leadership.md",
+      "title": "Open Weights and American AI Leadership"
+    },
+    {
+      "from": "sources/rethinking-open-source-generative-ai.md",
+      "title": "Rethinking open source generative AI: open-washing and the EU AI Act"
+    },
+    {
+      "from": "sources/senators-question-meta-llama-leak.md",
+      "title": "Senators Question Meta's LLaMA Leak Impact"
+    },
+    {
+      "from": "sources/societal-impact-open-foundation-models.md",
+      "title": "On the Societal Impact of Open Foundation Models"
+    }
+  ],
+  "Distillation": [
+    {
+      "from": "sources/anthropic-position-open-weights-models.md",
+      "title": "Our position on open-weights models"
+    },
+    {
+      "from": "sources/deepseek-r1-release.md",
+      "title": "DeepSeek-R1 Release"
+    },
+    {
+      "from": "sources/open-source-ai-path-forward.md",
+      "title": "Open Source AI Is the Path Forward"
+    },
+    {
+      "from": "sources/open-weights-american-ai-leadership.md",
+      "title": "Open Weights and American AI Leadership"
+    }
+  ],
+  "OpenSourceInitiative": [
     {
       "from": "sources/case-against-osaid.md",
       "title": "The Case Against OSI's Open Source AI Definition"
+    },
+    {
+      "from": "sources/debian-ai-models-dfsg.md",
+      "title": "Debian Debates AI Models and the DFSG"
+    },
+    {
+      "from": "sources/joint-statement-ai-safety-openness.md",
+      "title": "Joint Statement on AI Safety and Openness"
     },
     {
       "from": "sources/mozilla-celebrates-osaid.md",
       "title": "Celebrating an Important Step Forward for Open Source AI (Mozilla)"
     },
     {
-      "from": "sources/open-source-ai-models-how-open.md",
-      "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
-    },
-    {
-      "from": "sources/osi-open-source-ai-definition.md",
-      "title": "The Open Source AI Definition 1.0"
-    },
-    {
-      "from": "entities/FreeSoftwareFoundation.md",
-      "title": "Free Software Foundation"
-    },
-    {
-      "from": "entities/Mozilla.md",
-      "title": "Mozilla"
-    },
-    {
-      "from": "entities/OpenSourceInitiative.md",
-      "title": "Open Source Initiative"
-    },
-    {
-      "from": "concepts/FineTuning.md",
-      "title": "Fine-Tuning"
-    },
-    {
-      "from": "concepts/OpenSourceAI.md",
-      "title": "Open Source AI"
-    },
-    {
-      "from": "concepts/OpenWeights.md",
-      "title": "Open Weights"
-    }
-  ],
-  "OpenSourceAI": [
-    {
-      "from": "sources/case-against-osaid.md",
-      "title": "The Case Against OSI's Open Source AI Definition"
-    },
-    {
-      "from": "sources/mozilla-celebrates-osaid.md",
-      "title": "Celebrating an Important Step Forward for Open Source AI (Mozilla)"
+      "from": "sources/open-future-osaid-step-forward.md",
+      "title": "The Open Source AI Definition is a step forward in defining openness in AI"
     },
     {
       "from": "sources/open-source-ai-models-how-open.md",
       "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
     },
     {
+      "from": "sources/osaid-take-it-or-leave-it.md",
+      "title": "Open Source Artificial Intelligence Definition 1.0 - A \"take it or leave it\" approach for open source AI systems?"
+    },
+    {
+      "from": "sources/osi-meta-llama-2-license-not-open-source.md",
+      "title": "Meta's LLaMa License Is Not Open Source"
+    },
+    {
+      "from": "sources/osi-meta-llama-license-still-not-open-source.md",
+      "title": "Meta's LLaMa License Is Still Not Open Source"
+    },
+    {
       "from": "sources/osi-open-source-ai-definition.md",
       "title": "The Open Source AI Definition 1.0"
     },
     {
-      "from": "entities/DeepSeek.md",
-      "title": "DeepSeek"
+      "from": "sources/osi-open-weights-good-open-source-better.md",
+      "title": "Open Weights Are Good. Open Source Is Better."
+    },
+    {
+      "from": "sources/osi-readies-controversial-osaid.md",
+      "title": "OSI Readies Controversial Open AI Definition"
+    },
+    {
+      "from": "sources/red-hat-open-source-ai-point-of-view.md",
+      "title": "Open Source AI: Red Hat's Point-of-View"
+    },
+    {
+      "from": "sources/rethinking-open-source-generative-ai.md",
+      "title": "Rethinking open source generative AI: open-washing and the EU AI Act"
+    },
+    {
+      "from": "sources/sfc-osaid-erodes-open-source.md",
+      "title": "Open Source AI Definition Erodes the Meaning of “Open Source”"
+    },
+    {
+      "from": "sources/techcrunch-osaid-official-definition.md",
+      "title": "We Finally Have an 'Official' Definition for Open Source AI"
+    },
+    {
+      "from": "sources/what-does-open-source-ai-mean.md",
+      "title": "What does 'open source AI' mean, anyway?"
     },
     {
       "from": "entities/FreeSoftwareFoundation.md",
@@ -139,8 +319,370 @@
       "title": "Mozilla"
     },
     {
+      "from": "entities/StefanoMaffulli.md",
+      "title": "Stefano Maffulli"
+    },
+    {
+      "from": "concepts/EUAIAct.md",
+      "title": "EU AI Act"
+    },
+    {
+      "from": "concepts/ModelLicensing.md",
+      "title": "Model Licensing"
+    },
+    {
+      "from": "concepts/ModelOpennessFramework.md",
+      "title": "Model Openness Framework"
+    },
+    {
+      "from": "concepts/OpenSourceAI.md",
+      "title": "Open Source AI"
+    },
+    {
+      "from": "concepts/OpenSourceDefinition.md",
+      "title": "Open Source Definition"
+    },
+    {
+      "from": "concepts/OpenWashing.md",
+      "title": "Open-Washing"
+    },
+    {
+      "from": "concepts/TrainingData.md",
+      "title": "Training Data"
+    }
+  ],
+  "FreeSoftwareFoundation": [
+    {
+      "from": "sources/case-against-osaid.md",
+      "title": "The Case Against OSI's Open Source AI Definition"
+    },
+    {
+      "from": "sources/fsf-free-ml-application-criteria.md",
+      "title": "FSF is working on freedom in machine learning applications"
+    },
+    {
+      "from": "sources/osi-meta-llama-license-still-not-open-source.md",
+      "title": "Meta's LLaMa License Is Still Not Open Source"
+    },
+    {
+      "from": "sources/osi-readies-controversial-osaid.md",
+      "title": "OSI Readies Controversial Open AI Definition"
+    },
+    {
+      "from": "sources/techcrunch-osaid-official-definition.md",
+      "title": "We Finally Have an 'Official' Definition for Open Source AI"
+    },
+    {
       "from": "entities/OpenSourceInitiative.md",
       "title": "Open Source Initiative"
+    },
+    {
+      "from": "concepts/OpenSourceAI.md",
+      "title": "Open Source AI"
+    },
+    {
+      "from": "concepts/OpenSourceDefinition.md",
+      "title": "Open Source Definition"
+    },
+    {
+      "from": "concepts/TrainingData.md",
+      "title": "Training Data"
+    }
+  ],
+  "TrainingData": [
+    {
+      "from": "sources/case-against-osaid.md",
+      "title": "The Case Against OSI's Open Source AI Definition"
+    },
+    {
+      "from": "sources/debian-ai-models-dfsg.md",
+      "title": "Debian Debates AI Models and the DFSG"
+    },
+    {
+      "from": "sources/fsf-free-ml-application-criteria.md",
+      "title": "FSF is working on freedom in machine learning applications"
+    },
+    {
+      "from": "sources/hello-olmo-truly-open-llm.md",
+      "title": "Hello OLMo: A Truly Open LLM"
+    },
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "title": "Celebrating an Important Step Forward for Open Source AI (Mozilla)"
+    },
+    {
+      "from": "sources/open-future-osaid-step-forward.md",
+      "title": "The Open Source AI Definition is a step forward in defining openness in AI"
+    },
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
+    },
+    {
+      "from": "sources/open-source-ai-uniquely-dangerous.md",
+      "title": "Open-Source AI Is Uniquely Dangerous"
+    },
+    {
+      "from": "sources/open-weight-models-frontier-safety-gap.md",
+      "title": "Open-Weight AI Models Are Catching Up to the Frontier. The Safety Gap Remains."
+    },
+    {
+      "from": "sources/openmdw-1-1-nvidia-adoption.md",
+      "title": "Linux Foundation Releases OpenMDW-1.1; NVIDIA Adopts OpenMDW for Cosmos, Isaac GR00T, Ising and Nemotron, AI Model Families"
+    },
+    {
+      "from": "sources/osaid-take-it-or-leave-it.md",
+      "title": "Open Source Artificial Intelligence Definition 1.0 - A \"take it or leave it\" approach for open source AI systems?"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "title": "The Open Source AI Definition 1.0"
+    },
+    {
+      "from": "sources/osi-open-weights-good-open-source-better.md",
+      "title": "Open Weights Are Good. Open Source Is Better."
+    },
+    {
+      "from": "sources/osi-readies-controversial-osaid.md",
+      "title": "OSI Readies Controversial Open AI Definition"
+    },
+    {
+      "from": "sources/red-hat-open-source-ai-point-of-view.md",
+      "title": "Open Source AI: Red Hat's Point-of-View"
+    },
+    {
+      "from": "sources/rethinking-open-source-generative-ai.md",
+      "title": "Rethinking open source generative AI: open-washing and the EU AI Act"
+    },
+    {
+      "from": "sources/sfc-osaid-erodes-open-source.md",
+      "title": "Open Source AI Definition Erodes the Meaning of “Open Source”"
+    },
+    {
+      "from": "sources/techcrunch-osaid-official-definition.md",
+      "title": "We Finally Have an 'Official' Definition for Open Source AI"
+    },
+    {
+      "from": "sources/welcome-gpt-oss-openai.md",
+      "title": "Welcome GPT OSS, the New Open-Source Model Family from OpenAI"
+    },
+    {
+      "from": "sources/what-does-open-source-ai-mean.md",
+      "title": "What does 'open source AI' mean, anyway?"
+    },
+    {
+      "from": "entities/FreeSoftwareFoundation.md",
+      "title": "Free Software Foundation"
+    },
+    {
+      "from": "entities/Mozilla.md",
+      "title": "Mozilla"
+    },
+    {
+      "from": "entities/OpenAI.md",
+      "title": "OpenAI"
+    },
+    {
+      "from": "entities/OpenSourceInitiative.md",
+      "title": "Open Source Initiative"
+    },
+    {
+      "from": "entities/StefanoMaffulli.md",
+      "title": "Stefano Maffulli"
+    },
+    {
+      "from": "concepts/AISafety.md",
+      "title": "AI Safety"
+    },
+    {
+      "from": "concepts/EUAIAct.md",
+      "title": "EU AI Act"
+    },
+    {
+      "from": "concepts/FineTuning.md",
+      "title": "Fine-Tuning"
+    },
+    {
+      "from": "concepts/ModelOpennessFramework.md",
+      "title": "Model Openness Framework"
+    },
+    {
+      "from": "concepts/OpenSourceAI.md",
+      "title": "Open Source AI"
+    },
+    {
+      "from": "concepts/OpenSourceDefinition.md",
+      "title": "Open Source Definition"
+    },
+    {
+      "from": "concepts/OpenWeights.md",
+      "title": "Open Weights"
+    }
+  ],
+  "OpenSourceAI": [
+    {
+      "from": "sources/case-against-osaid.md",
+      "title": "The Case Against OSI's Open Source AI Definition"
+    },
+    {
+      "from": "sources/debian-ai-models-dfsg.md",
+      "title": "Debian Debates AI Models and the DFSG"
+    },
+    {
+      "from": "sources/deepseek-r1-release.md",
+      "title": "DeepSeek-R1 Release"
+    },
+    {
+      "from": "sources/eu-gpai-provider-guidelines.md",
+      "title": "Learn more about the guidelines for providers of general-purpose AI models"
+    },
+    {
+      "from": "sources/fsf-free-ml-application-criteria.md",
+      "title": "FSF is working on freedom in machine learning applications"
+    },
+    {
+      "from": "sources/hello-olmo-truly-open-llm.md",
+      "title": "Hello OLMo: A Truly Open LLM"
+    },
+    {
+      "from": "sources/joint-statement-ai-safety-openness.md",
+      "title": "Joint Statement on AI Safety and Openness"
+    },
+    {
+      "from": "sources/llama-2-meta-microsoft.md",
+      "title": "Meta and Microsoft Introduce the Next Generation of Llama"
+    },
+    {
+      "from": "sources/mistral-ai-non-production-license.md",
+      "title": "The Mistral AI Non-Production License"
+    },
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "title": "Celebrating an Important Step Forward for Open Source AI (Mozilla)"
+    },
+    {
+      "from": "sources/ntia-open-model-weights-report.md",
+      "title": "NTIA Supports Open Models to Promote AI Innovation"
+    },
+    {
+      "from": "sources/open-future-osaid-step-forward.md",
+      "title": "The Open Source AI Definition is a step forward in defining openness in AI"
+    },
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
+    },
+    {
+      "from": "sources/open-source-ai-path-forward.md",
+      "title": "Open Source AI Is the Path Forward"
+    },
+    {
+      "from": "sources/open-source-ai-uniquely-dangerous.md",
+      "title": "Open-Source AI Is Uniquely Dangerous"
+    },
+    {
+      "from": "sources/open-weight-models-frontier-safety-gap.md",
+      "title": "Open-Weight AI Models Are Catching Up to the Frontier. The Safety Gap Remains."
+    },
+    {
+      "from": "sources/open-weights-american-ai-leadership.md",
+      "title": "Open Weights and American AI Leadership"
+    },
+    {
+      "from": "sources/openmdw-1-1-nvidia-adoption.md",
+      "title": "Linux Foundation Releases OpenMDW-1.1; NVIDIA Adopts OpenMDW for Cosmos, Isaac GR00T, Ising and Nemotron, AI Model Families"
+    },
+    {
+      "from": "sources/osaid-take-it-or-leave-it.md",
+      "title": "Open Source Artificial Intelligence Definition 1.0 - A \"take it or leave it\" approach for open source AI systems?"
+    },
+    {
+      "from": "sources/osi-meta-llama-2-license-not-open-source.md",
+      "title": "Meta's LLaMa License Is Not Open Source"
+    },
+    {
+      "from": "sources/osi-meta-llama-license-still-not-open-source.md",
+      "title": "Meta's LLaMa License Is Still Not Open Source"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "title": "The Open Source AI Definition 1.0"
+    },
+    {
+      "from": "sources/osi-open-weights-good-open-source-better.md",
+      "title": "Open Weights Are Good. Open Source Is Better."
+    },
+    {
+      "from": "sources/osi-readies-controversial-osaid.md",
+      "title": "OSI Readies Controversial Open AI Definition"
+    },
+    {
+      "from": "sources/red-hat-open-source-ai-point-of-view.md",
+      "title": "Open Source AI: Red Hat's Point-of-View"
+    },
+    {
+      "from": "sources/rethinking-open-source-generative-ai.md",
+      "title": "Rethinking open source generative AI: open-washing and the EU AI Act"
+    },
+    {
+      "from": "sources/senators-question-meta-llama-leak.md",
+      "title": "Senators Question Meta's LLaMA Leak Impact"
+    },
+    {
+      "from": "sources/sfc-osaid-erodes-open-source.md",
+      "title": "Open Source AI Definition Erodes the Meaning of “Open Source”"
+    },
+    {
+      "from": "sources/techcrunch-osaid-official-definition.md",
+      "title": "We Finally Have an 'Official' Definition for Open Source AI"
+    },
+    {
+      "from": "sources/welcome-gpt-oss-openai.md",
+      "title": "Welcome GPT OSS, the New Open-Source Model Family from OpenAI"
+    },
+    {
+      "from": "sources/what-does-open-source-ai-mean.md",
+      "title": "What does 'open source AI' mean, anyway?"
+    },
+    {
+      "from": "entities/DeepSeek.md",
+      "title": "DeepSeek"
+    },
+    {
+      "from": "entities/FreeSoftwareFoundation.md",
+      "title": "Free Software Foundation"
+    },
+    {
+      "from": "entities/Meta.md",
+      "title": "Meta"
+    },
+    {
+      "from": "entities/MistralAI.md",
+      "title": "Mistral AI"
+    },
+    {
+      "from": "entities/Mozilla.md",
+      "title": "Mozilla"
+    },
+    {
+      "from": "entities/OpenAI.md",
+      "title": "OpenAI"
+    },
+    {
+      "from": "entities/OpenSourceInitiative.md",
+      "title": "Open Source Initiative"
+    },
+    {
+      "from": "entities/StefanoMaffulli.md",
+      "title": "Stefano Maffulli"
+    },
+    {
+      "from": "concepts/AISafety.md",
+      "title": "AI Safety"
+    },
+    {
+      "from": "concepts/EUAIAct.md",
+      "title": "EU AI Act"
     },
     {
       "from": "concepts/FineTuning.md",
@@ -149,6 +691,14 @@
     {
       "from": "concepts/ModelLicensing.md",
       "title": "Model Licensing"
+    },
+    {
+      "from": "concepts/ModelOpennessFramework.md",
+      "title": "Model Openness Framework"
+    },
+    {
+      "from": "concepts/OpenSourceDefinition.md",
+      "title": "Open Source Definition"
     },
     {
       "from": "concepts/OpenWashing.md",
@@ -173,8 +723,44 @@
       "title": "Celebrating an Important Step Forward for Open Source AI (Mozilla)"
     },
     {
+      "from": "sources/open-future-osaid-step-forward.md",
+      "title": "The Open Source AI Definition is a step forward in defining openness in AI"
+    },
+    {
+      "from": "sources/osaid-take-it-or-leave-it.md",
+      "title": "Open Source Artificial Intelligence Definition 1.0 - A \"take it or leave it\" approach for open source AI systems?"
+    },
+    {
+      "from": "sources/osi-meta-llama-2-license-not-open-source.md",
+      "title": "Meta's LLaMa License Is Not Open Source"
+    },
+    {
+      "from": "sources/osi-meta-llama-license-still-not-open-source.md",
+      "title": "Meta's LLaMa License Is Still Not Open Source"
+    },
+    {
       "from": "sources/osi-open-source-ai-definition.md",
       "title": "The Open Source AI Definition 1.0"
+    },
+    {
+      "from": "sources/rethinking-open-source-generative-ai.md",
+      "title": "Rethinking open source generative AI: open-washing and the EU AI Act"
+    },
+    {
+      "from": "sources/sfc-osaid-erodes-open-source.md",
+      "title": "Open Source AI Definition Erodes the Meaning of “Open Source”"
+    },
+    {
+      "from": "sources/techcrunch-osaid-official-definition.md",
+      "title": "We Finally Have an 'Official' Definition for Open Source AI"
+    },
+    {
+      "from": "sources/welcome-gpt-oss-openai.md",
+      "title": "Welcome GPT OSS, the New Open-Source Model Family from OpenAI"
+    },
+    {
+      "from": "sources/what-does-open-source-ai-mean.md",
+      "title": "What does 'open source AI' mean, anyway?"
     },
     {
       "from": "entities/Meta.md",
@@ -185,8 +771,20 @@
       "title": "Mozilla"
     },
     {
+      "from": "entities/OpenAI.md",
+      "title": "OpenAI"
+    },
+    {
       "from": "entities/OpenSourceInitiative.md",
       "title": "Open Source Initiative"
+    },
+    {
+      "from": "entities/StefanoMaffulli.md",
+      "title": "Stefano Maffulli"
+    },
+    {
+      "from": "concepts/EUAIAct.md",
+      "title": "EU AI Act"
     },
     {
       "from": "concepts/ModelLicensing.md",
@@ -207,12 +805,80 @@
       "title": "The Case Against OSI's Open Source AI Definition"
     },
     {
+      "from": "sources/debian-ai-models-dfsg.md",
+      "title": "Debian Debates AI Models and the DFSG"
+    },
+    {
+      "from": "sources/deepseek-r1-release.md",
+      "title": "DeepSeek-R1 Release"
+    },
+    {
+      "from": "sources/eu-gpai-provider-guidelines.md",
+      "title": "Learn more about the guidelines for providers of general-purpose AI models"
+    },
+    {
+      "from": "sources/llama-2-meta-microsoft.md",
+      "title": "Meta and Microsoft Introduce the Next Generation of Llama"
+    },
+    {
+      "from": "sources/llama-3-1-community-license.md",
+      "title": "Llama 3.1 Community License Agreement"
+    },
+    {
+      "from": "sources/mistral-ai-non-production-license.md",
+      "title": "The Mistral AI Non-Production License"
+    },
+    {
+      "from": "sources/open-future-osaid-step-forward.md",
+      "title": "The Open Source AI Definition is a step forward in defining openness in AI"
+    },
+    {
       "from": "sources/open-source-ai-models-how-open.md",
       "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
     },
     {
+      "from": "sources/openmdw-1-1-nvidia-adoption.md",
+      "title": "Linux Foundation Releases OpenMDW-1.1; NVIDIA Adopts OpenMDW for Cosmos, Isaac GR00T, Ising and Nemotron, AI Model Families"
+    },
+    {
+      "from": "sources/osaid-take-it-or-leave-it.md",
+      "title": "Open Source Artificial Intelligence Definition 1.0 - A \"take it or leave it\" approach for open source AI systems?"
+    },
+    {
+      "from": "sources/osi-meta-llama-2-license-not-open-source.md",
+      "title": "Meta's LLaMa License Is Not Open Source"
+    },
+    {
+      "from": "sources/osi-meta-llama-license-still-not-open-source.md",
+      "title": "Meta's LLaMa License Is Still Not Open Source"
+    },
+    {
       "from": "sources/osi-open-source-ai-definition.md",
       "title": "The Open Source AI Definition 1.0"
+    },
+    {
+      "from": "sources/red-hat-open-source-ai-point-of-view.md",
+      "title": "Open Source AI: Red Hat's Point-of-View"
+    },
+    {
+      "from": "sources/rethinking-open-source-generative-ai.md",
+      "title": "Rethinking open source generative AI: open-washing and the EU AI Act"
+    },
+    {
+      "from": "sources/sfc-osaid-erodes-open-source.md",
+      "title": "Open Source AI Definition Erodes the Meaning of “Open Source”"
+    },
+    {
+      "from": "sources/techcrunch-osaid-official-definition.md",
+      "title": "We Finally Have an 'Official' Definition for Open Source AI"
+    },
+    {
+      "from": "sources/welcome-gpt-oss-openai.md",
+      "title": "Welcome GPT OSS, the New Open-Source Model Family from OpenAI"
+    },
+    {
+      "from": "sources/what-does-open-source-ai-mean.md",
+      "title": "What does 'open source AI' mean, anyway?"
     },
     {
       "from": "entities/DeepSeek.md",
@@ -223,12 +889,32 @@
       "title": "Meta"
     },
     {
+      "from": "entities/MistralAI.md",
+      "title": "Mistral AI"
+    },
+    {
+      "from": "entities/OpenAI.md",
+      "title": "OpenAI"
+    },
+    {
+      "from": "concepts/Distillation.md",
+      "title": "Distillation"
+    },
+    {
+      "from": "concepts/EUAIAct.md",
+      "title": "EU AI Act"
+    },
+    {
       "from": "concepts/FineTuning.md",
       "title": "Fine-Tuning"
     },
     {
       "from": "concepts/OpenSourceAI.md",
       "title": "Open Source AI"
+    },
+    {
+      "from": "concepts/OpenSourceDefinition.md",
+      "title": "Open Source Definition"
     },
     {
       "from": "concepts/OpenWashing.md",
@@ -239,98 +925,512 @@
       "title": "Open Weights"
     }
   ],
-  "Mozilla": [
+  "OpenSourceDefinition": [
     {
-      "from": "sources/mozilla-celebrates-osaid.md",
-      "title": "Celebrating an Important Step Forward for Open Source AI (Mozilla)"
+      "from": "sources/debian-ai-models-dfsg.md",
+      "title": "Debian Debates AI Models and the DFSG"
     },
     {
-      "from": "entities/OpenSourceInitiative.md",
-      "title": "Open Source Initiative"
-    }
-  ],
-  "Meta": [
-    {
-      "from": "sources/mozilla-celebrates-osaid.md",
-      "title": "Celebrating an Important Step Forward for Open Source AI (Mozilla)"
+      "from": "sources/open-future-osaid-step-forward.md",
+      "title": "The Open Source AI Definition is a step forward in defining openness in AI"
     },
     {
-      "from": "sources/osi-open-source-ai-definition.md",
-      "title": "The Open Source AI Definition 1.0"
+      "from": "sources/osi-meta-llama-2-license-not-open-source.md",
+      "title": "Meta's LLaMa License Is Not Open Source"
     },
     {
-      "from": "entities/OpenSourceInitiative.md",
-      "title": "Open Source Initiative"
+      "from": "sources/osi-meta-llama-license-still-not-open-source.md",
+      "title": "Meta's LLaMa License Is Still Not Open Source"
     },
     {
-      "from": "concepts/ModelLicensing.md",
-      "title": "Model Licensing"
+      "from": "sources/osi-readies-controversial-osaid.md",
+      "title": "OSI Readies Controversial Open AI Definition"
     },
     {
-      "from": "concepts/OpenWashing.md",
-      "title": "Open-Washing"
-    }
-  ],
-  "OpenWeights": [
-    {
-      "from": "sources/open-source-ai-models-how-open.md",
-      "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
+      "from": "sources/sfc-osaid-erodes-open-source.md",
+      "title": "Open Source AI Definition Erodes the Meaning of “Open Source”"
     },
     {
-      "from": "sources/osi-open-source-ai-definition.md",
-      "title": "The Open Source AI Definition 1.0"
+      "from": "sources/what-does-open-source-ai-mean.md",
+      "title": "What does 'open source AI' mean, anyway?"
     },
     {
-      "from": "entities/DeepSeek.md",
-      "title": "DeepSeek"
-    },
-    {
-      "from": "entities/Meta.md",
-      "title": "Meta"
-    },
-    {
-      "from": "concepts/FineTuning.md",
-      "title": "Fine-Tuning"
-    },
-    {
-      "from": "concepts/ModelLicensing.md",
-      "title": "Model Licensing"
-    },
-    {
-      "from": "concepts/OpenSourceAI.md",
-      "title": "Open Source AI"
-    },
-    {
-      "from": "concepts/OpenWashing.md",
-      "title": "Open-Washing"
-    },
-    {
-      "from": "concepts/TrainingData.md",
-      "title": "Training Data"
-    }
-  ],
-  "FineTuning": [
-    {
-      "from": "sources/open-source-ai-models-how-open.md",
-      "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
-    },
-    {
-      "from": "entities/DeepSeek.md",
-      "title": "DeepSeek"
-    },
-    {
-      "from": "concepts/OpenWeights.md",
-      "title": "Open Weights"
+      "from": "entities/StefanoMaffulli.md",
+      "title": "Stefano Maffulli"
     }
   ],
   "DeepSeek": [
     {
+      "from": "sources/deepseek-r1-release.md",
+      "title": "DeepSeek-R1 Release"
+    },
+    {
       "from": "sources/open-source-ai-models-how-open.md",
       "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
     },
     {
+      "from": "sources/osaid-take-it-or-leave-it.md",
+      "title": "Open Source Artificial Intelligence Definition 1.0 - A \"take it or leave it\" approach for open source AI systems?"
+    },
+    {
+      "from": "sources/red-hat-open-source-ai-point-of-view.md",
+      "title": "Open Source AI: Red Hat's Point-of-View"
+    },
+    {
+      "from": "entities/OpenAI.md",
+      "title": "OpenAI"
+    },
+    {
+      "from": "concepts/Distillation.md",
+      "title": "Distillation"
+    },
+    {
       "from": "concepts/OpenWeights.md",
       "title": "Open Weights"
+    }
+  ],
+  "FineTuning": [
+    {
+      "from": "sources/deepseek-r1-release.md",
+      "title": "DeepSeek-R1 Release"
+    },
+    {
+      "from": "sources/eu-gpai-provider-guidelines.md",
+      "title": "Learn more about the guidelines for providers of general-purpose AI models"
+    },
+    {
+      "from": "sources/llama-2-meta-microsoft.md",
+      "title": "Meta and Microsoft Introduce the Next Generation of Llama"
+    },
+    {
+      "from": "sources/llama-3-1-community-license.md",
+      "title": "Llama 3.1 Community License Agreement"
+    },
+    {
+      "from": "sources/open-source-ai-models-how-open.md",
+      "title": "Open Source AI Models: How Open Are They Really? (Part 1)"
+    },
+    {
+      "from": "sources/open-source-ai-path-forward.md",
+      "title": "Open Source AI Is the Path Forward"
+    },
+    {
+      "from": "sources/open-weight-models-frontier-safety-gap.md",
+      "title": "Open-Weight AI Models Are Catching Up to the Frontier. The Safety Gap Remains."
+    },
+    {
+      "from": "sources/osi-open-weights-good-open-source-better.md",
+      "title": "Open Weights Are Good. Open Source Is Better."
+    },
+    {
+      "from": "sources/osi-readies-controversial-osaid.md",
+      "title": "OSI Readies Controversial Open AI Definition"
+    },
+    {
+      "from": "sources/red-hat-open-source-ai-point-of-view.md",
+      "title": "Open Source AI: Red Hat's Point-of-View"
+    },
+    {
+      "from": "sources/rethinking-open-source-generative-ai.md",
+      "title": "Rethinking open source generative AI: open-washing and the EU AI Act"
+    },
+    {
+      "from": "sources/techcrunch-osaid-official-definition.md",
+      "title": "We Finally Have an 'Official' Definition for Open Source AI"
+    },
+    {
+      "from": "sources/welcome-gpt-oss-openai.md",
+      "title": "Welcome GPT OSS, the New Open-Source Model Family from OpenAI"
+    },
+    {
+      "from": "entities/DeepSeek.md",
+      "title": "DeepSeek"
+    },
+    {
+      "from": "entities/HuggingFace.md",
+      "title": "Hugging Face"
+    },
+    {
+      "from": "entities/OpenAI.md",
+      "title": "OpenAI"
+    },
+    {
+      "from": "concepts/AISafety.md",
+      "title": "AI Safety"
+    },
+    {
+      "from": "concepts/Distillation.md",
+      "title": "Distillation"
+    },
+    {
+      "from": "concepts/EUAIAct.md",
+      "title": "EU AI Act"
+    },
+    {
+      "from": "concepts/OpenWeights.md",
+      "title": "Open Weights"
+    }
+  ],
+  "open-source-ai-models-how-open": [
+    {
+      "from": "sources/deepseek-r1-release.md",
+      "title": "DeepSeek-R1 Release"
+    }
+  ],
+  "OpenAI": [
+    {
+      "from": "sources/deepseek-r1-release.md",
+      "title": "DeepSeek-R1 Release"
+    },
+    {
+      "from": "sources/open-future-osaid-step-forward.md",
+      "title": "The Open Source AI Definition is a step forward in defining openness in AI"
+    },
+    {
+      "from": "sources/open-source-ai-uniquely-dangerous.md",
+      "title": "Open-Source AI Is Uniquely Dangerous"
+    },
+    {
+      "from": "sources/open-weight-models-frontier-safety-gap.md",
+      "title": "Open-Weight AI Models Are Catching Up to the Frontier. The Safety Gap Remains."
+    },
+    {
+      "from": "sources/open-weights-american-ai-leadership.md",
+      "title": "Open Weights and American AI Leadership"
+    },
+    {
+      "from": "sources/osaid-take-it-or-leave-it.md",
+      "title": "Open Source Artificial Intelligence Definition 1.0 - A \"take it or leave it\" approach for open source AI systems?"
+    },
+    {
+      "from": "sources/rethinking-open-source-generative-ai.md",
+      "title": "Rethinking open source generative AI: open-washing and the EU AI Act"
+    },
+    {
+      "from": "sources/senators-question-meta-llama-leak.md",
+      "title": "Senators Question Meta's LLaMA Leak Impact"
+    },
+    {
+      "from": "sources/welcome-gpt-oss-openai.md",
+      "title": "Welcome GPT OSS, the New Open-Source Model Family from OpenAI"
+    }
+  ],
+  "EUAIAct": [
+    {
+      "from": "sources/eu-gpai-provider-guidelines.md",
+      "title": "Learn more about the guidelines for providers of general-purpose AI models"
+    },
+    {
+      "from": "sources/open-future-osaid-step-forward.md",
+      "title": "The Open Source AI Definition is a step forward in defining openness in AI"
+    },
+    {
+      "from": "sources/open-source-ai-uniquely-dangerous.md",
+      "title": "Open-Source AI Is Uniquely Dangerous"
+    },
+    {
+      "from": "sources/osaid-take-it-or-leave-it.md",
+      "title": "Open Source Artificial Intelligence Definition 1.0 - A \"take it or leave it\" approach for open source AI systems?"
+    },
+    {
+      "from": "sources/rethinking-open-source-generative-ai.md",
+      "title": "Rethinking open source generative AI: open-washing and the EU AI Act"
+    }
+  ],
+  "Meta": [
+    {
+      "from": "sources/hello-olmo-truly-open-llm.md",
+      "title": "Hello OLMo: A Truly Open LLM"
+    },
+    {
+      "from": "sources/joint-statement-ai-safety-openness.md",
+      "title": "Joint Statement on AI Safety and Openness"
+    },
+    {
+      "from": "sources/llama-2-meta-microsoft.md",
+      "title": "Meta and Microsoft Introduce the Next Generation of Llama"
+    },
+    {
+      "from": "sources/llama-3-1-community-license.md",
+      "title": "Llama 3.1 Community License Agreement"
+    },
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "title": "Celebrating an Important Step Forward for Open Source AI (Mozilla)"
+    },
+    {
+      "from": "sources/open-future-osaid-step-forward.md",
+      "title": "The Open Source AI Definition is a step forward in defining openness in AI"
+    },
+    {
+      "from": "sources/open-source-ai-path-forward.md",
+      "title": "Open Source AI Is the Path Forward"
+    },
+    {
+      "from": "sources/open-source-ai-uniquely-dangerous.md",
+      "title": "Open-Source AI Is Uniquely Dangerous"
+    },
+    {
+      "from": "sources/open-weights-american-ai-leadership.md",
+      "title": "Open Weights and American AI Leadership"
+    },
+    {
+      "from": "sources/osaid-take-it-or-leave-it.md",
+      "title": "Open Source Artificial Intelligence Definition 1.0 - A \"take it or leave it\" approach for open source AI systems?"
+    },
+    {
+      "from": "sources/osi-meta-llama-2-license-not-open-source.md",
+      "title": "Meta's LLaMa License Is Not Open Source"
+    },
+    {
+      "from": "sources/osi-meta-llama-license-still-not-open-source.md",
+      "title": "Meta's LLaMa License Is Still Not Open Source"
+    },
+    {
+      "from": "sources/osi-open-source-ai-definition.md",
+      "title": "The Open Source AI Definition 1.0"
+    },
+    {
+      "from": "sources/rethinking-open-source-generative-ai.md",
+      "title": "Rethinking open source generative AI: open-washing and the EU AI Act"
+    },
+    {
+      "from": "sources/senators-question-meta-llama-leak.md",
+      "title": "Senators Question Meta's LLaMA Leak Impact"
+    },
+    {
+      "from": "sources/sfc-osaid-erodes-open-source.md",
+      "title": "Open Source AI Definition Erodes the Meaning of “Open Source”"
+    },
+    {
+      "from": "sources/societal-impact-open-foundation-models.md",
+      "title": "On the Societal Impact of Open Foundation Models"
+    },
+    {
+      "from": "sources/techcrunch-osaid-official-definition.md",
+      "title": "We Finally Have an 'Official' Definition for Open Source AI"
+    },
+    {
+      "from": "sources/what-does-open-source-ai-mean.md",
+      "title": "What does 'open source AI' mean, anyway?"
+    },
+    {
+      "from": "entities/Anthropic.md",
+      "title": "Anthropic"
+    },
+    {
+      "from": "entities/HuggingFace.md",
+      "title": "Hugging Face"
+    },
+    {
+      "from": "entities/MistralAI.md",
+      "title": "Mistral AI"
+    },
+    {
+      "from": "entities/OpenAI.md",
+      "title": "OpenAI"
+    },
+    {
+      "from": "entities/OpenSourceInitiative.md",
+      "title": "Open Source Initiative"
+    },
+    {
+      "from": "entities/StefanoMaffulli.md",
+      "title": "Stefano Maffulli"
+    },
+    {
+      "from": "concepts/AISafety.md",
+      "title": "AI Safety"
+    },
+    {
+      "from": "concepts/Distillation.md",
+      "title": "Distillation"
+    },
+    {
+      "from": "concepts/EUAIAct.md",
+      "title": "EU AI Act"
+    },
+    {
+      "from": "concepts/ModelLicensing.md",
+      "title": "Model Licensing"
+    },
+    {
+      "from": "concepts/OpenSourceDefinition.md",
+      "title": "Open Source Definition"
+    },
+    {
+      "from": "concepts/OpenWashing.md",
+      "title": "Open-Washing"
+    }
+  ],
+  "Mozilla": [
+    {
+      "from": "sources/joint-statement-ai-safety-openness.md",
+      "title": "Joint Statement on AI Safety and Openness"
+    },
+    {
+      "from": "sources/mozilla-celebrates-osaid.md",
+      "title": "Celebrating an Important Step Forward for Open Source AI (Mozilla)"
+    },
+    {
+      "from": "sources/open-future-osaid-step-forward.md",
+      "title": "The Open Source AI Definition is a step forward in defining openness in AI"
+    },
+    {
+      "from": "sources/open-weights-american-ai-leadership.md",
+      "title": "Open Weights and American AI Leadership"
+    },
+    {
+      "from": "sources/osi-readies-controversial-osaid.md",
+      "title": "OSI Readies Controversial Open AI Definition"
+    },
+    {
+      "from": "sources/rethinking-open-source-generative-ai.md",
+      "title": "Rethinking open source generative AI: open-washing and the EU AI Act"
+    },
+    {
+      "from": "entities/HuggingFace.md",
+      "title": "Hugging Face"
+    },
+    {
+      "from": "entities/MistralAI.md",
+      "title": "Mistral AI"
+    },
+    {
+      "from": "entities/OpenSourceInitiative.md",
+      "title": "Open Source Initiative"
+    },
+    {
+      "from": "concepts/AISafety.md",
+      "title": "AI Safety"
+    },
+    {
+      "from": "concepts/ModelOpennessFramework.md",
+      "title": "Model Openness Framework"
+    }
+  ],
+  "MistralAI": [
+    {
+      "from": "sources/joint-statement-ai-safety-openness.md",
+      "title": "Joint Statement on AI Safety and Openness"
+    },
+    {
+      "from": "sources/mistral-ai-non-production-license.md",
+      "title": "The Mistral AI Non-Production License"
+    }
+  ],
+  "osi-open-source-ai-definition": [
+    {
+      "from": "sources/llama-2-meta-microsoft.md",
+      "title": "Meta and Microsoft Introduce the Next Generation of Llama"
+    },
+    {
+      "from": "sources/osi-readies-controversial-osaid.md",
+      "title": "OSI Readies Controversial Open AI Definition"
+    },
+    {
+      "from": "sources/techcrunch-osaid-official-definition.md",
+      "title": "We Finally Have an 'Official' Definition for Open Source AI"
+    },
+    {
+      "from": "sources/what-does-open-source-ai-mean.md",
+      "title": "What does 'open source AI' mean, anyway?"
+    }
+  ],
+  "ModelOpennessFramework": [
+    {
+      "from": "sources/open-future-osaid-step-forward.md",
+      "title": "The Open Source AI Definition is a step forward in defining openness in AI"
+    },
+    {
+      "from": "sources/osaid-take-it-or-leave-it.md",
+      "title": "Open Source Artificial Intelligence Definition 1.0 - A \"take it or leave it\" approach for open source AI systems?"
+    },
+    {
+      "from": "sources/what-does-open-source-ai-mean.md",
+      "title": "What does 'open source AI' mean, anyway?"
+    }
+  ],
+  "llama-3-1-community-license": [
+    {
+      "from": "sources/open-source-ai-path-forward.md",
+      "title": "Open Source AI Is the Path Forward"
+    },
+    {
+      "from": "sources/osi-meta-llama-license-still-not-open-source.md",
+      "title": "Meta's LLaMa License Is Still Not Open Source"
+    }
+  ],
+  "osi-meta-llama-2-license-not-open-source": [
+    {
+      "from": "sources/open-source-ai-path-forward.md",
+      "title": "Open Source AI Is the Path Forward"
+    },
+    {
+      "from": "sources/osi-meta-llama-license-still-not-open-source.md",
+      "title": "Meta's LLaMa License Is Still Not Open Source"
+    }
+  ],
+  "joint-statement-ai-safety-openness": [
+    {
+      "from": "sources/open-source-ai-uniquely-dangerous.md",
+      "title": "Open-Source AI Is Uniquely Dangerous"
+    },
+    {
+      "from": "sources/rethinking-open-source-generative-ai.md",
+      "title": "Rethinking open source generative AI: open-washing and the EU AI Act"
+    }
+  ],
+  "StefanoMaffulli": [
+    {
+      "from": "sources/osi-meta-llama-2-license-not-open-source.md",
+      "title": "Meta's LLaMa License Is Not Open Source"
+    },
+    {
+      "from": "sources/osi-readies-controversial-osaid.md",
+      "title": "OSI Readies Controversial Open AI Definition"
+    },
+    {
+      "from": "sources/techcrunch-osaid-official-definition.md",
+      "title": "We Finally Have an 'Official' Definition for Open Source AI"
+    },
+    {
+      "from": "sources/what-does-open-source-ai-mean.md",
+      "title": "What does 'open source AI' mean, anyway?"
+    }
+  ],
+  "hello-olmo-truly-open-llm": [
+    {
+      "from": "sources/osi-open-weights-good-open-source-better.md",
+      "title": "Open Weights Are Good. Open Source Is Better."
+    },
+    {
+      "from": "sources/rethinking-open-source-generative-ai.md",
+      "title": "Rethinking open source generative AI: open-washing and the EU AI Act"
+    }
+  ],
+  "case-against-osaid": [
+    {
+      "from": "sources/red-hat-open-source-ai-point-of-view.md",
+      "title": "Open Source AI: Red Hat's Point-of-View"
+    }
+  ],
+  "open-source-ai-uniquely-dangerous": [
+    {
+      "from": "sources/senators-question-meta-llama-leak.md",
+      "title": "Senators Question Meta's LLaMA Leak Impact"
+    }
+  ],
+  "llama-2-meta-microsoft": [
+    {
+      "from": "sources/societal-impact-open-foundation-models.md",
+      "title": "On the Societal Impact of Open Foundation Models"
+    }
+  ],
+  "HuggingFace": [
+    {
+      "from": "sources/welcome-gpt-oss-openai.md",
+      "title": "Welcome GPT OSS, the New Open-Source Model Family from OpenAI"
     }
   ],
   "open-training-data-requirement": [

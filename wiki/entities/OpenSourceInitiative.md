@@ -3,7 +3,7 @@ title: "Open Source Initiative"
 type: entity
 kind: org
 tags: [OSI, open-source-ai, governance, licensing]
-sources: [osi-open-source-ai-definition, case-against-osaid, mozilla-celebrates-osaid, open-source-ai-models-how-open]
+sources: [osi-open-source-ai-definition, case-against-osaid, mozilla-celebrates-osaid, open-source-ai-models-how-open, debian-ai-models-dfsg, joint-statement-ai-safety-openness, open-future-osaid-step-forward, osaid-take-it-or-leave-it, osi-meta-llama-2-license-not-open-source, osi-meta-llama-license-still-not-open-source, osi-open-weights-good-open-source-better, osi-readies-controversial-osaid, red-hat-open-source-ai-point-of-view, rethinking-open-source-generative-ai, sfc-osaid-erodes-open-source, techcrunch-osaid-official-definition, what-does-open-source-ai-mean]
 last_updated: 2026-07-19
 ---
 

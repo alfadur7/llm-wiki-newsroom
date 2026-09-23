@@ -3,7 +3,7 @@ title: "DeepSeek"
 type: entity
 kind: org
 tags: [DeepSeek, open-weights, model-weights, licensing]
-sources: [open-source-ai-models-how-open]
+sources: [open-source-ai-models-how-open, deepseek-r1-release, osaid-take-it-or-leave-it, red-hat-open-source-ai-point-of-view]
 last_updated: 2026-09-15
 ---
 

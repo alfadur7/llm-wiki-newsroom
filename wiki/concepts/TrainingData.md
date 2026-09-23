@@ -2,7 +2,7 @@
 title: "Training Data"
 type: concept
 tags: [training-data, open-source-ai, transparency, reproducibility]
-sources: [case-against-osaid, osi-open-source-ai-definition, open-source-ai-models-how-open, mozilla-celebrates-osaid]
+sources: [case-against-osaid, osi-open-source-ai-definition, open-source-ai-models-how-open, mozilla-celebrates-osaid, debian-ai-models-dfsg, fsf-free-ml-application-criteria, hello-olmo-truly-open-llm, open-future-osaid-step-forward, open-source-ai-uniquely-dangerous, open-weight-models-frontier-safety-gap, openmdw-1-1-nvidia-adoption, osaid-take-it-or-leave-it, osi-open-weights-good-open-source-better, osi-readies-controversial-osaid, red-hat-open-source-ai-point-of-view, rethinking-open-source-generative-ai, sfc-osaid-erodes-open-source, techcrunch-osaid-official-definition, welcome-gpt-oss-openai, what-does-open-source-ai-mean]
 last_updated: 2026-07-19
 ---
 

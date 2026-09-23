@@ -3,7 +3,7 @@ title: "Free Software Foundation"
 type: entity
 kind: org
 tags: [FSF, free-software, training-data, open-source-ai]
-sources: [case-against-osaid]
+sources: [case-against-osaid, fsf-free-ml-application-criteria, osi-meta-llama-license-still-not-open-source, osi-readies-controversial-osaid, techcrunch-osaid-official-definition]
 last_updated: 2026-06-26
 ---
 

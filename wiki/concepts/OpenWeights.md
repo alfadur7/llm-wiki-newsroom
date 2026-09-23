@@ -2,7 +2,7 @@
 title: "Open Weights"
 type: concept
 tags: [open-weights, model-weights, fine-tuning, licensing]
-sources: [open-source-ai-models-how-open, osi-open-source-ai-definition]
+sources: [open-source-ai-models-how-open, osi-open-source-ai-definition, anthropic-position-open-weights-models, debian-ai-models-dfsg, deepseek-r1-release, fsf-free-ml-application-criteria, hello-olmo-truly-open-llm, joint-statement-ai-safety-openness, llama-2-meta-microsoft, llama-3-1-community-license, ntia-open-model-weights-report, open-future-osaid-step-forward, open-source-ai-path-forward, open-source-ai-uniquely-dangerous, open-weight-models-frontier-safety-gap, open-weights-american-ai-leadership, openmdw-1-1-nvidia-adoption, osi-open-weights-good-open-source-better, red-hat-open-source-ai-point-of-view, rethinking-open-source-generative-ai, senators-question-meta-llama-leak, societal-impact-open-foundation-models, welcome-gpt-oss-openai, what-does-open-source-ai-mean]
 last_updated: 2026-06-26
 ---
 
