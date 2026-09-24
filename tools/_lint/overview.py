@@ -934,7 +934,7 @@ def _format_metrics_line(m: dict) -> list[str]:
     s6_pa = mark(len(m["s6_para_anti"]) == 0)
     # G1·G2 — Phase 2 source schema meta-use (advisory, dimension 7).
     g1 = mark(m["g1_grade_meta"] >= _G1_THRESHOLD)
-    g2 = mark(m["g2_cite_type_meta"] >= _G2_THRESHOLD)
+    g2 = mark(m["g2_cite_type_meta"] >= _G2_THRESHOLD if korean_mode() else None)
 
     ratio_str = f"{m['lead_body_ratio']:.2f}" if m["lead_body_ratio"] is not None else "n/a"
     lines = [
@@ -995,7 +995,7 @@ def _skeleton_overview(cluster: dict) -> str:
         f"## Key Trends & Figures\n\n"
         f"_TODO: Major events·figures·recent examples._\n\n"
         f"## Adjacent Domains & Scope\n\n"
-        f"_TODO: Reference adjacent cluster overviews as [[<slug>|<cluster name>]] (a display-name alias is required — CLAUDE.md 'Cluster slug alias') + a one-line description of each boundary (2–4 bullets)._\n\n"
+        f"_TODO: Reference adjacent cluster overviews as [[<slug>|<cluster name>]] (a display-name alias is required — CLAUDE.md 'Cluster slug alias') + a one-line description of each boundary (one bullet per adjacent cluster)._\n\n"
         f"<!-- AUTO:MEMBERS BEGIN -->\n"
         f"<!-- AUTO:MEMBERS END -->\n\n"
         f"<!-- AUTO:SOURCES BEGIN -->\n"
@@ -1422,7 +1422,7 @@ def _check_overview_md(cluster_slugs: set[str]) -> tuple[list[str], list[str]]:
     g1_grade_meta = cit_skill.count_grade_meta(editor)
     g2_cite_type_meta = cit_skill.count_cite_type_meta(editor)
     g1_ok = g1_grade_meta >= _L24_G1_THRESHOLD
-    g2_ok = g2_cite_type_meta >= _L24_G2_THRESHOLD
+    g2_ok = g2_cite_type_meta >= _L24_G2_THRESHOLD if korean_mode() else None
     metrics_lines.append(
         f"  [Rubric L2-4] G1 grade_meta={g1_grade_meta} {ok(g1_ok)}  "
         f"G2 cite_type_meta={g2_cite_type_meta} {ok(g2_ok)}"

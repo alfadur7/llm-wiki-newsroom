@@ -27,7 +27,9 @@ L1_RAW_SLUG_RE = re.compile(r"\[\[([a-z][a-z0-9\-]{" + str(L1_MIN_SLUG_LEN - 1) 
 
 
 def mark(ok) -> str:
-    """Rubric advisory PASS/FAIL glyph."""
+    """Rubric advisory PASS/FAIL glyph; None = not applicable (—)."""
+    if ok is None:
+        return "—"
     return "✅" if ok else "⚠️"
 
 

@@ -41,7 +41,7 @@ from datetime import date as _date, datetime as _datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import AUTO_BLOCK_RE, CLUSTERS_JSON, REPO_ROOT, fm_sources, WIKI, WIKILINK_TARGET_RE, atomic_write_text, confirm_changes, parse_frontmatter, print_delete_cleanup_advisory, read_source_date, real_source_files, safe_slug_path, section_body, slug_only, strip_frontmatter  # noqa: E402
+from _lib import AUTO_BLOCK_RE, CLUSTERS_JSON, REPO_ROOT, fm_sources, WIKI, WIKILINK_TARGET_RE, atomic_write_text, confirm_changes, korean_mode, parse_frontmatter, print_delete_cleanup_advisory, read_source_date, real_source_files, safe_slug_path, section_body, slug_only, strip_frontmatter  # noqa: E402
 from _advisory_common import mark  # noqa: E402
 from _manifest_counts import _load_manifest, counts as _roster_counts, threshold_label  # noqa: E402
 
@@ -837,7 +837,7 @@ def _format_metrics_line(m: dict, exempt: set[str] | None = None) -> list[str]:
     # G1·G2 — Phase 2 schema meta-use (advisory, dimension 6).
     # Thresholds: G1 ≥ 2 (grade meta), G2 ≥ 1 (citation-type meta).
     g1_ok = m["G1_grade_meta"] >= _G1_THRESHOLD
-    g2_ok = m["G2_cite_type_meta"] >= _G2_THRESHOLD
+    g2_ok = m["G2_cite_type_meta"] >= _G2_THRESHOLD if korean_mode() else None
 
     ab_str = f"A={m['D5_words']['A']}/B={m['D5_words']['B']}"
     d5_str = f"C={c_w}/{ab_str}"
@@ -1137,7 +1137,7 @@ def _check_contradictions_md(
     g1_grade_meta = cit_skill.count_grade_meta(aggregate_editor)
     g2_cite_type_meta = cit_skill.count_cite_type_meta(aggregate_editor)
     g1_ok = g1_grade_meta >= _L24_G1_THRESHOLD
-    g2_ok = g2_cite_type_meta >= _L24_G2_THRESHOLD
+    g2_ok = g2_cite_type_meta >= _L24_G2_THRESHOLD if korean_mode() else None
     metrics_lines.append(
         f"  [Rubric L2-4] G1 grade_meta={g1_grade_meta} {ok(g1_ok)}  "
         f"G2 cite_type_meta={g2_cite_type_meta} {ok(g2_ok)}"

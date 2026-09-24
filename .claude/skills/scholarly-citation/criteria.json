@@ -112,7 +112,7 @@
       "algorithm": "count_cite_type_meta", "comparator": ">=", "default_threshold": 1,
       "legacy": {"overview-cluster": "G2", "overview-aggregate": "G2", "contradiction-theme": "G2", "contradiction-aggregate": "G2"},
       "source": "scite Smart Citations", "source_url": "https://scite.ai/",
-      "note": "The synthesis page's EDITOR body reflects cites/references/contradicts/defines meaning distinction as meta (≥1 advisory)."
+      "note": "The synthesis page's EDITOR body reflects cites/references/contradicts/defines meaning distinction as meta (≥1 advisory). The overview and contradiction lints judge it only under WIKI_LANG=ko and show it as not applicable (—) in English."
     }
   }
 }

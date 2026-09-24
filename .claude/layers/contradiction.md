@@ -277,7 +277,7 @@ The lint output is labeled with **legacy codes** (N4·N5·S2·X1·G1 etc.) for r
     [Rubric] S1=4/4 todo=0 ✅  S2 evidence=5 slugs=4 ✅  S3 lead nums=3/wiki=4 ✅  W1 links=38 ✅  D1 labels=2 ✅  D5 C=0/A=85/B=92 ✅  D6 C_meta=0 ✅
     [Rubric] N4 reuse_max=2 ✅  N5 verdict_fails=1 ✅  N6 num_reuse_max=2 ✅  N7 label_skew=0 ✅  T4 qualifiers=2 ✅
     [Rubric] X1 source_refs=5/8 (63%) ⚠️  X2 landscape=1 ✅  L1 raw_slugs=0 ✅  L2 cite_miss=0 ✅  L3 grounded=2/5 ✅
-    [Rubric] G1 grade_meta=3 ✅  G2 cite_type_meta=1 ✅
+    [Rubric] G1 grade_meta=3 ✅  G2 cite_type_meta=1 —
 ```
 
 If there is an upper-bound exceedance, a reappearing token, or a consistency violation, the following supplementary advisory lines are appended, one per line:
@@ -294,10 +294,10 @@ If there is an upper-bound exceedance, a reappearing token, or a consistency vio
     [Rubric] G2 cite-type meta below threshold (need ≥1)
 ```
 
-- **✅ = PASS**, **⚠️ = FAIL**, **— = exempt** (`other-fragmentary`'s N2·D5·D6·S3)
+- **✅ = PASS**, **⚠️ = FAIL**, **— = exempt or not applicable** (`other-fragmentary`'s N2·D5·D6·S3; G2 outside WIKI_LANG=ko)
 - Output token = threshold (each criterion's definition SoT is the mapping-table skill's `criteria.json` or the structural section above):
   - dialectic · NPOV craft → skill: `N5 verdict_fails ≤2` · `N7 label_skew ==0` · `T4 qualifiers ≥1` · `D1 labels ≥2` · `D5 C_words ≤ max(A,B)` · `D6 C_meta ==0`
-  - citation · linking craft → skill: `W1 links ≥30` · `X2 landscape ≥1` · `L1 raw_slugs ==0` · `L2 cite_miss ==0` · `L3 grounded ≥1` · `G1 grade_meta ≥2` · `G2 cite_type_meta ≥1`
+  - citation · linking craft → skill: `W1 links ≥30` · `X2 landscape ≥1` · `L1 raw_slugs ==0` · `L2 cite_miss ==0` · `L3 grounded ≥1` · `G1 grade_meta ≥2` · `G2 cite_type_meta ≥1` (WIKI_LANG=ko only)
   - structural · house → structural section above: `S1 4/4 todo=0` · `S2 evidence/slug 3~7` · `S3 lead nums≤4 wiki≤5` · `X1 source_refs/total ≥0.7` · `N4 reuse_max ≤2` · `N6 num_reuse_max ≤2`
 - Measurement nuance (skill `checks.py` · `tools/_lint/contradiction.py` is SoT): `N4` · `S2` are by source slug (entity/concept wikilinks excluded from the count) · the `X1` denominator is the JSON SoT (no editor gaming) · `L2` is the set difference claim source ∩ body − frontmatter (non-claim mentions excluded from the count) · `L3` blocks only the "0 Reads extreme" (partial gaming is the editor's self-discipline) · the figure vocabulary (`NUMBER_TOKEN_RE`) is owned by the skill `checks.py` (encyclopedia-writing) and consumed by contradiction.py, while the assertion/qualifier/camp-word dictionaries are owned by the skill `checks.py` (encyclopedia-writing · journalism-writing) as SoT.
 - **W4** (required) is separate: 0 broken links in `python tools/lint.py graph structure`.
@@ -386,7 +386,7 @@ wiki/contradiction.md:
 ```
 
 - **✅ = PASS**, **⚠️ = FAIL** · output token = threshold (definition SoT is the mapping-table skill or the structural section above · **aggregate-scale thresholds**):
-  - craft → skill: `N5 verdict_fails ≤2` (implications) · `N7 axis_skew ==0` (axis titles) · `T4 qualifiers ≥1` (implications) · `W1 links ≥50` · `D1 axes 2~4` (`### Other` excluded from the count) · `D2 alias N/N` (theme-reference pipe alias) · `D3 balance max/min ≤4` (warning) · `F1 cluster_refs ==0` · `G1 grade_meta ≥2` · `G2 cite_type_meta ≥1`
+  - craft → skill: `N5 verdict_fails ≤2` (implications) · `N7 axis_skew ==0` (axis titles) · `T4 qualifiers ≥1` (implications) · `W1 links ≥50` · `D1 axes 2~4` (`### Other` excluded from the count) · `D2 alias N/N` (theme-reference pipe alias) · `D3 balance max/min ≤4` (warning) · `F1 cluster_refs ==0` · `G1 grade_meta ≥2` · `G2 cite_type_meta ≥1` (WIKI_LANG=ko only)
   - structural → section above: `S1 sections 4/4` · `S2 insights ≥3` · `X1 theme_coverage M/M` · `F2 stats ok` (preamble statistics)
 - Reuses the same measurement dictionaries as Part 1 (assertion/camp-word/qualifier — skill `checks.py`). **W4** (required) is separate: 0 broken links in `graph structure`.
 

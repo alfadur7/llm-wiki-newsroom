@@ -715,3 +715,42 @@ Still stale after this commit: the eleven pre-existing hubs whose sources change
 ModelLicensing, OpenWashing, OpenWeights, OpenSourceAI, TrainingData), several of which
 now disagree with the pages above them. That is a hub-authoring batch, not this one.
 The cluster partition is still the soft two-way split recorded on 2026-09-23.
+
+## [2026-09-24] guideline | the count that paid for schema tokens, and two rules that already existed or could not be checked
+
+The reground left seven rule proposals behind. Three were adopted in part, one was
+deferred, and three were withdrawn or narrowed on review.
+
+G2 (`cit.cite-type-meta`) now reports "not applicable" in English and is judged only
+under `WIKI_LANG=ko`. Its Korean patterns match prose phrasing about citation
+strength; its English patterns are the four schema tokens, so in English the only
+way to score was to paste `contradicts:` into a sentence. Every theme and root page
+of the reground had ended at zero, and two of the authors wrote sentences shaped to
+hit the token before they were rewritten. The measurement is a lint before/after:
+nine pages move from eight warnings and one pass to nine "—", Korean output is
+unchanged, and no other metric or FAIL moves.
+
+The blind review ran all three rotations. It refuted the change's rationale twice.
+The first version said the layer guides forbid schema tokens in body prose; they do
+not, except on the root overview, and the theme and cluster guides tell authors to
+reflect citation types deliberately. The second said such tokens never occur in
+natural prose; the open-weights overview carries one. The rationale was then deleted
+rather than rewritten a third time, and the code and docs state only what the lint
+does. One defect found in the third rotation, stale output examples in two Part 2
+blocks, was left for the corpus rather than edited after the convergence call.
+
+The adjacent-cluster rule for overviews now asks for one bullet per neighbour instead
+of two to four, because with two clusters both overviews had split their only
+neighbour in two; the `--fix` skeletons and two examples naming the retired cluster
+changed with it. The regression set drops the deleted overview and keeps
+`open-weights` outside the fixed set, so an overview remains available as a
+proposal's motivating page.
+
+A date-notation rule was withdrawn in the first rotation: `house.date-format` already
+sets it for overviews and timelines, and the Desk finding that no rule existed had
+not been checked. An American-spelling rule was deferred. The reviewer classed it as
+a substantive change, which puts it under the measurement obligation, and nothing
+would enforce it; it comes back only if spelling drift recurs on three or more pages,
+paired with a check. The cross-assigned-claim rule waits for a second cross-assigned
+claim, and the two craft rules on schema vocabulary and one-source-one-name go to a
+measured batch of their own.

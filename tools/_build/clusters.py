@@ -999,7 +999,7 @@ def _skeleton_overview(cluster: dict) -> str:
         f"## Key Trends & Figures\n\n"
         f"_TODO: Major events·figures·recent examples._\n\n"
         f"## Adjacent Domains & Scope\n\n"
-        f"_TODO: Reference adjacent cluster overviews as [[<slug>|<cluster name>]] (a display-name alias is required — CLAUDE.md 'Cluster slug alias') + a one-line description of each boundary (2–4 bullets)._\n\n"
+        f"_TODO: Reference adjacent cluster overviews as [[<slug>|<cluster name>]] (a display-name alias is required — CLAUDE.md 'Cluster slug alias') + a one-line description of each boundary (one bullet per adjacent cluster)._\n\n"
         f"<!-- AUTO:MEMBERS BEGIN -->\n"
         f"<!-- AUTO:MEMBERS END -->\n\n"
         f"<!-- AUTO:SOURCES BEGIN -->\n"

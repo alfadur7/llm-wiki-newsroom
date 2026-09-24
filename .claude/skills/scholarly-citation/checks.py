@@ -150,8 +150,8 @@ GRADE_META_PATTERNS = [
 # (partly dormant: several patterns key on Korean meta-phrases — 정의/반박/인용
 #  attribution, 맥락 참조 (context reference), cite/인용 강도 (cite strength), 강한
 #  결합/약한 참조 (strong coupling/weak reference). The English literals (cites:·
-#  references:·contradicts:·defines:) DO fire. An English equivalent would add
-#  "context reference", "cite strength", "strong coupling/weak reference". See FLAG.)
+#  references:·contradicts:·defines:) also fire, but the lint callers judge G2 only
+#  under WIKI_LANG=ko and show it as not applicable (—) in English. See FLAG.)
 CITATION_TYPE_META_PATTERNS = [
     re.compile(r"정의\s*attribution", re.IGNORECASE),
     re.compile(r"반박\s*attribution", re.IGNORECASE),

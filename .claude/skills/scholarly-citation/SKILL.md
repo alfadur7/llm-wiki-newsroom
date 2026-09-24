@@ -33,7 +33,7 @@ A piece synthesizing many sources follows Select→Read→Cite discipline — th
 
 ## Schema meta-use (cit.grade-meta · cit.cite-type-meta)
 
-The synthesizing piece's narrative consciously reflects the evidence-grade (`[fact]`·`[analysis]`·`[forecast]`) and citation-type (`cites:`·`references:`·`contradicts:`·`defines:`) schema attached to sources — noting which grades the evidence base rests on, the dominant claimant, strong coupling (cites) vs context (references) — to deepen attribution. Confine attribution strength to factual statements; do not let it spill into verdict conclusions. Deterministic measurement (`count_grade_meta`·`count_cite_type_meta`) counts grade/cite-type meta expressions as advisory.
+The synthesizing piece's narrative consciously reflects the evidence-grade (`[fact]`·`[analysis]`·`[forecast]`) and citation-type (`cites:`·`references:`·`contradicts:`·`defines:`) schema attached to sources — noting which grades the evidence base rests on, the dominant claimant, strong coupling (cites) vs context (references) — to deepen attribution. Confine attribution strength to factual statements; do not let it spill into verdict conclusions. Deterministic measurement (`count_grade_meta`·`count_cite_type_meta`) counts grade/cite-type meta expressions as advisory; the lints judge the cite-type count only under WIKI_LANG=ko.
 
 ## Sources
 
