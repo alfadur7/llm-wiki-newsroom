@@ -24,14 +24,14 @@ This project runs on the RAG corpus alone — the synthesis and directory files 
 
 A Claude.ai project loads knowledge files **whole into context, not via retrieval**. The limit is about 200K tokens, so uploading everything overflows it. Upload within the estimated token counts (approximate) below. (The Core/Optional split is determined automatically by filling up to the limit in priority order.)
 
-**Core — upload these first (total ~12,323 tok, within the ~200,000 limit):**
-- `index.md` (~817 tok)
-- `overview.md` (~1,663 tok)
-- `contradiction.md` (~1,107 tok)
-- `all-syntheses.md` (~1,461 tok)
-- `all-overviews.md` (~5,017 tok)
-- `all-contradictions.md` (~2,065 tok)
-- `all-sources-index.md` (~193 tok)
+**Core — upload these first (total ~33,658 tok, within the ~200,000 limit):**
+- `index.md` (~1,219 tok)
+- `overview.md` (~3,245 tok)
+- `contradiction.md` (~3,338 tok)
+- `all-syntheses.md` (~3,203 tok)
+- `all-overviews.md` (~8,774 tok)
+- `all-contradictions.md` (~12,895 tok)
+- `all-sources-index.md` (~984 tok)
 
 **Optional — add selectively if the budget allows (large files; uploading them all together risks overflow):**
 
