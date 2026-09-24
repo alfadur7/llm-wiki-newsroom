@@ -1,12 +1,52 @@
 {
-  "derived_at": "2026-06-26",
+  "derived_at": "2026-09-23",
   "derived_by": "claude",
   "phase": 2,
-  "source_count": 1,
+  "source_count": 23,
   "themes": {
     "open-training-data-requirement": {
       "name": "OSAID Definition vs Open Training-Data Requirement",
-      "claim_ids": ["08b6d663"]
+      "claim_ids": [
+        "08b6d663",
+        "e58ac91a",
+        "db4e440b",
+        "ad0e9a83",
+        "b88775a5",
+        "9b189557"
+      ]
+    },
+    "llama-open-source-label": {
+      "name": "Meta's 'open source' label for Llama vs the OSI and critics' rejection",
+      "claim_ids": [
+        "af196221",
+        "fd7fe870",
+        "fb98dd8f",
+        "fb1a019e",
+        "5ce812a6",
+        "ec2343f1",
+        "ed3c0654",
+        "8db8a2ff"
+      ]
+    },
+    "osaid-form-and-legitimacy": {
+      "name": "A single binary definition vs graded openness or repeal",
+      "claim_ids": [
+        "74636332",
+        "cec6e13f",
+        "f53fe134",
+        "f9dd3690",
+        "1428e4bc",
+        "08b6d663"
+      ]
+    },
+    "open-weights-safety-tradeoff": {
+      "name": "Openness as a safety mechanism vs open weights as uniquely hard to govern",
+      "claim_ids": [
+        "290b2e1f",
+        "a55f49c0",
+        "4511cf29",
+        "2c9da7fd"
+      ]
     },
     "other-fragmentary": {
       "name": "Residual Fragmentary Issues",

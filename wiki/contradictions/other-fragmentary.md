@@ -2,26 +2,37 @@
 title: "Residual Fragmentary Issues"
 type: contradiction
 tags: [residual, open-source-ai]
-sources: [open-source-ai-models-how-open]
-last_updated: 2026-06-26
+sources: [case-against-osaid]
+last_updated: 2026-09-24
 ---
 
 # Residual Fragmentary Issues
 
 ## Opposing Positions
 
-This page is the residual-absorption bucket for source-to-source contradictions that do not converge onto a single axis of contention. Unlike a true theme, it has no one opposition structure; it groups leftover claims by character so they remain visible without being forced into an axis they do not belong to.
+This page holds source-to-source disagreements that fit no single axis of contention. Unlike a theme, it has no one opposition to describe. It groups leftover disputes by character instead: one-off factual disputes, time-shifted updates, and single-actor claims that lack a counterpart.
 
-At present the corpus is small and its only registered contradiction maps cleanly onto a dedicated theme, so this bucket holds no claims. The grouping is kept in place — as the standing convention requires — so that future fragmentary oppositions (one-off factual disputes, time-shifted updates, or single-actor issues that lack a counterpart) have a home the moment they appear.
+The bucket is currently empty. The corpus records 23 disagreements, and every one of them falls under one of four named themes. None was left over.
 
 ## Representative Evidence
 
-No claims are currently assigned to this bucket, so there is no representative evidence to present. The single contradiction extracted from the corpus is analysed under its own theme rather than here. For background on how the surrounding debate is framed, the open-weights legal primer [[open-source-ai-models-how-open]] sets the technical context against which future fragmentary disputes would be read.
+No disagreements are assigned here, so there is no evidence to present. The 23 are analysed on their theme pages instead:
+
+- [[llama-open-source-label|Meta's 'open source' label for Llama vs the OSI and critics' rejection]] — 8 disagreements.
+- [[open-training-data-requirement|OSAID Definition vs Open Training-Data Requirement]] — 6 disagreements.
+- [[osaid-form-and-legitimacy|A single binary definition vs graded openness or repeal]] — 6 disagreements.
+- [[open-weights-safety-tradeoff|Openness as a safety mechanism vs open weights as uniquely hard to govern]] — 4 disagreements.
+
+The counts sum to 24 because one disagreement is filed under two themes. The critics in The New Stack's round-up argue that the OSI's definition dilutes the open-source brand ([[case-against-osaid|The New Stack's round-up]]). That argument bears both on the training-data requirement and on whether a single definition is legitimate at all.
 
 ## Derived Tensions & Generational Readings
 
-Because nothing has converged here, there is no derived tension to trace. The reason this bucket is empty rather than absent is structural: the corpus contains exactly one source-to-source contradiction, and that contradiction is a clear, single-axis dispute over whether open-source AI must include open training data — strong enough to stand as its own theme rather than be diluted into a residual pile.
+The one candidate for this bucket was the safety theme. Its 4 disagreements sit below the five-disagreement size at which a theme normally stands alone. The theme mapping kept it separate because its axis would dissolve if absorbed. It is a clear two-sided dispute over whether open release helps defenders or attackers more. No other theme covers that question, so filing it here would have demoted a coherent opposition to a residual fragment.
+
+The other three themes each exceed that size, and none of their disagreements is a one-off. They recur across sources around a shared axis, which is what a theme requires.
 
 ## Interpretive Direction
 
-The follow-up plan is simply to monitor ingestion. As new sources enter the wiki, any contradiction that is genuinely one-off — a fact check, a timeline correction, or an isolated single-actor claim with no opposing camp — should be absorbed here rather than spun into a thin standalone theme. Should a cluster of related fragments accumulate around a shared axis, the convention is to promote them out of this bucket into a named theme at that point, not before.
+The page stays in place so that a future one-off dispute has a home the moment it appears. Likely candidates are a corrected date or figure, a later source that updates an earlier one without opposing it, or a claim by a single actor that no source answers. Such items should land here rather than be spun into a thin theme of their own.
+
+Two movements would change this page. If the safety theme stays small for three or more mapping cycles and its separate axis no longer holds up, it becomes a candidate for absorption here. If fragments here come to share an axis, they should be promoted out into a named theme at that point, not before. The landscape any future fragment would be read against is surveyed in the [[open-source-ai-definition|Open-Source AI Definition]] and [[open-weights|Open Weights]] cluster overviews.

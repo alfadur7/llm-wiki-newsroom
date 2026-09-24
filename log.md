@@ -665,3 +665,53 @@ theme consolidation (claims went from one to twenty-three, and new themes need t
 two-phase mapping and slug approval), the two remaining cluster overviews (both
 flagged for rewrite after five- to twenty-seven-fold source growth), the orphaned
 licensing-open-washing overview, and the root pages that summarize them.
+
+## [2026-09-24] reground | the derived layer catches up with thirty new sources
+
+The ingest of 2026-09-23 left every derived page describing a four-source corpus, and
+this batch re-grounds them against thirty-four. Contradiction claims had gone from one
+to twenty-three, so the theme mapping was re-derived from scratch in both phases with
+an operator review between them. It settled on four themes: the existing
+training-data requirement, and three new slugs the operator approved — Meta's "open
+source" label for Llama, the definition's form and legitimacy, and the open-weights
+safety trade-off. The safety theme holds four claims, one under the floor, and is kept
+under the core-issue exception because absorbing it would erase the corpus's clearest
+two-sided dispute. One claim is filed under two themes, and the pages split its source
+by argument rather than by quote.
+
+The retired `licensing-open-washing` cluster is gone: its label, its overview and every
+link to it. Its content now lives in the two remaining cluster overviews — license
+families, the Llama license and Mistral with open weights; open-washing, the EU AI Act
+and the OSI's Llama rulings with the definition. Both overviews, all four theme pages,
+the residual bucket, the synthesis and both root pages were rewritten, each through a
+Columnist draft, a Desk pass against the originals and an ADAPT round. Two session
+limits interrupted the batch mid-run; the stalled drafts and reviews were restarted,
+one from a half-written file checked against its committed version.
+
+The Desk passes found 97 actionable defects across ten pages, eight of them high; seven more records file the lint conflict and the rule proposals below.
+They cluster where single-page lint cannot see: a camp's own grounds dropped while its
+critics' are kept, opposing sources written up as replies to each other when the wiki
+had paired them, concessions a source never made, and monitoring points that watch for
+only one side being right. Several pages had carried the claim that the OSI
+"validated" models; the OSI's own page says those results are "not certifications of
+any kind", and every derived page now says so. The synthesis also had the FSF's position
+backwards. The mechanism-cluster labels on these records were assigned by keyword
+rules, not by hand.
+
+One lint criterion now works against the layer rule it sits under. G2 scores a theme
+page only when the body carries a literal citation-type token such as `contradicts:`,
+while `contradiction.md` forbids schema vocabulary in reader prose. Authors either
+leaked the field name or wrote sentences shaped to hit the token; two such sentences
+were rewritten, and every theme and root page ships at G2 = 0 by operator decision.
+The criterion is filed, along with six authoring-rule proposals the Desk raised on two
+or more pages — none of them applied here.
+
+**Source pages were not edited**, including where authors found them at odds with their
+originals. They are the population for the blind-labelled measurement that follows,
+and repairing them now would contaminate it.
+
+Still stale after this commit: the eleven pre-existing hubs whose sources changed
+(FreeSoftwareFoundation, Meta, Mozilla, OpenSourceInitiative, DeepSeek, FineTuning,
+ModelLicensing, OpenWashing, OpenWeights, OpenSourceAI, TrainingData), several of which
+now disagree with the pages above them. That is a hub-authoring batch, not this one.
+The cluster partition is still the soft two-way split recorded on 2026-09-23.

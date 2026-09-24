@@ -1,5 +1,5 @@
 {
-  "_comment": "Cluster labels attach a human-readable name to each Leiden-detected community. This example corpus (open-source-AI debate) splits into three coherent sub-themes.",
+  "_comment": "Cluster labels attach a human-readable name to each Leiden-detected community. This example corpus (open-source-AI debate) splits into two coherent sub-themes.",
   "_schema": "labels[]: {slug, name, color?, anchor_members[], paired_with?[]}. slug must be URL/filename-safe. color is optional hex (#RRGGBB).",
   "labels": [
     {
@@ -12,7 +12,7 @@
         "concepts/TrainingData.md",
         "entities/Mozilla.md"
       ],
-      "paired_with": ["licensing-open-washing"]
+      "paired_with": []
     },
     {
       "slug": "open-weights",
@@ -24,17 +24,6 @@
         "entities/DeepSeek.md"
       ],
       "paired_with": []
-    },
-    {
-      "slug": "licensing-open-washing",
-      "name": "Licensing & Open-Washing",
-      "color": "#FFC97F",
-      "anchor_members": [
-        "concepts/ModelLicensing.md",
-        "concepts/OpenWashing.md",
-        "entities/Meta.md"
-      ],
-      "paired_with": ["open-source-ai-definition"]
     }
   ]
 }
