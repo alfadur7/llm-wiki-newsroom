@@ -45,3 +45,37 @@ Each line format: `- HH:MM [<source>] <URL> → <result>`
 - 22:52 [interactive] https://www.anthropic.com/news/position-open-weights-models → raw/NewsScrap/Our position on open-weights models.md OK
 - 22:52 [interactive] https://techcrunch.com/2026/08/04/open-weight-ai-models-are-catching-up-to-the-frontier-the-safety-gap-remains/ → raw/NewsScrap/Open-weight AI models are catching up to the frontier. The safety gap remains. T.md OK
 - 22:52 [interactive] https://opensource.org/blog/open-weights-are-good-open-source-is-better → raw/NewsScrap/Open Weights Are Good. Open Source Is Better.md OK
+
+## 2026-09-27
+- 17:35 [scout] https://www.theregister.com/columnists/2026/09/15/open-weights-are-not-open-source-why-ais-favorite-label-is-under-dispute/5295436 → raw/NewsScrap/Open weights are not open source Why AI's favorite label is under dispute.md OK
+- 17:35 [scout] https://www.theregister.com/2024/10/25/opinion_open_washing → raw/NewsScrap/The open secret of open washing.md OK
+- 17:35 [scout] https://www.technologyreview.com/2024/03/25/1090111/tech-industry-open-source-ai-definition-problem/ → raw/NewsScrap/The tech industry can’t agree on what open-source AI means. That’s a problem.md OK
+- 17:35 [scout] https://www.technologyreview.com/2026/02/12/1132811/whats-next-for-chinese-open-source-ai/ → raw/NewsScrap/What’s next for Chinese open-source AI.md OK
+- 17:35 [scout] https://www.infoworld.com/article/3593266/osi-unveils-open-source-ai-definition-1-0.html → raw/NewsScrap/OSI unveils Open Source AI Definition 1.0.md OK
+- 17:35 [scout] https://www.euronews.com/next/2024/10/28/what-is-open-source-ai-new-definition-shows-metas-version-isnt-what-it-claims-to-be → raw/NewsScrap/Why Meta’s ‘open source’ AI isn’t all it seems.md OK
+- 17:35 [scout] https://spectrum.ieee.org/open-source-llm-not-open → raw/NewsScrap/LLAMA and ChatGPT Are Not Open-Source.md OK
+- 17:35 [scout] https://spectrum.ieee.org/open-ai-models → raw/NewsScrap/OpenAI’s New Model Challenges Meta’s Open-Source Dominance.md OK
+- 17:35 [scout] https://venturebeat.com/ai/with-a-wave-of-new-llms-open-source-ai-is-having-a-moment-and-a-red-hot-debate → raw/NewsScrap/Open-source AI's role in LLM access debate VentureBeat.md OK
+- 17:35 [scout] https://venturebeat.com/technology/meta-returns-to-open-source-with-muse-glimmer-an-apache-2-0-licensed-30b-parameter-ai-model-optimized-for-agents-available-now → raw/NewsScrap/Meta returns to open source with Muse Glimmer, an Apache 2.0 licensed 30B parame.md OK
+- 17:35 [scout] https://venturebeat.com/ai/the-open-source-ai-debate-why-selective-transparency-poses-a-serious-risk → raw/NewsScrap/True open source AI boosts innovation VentureBeat.md OK
+- 17:35 [scout] https://techcrunch.com/2025/03/14/open-ai-model-licenses-often-carry-concerning-restrictions/ → raw/NewsScrap/'Open' AI model licenses often carry concerning restrictions TechCrunch.md OK
+- 17:35 [scout] https://techcrunch.com/2025/06/06/eleutherai-releases-massive-ai-training-dataset-of-licensed-and-open-domain-text/ → raw/NewsScrap/EleutherAI releases massive AI training dataset of licensed and open domain text.md OK
+- 17:35 [scout] https://techcrunch.com/2025/07/30/zuckerberg-says-meta-likely-wont-open-source-all-of-its-superintelligence-ai-models/ → raw/NewsScrap/Zuckerberg signals Meta won't open source all of its 'superintelligence' AI mode.md OK
+- 17:35 [scout] https://techcrunch.com/2026/09/10/anthropic-details-distillation-campaigns-from-alibaba-moonshot-ai-and-deepseek/ → raw/NewsScrap/Anthropic details distillation campaigns from Alibaba, Moonshot AI, and DeepSeek.md OK
+- 17:35 [scout] https://restofworld.org/2026/openai-deepseek-distillation-dispute-us-china/ → raw/NewsScrap/OpenAI accuses DeepSeek of “free-riding” on American R&D.md OK
+- 17:36 [scout] https://www.lawfaremedia.org/article/knives-are-out-for-open-weight-ai-models → raw/NewsScrap/Knives Are Out for Open-Weight AI Models.md OK
+- 17:36 [scout] https://www.lawfaremedia.org/article/open-weight-diplomacy--how-china-s-ai-models-are-rerunning-the-digital-silk-road → raw/NewsScrap/Open-Weight Diplomacy How China’s AI Models Are Rerunning the Digital Silk Road.md OK
+- 17:36 [scout] https://time.com/article/2026/07/28/open-source-ai-hugging-face-openai/ → raw/NewsScrap/The OpenAI Hack Is Fueling a New Fight Over Open-Source AI.md OK
+- 17:36 [scout] https://time.com/7002563/mark-zuckerberg-ai-llama-meta-open-source/ → raw/NewsScrap/Mark Zuckerberg Just Intensified the Battle for AI’s Future.md OK
+- 17:36 [scout] https://www.scientificamerican.com/article/secrets-of-chinese-ai-model-deepseek-revealed-in-landmark-paper/ → raw/NewsScrap/Secrets of DeepSeek AI Model Revealed in Landmark Paper.md OK
+- 17:36 [scout] https://lwn.net/Articles/1089251/ → raw/NewsScrap/Considering the OpenMDW license.md OK
+- 17:36 [scout] https://lwn.net/Articles/1020968/ → raw/NewsScrap/Debian AI General Resolution withdrawn.md OK
+- 17:36 [scout] https://hai.stanford.edu/news/open-weight-models-arent-enough-we-need-truly-open-source-ai-models-for-science-and-society → raw/NewsScrap/Open-Weight Models Aren’t Enough. We Need Truly Open Source AI Models for Scienc.md OK
+- 17:36 [scout] https://hai.stanford.edu/policy/beyond-deepseek-chinas-diverse-open-weight-ai-ecosystem-and-its-policy-implications → raw/NewsScrap/Beyond DeepSeek China's Diverse Open-Weight AI Ecosystem and Its Policy Implicat.md OK
+- 17:36 [scout] https://www.techpolicy.press/open-washing-is-everywhere-in-ai-four-criteria-cut-through-it/ → raw/NewsScrap/‘Open-Washing’ Is Everywhere in AI. Four Criteria Cut Through It.md OK
+- 17:36 [scout] https://oecd.ai/en/wonk/balancing-innovation-transparency-and-risk-in-open-weight-models → raw/NewsScrap/AI openness Balancing innovation, transparency and risk in open-weight models.md OK
+- 17:36 [scout] https://opensource.org/blog/ensuring-open-source-ai-thrives-under-the-eus-new-ai-rules → raw/NewsScrap/Ensuring Open Source AI thrives under the EU’s new AI rules.md OK
+- 17:36 [scout] https://huggingface.co/blog/yjernite/eu-act-os-guideai → raw/NewsScrap/What Open-Source Developers Need to Know about the EU AI Act's Rules for GPAI Mo.md OK
+- 17:36 [scout] https://blog.mozilla.org/netpolicy/2024/08/19/mozilla-eleutherai-and-hugging-face-provide-comments-on-californias-sb-1047/ → raw/NewsScrap/Mozilla, EleutherAI, and Hugging Face Provide Comments on California’s SB 1047 –.md OK
+- 17:36 [scout] https://ethz.ch/en/news-and-events/eth-news/news/2025/09/press-release-apertus-a-fully-open-transparent-multilingual-language-model.html → raw/NewsScrap/Apertus a fully open, transparent, multilingual language model.md OK
+- 17:36 [scout] https://mistral.ai/news/mistral-small-3/ → raw/NewsScrap/Mistral Small 3 Mistral AI.md OK
