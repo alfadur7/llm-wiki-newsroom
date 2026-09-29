@@ -3,7 +3,7 @@ title: "Stefano Maffulli"
 type: entity
 kind: person
 tags: [OpenSourceInitiative, open-source-ai, osaid, person]
-sources: [osi-meta-llama-2-license-not-open-source, what-does-open-source-ai-mean, osi-readies-controversial-osaid, techcrunch-osaid-official-definition, societal-impact-open-foundation-models, joint-statement-ai-safety-openness]
+sources: [osi-meta-llama-2-license-not-open-source, what-does-open-source-ai-mean, osi-readies-controversial-osaid, techcrunch-osaid-official-definition, societal-impact-open-foundation-models, joint-statement-ai-safety-openness, euronews-meta-open-source-ai-not-all-it-seems, infoworld-osi-unveils-osaid-1-0, open-weights-not-open-source-label-dispute, tech-industry-open-source-ai-definition-problem]
 last_updated: 2026-09-23
 ---
 

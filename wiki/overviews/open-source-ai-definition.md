@@ -97,36 +97,33 @@ Critics turn the [[OpenWashing|open-washing]] charge back on the definition. The
 - [[OpenSourceInitiative]]
 - [[FreeSoftwareFoundation]]
 - [[Mozilla]]
-- [[StefanoMaffulli]]
+- [[MistralAI]]
 
-**Concepts** (6)
+**Concepts** (3)
 - [[OpenSourceAI]]
 - [[TrainingData]]
-- [[OpenWashing]]
-- [[EUAIAct]]
-- [[OpenSourceDefinition]]
 - [[ModelOpennessFramework]]
 <!-- AUTO:MEMBERS END -->
 
 <!-- AUTO:SOURCES BEGIN -->
 ## Sources
 
-25 total — see [Open-Source AI Definition catalog](../sources/_catalog-open-source-ai-definition.md).
+32 total — see [Open-Source AI Definition catalog](../sources/_catalog-open-source-ai-definition.md).
 
 Top 15 by weight:
-- [[osi-readies-controversial-osaid]] _(w=0.88)_
-- [[case-against-osaid]] _(w=0.83)_
-- [[mozilla-celebrates-osaid]] _(w=0.83)_
+- [[debian-ai-gr-withdrawn]] _(w=0.75)_
 - [[fsf-free-ml-application-criteria]] _(w=0.75)_
-- [[osi-meta-llama-license-still-not-open-source]] _(w=0.71)_
-- [[sfc-osaid-erodes-open-source]] _(w=0.71)_
-- [[osi-meta-llama-2-license-not-open-source]] _(w=0.71)_
-- [[what-does-open-source-ai-mean]] _(w=0.70)_
-- [[debian-ai-models-dfsg]] _(w=0.67)_
-- [[open-future-osaid-step-forward]] _(w=0.67)_
-- [[techcrunch-osaid-official-definition]] _(w=0.67)_
+- [[case-against-osaid]] _(w=0.67)_
+- [[mozilla-celebrates-osaid]] _(w=0.67)_
+- [[mistral-ai-non-production-license]] _(w=0.67)_
+- [[osi-readies-controversial-osaid]] _(w=0.62)_
 - [[osi-open-weights-good-open-source-better]] _(w=0.60)_
-- [[osaid-take-it-or-leave-it]] _(w=0.60)_
-- [[osi-open-source-ai-definition]] _(w=0.57)_
+- [[joint-statement-ai-safety-openness]] _(w=0.57)_
 - [[openmdw-1-1-nvidia-adoption]] _(w=0.50)_
+- [[debian-ai-models-dfsg]] _(w=0.50)_
+- [[hello-olmo-truly-open-llm]] _(w=0.50)_
+- [[infoworld-osi-unveils-osaid-1-0]] _(w=0.44)_
+- [[techcrunch-osaid-official-definition]] _(w=0.44)_
+- [[lwn-openmdw-license-review]] _(w=0.43)_
+- [[open-source-ai-models-how-open]] _(w=0.43)_
 <!-- AUTO:SOURCES END -->

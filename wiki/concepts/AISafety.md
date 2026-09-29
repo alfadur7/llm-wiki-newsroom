@@ -2,7 +2,7 @@
 title: "AI Safety"
 type: concept
 tags: [ai-safety, open-weights, misuse-risk, safeguards, policy]
-sources: [anthropic-position-open-weights-models, joint-statement-ai-safety-openness, llama-2-meta-microsoft, ntia-open-model-weights-report, open-source-ai-path-forward, open-source-ai-uniquely-dangerous, open-weight-models-frontier-safety-gap, open-weights-american-ai-leadership, rethinking-open-source-generative-ai, senators-question-meta-llama-leak, societal-impact-open-foundation-models]
+sources: [anthropic-position-open-weights-models, joint-statement-ai-safety-openness, llama-2-meta-microsoft, ntia-open-model-weights-report, open-source-ai-path-forward, open-source-ai-uniquely-dangerous, open-weight-models-frontier-safety-gap, open-weights-american-ai-leadership, rethinking-open-source-generative-ai, senators-question-meta-llama-leak, societal-impact-open-foundation-models, ai-openness-oecd-gpai-open-weight-models, anthropic-distillation-campaigns-alibaba-moonshot, beyond-deepseek-china-open-weight-ecosystem, eu-ai-act-gpai-guide-open-source-developers, infoworld-osi-unveils-osaid-1-0, knives-out-open-weight-ai-models, meta-muse-glimmer-apache-2-0, mozilla-eleutherai-hf-sb-1047-letter, open-source-ai-llm-access-debate, open-weight-diplomacy-digital-silk-road, openai-hack-open-source-ai-fight, secrets-of-deepseek-r1-landmark-paper, true-open-source-ai-selective-transparency, zuckerberg-intensified-battle-ai-future, zuckerberg-superintelligence-not-all-open-source]
 last_updated: 2026-09-23
 ---
 

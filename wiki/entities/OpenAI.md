@@ -3,7 +3,7 @@ title: "OpenAI"
 type: entity
 kind: org
 tags: [OpenAI, open-weights, open-source-ai, ai-safety, licensing]
-sources: [welcome-gpt-oss-openai, open-source-ai-uniquely-dangerous, open-future-osaid-step-forward, osaid-take-it-or-leave-it, rethinking-open-source-generative-ai, senators-question-meta-llama-leak, open-weights-american-ai-leadership, open-weight-models-frontier-safety-gap, deepseek-r1-release]
+sources: [welcome-gpt-oss-openai, open-source-ai-uniquely-dangerous, open-future-osaid-step-forward, osaid-take-it-or-leave-it, rethinking-open-source-generative-ai, senators-question-meta-llama-leak, open-weights-american-ai-leadership, open-weight-models-frontier-safety-gap, deepseek-r1-release, ai-openness-oecd-gpai-open-weight-models, anthropic-distillation-campaigns-alibaba-moonshot, beyond-deepseek-china-open-weight-ecosystem, eleutherai-common-pile-dataset, eu-ai-act-gpai-guide-open-source-developers, gpt-oss-challenges-meta-open-weight, knives-out-open-weight-ai-models, llama-chatgpt-not-open-source, meta-muse-glimmer-apache-2-0, mistral-small-3, open-source-ai-llm-access-debate, openai-deepseek-free-riding-distillation, openai-hack-open-source-ai-fight, secrets-of-deepseek-r1-landmark-paper, tech-industry-open-source-ai-definition-problem, true-open-source-ai-selective-transparency, whats-next-chinese-open-source-ai, zuckerberg-intensified-battle-ai-future, zuckerberg-superintelligence-not-all-open-source]
 last_updated: 2026-09-23
 ---
 

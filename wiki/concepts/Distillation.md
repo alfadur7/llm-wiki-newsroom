@@ -2,7 +2,7 @@
 title: "Distillation"
 type: concept
 tags: [distillation, open-weights, ai-policy, model-training]
-sources: [open-weights-american-ai-leadership, deepseek-r1-release, open-source-ai-path-forward, anthropic-position-open-weights-models]
+sources: [open-weights-american-ai-leadership, deepseek-r1-release, open-source-ai-path-forward, anthropic-position-open-weights-models, anthropic-distillation-campaigns-alibaba-moonshot, knives-out-open-weight-ai-models, meta-muse-glimmer-apache-2-0, open-model-licenses-concerning-restrictions, openai-deepseek-free-riding-distillation, secrets-of-deepseek-r1-landmark-paper, whats-next-chinese-open-source-ai]
 last_updated: 2026-09-23
 ---
 

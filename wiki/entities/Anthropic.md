@@ -3,7 +3,7 @@ title: "Anthropic"
 type: entity
 kind: org
 tags: [Anthropic, open-weights, ai-safety, policy]
-sources: [anthropic-position-open-weights-models, open-weight-models-frontier-safety-gap, senators-question-meta-llama-leak, open-weights-american-ai-leadership]
+sources: [anthropic-position-open-weights-models, open-weight-models-frontier-safety-gap, senators-question-meta-llama-leak, open-weights-american-ai-leadership, anthropic-distillation-campaigns-alibaba-moonshot, open-weights-not-enough-open-source-science, openai-hack-open-source-ai-fight, whats-next-chinese-open-source-ai, zuckerberg-intensified-battle-ai-future]
 last_updated: 2026-09-23
 ---
 

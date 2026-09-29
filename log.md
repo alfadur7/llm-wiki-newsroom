@@ -754,3 +754,49 @@ would enforce it; it comes back only if spelling drift recurs on three or more p
 paired with a check. The cross-assigned-claim rule waits for a second cross-assigned
 claim, and the two craft rules on schema vocabulary and one-source-one-name go to a
 measured batch of their own.
+
+## [2026-09-28] ingest | thirty-two more sources, and a measurement that came back null
+
+The external judge model (Jev) measurement on the thirty-four source pages came back
+short of its preregistered rule: six defective pages against the twelve required, and
+a judge AUC of 0.685 whose lower bound fell to 0.38. An after-the-fact look found the
+signal sitting in the four pages written by the older pipeline — three of the six
+defective pages, ranked first, fourth and sixth — with the other thirty scoring 0.43.
+The rule said to expand, so an amendment was written first: the primary analysis
+covers only pages written by the current pipeline, the original four are reported
+apart, and a length-stratified analysis stops length or cohort from passing as a
+defect signal.
+
+Thirty-two sources were then scouted by topic and shape only, favouring reporting
+that quotes three or more parties. All thirty-two fetched; the IEEE Spectrum page
+again came back as its header while reporting success, and its body was re-extracted
+from the same HTML with the frontmatter byte-identical — the second time for that
+site, so the fetcher gap is now a recurrence. Six stubs were created with operator
+approval after a mention count (MarkZuckerberg, LinuxFoundation, Ai2, MoonshotAI,
+EleutherAI; OpenMDW). The Desk found 34 defects in them, two high — a delegation to a
+hub that did not hold the content, and a license critique carried without the
+subject's recorded replies — and all were fixed. The stubs were wired into the new
+source pages only. The thirty-four pages already labeled stayed byte-identical to
+their freeze, which leaves two of them failing G2 on a plain-text "Ai2" claimant, inside
+the lint's allowance, until they are repaired.
+
+**The L2-1 Desk pass was withheld again**, and the thirty-two new pages went through
+the same blind two-labeler protocol, with a third reviewer on the two disagreements.
+Among the sixty-two pages written by the current pipeline, four are defective (6.5%)
+and the judge's AUC is 0.491, interval 0.20–0.79; the sub-trigger scored 0.547 and page
+length 0.358. The four defective pages ranked 14th, 16th, 41st and 57th. The round-one
+signal belonged to the old cohort. The rule's literal branch — expand again — was not
+taken: at a 6.5% rate, twelve defective pages takes about 190 pages, which a further
+twenty-five sources cannot supply.
+
+The labels also say what the base rate is made of. Every one of the sixty-six pages
+carries at least one defect and twenty-five of the thirty-two newest carry a medium
+one, but of the 330 defect reports on those thirty-two pages two are high. All five
+labeler disagreements were over the severity of a defect both had found. The judge
+scorer stays local and uncommitted; the next step is to run the L2-1 Desk on every
+source page, beginning with the withheld reviews.
+
+Deferred, so `lint.py` exits 1 until the Reground commit: the build now finds four
+clusters, two of them unlabeled (new cluster slugs are operator-gated), the root
+overview is missing the new clusters, the contradiction aggregate declares 23 claims
+against 51, and the theme mapping has to take the new claims.

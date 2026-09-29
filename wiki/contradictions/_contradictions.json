@@ -18,6 +18,24 @@
     "evidence_strength": 0.35
   },
   {
+    "id": "9f692a03",
+    "source": "sources/debian-ai-gr-withdrawn.md",
+    "claim": "[[OpenSourceAI]] — Zhou's proposal would deny DFSG status to models without training data, which the OSAID admits as open-source AI",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.32
+  },
+  {
+    "id": "751df93e",
+    "source": "sources/debian-ai-gr-withdrawn.md",
+    "claim": "[[debian-ai-models-dfsg|Debian Debates AI Models and the DFSG]] — the earlier LWN report forecast the GR would likely pass; this report records its withdrawal before a vote",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.3
+  },
+  {
     "id": "e58ac91a",
     "source": "sources/debian-ai-models-dfsg.md",
     "claim": "[[OpenSourceAI]] — the GR would deny free-software status to models without training data, which the OSAID admits as open-source AI",
@@ -27,6 +45,87 @@
     "evidence_strength": 0.36
   },
   {
+    "id": "ef6566ca",
+    "source": "sources/eleutherai-common-pile-dataset.md",
+    "claim": "[[open-future-osaid-step-forward|Open Future on the OSAID]] — Open Future argues open resources lack the volume and diversity to train large foundation models, while EleutherAI claims models trained on openly licensed text perform on par with those trained on copyrighted data",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.27
+  },
+  {
+    "id": "fd3bf4ff",
+    "source": "sources/eu-ai-act-gpai-guide-open-source-developers.md",
+    "claim": "[[osi-eu-code-of-practice-open-source|OSI on the EU Code of Practice]] — the guidelines, as the guide reads them, let proportionate safety-related use restrictions sit inside a free and open-source license, while the OSI argues use restrictions conflict with rule 6 of the Open Source Definition",
+    "status": "open",
+    "type": "real",
+    "type_score": 0.8,
+    "evidence_strength": 0.39
+  },
+  {
+    "id": "0238bf84",
+    "source": "sources/euronews-meta-open-source-ai-not-all-it-seems.md",
+    "claim": "[[Meta]] — the OSI says Meta's Llama terms of use and distribution are incompatible with open source, against Meta's own \"open source\" label",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.37
+  },
+  {
+    "id": "480ac9db",
+    "source": "sources/euronews-meta-open-source-ai-not-all-it-seems.md",
+    "claim": "[[open-source-ai-path-forward|Open Source AI Is the Path Forward]] — Zuckerberg's letter calls Llama open source AI, while the OSI rates Llama 3.1 only partially open",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.29
+  },
+  {
+    "id": "03237af1",
+    "source": "sources/gpt-oss-challenges-meta-open-weight.md",
+    "claim": "[[OpenSourceInitiative]] — Brendan Ashworth argues that holding GPT-OSS to the full open-source standard sets the bar too high",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.37
+  },
+  {
+    "id": "3e0a49ae",
+    "source": "sources/gpt-oss-challenges-meta-open-weight.md",
+    "claim": "[[welcome-gpt-oss-openai|Welcome GPT OSS]] — the Hugging Face post headlines the family as \"open-source,\" while this article states it fails the OSAID's requirements",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.3
+  },
+  {
+    "id": "bc483ca0",
+    "source": "sources/infoworld-osi-unveils-osaid-1-0.md",
+    "claim": "[[osi-open-source-ai-definition|The Open Source AI Definition 1.0]] — Brian Jackson argues the definition leaves copyright-protected training data unaddressed",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.41
+  },
+  {
+    "id": "bcb48346",
+    "source": "sources/knives-out-open-weight-ai-models.md",
+    "claim": "[[anthropic-position-open-weights-models|Anthropic's position on open-weights models]] — Amodei argues distillation brings the Chinese frontier within months of the US, while Uren, Ball, and Lambert argue distillation does not explain Kimi K3's performance",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.44
+  },
+  {
+    "id": "cdb90a3d",
+    "source": "sources/knives-out-open-weight-ai-models.md",
+    "claim": "[[open-weight-models-frontier-safety-gap|Open-weight models and the safety gap]] — Papadatos calls the defensive benefit of open weights overstated, while Uren cites the Hugging Face case as proof of their cybersecurity value",
+    "status": "open",
+    "type": "real",
+    "type_score": 0.6,
+    "evidence_strength": 0.44
+  },
+  {
     "id": "af196221",
     "source": "sources/llama-2-meta-microsoft.md",
     "claim": "[[osi-open-source-ai-definition|The Open Source AI Definition 1.0]] — Meta calls Llama 2 open source, while the OSI judged Llama 2 non-compliant with the OSAID",
@@ -34,6 +133,24 @@
     "type": "soft",
     "type_score": 0.0,
     "evidence_strength": 0.53
+  },
+  {
+    "id": "bd3b1fef",
+    "source": "sources/llama-chatgpt-not-open-source.md",
+    "claim": "[[Meta]] — Dingemanse calls Meta's \"open source\" label for Llama 2 \"positively misleading,\" and the team ranks Llama 2 second worst for openness",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.4
+  },
+  {
+    "id": "49beed14",
+    "source": "sources/lwn-openmdw-license-review.md",
+    "claim": "[[openmdw-1-1-nvidia-adoption|Linux Foundation OpenMDW-1.1 release]] — the Linux Foundation presents OpenMDW as a clear, permissive framework, while OSI reviewers call its grant fuzzy, its termination clause overbroad, and its rights-clearing duty impossible",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.31
   },
   {
     "id": "db4e440b",
@@ -54,6 +171,42 @@
     "evidence_strength": 0.32
   },
   {
+    "id": "20d43732",
+    "source": "sources/open-model-licenses-concerning-restrictions.md",
+    "claim": "[[Meta]] — Florian Brand says the Llama license cannot reasonably be called open source, despite what tech executives claim",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.31
+  },
+  {
+    "id": "f043d021",
+    "source": "sources/open-secret-of-open-washing.md",
+    "claim": "[[Meta]] — rejects the claim that Llama 3 is open source, citing its license's litigation and branding clauses",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.26
+  },
+  {
+    "id": "63a1b2ef",
+    "source": "sources/open-source-ai-llm-access-debate.md",
+    "claim": "[[OpenAI]] — Falcon says OpenAI's closed GPT-4 release divorced it from the open-source community, and Pineau does not accept safety as a reason to keep models closed without transparency",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.33
+  },
+  {
+    "id": "566d72b2",
+    "source": "sources/open-source-ai-llm-access-debate.md",
+    "claim": "[[open-source-ai-uniquely-dangerous|Open-Source AI Is Uniquely Dangerous]] — Harris calls for pausing unsecured releases, while Willison leans toward open models and Biderman calls open-source research essential",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.25
+  },
+  {
     "id": "fb98dd8f",
     "source": "sources/open-source-ai-path-forward.md",
     "claim": "[[osi-meta-llama-2-license-not-open-source|OSI: Meta's LLaMa License Is Not Open Source]] — Meta again calls Llama \"open source,\" the label OSI said Meta should correct for Llama 2",
@@ -72,6 +225,15 @@
     "evidence_strength": 0.19
   },
   {
+    "id": "6ea90b63",
+    "source": "sources/open-weight-diplomacy-digital-silk-road.md",
+    "claim": "[[open-weights-american-ai-leadership|Open Weights and American AI Leadership]] — the letter says open weights help organizations avoid lock-in and keep control, while Sharma argues open-weight models are not inherently sovereignty-enhancing because dependency builds through the stack and the next release",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.43
+  },
+  {
     "id": "4511cf29",
     "source": "sources/open-weight-models-frontier-safety-gap.md",
     "claim": "[[open-weights-american-ai-leadership|Open Weights and American AI Leadership]] — the letter argues defenders need open models comparable to attackers', while Papadatos calls that defensive benefit overstated",
@@ -81,6 +243,42 @@
     "evidence_strength": 0.39
   },
   {
+    "id": "10e8ff50",
+    "source": "sources/open-weights-not-open-source-label-dispute.md",
+    "claim": "[[OpenSourceAI]] — Perens, Kuhn, Fontana and Antiga oppose the OSI's Open Source AI Definition, with Kuhn and Fontana calling for its repeal",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.39
+  },
+  {
+    "id": "be20f3e0",
+    "source": "sources/open-weights-not-open-source-label-dispute.md",
+    "claim": "[[lwn-openmdw-license-review|LWN on the OpenMDW license review]] — Maffulli attributes the reviewers' objections to ideological bias, while LWN reports them as specific defects in the license text",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.38
+  },
+  {
+    "id": "03b5b625",
+    "source": "sources/openai-deepseek-free-riding-distillation.md",
+    "claim": "[[DeepSeek]] — OpenAI's memo to a congressional committee formally accuses DeepSeek of distilling U.S. frontier models to free-ride on their capabilities",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.4
+  },
+  {
+    "id": "aa0f13f8",
+    "source": "sources/openai-hack-open-source-ai-fight.md",
+    "claim": "[[open-weight-models-frontier-safety-gap|Open-weight models and the safety gap]] — Nvidia calls the Hugging Face case proof that defenders need self-hosted AI, while Papadatos calls that defensive benefit overstated",
+    "status": "open",
+    "type": "real",
+    "type_score": 0.6,
+    "evidence_strength": 0.47
+  },
+  {
     "id": "74636332",
     "source": "sources/osaid-take-it-or-leave-it.md",
     "claim": "[[OpenSourceAI]] — argues a tiered notion of openness may be preferable to the OSAID's binary \"take it or leave it\" test",
@@ -88,6 +286,15 @@
     "type": "soft",
     "type_score": 0.0,
     "evidence_strength": 0.26
+  },
+  {
+    "id": "b624cabd",
+    "source": "sources/osi-eu-code-of-practice-open-source.md",
+    "claim": "[[Meta]] — the OSI calls Llama an example of openwashing and argues use restrictions of the acceptable-use-policy kind conflict with the Open Source Definition",
+    "status": "open",
+    "type": "real",
+    "type_score": 0.8,
+    "evidence_strength": 0.36
   },
   {
     "id": "fb1a019e",
@@ -144,6 +351,15 @@
     "evidence_strength": 0.26
   },
   {
+    "id": "45dc7990",
+    "source": "sources/secrets-of-deepseek-r1-landmark-paper.md",
+    "claim": "[[OpenAI]] — DeepSeek rebuts reported suspicions by OpenAI researchers that R1 was trained on OpenAI model outputs",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.44
+  },
+  {
     "id": "2c9da7fd",
     "source": "sources/senators-question-meta-llama-leak.md",
     "claim": "[[open-source-ai-uniquely-dangerous|Open-Source AI Is Uniquely Dangerous]] — Harris calls for pausing unsecured releases over spam and disinformation risks, while Manning judges LLaMA's release not an unacceptable risk and Prakash calls the spam concern a straw man",
@@ -171,6 +387,24 @@
     "evidence_strength": 0.36
   },
   {
+    "id": "24326a43",
+    "source": "sources/tech-industry-open-source-ai-definition-problem.md",
+    "claim": "[[Meta]] — reports that the Llama 2 license restricts use cases, which the Open Source Definition outlaws, despite Meta calling it open source",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.33
+  },
+  {
+    "id": "55748f24",
+    "source": "sources/tech-industry-open-source-ai-definition-problem.md",
+    "claim": "[[OpenSourceInitiative]] — Warso rejects the draft's treatment of ethics as \"out of scope\" as a myth",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.33
+  },
+  {
     "id": "8db8a2ff",
     "source": "sources/techcrunch-osaid-official-definition.md",
     "claim": "[[OpenSourceAI]] — Meta states it disagrees with OSI's new definition and defends its restrictive Llama license",
@@ -189,6 +423,15 @@
     "evidence_strength": 0.38
   },
   {
+    "id": "7bae0343",
+    "source": "sources/true-open-source-ai-selective-transparency.md",
+    "claim": "[[Meta]] — rebuts Meta's \"first frontier-level open-source AI model\" label for Llama 3.1 405B, since its source code and dataset stay closed",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.31
+  },
+  {
     "id": "1428e4bc",
     "source": "sources/what-does-open-source-ai-mean.md",
     "claim": "[[OpenSourceAI]] — Joseph Jacks argues there is no such thing as open-source AI, since open source was written for source code",
@@ -205,5 +448,14 @@
     "type": "soft",
     "type_score": 0.0,
     "evidence_strength": 0.39
+  },
+  {
+    "id": "86de04c6",
+    "source": "sources/zuckerberg-intensified-battle-ai-future.md",
+    "claim": "[[open-source-ai-path-forward|Open Source AI Is the Path Forward]] — Miotti and Chaudhry rebut the manifesto's safety and China arguments",
+    "status": "open",
+    "type": "soft",
+    "type_score": 0.0,
+    "evidence_strength": 0.33
   }
 ]

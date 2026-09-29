@@ -84,17 +84,14 @@ The **policy response** moved from a leak to talk of a ban. In 2023 [[senators-q
 <!-- AUTO:MEMBERS BEGIN -->
 ## Key Members (auto-extracted, top 15 by intra-cluster connectivity)
 
-**Entities** (6)
-- [[Meta]]
-- [[OpenAI]]
+**Entities** (4)
 - [[DeepSeek]]
-- [[HuggingFace]]
-- [[MistralAI]]
+- [[OpenAI]]
+- [[MoonshotAI]]
 - [[Anthropic]]
 
-**Concepts** (5)
+**Concepts** (4)
 - [[OpenWeights]]
-- [[ModelLicensing]]
 - [[FineTuning]]
 - [[Distillation]]
 - [[AISafety]]
@@ -103,22 +100,22 @@ The **policy response** moved from a leak to talk of a ban. In 2023 [[senators-q
 <!-- AUTO:SOURCES BEGIN -->
 ## Sources
 
-27 total — see [Open Weights catalog](../sources/_catalog-open-weights.md).
+35 total — see [Open Weights catalog](../sources/_catalog-open-weights.md).
 
 Top 15 by weight:
+- [[anthropic-distillation-campaigns-alibaba-moonshot]] _(w=1.00)_
 - [[anthropic-position-open-weights-models]] _(w=1.00)_
-- [[llama-3-1-community-license]] _(w=1.00)_
-- [[societal-impact-open-foundation-models]] _(w=1.00)_
-- [[deepseek-r1-release]] _(w=0.86)_
-- [[llama-2-meta-microsoft]] _(w=0.83)_
-- [[open-source-ai-path-forward]] _(w=0.83)_
-- [[senators-question-meta-llama-leak]] _(w=0.83)_
+- [[openai-deepseek-free-riding-distillation]] _(w=1.00)_
+- [[knives-out-open-weight-ai-models]] _(w=0.83)_
+- [[beyond-deepseek-china-open-weight-ecosystem]] _(w=0.80)_
+- [[deepseek-r1-release]] _(w=0.71)_
 - [[open-weight-models-frontier-safety-gap]] _(w=0.71)_
-- [[open-weights-american-ai-leadership]] _(w=0.71)_
+- [[secrets-of-deepseek-r1-landmark-paper]] _(w=0.71)_
+- [[ai-openness-oecd-gpai-open-weight-models]] _(w=0.71)_
+- [[whats-next-chinese-open-source-ai]] _(w=0.70)_
+- [[open-weight-diplomacy-digital-silk-road]] _(w=0.67)_
 - [[ntia-open-model-weights-report]] _(w=0.67)_
-- [[mistral-ai-non-production-license]] _(w=0.67)_
-- [[welcome-gpt-oss-openai]] _(w=0.62)_
-- [[joint-statement-ai-safety-openness]] _(w=0.57)_
-- [[open-source-ai-models-how-open]] _(w=0.57)_
-- [[red-hat-open-source-ai-point-of-view]] _(w=0.57)_
+- [[open-source-ai-path-forward]] _(w=0.67)_
+- [[openai-hack-open-source-ai-fight]] _(w=0.67)_
+- [[societal-impact-open-foundation-models]] _(w=0.67)_
 <!-- AUTO:SOURCES END -->

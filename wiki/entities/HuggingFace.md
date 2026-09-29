@@ -3,7 +3,7 @@ title: "Hugging Face"
 type: entity
 kind: org
 tags: [Hugging Face, open-weights, model-distribution]
-sources: [hello-olmo-truly-open-llm, joint-statement-ai-safety-openness, llama-2-meta-microsoft, open-source-ai-uniquely-dangerous, open-weight-models-frontier-safety-gap, open-weights-american-ai-leadership, welcome-gpt-oss-openai]
+sources: [hello-olmo-truly-open-llm, joint-statement-ai-safety-openness, llama-2-meta-microsoft, open-source-ai-uniquely-dangerous, open-weight-models-frontier-safety-gap, open-weights-american-ai-leadership, welcome-gpt-oss-openai, apertus-fully-open-multilingual-llm, eleutherai-common-pile-dataset, eu-ai-act-gpai-guide-open-source-developers, gpt-oss-challenges-meta-open-weight, knives-out-open-weight-ai-models, meta-muse-glimmer-apache-2-0, mistral-small-3, mozilla-eleutherai-hf-sb-1047-letter, open-model-licenses-concerning-restrictions, open-secret-of-open-washing, open-source-ai-llm-access-debate, open-weights-not-open-source-label-dispute, openai-hack-open-source-ai-fight, secrets-of-deepseek-r1-landmark-paper, tech-industry-open-source-ai-definition-problem, whats-next-chinese-open-source-ai]
 last_updated: 2026-09-23
 ---
 

@@ -4,29 +4,36 @@ This file is auto-generated and updated.
 
 ## Overview
 - [Overview](overview.md) — wiki-wide view along the landscape axis
-- [Contradiction Analysis](contradiction.md) — wiki-wide view along the conflict axis (23 contradictions, drill down by theme)
+- [Contradiction Analysis](contradiction.md) — wiki-wide view along the conflict axis (51 contradictions, drill down by theme)
 
-## Sources (34)
+## Sources (66)
 For the full source list see the [source catalog](sources/_catalog.md), or browse by cluster:
 
 | Cluster | Count | Catalog |
 |----------|------|---------|
-| Open Weights | 27 | [Open Weights catalog](sources/_catalog-open-weights.md) |
-| Open-Source AI Definition | 25 | [Open-Source AI Definition catalog](sources/_catalog-open-source-ai-definition.md) |
+| Open Weights | 35 | [Open Weights catalog](sources/_catalog-open-weights.md) |
+| Open-Source AI Definition | 32 | [Open-Source AI Definition catalog](sources/_catalog-open-source-ai-definition.md) |
+| open-source-ai-licensing | 29 | [open-source-ai-licensing catalog](sources/_catalog-open-source-ai-licensing.md) |
+| open-source-ai-open-weights | 1 | [open-source-ai-open-weights catalog](sources/_catalog-open-source-ai-open-weights.md) |
 
-## Entities (10)
+## Entities (15)
+- [Ai2 (Allen Institute for AI)](entities/Ai2.md) — Ai2, the Allen Institute for AI, is the research institute behind the OLMo language models.
 - [Anthropic](entities/Anthropic.md) — Anthropic develops the Claude models.
 - [DeepSeek](entities/DeepSeek.md) — DeepSeek is the AI company whose R1 model, released in January 2025 under the permissive MIT license, is a prominent OpenWeights example.
+- [EleutherAI](entities/EleutherAI.md) — EleutherAI, whose releases include the GPT-NeoX model and The Pile and Common Pile training datasets, released the Common Pile v0.1 in June 2025 (TechCrunch, June 6, 2025), an 8-terabyte training dataset of openly licensed and public-domain text that TechCrunch reports was built over about two years with Poolside, Hugging Face, other startups and academic institutions (eleutherai-common-pile-dataset).
 - [Free Software Foundation](entities/FreeSoftwareFoundation.md) — The Free Software Foundation (FSF), founded by Richard Stallman, is the free-software body developing its own criteria for machine-learning applications as a stricter alternative to the OpenSourceInitiative's OSAID.
 - [Hugging Face](entities/HuggingFace.md) — Hugging Face appears in this wiki's sources mainly as a venue where openly released models are distributed.
+- [Linux Foundation](entities/LinuxFoundation.md) — The Linux Foundation, whose CEO is Jim Zemlin, appears in these sources as the organization behind two AI-openness instruments — the OpenMDW model license and the tiered ModelOpennessFramework.
+- [Mark Zuckerberg](entities/MarkZuckerberg.md) — Mark Zuckerberg is the co-founder and CEO of Meta, and in the sources collected here, dated 2023 to 2026, he appears mainly as the author of Meta's public case for calling its AI models open source.
 - [Meta](entities/Meta.md) — Meta is the technology company whose Llama model family is the most-cited example in the OpenWashing debate.
 - [Mistral AI](entities/MistralAI.md) — Mistral AI is an AI model developer that on May 29, 2024 announced the Mistral AI Non-Production License (MNPL), a model license that, in the company's words, allows its technology to be used "for non-commercial purposes and to support research work." Codestral was the first model released under the MNPL.
+- [Moonshot AI](entities/MoonshotAI.md) — Moonshot AI is the maker of the Kimi models, cited in this wiki as one of the Chinese developers of open-weight models.
 - [Mozilla](entities/Mozilla.md) — Mozilla is the nonprofit-backed technology organization that publicly endorsed the OpenSourceInitiative's Open Source AI Definition as "an important step forward." Mozilla frames openness and transparency as critical ingredients for AI safety and accountability, and its AI strategy lead Ayah Bdeir defended the OSAID's data-information requirement as going further than most proprietary or ostensibly open models do today.
 - [Open Source Initiative](entities/OpenSourceInitiative.md) — The Open Source Initiative (OSI) is the nonprofit, formed in 1998, that has stewarded the Open Source Definition for software and, in 2024-10, released the Open Source AI Definition (OSAID) 1.0.
 - [OpenAI](entities/OpenAI.md) — OpenAI is the developer of the GPT model line.
 - [Stefano Maffulli](entities/StefanoMaffulli.md) — Stefano Maffulli is the OpenSourceInitiative (OSI) executive who led the OSI's Open Source AI Definition (OSAID) effort in the sources collected here; the dated sources run 2023–2024.
 
-## Concepts (11)
+## Concepts (12)
 - [AI Safety](concepts/AISafety.md) — In this wiki, AI safety appears as the axis of a dispute over whether releasing model weights openly makes AI safer or more dangerous.
 - [Distillation](concepts/Distillation.md) — Distillation is described by the signatories of the 2026 open weights letter as training one model on another model's outputs, a technique they call widely used for model improvement, evaluation, and validation.
 - [EU AI Act](concepts/EUAIAct.md) — The EU AI Act is the European Union regulation whose obligations for providers of general-purpose AI (GPAI) models enter into application on 2 August 2025, according to the European Commission, with the Commission's enforcement powers following from 2 August 2026 and a 2 August 2027 deadline for models already on the market before August 2025.
@@ -37,6 +44,7 @@ For the full source list see the [source catalog](sources/_catalog.md), or brows
 - [Open Source Definition](concepts/OpenSourceDefinition.md) — The Open Source Definition (OSD) is the software-license standard stewarded by the OpenSourceInitiative (OSI).
 - [Open Weights](concepts/OpenWeights.md) — Open weights is a release model in which an AI provider publishes the trained weights and parameters needed to run a model, but typically withholds the training data, detailed data information, and training algorithms.
 - [Open-Washing](concepts/OpenWashing.md) — Open-washing is the practice of promoting an AI model as "open source" while releasing only some of its components or attaching restrictive license terms, so the model gains the open-source brand without contributing to the commons.
+- [OpenMDW](concepts/OpenMDW.md) — OpenMDW (Open Model, Data and Weights) is a permissive license for AI model distributions published by the Linux Foundation, which says it launched the license in 2025 together with the PyTorch Foundation and released version 1.1 on 2026-05-28 (openmdw-1-1-nvidia-adoption).
 - [Training Data](concepts/TrainingData.md) — Training data is the corpus a model learns from, and whether it must be released is the central dispute in the OpenSourceAI debate.
 
 ## Analyses (1)

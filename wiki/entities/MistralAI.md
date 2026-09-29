@@ -3,7 +3,7 @@ title: "Mistral AI"
 type: entity
 kind: org
 tags: [Mistral AI, licensing, open-weights, open-source-ai]
-sources: [mistral-ai-non-production-license, techcrunch-osaid-official-definition, open-future-osaid-step-forward, rethinking-open-source-generative-ai, open-source-ai-uniquely-dangerous, joint-statement-ai-safety-openness, open-weights-american-ai-leadership]
+sources: [mistral-ai-non-production-license, techcrunch-osaid-official-definition, open-future-osaid-step-forward, rethinking-open-source-generative-ai, open-source-ai-uniquely-dangerous, joint-statement-ai-safety-openness, open-weights-american-ai-leadership, eu-ai-act-gpai-guide-open-source-developers, mistral-small-3]
 last_updated: 2026-09-23
 ---
 

@@ -2,7 +2,7 @@
 title: "Open Source Definition"
 type: concept
 tags: [OSD, open-source, licensing, OSI, DFSG]
-sources: [osi-meta-llama-2-license-not-open-source, osi-meta-llama-license-still-not-open-source, sfc-osaid-erodes-open-source, debian-ai-models-dfsg, what-does-open-source-ai-mean, osi-readies-controversial-osaid, open-future-osaid-step-forward, case-against-osaid]
+sources: [osi-meta-llama-2-license-not-open-source, osi-meta-llama-license-still-not-open-source, sfc-osaid-erodes-open-source, debian-ai-models-dfsg, what-does-open-source-ai-mean, osi-readies-controversial-osaid, open-future-osaid-step-forward, case-against-osaid, euronews-meta-open-source-ai-not-all-it-seems, infoworld-osi-unveils-osaid-1-0, lwn-openmdw-license-review, open-secret-of-open-washing, open-weights-not-open-source-label-dispute, osi-eu-code-of-practice-open-source, tech-industry-open-source-ai-definition-problem]
 last_updated: 2026-09-23
 ---
 

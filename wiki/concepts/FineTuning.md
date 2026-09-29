@@ -2,7 +2,7 @@
 title: "Fine-Tuning"
 type: concept
 tags: [fine-tuning, open-weights, model-weights, adaptation]
-sources: [open-source-ai-models-how-open, deepseek-r1-release, eu-gpai-provider-guidelines, llama-2-meta-microsoft, llama-3-1-community-license, open-source-ai-path-forward, open-weight-models-frontier-safety-gap, osi-open-weights-good-open-source-better, osi-readies-controversial-osaid, red-hat-open-source-ai-point-of-view, rethinking-open-source-generative-ai, techcrunch-osaid-official-definition, welcome-gpt-oss-openai]
+sources: [open-source-ai-models-how-open, deepseek-r1-release, eu-gpai-provider-guidelines, llama-2-meta-microsoft, llama-3-1-community-license, open-source-ai-path-forward, open-weight-models-frontier-safety-gap, osi-open-weights-good-open-source-better, osi-readies-controversial-osaid, red-hat-open-source-ai-point-of-view, rethinking-open-source-generative-ai, techcrunch-osaid-official-definition, welcome-gpt-oss-openai, ai-openness-oecd-gpai-open-weight-models, anthropic-distillation-campaigns-alibaba-moonshot, eu-ai-act-gpai-guide-open-source-developers, gpt-oss-challenges-meta-open-weight, mistral-small-3, open-source-ai-llm-access-debate, open-washing-four-criteria, open-weights-not-open-source-label-dispute, tech-industry-open-source-ai-definition-problem, whats-next-chinese-open-source-ai]
 last_updated: 2026-06-26
 ---
 

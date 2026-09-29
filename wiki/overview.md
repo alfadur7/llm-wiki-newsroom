@@ -1,9 +1,9 @@
 # Overview
 
 <!-- AUTO:STATS BEGIN -->
-This wiki is a knowledge base comprising **34 source documents** (2023~2026), **10 entities**, **11 concepts**, **2 field overviews**, **1 analysis reports**, **0 associative trails**, and **0 timelines**.
+This wiki is a knowledge base comprising **66 source documents** (2023~2026), **15 entities**, **12 concepts**, **2 field overviews**, **1 analysis reports**, **0 associative trails**, and **0 timelines**.
 
-Sources are automatically classified into 2 topic clusters via Leiden topology clustering: **Open Weights(27)**, **Open-Source AI Definition(25)**. A single source may span multiple clusters (listed in every catalog where its weight is ≥0.3); for the full cluster list and members, see [[index]] or `graph/_clusters.json`.
+Sources are automatically classified into 4 topic clusters via Leiden topology clustering: **Open Weights(35)**, **open-source-ai-licensing(29)**, **Open-Source AI Definition(32)**, **open-source-ai-open-weights(1)**. A single source may span multiple clusters (listed in every catalog where its weight is ≥0.3); for the full cluster list and members, see [[index]] or `graph/_clusters.json`.
 <!-- AUTO:STATS END -->
 
 This wiki maps the argument over what "open source" should mean for AI models. At its center is the OSI ([[OpenSourceInitiative|Open Source Initiative]]), whose 2024 [[OpenSourceAI|Open Source AI Definition]] drew an endorsement from [[Mozilla]] and stricter rival tests from the [[FreeSoftwareFoundation|Free Software Foundation]]. Around it sit [[OpenWeights|open-weights]] releases such as [[Meta]]'s Llama, [[DeepSeek]]'s R1 and [[OpenAI]]'s gpt-oss, with the [[ModelLicensing|licenses]] they ship under and the [[OpenWashing|open-washing]] charges they draw. The [[EUAIAct|EU AI Act]] adds an exemption that gives the label a legal payoff.

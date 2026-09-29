@@ -2,7 +2,7 @@
 title: "Model Openness Framework"
 type: concept
 tags: [model-openness-framework, open-source-ai, OSAID, openness-tiers, linux-foundation]
-sources: [open-future-osaid-step-forward, osaid-take-it-or-leave-it, what-does-open-source-ai-mean]
+sources: [open-future-osaid-step-forward, osaid-take-it-or-leave-it, what-does-open-source-ai-mean, open-weights-not-enough-open-source-science]
 last_updated: 2026-09-23
 ---
 

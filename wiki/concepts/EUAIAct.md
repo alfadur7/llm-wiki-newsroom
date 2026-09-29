@@ -2,7 +2,7 @@
 title: "EU AI Act"
 type: concept
 tags: [ai-act, regulation, general-purpose-ai, open-source-ai, licensing]
-sources: [eu-gpai-provider-guidelines, open-future-osaid-step-forward, open-source-ai-uniquely-dangerous, osaid-take-it-or-leave-it, rethinking-open-source-generative-ai]
+sources: [eu-gpai-provider-guidelines, open-future-osaid-step-forward, open-source-ai-uniquely-dangerous, osaid-take-it-or-leave-it, rethinking-open-source-generative-ai, apertus-fully-open-multilingual-llm, eu-ai-act-gpai-guide-open-source-developers, open-secret-of-open-washing, osi-eu-code-of-practice-open-source, tech-industry-open-source-ai-definition-problem]
 last_updated: 2026-09-23
 ---
 

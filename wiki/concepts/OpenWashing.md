@@ -2,7 +2,7 @@
 title: "Open-Washing"
 type: concept
 tags: [open-washing, open-source-ai, licensing, transparency]
-sources: [mozilla-celebrates-osaid, osi-open-source-ai-definition, open-source-ai-models-how-open, case-against-osaid, open-future-osaid-step-forward, osaid-take-it-or-leave-it, osi-meta-llama-2-license-not-open-source, osi-meta-llama-license-still-not-open-source, rethinking-open-source-generative-ai, sfc-osaid-erodes-open-source, techcrunch-osaid-official-definition, welcome-gpt-oss-openai, what-does-open-source-ai-mean]
+sources: [mozilla-celebrates-osaid, osi-open-source-ai-definition, open-source-ai-models-how-open, case-against-osaid, open-future-osaid-step-forward, osaid-take-it-or-leave-it, osi-meta-llama-2-license-not-open-source, osi-meta-llama-license-still-not-open-source, rethinking-open-source-generative-ai, sfc-osaid-erodes-open-source, techcrunch-osaid-official-definition, welcome-gpt-oss-openai, what-does-open-source-ai-mean, euronews-meta-open-source-ai-not-all-it-seems, infoworld-osi-unveils-osaid-1-0, llama-chatgpt-not-open-source, open-model-licenses-concerning-restrictions, open-secret-of-open-washing, open-washing-four-criteria, open-weights-not-open-source-label-dispute, osi-eu-code-of-practice-open-source, tech-industry-open-source-ai-definition-problem, true-open-source-ai-selective-transparency]
 last_updated: 2026-06-26
 ---
 
