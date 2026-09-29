@@ -1,0 +1,30 @@
+{"page": "openai-deepseek-free-riding-distillation", "severity": "low", "lens": "bias\u00b7trust", "issue": "Summary hardens allegation, shifts subject"}
+{"page": "openai-deepseek-free-riding-distillation", "severity": "low", "lens": "bias\u00b7trust", "issue": "Shah framed as questioner"}
+{"page": "openai-deepseek-free-riding-distillation", "severity": "low", "lens": "fine readability", "issue": "US vs U.S."}
+{"page": "open-weight-diplomacy-digital-silk-road", "severity": "medium", "lens": "fine readability", "issue": "central events undated"}
+{"page": "open-weight-diplomacy-digital-silk-road", "severity": "low", "lens": "bias\u00b7trust", "issue": "'reportedly' graded [fact]"}
+{"page": "open-weight-diplomacy-digital-silk-road", "severity": "low", "lens": "bias\u00b7trust", "issue": "camp labels in narrator voice"}
+{"page": "open-weight-diplomacy-digital-silk-road", "severity": "low", "lens": "bias\u00b7trust", "issue": "'sovereign AI' self-label absorbed"}
+{"page": "open-weight-diplomacy-digital-silk-road", "severity": "medium", "lens": "information density", "issue": "eight-sentence summary stacked evidence"}
+{"page": "open-weight-diplomacy-digital-silk-road", "severity": "low", "lens": "information density", "issue": "42 claims transcript"}
+{"page": "open-weight-diplomacy-digital-silk-road", "severity": "low", "lens": "fine readability", "issue": "Entity List unglossed"}
+{"page": "open-weight-diplomacy-digital-silk-road", "severity": "low", "lens": "fine readability", "issue": "'welcome phase' coinage"}
+{"page": "open-weight-diplomacy-digital-silk-road", "severity": "low", "lens": "argument quality", "issue": "Stanford HAI cross-link implied"}
+{"page": "open-weight-diplomacy-digital-silk-road", "severity": "low", "lens": "fine readability", "issue": "composite dated events"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "medium", "lens": "argument quality", "issue": "Distillation/FineTuning connections dangling"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "bias\u00b7trust", "issue": "'approach' weakens 'match'"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "bias\u00b7trust", "issue": "MIT study routed through magazine"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "bias\u00b7trust", "issue": "CNBC attribution stretched"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "fine readability", "issue": "mixed/missing dates"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "fine readability", "issue": "Zhipu gloss dropped"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "fine readability", "issue": "Casado role missing"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "fine readability", "issue": "composite three labs"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "fine readability", "issue": "chained verb phrases"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "bias\u00b7trust", "issue": "voice asymmetry not surfaced"}
+{"page": "openai-hack-open-source-ai-fight", "severity": "medium", "lens": "argument quality", "issue": "'mistakenly' parenthetical dropped"}
+{"page": "openai-hack-open-source-ai-fight", "severity": "medium", "lens": "narrative flow", "issue": "weekday dates unresolved"}
+{"page": "openai-hack-open-source-ai-fight", "severity": "low", "lens": "fine readability", "issue": "bare surname Papadatos"}
+{"page": "openai-deepseek-free-riding-distillation", "reviewed": true, "defects": 3}
+{"page": "open-weight-diplomacy-digital-silk-road", "reviewed": true, "defects": 10}
+{"page": "whats-next-chinese-open-source-ai", "reviewed": true, "defects": 10}
+{"page": "openai-hack-open-source-ai-fight", "reviewed": true, "defects": 3}

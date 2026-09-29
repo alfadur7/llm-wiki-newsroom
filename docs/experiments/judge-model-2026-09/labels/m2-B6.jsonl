@@ -1,0 +1,26 @@
+{"page": "true-open-source-ai-selective-transparency", "severity": "low", "lens": "argument quality", "issue": "quote marks misplace 'open source'"}
+{"page": "true-open-source-ai-selective-transparency", "severity": "low", "lens": "fine readability", "issue": "LAION notation"}
+{"page": "true-open-source-ai-selective-transparency", "severity": "low", "lens": "information density", "issue": "five-sentence summary"}
+{"page": "open-weights-not-open-source-label-dispute", "severity": "low", "lens": "argument quality", "issue": "'most' quantifier added"}
+{"page": "open-weights-not-open-source-label-dispute", "severity": "low", "lens": "bias\u00b7trust", "issue": "'critique' vs 'attacks'"}
+{"page": "open-weights-not-open-source-label-dispute", "severity": "low", "lens": "argument quality", "issue": "Maffulli stake dropped"}
+{"page": "open-weights-not-open-source-label-dispute", "severity": "low", "lens": "argument quality", "issue": "grade inconsistency on quoted opinions"}
+{"page": "open-weights-not-open-source-label-dispute", "severity": "low", "lens": "fine readability", "issue": "HAI unglossed"}
+{"page": "open-weights-not-open-source-label-dispute", "severity": "low", "lens": "fine readability", "issue": "OSAID/FOSS unglossed"}
+{"page": "open-weights-not-open-source-label-dispute", "severity": "low", "lens": "fine readability", "issue": "mixed dates"}
+{"page": "llama-chatgpt-not-open-source", "severity": "medium", "lens": "argument quality", "issue": "21 vs 20 counts"}
+{"page": "llama-chatgpt-not-open-source", "severity": "low", "lens": "bias\u00b7trust", "issue": "contested label absorbed"}
+{"page": "llama-chatgpt-not-open-source", "severity": "low", "lens": "argument quality", "issue": "narration attributed to Liesenfeld"}
+{"page": "llama-chatgpt-not-open-source", "severity": "low", "lens": "narrative flow", "issue": "'no response' vs Meta quote"}
+{"page": "llama-chatgpt-not-open-source", "severity": "low", "lens": "information density", "issue": "five-sentence summary"}
+{"page": "tech-industry-open-source-ai-definition-problem", "severity": "medium", "lens": "argument quality", "issue": "'biggest sticking point' attributed to Maffulli"}
+{"page": "tech-industry-open-source-ai-definition-problem", "severity": "low", "lens": "fine readability", "issue": "provenance note in lede"}
+{"page": "tech-industry-open-source-ai-definition-problem", "severity": "low", "lens": "fine readability", "issue": "Skowron role missing"}
+{"page": "tech-industry-open-source-ai-definition-problem", "severity": "low", "lens": "narrative flow", "issue": "contextless quote"}
+{"page": "tech-industry-open-source-ai-definition-problem", "severity": "low", "lens": "argument quality", "issue": "Villa qualifier dropped"}
+{"page": "tech-industry-open-source-ai-definition-problem", "severity": "low", "lens": "fine readability", "issue": "RAIL unglossed"}
+{"page": "tech-industry-open-source-ai-definition-problem", "severity": "low", "lens": "fine readability", "issue": "mixed dates"}
+{"page": "true-open-source-ai-selective-transparency", "reviewed": true, "defects": 3}
+{"page": "open-weights-not-open-source-label-dispute", "reviewed": true, "defects": 7}
+{"page": "llama-chatgpt-not-open-source", "reviewed": true, "defects": 5}
+{"page": "tech-industry-open-source-ai-definition-problem", "reviewed": true, "defects": 7}

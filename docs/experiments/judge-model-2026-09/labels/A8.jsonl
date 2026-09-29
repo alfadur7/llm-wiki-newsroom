@@ -1,0 +1,28 @@
+{"page": "senators-question-meta-llama-leak", "severity": "medium", "lens": "argument quality", "issue": "contradicts: line says Harris cited spam"}
+{"page": "senators-question-meta-llama-leak", "severity": "low", "lens": "bias·trust", "issue": "Meta vs Zuckerberg on declined comment"}
+{"page": "senators-question-meta-llama-leak", "severity": "low", "lens": "argument quality", "issue": "AISafety connection flattens the experts"}
+{"page": "senators-question-meta-llama-leak", "severity": "low", "lens": "argument quality", "issue": "conspiracy disclaimers dropped"}
+{"page": "senators-question-meta-llama-leak", "severity": "low", "lens": "bias·trust", "issue": "parameter figures attributed to Manning"}
+{"page": "senators-question-meta-llama-leak", "severity": "low", "lens": "bias·trust", "issue": "letter passages split Blumenthal/Hawley"}
+{"page": "senators-question-meta-llama-leak", "severity": "low", "lens": "fine readability", "issue": "Falcon name collision"}
+{"page": "senators-question-meta-llama-leak", "severity": "low", "lens": "fine readability", "issue": "relative 'Tuesday'"}
+{"page": "sfc-osaid-erodes-open-source", "severity": "medium", "lens": "bias·trust", "issue": "1999 OSD date in narrator voice vs disputed hub"}
+{"page": "sfc-osaid-erodes-open-source", "severity": "medium", "lens": "bias·trust", "issue": "Kuhn's characterization of OSI graded [fact]"}
+{"page": "sfc-osaid-erodes-open-source", "severity": "low", "lens": "argument quality", "issue": "OpenWashing connection mislocates the objection"}
+{"page": "sfc-osaid-erodes-open-source", "severity": "low", "lens": "narrative flow", "issue": "Knuth epigraph floats"}
+{"page": "sfc-osaid-erodes-open-source", "severity": "low", "lens": "fine readability", "issue": "FOSS unglossed"}
+{"page": "sfc-osaid-erodes-open-source", "severity": "low", "lens": "fine readability", "issue": "missing [sic]"}
+{"page": "societal-impact-open-foundation-models", "severity": "low", "lens": "information density", "issue": "Maffulli plain text"}
+{"page": "societal-impact-open-foundation-models", "severity": "low", "lens": "argument quality", "issue": "metadata as [fact] claims"}
+{"page": "techcrunch-osaid-official-definition", "severity": "medium", "lens": "bias·trust", "issue": "Summary puts Wiggers's no-enforcement in Maffulli's mouth"}
+{"page": "techcrunch-osaid-official-definition", "severity": "low", "lens": "bias·trust", "issue": "'despite' folded into Meta's statement"}
+{"page": "techcrunch-osaid-official-definition", "severity": "low", "lens": "bias·trust", "issue": "Meta quote cut before the affirmative"}
+{"page": "techcrunch-osaid-official-definition", "severity": "low", "lens": "bias·trust", "issue": "committee composite under Maffulli"}
+{"page": "techcrunch-osaid-official-definition", "severity": "low", "lens": "argument quality", "issue": "composite claims"}
+{"page": "techcrunch-osaid-official-definition", "severity": "low", "lens": "fine readability", "issue": "Signal/CMU study undated"}
+{"page": "techcrunch-osaid-official-definition", "severity": "low", "lens": "information density", "issue": "MistralAI unlinked"}
+{"page": "techcrunch-osaid-official-definition", "severity": "low", "lens": "repetition", "issue": "defines+contradicts double-typing the same hub"}
+{"page": "senators-question-meta-llama-leak", "reviewed": true, "defects": 8}
+{"page": "sfc-osaid-erodes-open-source", "reviewed": true, "defects": 6}
+{"page": "societal-impact-open-foundation-models", "reviewed": true, "defects": 2}
+{"page": "techcrunch-osaid-official-definition", "reviewed": true, "defects": 8}

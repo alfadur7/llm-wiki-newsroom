@@ -1,0 +1,27 @@
+{"page": "openai-deepseek-free-riding-distillation", "severity": "low", "lens": "bias\u00b7trust", "issue": "Summary hardens 'developing methods'"}
+{"page": "openai-deepseek-free-riding-distillation", "severity": "low", "lens": "bias\u00b7trust", "issue": "Shah framed as skeptic"}
+{"page": "openai-deepseek-free-riding-distillation", "severity": "low", "lens": "fine readability", "issue": "R1 unglossed"}
+{"page": "openai-deepseek-free-riding-distillation", "severity": "low", "lens": "fine readability", "issue": "US vs U.S."}
+{"page": "openai-deepseek-free-riding-distillation", "severity": "low", "lens": "fine readability", "issue": "relative dates"}
+{"page": "openai-deepseek-free-riding-distillation", "severity": "low", "lens": "bias\u00b7trust", "issue": "OpenAI framing in narrator voice"}
+{"page": "tech-industry-open-source-ai-definition-problem", "severity": "medium", "lens": "bias\u00b7trust", "issue": "narrator 'biggest sticking point' attributed to Maffulli"}
+{"page": "tech-industry-open-source-ai-definition-problem", "severity": "low", "lens": "argument quality", "issue": "Villa qualifier dropped"}
+{"page": "tech-industry-open-source-ai-definition-problem", "severity": "low", "lens": "fine readability", "issue": "contextless short quote"}
+{"page": "tech-industry-open-source-ai-definition-problem", "severity": "low", "lens": "fine readability", "issue": "RAIL before spell-out"}
+{"page": "tech-industry-open-source-ai-definition-problem", "severity": "low", "lens": "fine readability", "issue": "Open Future link labelled as organization"}
+{"page": "open-model-licenses-concerning-restrictions", "severity": "medium", "lens": "bias\u00b7trust", "issue": "no licensor-response note"}
+{"page": "open-model-licenses-concerning-restrictions", "severity": "low", "lens": "bias\u00b7trust", "issue": "Gemma remote restriction condition dropped"}
+{"page": "open-model-licenses-concerning-restrictions", "severity": "low", "lens": "fine readability", "issue": "Lee role missing"}
+{"page": "open-model-licenses-concerning-restrictions", "severity": "low", "lens": "bias\u00b7trust", "issue": "OpenWeights line overstates restriction"}
+{"page": "knives-out-open-weight-ai-models", "severity": "medium", "lens": "bias\u00b7trust", "issue": "Ball's OpenAI role dropped"}
+{"page": "knives-out-open-weight-ai-models", "severity": "low", "lens": "fine readability", "issue": "Lambert role missing"}
+{"page": "knives-out-open-weight-ai-models", "severity": "medium", "lens": "argument quality", "issue": "hedged views hardened into contradicts"}
+{"page": "knives-out-open-weight-ai-models", "severity": "medium", "lens": "narrative flow", "issue": "no year anywhere"}
+{"page": "knives-out-open-weight-ai-models", "severity": "low", "lens": "bias\u00b7trust", "issue": "hearsay graded [fact]"}
+{"page": "knives-out-open-weight-ai-models", "severity": "low", "lens": "fine readability", "issue": "Kratsios two descriptors"}
+{"page": "knives-out-open-weight-ai-models", "severity": "low", "lens": "fine readability", "issue": "Entity List unglossed"}
+{"page": "knives-out-open-weight-ai-models", "severity": "low", "lens": "argument quality", "issue": "'ban' vs 'rein in'"}
+{"page": "openai-deepseek-free-riding-distillation", "reviewed": true, "defects": 6}
+{"page": "tech-industry-open-source-ai-definition-problem", "reviewed": true, "defects": 5}
+{"page": "open-model-licenses-concerning-restrictions", "reviewed": true, "defects": 4}
+{"page": "knives-out-open-weight-ai-models", "reviewed": true, "defects": 8}

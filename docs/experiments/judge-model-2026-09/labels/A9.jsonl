@@ -1,0 +1,13 @@
+{"page": "welcome-gpt-oss-openai", "severity": "medium", "lens": "argument quality", "issue": "summary says body never mentions training data; claim 19 reports it"}
+{"page": "welcome-gpt-oss-openai", "severity": "low", "lens": "fine readability", "issue": "20B vs 117B paired unlike"}
+{"page": "welcome-gpt-oss-openai", "severity": "low", "lens": "fine readability", "issue": "RoPE/sliding-window fused as causal"}
+{"page": "welcome-gpt-oss-openai", "severity": "low", "lens": "fine readability", "issue": "RoPE/LoRA/trl/ROCm/MXFP4 unglossed"}
+{"page": "welcome-gpt-oss-openai", "severity": "low", "lens": "bias\u00b7trust", "issue": "comment sample one-sided"}
+{"page": "what-does-open-source-ai-mean", "severity": "medium", "lens": "argument quality", "issue": "summary drops 'else' from Maffulli's 'everyone else agrees'"}
+{"page": "what-does-open-source-ai-mean", "severity": "medium", "lens": "bias\u00b7trust", "issue": "Meta unquoted, no 'no official comment' note"}
+{"page": "what-does-open-source-ai-mean", "severity": "low", "lens": "fine readability", "issue": "Maffulli/OSD/MOF unlinked at first mention"}
+{"page": "what-does-open-source-ai-mean", "severity": "low", "lens": "fine readability", "issue": "OSAID/OSD unglossed"}
+{"page": "what-does-open-source-ai-mean", "severity": "low", "lens": "argument quality", "issue": "license spectrum connection dangling"}
+{"page": "what-does-open-source-ai-mean", "severity": "low", "lens": "information density", "issue": "composite Meta claim"}
+{"page": "welcome-gpt-oss-openai", "reviewed": true, "defects": 5}
+{"page": "what-does-open-source-ai-mean", "reviewed": true, "defects": 6}

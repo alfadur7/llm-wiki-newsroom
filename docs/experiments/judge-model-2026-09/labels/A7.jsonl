@@ -1,0 +1,25 @@
+{"page": "osi-open-weights-good-open-source-better", "severity": "medium", "lens": "bias·trust", "issue": "narrator voice drops 'or information'"}
+{"page": "osi-open-weights-good-open-source-better", "severity": "medium", "lens": "argument quality", "issue": "claim drops 'or information'"}
+{"page": "osi-open-weights-good-open-source-better", "severity": "medium", "lens": "bias·trust", "issue": "$8.8T relayed as OSI's figure"}
+{"page": "osi-open-weights-good-open-source-better", "severity": "low", "lens": "bias·trust", "issue": "claimant OSI vs Steen-James"}
+{"page": "osi-open-weights-good-open-source-better", "severity": "low", "lens": "argument quality", "issue": "no scope note"}
+{"page": "osi-open-weights-good-open-source-better", "severity": "low", "lens": "fine readability", "issue": "Olmo/OLMo"}
+{"page": "osi-readies-controversial-osaid", "severity": "medium", "lens": "bias·trust", "issue": "FSF/SFC enlisted as critics saying the bar is too low"}
+{"page": "osi-readies-controversial-osaid", "severity": "low", "lens": "fine readability", "issue": "mixed date notation"}
+{"page": "osi-readies-controversial-osaid", "severity": "low", "lens": "fine readability", "issue": "OSAID/RC2/OSD unglossed"}
+{"page": "osi-readies-controversial-osaid", "severity": "low", "lens": "fine readability", "issue": "nested double quotes"}
+{"page": "red-hat-open-source-ai-point-of-view", "severity": "medium", "lens": "information density", "issue": "4 product-portfolio claims"}
+{"page": "red-hat-open-source-ai-point-of-view", "severity": "low", "lens": "bias·trust", "issue": "claimant alternates Red Hat/Wright"}
+{"page": "red-hat-open-source-ai-point-of-view", "severity": "low", "lens": "argument quality", "issue": "contradicts framing 'rejects the critics' premise'"}
+{"page": "red-hat-open-source-ai-point-of-view", "severity": "low", "lens": "fine readability", "issue": "OCI/LLMs unglossed"}
+{"page": "rethinking-open-source-generative-ai", "severity": "low", "lens": "argument quality", "issue": "subjectless prediction graded as authors' forecast"}
+{"page": "rethinking-open-source-generative-ai", "severity": "low", "lens": "bias·trust", "issue": "Jaffee's name/role from outside the prose"}
+{"page": "rethinking-open-source-generative-ai", "severity": "low", "lens": "bias·trust", "issue": "'expert' not in raw"}
+{"page": "rethinking-open-source-generative-ai", "severity": "low", "lens": "bias·trust", "issue": "open-washing definition credited to the authors"}
+{"page": "rethinking-open-source-generative-ai", "severity": "low", "lens": "repetition", "issue": "'at best open weights' repeated 4x"}
+{"page": "rethinking-open-source-generative-ai", "severity": "low", "lens": "fine readability", "issue": "AllenAI vs Ai2"}
+{"page": "rethinking-open-source-generative-ai", "severity": "low", "lens": "fine readability", "issue": "FAccT/CSAM unglossed"}
+{"page": "osi-open-weights-good-open-source-better", "reviewed": true, "defects": 6}
+{"page": "osi-readies-controversial-osaid", "reviewed": true, "defects": 4}
+{"page": "red-hat-open-source-ai-point-of-view", "reviewed": true, "defects": 4}
+{"page": "rethinking-open-source-generative-ai", "reviewed": true, "defects": 7}

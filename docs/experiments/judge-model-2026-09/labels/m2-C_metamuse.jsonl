@@ -1,0 +1,15 @@
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "medium", "lens": "argument quality", "issue": "inferred ratings qualifier dropped"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "medium", "lens": "bias\u00b7trust", "issue": "privacy result promised but omitted"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "medium", "lens": "argument quality", "issue": "raw's Gemma contradiction unflagged"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "repetition", "issue": "weights-only point x5"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "bias\u00b7trust", "issue": "Wang statement under Meta"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "fine readability", "issue": "Wang role missing in claims"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "fine readability", "issue": "OSI unglossed"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "fine readability", "issue": "Gemma/Qwen notation"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "fine readability", "issue": "fragment quote"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "fine readability", "issue": "'whose' antecedent"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "fine readability", "issue": "dangling date"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "argument quality", "issue": "composite Franzen"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "bias\u00b7trust", "issue": "conditional turned into 'expects'"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "information density", "issue": "five-sentence summary"}
+{"page": "meta-muse-glimmer-apache-2-0", "reviewed": true, "defects": 14}

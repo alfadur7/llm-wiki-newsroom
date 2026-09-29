@@ -1,0 +1,11 @@
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "high", "lens": "bias\u00b7trust", "issue": "narrator 'partially open' attributed to OSI in contradicts"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "medium", "lens": "argument quality", "issue": "appositive inverts comparison"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "medium", "lens": "argument quality", "issue": "innovation location merged with data"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "medium", "lens": "bias\u00b7trust", "issue": "anchor supports half the line"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "low", "lens": "fine readability", "issue": "Maffulli unaliased"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "low", "lens": "fine readability", "issue": "reported speech in quote marks"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "low", "lens": "argument quality", "issue": "'such as' dropped"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "low", "lens": "argument quality", "issue": "'such as' dropped (retraction)"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "low", "lens": "bias\u00b7trust", "issue": "'experts say' absorbed"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "low", "lens": "fine readability", "issue": "Llama not identified as model"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "reviewed": true, "defects": 10}

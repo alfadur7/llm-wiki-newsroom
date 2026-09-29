@@ -1,0 +1,26 @@
+{"page": "llama-2-meta-microsoft", "severity": "medium", "lens": "narrative flow", "issue": "no date; contradiction reads as defiance of later OSAID"}
+{"page": "llama-2-meta-microsoft", "severity": "low", "lens": "bias·trust", "issue": "hedge hardened to 'could not build'"}
+{"page": "llama-2-meta-microsoft", "severity": "low", "lens": "bias·trust", "issue": "contradicts line states OSI verdict OSI disclaims"}
+{"page": "openmdw-1-1-nvidia-adoption", "severity": "low", "lens": "fine readability", "issue": "'under [[ModelLicensing]]' forced link"}
+{"page": "openmdw-1-1-nvidia-adoption", "severity": "low", "lens": "fine readability", "issue": "CamelCase slug mid-sentence"}
+{"page": "openmdw-1-1-nvidia-adoption", "severity": "low", "lens": "fine readability", "issue": "raw self-anchor slug exposed"}
+{"page": "openmdw-1-1-nvidia-adoption", "severity": "low", "lens": "bias·trust", "issue": "IP-protection headline feature dropped"}
+{"page": "techcrunch-osaid-official-definition", "severity": "medium", "lens": "bias·trust", "issue": "summary puts Wiggers' 'no enforcement' in Maffulli's mouth"}
+{"page": "techcrunch-osaid-official-definition", "severity": "low", "lens": "bias·trust", "issue": "reporter's 'despite' folded into Meta statement"}
+{"page": "techcrunch-osaid-official-definition", "severity": "low", "lens": "bias·trust", "issue": "'restrictive' adopted in narrator voice"}
+{"page": "techcrunch-osaid-official-definition", "severity": "low", "lens": "bias·trust", "issue": "Meta quote cut before its affirmative case"}
+{"page": "techcrunch-osaid-official-definition", "severity": "low", "lens": "argument quality", "issue": "Maffulli quote truncated before its point"}
+{"page": "techcrunch-osaid-official-definition", "severity": "low", "lens": "argument quality", "issue": "composite claim two actors"}
+{"page": "techcrunch-osaid-official-definition", "severity": "low", "lens": "argument quality", "issue": "two arguments chained"}
+{"page": "techcrunch-osaid-official-definition", "severity": "low", "lens": "fine readability", "issue": "CamelCase slug mid-phrase"}
+{"page": "osi-open-source-ai-definition", "severity": "high", "lens": "bias·trust", "issue": "definitional core imported from outside the raw"}
+{"page": "osi-open-source-ai-definition", "severity": "high", "lens": "A/B self-acknowledgment", "issue": "'validated/judged' verdict the OSI disclaims"}
+{"page": "osi-open-source-ai-definition", "severity": "medium", "lens": "bias·trust", "issue": "only Llama 2 named among failing/conditional models"}
+{"page": "osi-open-source-ai-definition", "severity": "medium", "lens": "bias·trust", "issue": "open-weights 'non-compliant' position not in raw"}
+{"page": "osi-open-source-ai-definition", "severity": "low", "lens": "bias·trust", "issue": "'binary' editorial adjective"}
+{"page": "osi-open-source-ai-definition", "severity": "low", "lens": "argument quality", "issue": "benefits and endorsers absent"}
+{"page": "osi-open-source-ai-definition", "severity": "low", "lens": "fine readability", "issue": "CamelCase slugs mid-sentence"}
+{"page": "llama-2-meta-microsoft", "reviewed": true, "defects": 3}
+{"page": "openmdw-1-1-nvidia-adoption", "reviewed": true, "defects": 4}
+{"page": "techcrunch-osaid-official-definition", "reviewed": true, "defects": 8}
+{"page": "osi-open-source-ai-definition", "reviewed": true, "defects": 7}

@@ -1,0 +1,25 @@
+{"page": "joint-statement-ai-safety-openness", "severity": "high", "lens": "bias/trust", "issue": "summary: proprietary control itself called naive; raw: the idea it is the only path"}
+{"page": "joint-statement-ai-safety-openness", "severity": "medium", "lens": "bias/trust", "issue": "drops 'the wrong kind of' regulation"}
+{"page": "joint-statement-ai-safety-openness", "severity": "medium", "lens": "bias/trust", "issue": "'four Mozilla leaders' wrong count and role"}
+{"page": "joint-statement-ai-safety-openness", "severity": "medium", "lens": "argument quality", "issue": "normative call regraded as [forecast]"}
+{"page": "joint-statement-ai-safety-openness", "severity": "low", "lens": "fine readability", "issue": "Maffulli plain text"}
+{"page": "joint-statement-ai-safety-openness", "severity": "low", "lens": "fine readability", "issue": "MistralAI unspaced/unlinked"}
+{"page": "joint-statement-ai-safety-openness", "severity": "low", "lens": "information density", "issue": "Hugging Face unlinked, no Connections"}
+{"page": "joint-statement-ai-safety-openness", "severity": "low", "lens": "bias/trust", "issue": "1821 counter undated, host is speaker"}
+{"page": "joint-statement-ai-safety-openness", "severity": "low", "lens": "repetition", "issue": "AISafety connection restates summary"}
+{"page": "joint-statement-ai-safety-openness", "severity": "low", "lens": "fine readability", "issue": "Mozilla linked twice in summary"}
+{"page": "joint-statement-ai-safety-openness", "severity": "low", "lens": "argument quality", "issue": "composite claim line"}
+{"page": "ntia-open-model-weights-report", "severity": "low", "lens": "fine readability", "issue": "'the President' unidentified"}
+{"page": "ntia-open-model-weights-report", "severity": "low", "lens": "information density", "issue": "three ideas in one sentence"}
+{"page": "ntia-open-model-weights-report", "severity": "low", "lens": "repetition", "issue": "'do not restrict immediately' four times"}
+{"page": "open-source-ai-path-forward", "severity": "medium", "lens": "bias/trust", "issue": "vendor cost/savings figures graded [fact]"}
+{"page": "open-source-ai-path-forward", "severity": "low", "lens": "argument quality", "issue": "license connection unsupported by body"}
+{"page": "open-source-ai-path-forward", "severity": "low", "lens": "argument quality", "issue": "composite forecast line"}
+{"page": "open-source-ai-path-forward", "severity": "low", "lens": "bias/trust", "issue": "'should be' hardened to 'is' significantly safer"}
+{"page": "mistral-ai-non-production-license", "severity": "low", "lens": "bias/trust", "issue": "'first model' not in raw"}
+{"page": "mistral-ai-non-production-license", "severity": "low", "lens": "fine readability", "issue": "self alias renders 'self'"}
+{"page": "mistral-ai-non-production-license", "severity": "low", "lens": "bias/trust", "issue": "license scope in narrator voice"}
+{"page": "joint-statement-ai-safety-openness", "reviewed": true, "defects": 11}
+{"page": "ntia-open-model-weights-report", "reviewed": true, "defects": 3}
+{"page": "open-source-ai-path-forward", "reviewed": true, "defects": 4}
+{"page": "mistral-ai-non-production-license", "reviewed": true, "defects": 3}

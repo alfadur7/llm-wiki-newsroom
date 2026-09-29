@@ -1,0 +1,25 @@
+{"page": "debian-ai-models-dfsg", "severity": "low", "lens": "fine readability", "issue": "OSAID/OSD unglossed"}
+{"page": "debian-ai-models-dfsg", "severity": "low", "lens": "fine readability", "issue": "dates without year"}
+{"page": "case-against-osaid", "severity": "medium", "lens": "bias\u00b7trust", "issue": "Johnston's board claim attributed to OSI as fact"}
+{"page": "case-against-osaid", "severity": "high", "lens": "argument quality", "issue": "Key Claims do not carry the Summary's critics"}
+{"page": "case-against-osaid", "severity": "medium", "lens": "bias\u00b7trust", "issue": "OSI-side material dropped"}
+{"page": "case-against-osaid", "severity": "medium", "lens": "argument quality", "issue": "SFC as claimant of Kuhn's candidacy"}
+{"page": "case-against-osaid", "severity": "medium", "lens": "argument quality", "issue": "announcement graded [forecast]"}
+{"page": "case-against-osaid", "severity": "medium", "lens": "argument quality", "issue": "editorial meta-note and 'OSAID-validated OLMo' in Ai2 [fact]"}
+{"page": "case-against-osaid", "severity": "medium", "lens": "argument quality", "issue": "AMD fused with anonymous observer"}
+{"page": "case-against-osaid", "severity": "medium", "lens": "argument quality", "issue": "one Key Quote only"}
+{"page": "case-against-osaid", "severity": "low", "lens": "fine readability", "issue": "Perens quote cut without ellipsis"}
+{"page": "case-against-osaid", "severity": "low", "lens": "bias\u00b7trust", "issue": "subjectless 'argues' in contradicts line"}
+{"page": "case-against-osaid", "severity": "low", "lens": "argument quality", "issue": "OpenWashing connection dangling"}
+{"page": "what-does-open-source-ai-mean", "severity": "low", "lens": "fine readability", "issue": "mixed date notation"}
+{"page": "what-does-open-source-ai-mean", "severity": "low", "lens": "fine readability", "issue": "Maffulli unlinked in Summary"}
+{"page": "what-does-open-source-ai-mean", "severity": "low", "lens": "fine readability", "issue": "checklist paraphrase blurs sense"}
+{"page": "osi-readies-controversial-osaid", "severity": "medium", "lens": "bias\u00b7trust", "issue": "FSF/SFC enlisted in 'bar too low' camp"}
+{"page": "osi-readies-controversial-osaid", "severity": "low", "lens": "fine readability", "issue": "nested double quotes"}
+{"page": "osi-readies-controversial-osaid", "severity": "low", "lens": "fine readability", "issue": "RC2 unglossed"}
+{"page": "osi-readies-controversial-osaid", "severity": "low", "lens": "fine readability", "issue": "mixed date notation"}
+{"page": "osi-readies-controversial-osaid", "severity": "low", "lens": "fine readability", "issue": "Maffulli unlinked in Summary"}
+{"page": "debian-ai-models-dfsg", "reviewed": true, "defects": 2}
+{"page": "case-against-osaid", "reviewed": true, "defects": 11}
+{"page": "what-does-open-source-ai-mean", "reviewed": true, "defects": 3}
+{"page": "osi-readies-controversial-osaid", "reviewed": true, "defects": 5}

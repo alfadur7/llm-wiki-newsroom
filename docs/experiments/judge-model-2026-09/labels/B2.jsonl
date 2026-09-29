@@ -1,0 +1,34 @@
+{"page": "eu-gpai-provider-guidelines", "severity": "medium", "lens": "argument quality", "issue": "'lists the baseline obligations as' closes a non-exhaustive list"}
+{"page": "eu-gpai-provider-guidelines", "severity": "medium", "lens": "bias/trust", "issue": "OpenSourceAI inference grafted onto a Commission [fact] line"}
+{"page": "eu-gpai-provider-guidelines", "severity": "low", "lens": "argument quality", "issue": "FineTuning aside in Commission [fact] line"}
+{"page": "eu-gpai-provider-guidelines", "severity": "low", "lens": "argument quality", "issue": "summary definition compute-only; raw conjunctive"}
+{"page": "eu-gpai-provider-guidelines", "severity": "low", "lens": "argument quality", "issue": "no Key Quotes"}
+{"page": "eu-gpai-provider-guidelines", "severity": "low", "lens": "fine readability", "issue": "FLOP unglossed"}
+{"page": "eu-gpai-provider-guidelines", "severity": "low", "lens": "fine readability", "issue": "10 July without year"}
+{"page": "osi-open-weights-good-open-source-better", "severity": "medium", "lens": "bias/trust", "issue": "no distancing note on a single-camp advocacy post"}
+{"page": "osi-open-weights-good-open-source-better", "severity": "medium", "lens": "bias/trust", "issue": "$8.8T external estimate attributed to OSI as originator"}
+{"page": "osi-open-weights-good-open-source-better", "severity": "medium", "lens": "argument quality", "issue": "drops 'or information' — OSI requirement stated stricter"}
+{"page": "osi-open-weights-good-open-source-better", "severity": "low", "lens": "argument quality", "issue": "same drop in summary"}
+{"page": "osi-open-weights-good-open-source-better", "severity": "low", "lens": "bias/trust", "issue": "author vs institution attribution unclear"}
+{"page": "osi-open-weights-good-open-source-better", "severity": "low", "lens": "argument quality", "issue": "relayed study graded [fact]"}
+{"page": "osi-open-weights-good-open-source-better", "severity": "low", "lens": "fine readability", "issue": "cross-reference aside in claim line"}
+{"page": "osi-open-weights-good-open-source-better", "severity": "low", "lens": "fine readability", "issue": "Olmo vs OLMo spelling"}
+{"page": "fsf-free-ml-application-criteria", "severity": "medium", "lens": "argument quality", "issue": "OpenSourceAI connection asserts an equivalence the raw never makes"}
+{"page": "fsf-free-ml-application-criteria", "severity": "low", "lens": "argument quality", "issue": "summary inverts excusability condition"}
+{"page": "fsf-free-ml-application-criteria", "severity": "low", "lens": "argument quality", "issue": "hedge 'not necessarily' dropped"}
+{"page": "fsf-free-ml-application-criteria", "severity": "low", "lens": "argument quality", "issue": "inconsistent grading within one passage"}
+{"page": "fsf-free-ml-application-criteria", "severity": "low", "lens": "fine readability", "issue": "three date notations"}
+{"page": "open-source-ai-models-how-open", "severity": "high", "lens": "bias/trust", "issue": "concept OpenWeights as claimant of the primer's description"}
+{"page": "open-source-ai-models-how-open", "severity": "high", "lens": "bias/trust", "issue": "concept-as-claimant on the primer's evaluative conclusion"}
+{"page": "open-source-ai-models-how-open", "severity": "high", "lens": "bias/trust", "issue": "DeepSeek made claimant of the primer's classification of R1"}
+{"page": "open-source-ai-models-how-open", "severity": "medium", "lens": "argument quality", "issue": "key claims omit the primer's most relevant facts"}
+{"page": "open-source-ai-models-how-open", "severity": "low", "lens": "argument quality", "issue": "present-tense assessment graded [forecast]"}
+{"page": "open-source-ai-models-how-open", "severity": "low", "lens": "bias/trust", "issue": "narrator superlative 'leading example'"}
+{"page": "open-source-ai-models-how-open", "severity": "low", "lens": "bias/trust", "issue": "'strict OSAID' drops raw hedge"}
+{"page": "open-source-ai-models-how-open", "severity": "low", "lens": "fine readability", "issue": "OSAID/OSI unglossed"}
+{"page": "open-source-ai-models-how-open", "severity": "low", "lens": "argument quality", "issue": "ModelLicensing connection unsupported"}
+{"page": "open-source-ai-models-how-open", "severity": "low", "lens": "fine readability", "issue": "defines: line description empty of content"}
+{"page": "eu-gpai-provider-guidelines", "reviewed": true, "defects": 7}
+{"page": "osi-open-weights-good-open-source-better", "reviewed": true, "defects": 8}
+{"page": "fsf-free-ml-application-criteria", "reviewed": true, "defects": 5}
+{"page": "open-source-ai-models-how-open", "reviewed": true, "defects": 10}

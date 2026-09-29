@@ -1,0 +1,22 @@
+{"page": "apertus-fully-open-multilingual-llm", "severity": "low", "lens": "argument quality", "issue": "self-acknowledged infra caveat dropped"}
+{"page": "apertus-fully-open-multilingual-llm", "severity": "low", "lens": "bias\u00b7trust", "issue": "'open-weights posture' wiki framing"}
+{"page": "apertus-fully-open-multilingual-llm", "severity": "low", "lens": "argument quality", "issue": "GPU hours narrowed to Apertus"}
+{"page": "apertus-fully-open-multilingual-llm", "severity": "low", "lens": "fine readability", "issue": "bare slug notation"}
+{"page": "apertus-fully-open-multilingual-llm", "severity": "low", "lens": "information density", "issue": "six-sentence summary"}
+{"page": "lwn-openmdw-license-review", "severity": "medium", "lens": "bias\u00b7trust", "issue": "'fuzzy' narrator word attributed to reviewers in contradicts line"}
+{"page": "lwn-openmdw-license-review", "severity": "low", "lens": "argument quality", "issue": "Fontana reweighting omitted"}
+{"page": "lwn-openmdw-license-review", "severity": "low", "lens": "fine readability", "issue": "OSD unglossed"}
+{"page": "lwn-openmdw-license-review", "severity": "low", "lens": "fine readability", "issue": "forced 'within model licensing' link"}
+{"page": "beyond-deepseek-china-open-weight-ecosystem", "severity": "low", "lens": "bias\u00b7trust", "issue": "Summary drops 'seem to'"}
+{"page": "beyond-deepseek-china-open-weight-ecosystem", "severity": "low", "lens": "argument quality", "issue": "'not decisive' drift"}
+{"page": "beyond-deepseek-china-open-weight-ecosystem", "severity": "low", "lens": "bias\u00b7trust", "issue": "anonymous policymakers [fact]"}
+{"page": "ai-openness-oecd-gpai-open-weight-models", "severity": "medium", "lens": "bias\u00b7trust", "issue": "one sentence two speakers (authors vs report)"}
+{"page": "ai-openness-oecd-gpai-open-weight-models", "severity": "low", "lens": "bias\u00b7trust", "issue": "boiling frog attribution mismatch"}
+{"page": "ai-openness-oecd-gpai-open-weight-models", "severity": "medium", "lens": "argument quality", "issue": "DeepSeek connection dangling"}
+{"page": "ai-openness-oecd-gpai-open-weight-models", "severity": "low", "lens": "argument quality", "issue": "report finding fused with AIKoD caption"}
+{"page": "ai-openness-oecd-gpai-open-weight-models", "severity": "low", "lens": "fine readability", "issue": "mixed British/American spelling"}
+{"page": "ai-openness-oecd-gpai-open-weight-models", "severity": "low", "lens": "fine readability", "issue": "unparseable compression"}
+{"page": "apertus-fully-open-multilingual-llm", "reviewed": true, "defects": 5}
+{"page": "lwn-openmdw-license-review", "reviewed": true, "defects": 4}
+{"page": "beyond-deepseek-china-open-weight-ecosystem", "reviewed": true, "defects": 3}
+{"page": "ai-openness-oecd-gpai-open-weight-models", "reviewed": true, "defects": 6}

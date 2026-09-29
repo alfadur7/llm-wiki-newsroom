@@ -1,0 +1,172 @@
+{
+ "anthropic-position-open-weights-models.md": {
+  "page": "1f7a5c96ffb05d97",
+  "raw": "raw/NewsScrap/Our position on open-weights models.md",
+  "raw_sha": "ce6ad67d49566d8e"
+ },
+ "case-against-osaid.md": {
+  "page": "ce973ff666629265",
+  "raw": "raw/NewsScrap/The Case Against OSI's Open Source AI Definition.md",
+  "raw_sha": "c369ae5965f9302c"
+ },
+ "debian-ai-models-dfsg.md": {
+  "page": "7a8d85b779123576",
+  "raw": "raw/NewsScrap/Debian debates AI models and the DFSG.md",
+  "raw_sha": "9b98d00c9e50ed3e"
+ },
+ "deepseek-r1-release.md": {
+  "page": "b9514495da5cd0cb",
+  "raw": "raw/NewsScrap/DeepSeek-R1 Release.md",
+  "raw_sha": "5b337bf94d419a6f"
+ },
+ "eu-gpai-provider-guidelines.md": {
+  "page": "28e7ca285467c45c",
+  "raw": "raw/NewsScrap/Learn more about the guidelines for providers of general-purpose AI models.md",
+  "raw_sha": "7614a92428d30464"
+ },
+ "fsf-free-ml-application-criteria.md": {
+  "page": "c2da0ec6396b63ac",
+  "raw": "raw/NewsScrap/FSF is working on freedom in machine learning applications.md",
+  "raw_sha": "116250a33bf83ca2"
+ },
+ "hello-olmo-truly-open-llm.md": {
+  "page": "a0c5ac4758762d8a",
+  "raw": "raw/NewsScrap/Hello OLMo A truly open LLM Ai2.md",
+  "raw_sha": "126c80a75faefe47"
+ },
+ "joint-statement-ai-safety-openness.md": {
+  "page": "2ca1a1fc16be7077",
+  "raw": "raw/NewsScrap/Joint Statement on AI Safety and Openness.md",
+  "raw_sha": "77ce31b3064b8c44"
+ },
+ "llama-2-meta-microsoft.md": {
+  "page": "faa4aa2e5df5ab84",
+  "raw": "raw/NewsScrap/Meta and Microsoft Introduce the Next Generation of Llama.md",
+  "raw_sha": "a099fa0b94c5838d"
+ },
+ "llama-3-1-community-license.md": {
+  "page": "ab0e02ec88a2b551",
+  "raw": "raw/NewsScrap/llama-modelsmodelsllama3_1LICENSE at main \u00b7 meta-llamallama-models.md",
+  "raw_sha": "f44609a7dd08c266"
+ },
+ "mistral-ai-non-production-license.md": {
+  "page": "80fa3003cc29cef0",
+  "raw": "raw/NewsScrap/The Mistral AI Non-Production License Mistral AI.md",
+  "raw_sha": "079aa9a55f269596"
+ },
+ "mozilla-celebrates-osaid.md": {
+  "page": "f4fc1d96f3e68428",
+  "raw": "raw/NewsScrap/Celebrating An Important Step Forward For Open Source AI The Mozilla Blog.md",
+  "raw_sha": "a707dcf692afd905"
+ },
+ "ntia-open-model-weights-report.md": {
+  "page": "03ac1b4fce6c03b9",
+  "raw": "raw/NewsScrap/NTIA Supports Open Models to Promote AI Innovation.md",
+  "raw_sha": "e65f1680248d0004"
+ },
+ "open-future-osaid-step-forward.md": {
+  "page": "991a48eb8db20917",
+  "raw": "raw/NewsScrap/The Open Source AI Definition is a step forward in defining openness in AI \u2013 Ope.md",
+  "raw_sha": "d9c438575b593d7c"
+ },
+ "open-source-ai-models-how-open.md": {
+  "page": "80a81875f6bbaa5c",
+  "raw": "raw/NewsScrap/Part 1 \u2013 Open Source AI Models How Open Are They Really.md",
+  "raw_sha": "67811857561ed8fb"
+ },
+ "open-source-ai-path-forward.md": {
+  "page": "71b74a003a73edfa",
+  "raw": "raw/NewsScrap/Open Source AI is the Path Forward.md",
+  "raw_sha": "1e2dcda93aeb1187"
+ },
+ "open-source-ai-uniquely-dangerous.md": {
+  "page": "b77c47d01469751f",
+  "raw": "raw/NewsScrap/Open-Source AI Is Uniquely Dangerous.md",
+  "raw_sha": "9e8b034b49ee6d47"
+ },
+ "open-weight-models-frontier-safety-gap.md": {
+  "page": "ea83b939d865b979",
+  "raw": "raw/NewsScrap/Open-weight AI models are catching up to the frontier. The safety gap remains. T.md",
+  "raw_sha": "eebc46677bd2a6df"
+ },
+ "open-weights-american-ai-leadership.md": {
+  "page": "23b266fa3da1261f",
+  "raw": "raw/NewsScrap/Open Weights and American AI Leadership.md",
+  "raw_sha": "2d7cd63dc79ee8ca"
+ },
+ "openmdw-1-1-nvidia-adoption.md": {
+  "page": "fb62565a88e4e5bf",
+  "raw": "raw/NewsScrap/Linux Foundation Releases OpenMDW-1.1; NVIDIA Adopts OpenMDW for Cosmos, Isaac G.md",
+  "raw_sha": "f2e32d3fa9b9a9d8"
+ },
+ "osaid-take-it-or-leave-it.md": {
+  "page": "0f6f9f2fcf73a340",
+  "raw": "raw/NewsScrap/Open Source Artificial Intelligence Definition 1.0 - A \u201ctake it or leave it\u201d app.md",
+  "raw_sha": "3489382b55df3b0f"
+ },
+ "osi-meta-llama-2-license-not-open-source.md": {
+  "page": "837639f6efa32552",
+  "raw": "raw/NewsScrap/Meta\u2019s LLaMa license is not Open Source.md",
+  "raw_sha": "c1c3befceeec187f"
+ },
+ "osi-meta-llama-license-still-not-open-source.md": {
+  "page": "7d4854dc75527674",
+  "raw": "raw/NewsScrap/Meta\u2019s LLaMa license is still not Open Source.md",
+  "raw_sha": "45ae60a5fad92118"
+ },
+ "osi-open-source-ai-definition.md": {
+  "page": "a61919edeb0e938b",
+  "raw": "raw/NewsScrap/Open Source AI.md",
+  "raw_sha": "35a9286079202f65"
+ },
+ "osi-open-weights-good-open-source-better.md": {
+  "page": "acf854831e2ee582",
+  "raw": "raw/NewsScrap/Open Weights Are Good. Open Source Is Better.md",
+  "raw_sha": "3e23d61ec2390d9a"
+ },
+ "osi-readies-controversial-osaid.md": {
+  "page": "fe4dd893ae8cefde",
+  "raw": "raw/NewsScrap/OSI readies controversial Open AI definition.md",
+  "raw_sha": "114cf94467b543e2"
+ },
+ "red-hat-open-source-ai-point-of-view.md": {
+  "page": "4e6ccead7d26a81d",
+  "raw": "raw/NewsScrap/Open source AI Red Hat\u2019s point-of-view.md",
+  "raw_sha": "e02b4722f1f420c1"
+ },
+ "rethinking-open-source-generative-ai.md": {
+  "page": "9c2eed7b5edc0e39",
+  "raw": "raw/PDF/facct24-120.pdf",
+  "raw_sha": "9c4e84355e908af3"
+ },
+ "senators-question-meta-llama-leak.md": {
+  "page": "cc5ae21dd6e5140d",
+  "raw": "raw/NewsScrap/Senators question Meta's LLaMA leak impact VentureBeat.md",
+  "raw_sha": "b247bd8dd3ba2a3e"
+ },
+ "sfc-osaid-erodes-open-source.md": {
+  "page": "60b1d5ae5e5b6e98",
+  "raw": "raw/NewsScrap/Open Source AI Definition Erodes the Meaning of \u201cOpen Source\u201d.md",
+  "raw_sha": "b91062f46fdf0b15"
+ },
+ "societal-impact-open-foundation-models.md": {
+  "page": "ddb812fa1d712955",
+  "raw": "raw/NewsScrap/On the Societal Impact of Open Foundation Models.md",
+  "raw_sha": "2877b6d76a3d8746"
+ },
+ "techcrunch-osaid-official-definition.md": {
+  "page": "e35ecfbb10db2cd6",
+  "raw": "raw/NewsScrap/We finally have an 'official' definition for open source AI TechCrunch.md",
+  "raw_sha": "09162369d8315f94"
+ },
+ "welcome-gpt-oss-openai.md": {
+  "page": "16f4ac2e0a98cf9e",
+  "raw": "raw/NewsScrap/Welcome GPT OSS, the new open-source model family from OpenAI!.md",
+  "raw_sha": "55a2e64443ef2f73"
+ },
+ "what-does-open-source-ai-mean.md": {
+  "page": "030809b0e70895b9",
+  "raw": "raw/NewsScrap/What does 'open source AI' mean, anyway TechCrunch.md",
+  "raw_sha": "d1e4a2e96de4f972"
+ }
+}

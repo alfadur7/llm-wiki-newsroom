@@ -1,0 +1,35 @@
+{"page": "anthropic-position-open-weights-models", "severity": "medium", "lens": "bias & trust", "issue": "Connections drop 'potentially'"}
+{"page": "anthropic-position-open-weights-models", "severity": "low", "lens": "bias & trust", "issue": "worry hardened to expects"}
+{"page": "anthropic-position-open-weights-models", "severity": "low", "lens": "fine readability", "issue": "CCP apposition garbled"}
+{"page": "anthropic-position-open-weights-models", "severity": "low", "lens": "fine readability", "issue": "quote cut without ellipsis"}
+{"page": "anthropic-position-open-weights-models", "severity": "low", "lens": "argument quality", "issue": "US-government support dropped"}
+{"page": "anthropic-position-open-weights-models", "severity": "low", "lens": "information density", "issue": "seven-sentence summary"}
+{"page": "case-against-osaid", "severity": "high", "lens": "argument quality", "issue": "Johnston's board charge attributed to OSI as [fact]"}
+{"page": "case-against-osaid", "severity": "high", "lens": "argument quality", "issue": "Key Quotes has one quote; five critics' verbatim dropped"}
+{"page": "case-against-osaid", "severity": "medium", "lens": "bias & trust", "issue": "defending side reduced to one FAQ line"}
+{"page": "case-against-osaid", "severity": "medium", "lens": "argument quality", "issue": "SFC as claimant of Kuhn's personal candidacy"}
+{"page": "case-against-osaid", "severity": "low", "lens": "argument quality", "issue": "announced plan graded [forecast]"}
+{"page": "case-against-osaid", "severity": "medium", "lens": "argument quality", "issue": "Ai2 [fact] line carries unsupported 'OSAID-validated OLMo' aside"}
+{"page": "case-against-osaid", "severity": "medium", "lens": "argument quality", "issue": "AMD line fuses anonymous observer's rebuttal"}
+{"page": "case-against-osaid", "severity": "low", "lens": "argument quality", "issue": "contradicts line quotes phrases absent from body"}
+{"page": "case-against-osaid", "severity": "low", "lens": "bias & trust", "issue": "'erodes' attributed collectively"}
+{"page": "case-against-osaid", "severity": "low", "lens": "fine readability", "issue": "Perens quote cut without ellipsis"}
+{"page": "case-against-osaid", "severity": "low", "lens": "fine readability", "issue": "OSAID unglossed"}
+{"page": "case-against-osaid", "severity": "low", "lens": "fine readability", "issue": "no OpenSourceDefinition link"}
+{"page": "debian-ai-models-dfsg", "severity": "medium", "lens": "bias & trust", "issue": "Glaser anti-AI framing kept; Zhou not anti-AI counter-framing dropped"}
+{"page": "debian-ai-models-dfsg", "severity": "low", "lens": "argument quality", "issue": "Glaser ethics/ecology clause omitted"}
+{"page": "debian-ai-models-dfsg", "severity": "low", "lens": "argument quality", "issue": "'yet to be specified' qualifier dropped"}
+{"page": "debian-ai-models-dfsg", "severity": "low", "lens": "bias & trust", "issue": "'in contrast to' hardened to 'at odds with'"}
+{"page": "debian-ai-models-dfsg", "severity": "low", "lens": "narrative flow", "issue": "dates without year"}
+{"page": "debian-ai-models-dfsg", "severity": "low", "lens": "fine readability", "issue": "OSAID unglossed"}
+{"page": "debian-ai-models-dfsg", "severity": "low", "lens": "fine readability", "issue": "release-critical-buggy unglossed"}
+{"page": "debian-ai-models-dfsg", "severity": "low", "lens": "fine readability", "issue": "TrainingData linked twice"}
+{"page": "deepseek-r1-release", "severity": "medium", "lens": "narrative flow", "issue": "no date anywhere"}
+{"page": "deepseek-r1-release", "severity": "low", "lens": "argument quality", "issue": "causal link inferred between bullets"}
+{"page": "deepseek-r1-release", "severity": "low", "lens": "bias & trust", "issue": "vendor label unquoted inconsistently"}
+{"page": "deepseek-r1-release", "severity": "low", "lens": "fine readability", "issue": "'the wiki's' self-reference"}
+{"page": "deepseek-r1-release", "severity": "low", "lens": "repetition", "issue": "MIT License stated seven times"}
+{"page": "anthropic-position-open-weights-models", "reviewed": true, "defects": 6}
+{"page": "case-against-osaid", "reviewed": true, "defects": 12}
+{"page": "debian-ai-models-dfsg", "reviewed": true, "defects": 8}
+{"page": "deepseek-r1-release", "reviewed": true, "defects": 5}

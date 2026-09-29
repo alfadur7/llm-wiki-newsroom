@@ -1,0 +1,27 @@
+{"page": "ntia-open-model-weights-report", "severity": "medium", "lens": "repetition", "issue": "claim 1 restates claims 2-3"}
+{"page": "ntia-open-model-weights-report", "severity": "low", "lens": "fine readability", "issue": "raw self-anchor slug exposed x3"}
+{"page": "open-future-osaid-step-forward", "severity": "high", "lens": "information density", "issue": "44-line Key Claims, inventory"}
+{"page": "open-future-osaid-step-forward", "severity": "low", "lens": "argument quality", "issue": "'week before 2024-11-01' vs same week"}
+{"page": "open-future-osaid-step-forward", "severity": "low", "lens": "fine readability", "issue": "CamelCase slugs in Summary, OSI/OSD unexpanded"}
+{"page": "open-future-osaid-step-forward", "severity": "low", "lens": "fine readability", "issue": "open-washing hyphenation"}
+{"page": "open-future-osaid-step-forward", "severity": "low", "lens": "fine readability", "issue": "hub links inconsistent in claims"}
+{"page": "open-future-osaid-step-forward", "severity": "low", "lens": "information density", "issue": "Mistral has no link/Connections"}
+{"page": "open-future-osaid-step-forward", "severity": "low", "lens": "argument quality", "issue": "composite claim"}
+{"page": "open-source-ai-models-how-open", "severity": "critical", "lens": "bias·trust", "issue": "DeepSeek as claimant of Hunton's classification"}
+{"page": "open-source-ai-models-how-open", "severity": "high", "lens": "bias·trust", "issue": "OpenWeights concept as claimant; middle withheld item dropped"}
+{"page": "open-source-ai-models-how-open", "severity": "high", "lens": "bias·trust", "issue": "concept-as-claimant on the forecast"}
+{"page": "open-source-ai-models-how-open", "severity": "high", "lens": "argument quality", "issue": "limitations paragraph dropped"}
+{"page": "open-source-ai-models-how-open", "severity": "medium", "lens": "information density", "issue": "no OSI/OpenWashing Connections"}
+{"page": "open-source-ai-models-how-open", "severity": "medium", "lens": "information density", "issue": "OSI validated list and peers absent"}
+{"page": "open-source-ai-models-how-open", "severity": "low", "lens": "fine readability", "issue": "OSI/OSAID unexpanded, lead unlinked"}
+{"page": "open-source-ai-models-how-open", "severity": "low", "lens": "fine readability", "issue": "hyphenation drift"}
+{"page": "open-source-ai-path-forward", "severity": "low", "lens": "narrative flow", "issue": "five-sentence summary"}
+{"page": "open-source-ai-path-forward", "severity": "low", "lens": "fine readability", "issue": "tautological role tag"}
+{"page": "open-source-ai-path-forward", "severity": "low", "lens": "argument quality", "issue": "composite forecast"}
+{"page": "open-source-ai-path-forward", "severity": "low", "lens": "argument quality", "issue": "analysis-vs-forecast grade"}
+{"page": "open-source-ai-path-forward", "severity": "low", "lens": "fine readability", "issue": "CamelCase in Summary"}
+{"page": "open-source-ai-path-forward", "severity": "low", "lens": "information density", "issue": "license connection dangling"}
+{"page": "ntia-open-model-weights-report", "reviewed": true, "defects": 2}
+{"page": "open-future-osaid-step-forward", "reviewed": true, "defects": 7}
+{"page": "open-source-ai-models-how-open", "reviewed": true, "defects": 8}
+{"page": "open-source-ai-path-forward", "reviewed": true, "defects": 6}

@@ -1,0 +1,10 @@
+{"page": "open-future-osaid-step-forward", "severity": "medium", "lens": "argument quality", "issue": "drops 'just' before software framework"}
+{"page": "open-future-osaid-step-forward", "severity": "medium", "lens": "narrative flow", "issue": "'week before' vs 'same week'"}
+{"page": "open-future-osaid-step-forward", "severity": "low", "lens": "bias\u00b7trust", "issue": "RAIL exclusion flat in Connections"}
+{"page": "open-future-osaid-step-forward", "severity": "low", "lens": "bias\u00b7trust", "issue": "open-washing evaluation in narrator voice"}
+{"page": "open-future-osaid-step-forward", "severity": "low", "lens": "bias\u00b7trust", "issue": "'think tank' not in raw"}
+{"page": "open-future-osaid-step-forward", "severity": "low", "lens": "information density", "issue": "composite two subjects"}
+{"page": "open-future-osaid-step-forward", "severity": "low", "lens": "fine readability", "issue": "open-washing notation x3"}
+{"page": "open-future-osaid-step-forward", "severity": "low", "lens": "fine readability", "issue": "responsible-AI hyphenation"}
+{"page": "open-future-osaid-step-forward", "severity": "low", "lens": "fine readability", "issue": "OSI unglossed"}
+{"page": "open-future-osaid-step-forward", "reviewed": true, "defects": 9}

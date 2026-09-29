@@ -1,0 +1,18 @@
+{"page": "llama-3-1-community-license", "severity": "high", "lens": "bias\u00b7trust", "issue": "IP-retaliation clause narrowed to suits against Meta; indemnity dropped"}
+{"page": "llama-3-1-community-license", "severity": "medium", "lens": "bias\u00b7trust", "issue": "integrated end-user product carve-out of 700M clause missing"}
+{"page": "llama-3-1-community-license", "severity": "low", "lens": "argument quality", "issue": "MAU test drops 'or services'/'affiliates'"}
+{"page": "llama-3-1-community-license", "severity": "low", "lens": "argument quality", "issue": "'assigns' ownership overstates 'as between you and Meta'"}
+{"page": "llama-3-1-community-license", "severity": "low", "lens": "argument quality", "issue": "Summary understates naming rule scope/position"}
+{"page": "llama-3-1-community-license", "severity": "low", "lens": "fine readability", "issue": "'the raw' jargon"}
+{"page": "osaid-take-it-or-leave-it", "severity": "medium", "lens": "bias\u00b7trust", "issue": "Key Claims omit authors' endorsements"}
+{"page": "osaid-take-it-or-leave-it", "severity": "medium", "lens": "argument quality", "issue": "DeepSeek 'does include' typo claim ambiguous"}
+{"page": "osaid-take-it-or-leave-it", "severity": "medium", "lens": "argument quality", "issue": "no Key Quote in authors' own voice"}
+{"page": "osaid-take-it-or-leave-it", "severity": "low", "lens": "prescription strength", "issue": "RAIL 'arguably' and 'unlawful' hedges dropped"}
+{"page": "osaid-take-it-or-leave-it", "severity": "low", "lens": "argument quality", "issue": "OpenWashing substituted for 'industry capture'"}
+{"page": "osaid-take-it-or-leave-it", "severity": "low", "lens": "fine readability", "issue": "OSI unglossed"}
+{"page": "osaid-take-it-or-leave-it", "severity": "low", "lens": "fine readability", "issue": "mixed date notation"}
+{"page": "osaid-take-it-or-leave-it", "severity": "low", "lens": "fine readability", "issue": "OpenAI/EUAIAct/MOF unlinked in body"}
+{"page": "osaid-take-it-or-leave-it", "severity": "low", "lens": "fine readability", "issue": "'the raw' jargon"}
+{"page": "osaid-take-it-or-leave-it", "severity": "low", "lens": "fine readability", "issue": "'disclosure of training use' opaque"}
+{"page": "llama-3-1-community-license", "reviewed": true, "defects": 6}
+{"page": "osaid-take-it-or-leave-it", "reviewed": true, "defects": 10}

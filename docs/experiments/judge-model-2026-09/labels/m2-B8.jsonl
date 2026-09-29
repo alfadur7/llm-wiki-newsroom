@@ -1,0 +1,35 @@
+{"page": "open-source-ai-llm-access-debate", "severity": "medium", "lens": "argument quality", "issue": "Dolly/leak causation wrong"}
+{"page": "open-source-ai-llm-access-debate", "severity": "medium", "lens": "bias\u00b7trust", "issue": "Biderman's 'most agree' absorbed"}
+{"page": "open-source-ai-llm-access-debate", "severity": "medium", "lens": "argument quality", "issue": "Pineau leak quote claimed; she declined"}
+{"page": "open-source-ai-llm-access-debate", "severity": "low", "lens": "bias\u00b7trust", "issue": "Pineau hedge hardened"}
+{"page": "open-source-ai-llm-access-debate", "severity": "low", "lens": "bias\u00b7trust", "issue": "OpenAI on-record quote not carried"}
+{"page": "open-source-ai-llm-access-debate", "severity": "low", "lens": "bias\u00b7trust", "issue": "Engler endorsement dropped"}
+{"page": "open-source-ai-llm-access-debate", "severity": "low", "lens": "argument quality", "issue": "composite Pineau"}
+{"page": "open-source-ai-llm-access-debate", "severity": "low", "lens": "argument quality", "issue": "composite Agarwal"}
+{"page": "open-source-ai-llm-access-debate", "severity": "low", "lens": "fine readability", "issue": "LAION unglossed"}
+{"page": "open-source-ai-llm-access-debate", "severity": "low", "lens": "fine readability", "issue": "44-word opening sentence"}
+{"page": "open-weights-not-enough-open-source-science", "severity": "medium", "lens": "bias\u00b7trust", "issue": "advocacy feature framed as report"}
+{"page": "open-weights-not-enough-open-source-science", "severity": "low", "lens": "argument quality", "issue": "in-progress narrowing stated as done"}
+{"page": "open-weights-not-enough-open-source-science", "severity": "low", "lens": "bias\u00b7trust", "issue": "inconsistent Landay/HAI attribution"}
+{"page": "open-weights-not-enough-open-source-science", "severity": "low", "lens": "fine readability", "issue": "'last year' unanchored"}
+{"page": "open-weights-not-enough-open-source-science", "severity": "low", "lens": "fine readability", "issue": "'the page' referent"}
+{"page": "open-weights-not-enough-open-source-science", "severity": "low", "lens": "fine readability", "issue": "HAI unglossed"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "high", "lens": "bias\u00b7trust", "issue": "unfavorable privacy result omitted; connection claims it"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "medium", "lens": "argument quality", "issue": "inferred risk ratings qualifier dropped"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "medium", "lens": "argument quality", "issue": "raw's Gemma contradiction not surfaced"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "argument quality", "issue": "Wang's rollout list attributed to Meta"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "argument quality", "issue": "composite Franzen"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "fine readability", "issue": "OSI unglossed"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "fine readability", "issue": "45-word sentence"}
+{"page": "knives-out-open-weight-ai-models", "severity": "medium", "lens": "bias\u00b7trust", "issue": "Ball's OpenAI role dropped"}
+{"page": "knives-out-open-weight-ai-models", "severity": "low", "lens": "argument quality", "issue": "anonymous Axios allegation [fact]"}
+{"page": "knives-out-open-weight-ai-models", "severity": "low", "lens": "argument quality", "issue": "hearsay [fact]"}
+{"page": "knives-out-open-weight-ai-models", "severity": "low", "lens": "argument quality", "issue": "Uren narration merged into HF statement"}
+{"page": "knives-out-open-weight-ai-models", "severity": "low", "lens": "argument quality", "issue": "Lambert hardened"}
+{"page": "knives-out-open-weight-ai-models", "severity": "low", "lens": "argument quality", "issue": "report vs forecast conflated"}
+{"page": "knives-out-open-weight-ai-models", "severity": "low", "lens": "fine readability", "issue": "July 27 no year"}
+{"page": "knives-out-open-weight-ai-models", "severity": "low", "lens": "fine readability", "issue": "Kratsios role notation"}
+{"page": "open-source-ai-llm-access-debate", "reviewed": true, "defects": 10}
+{"page": "open-weights-not-enough-open-source-science", "reviewed": true, "defects": 6}
+{"page": "meta-muse-glimmer-apache-2-0", "reviewed": true, "defects": 7}
+{"page": "knives-out-open-weight-ai-models", "reviewed": true, "defects": 8}

@@ -1,0 +1,30 @@
+{"page": "open-source-ai-uniquely-dangerous", "severity": "medium", "lens": "bias·trust", "issue": "Harris identified only as former Meta employee; byline is UC Berkeley scholar"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "medium", "lens": "argument quality", "issue": "EUAIAct gloss says exemptions 'won', raw 'limited progress'"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "low", "lens": "argument quality", "issue": "categorical 'does not call for rules aimed only at unsecured AI'"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "low", "lens": "argument quality", "issue": "3-item prohibition as 2"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "low", "lens": "information density", "issue": "Hugging Face/Mistral plain text"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "low", "lens": "fine readability", "issue": "C2PA unglossed"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "low", "lens": "narrative flow", "issue": "Bletchley claim floats"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "low", "lens": "fine readability", "issue": "'risk assessments' not introduced"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "low", "lens": "argument quality", "issue": "composite"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "low", "lens": "argument quality", "issue": "composite forecasts"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "low", "lens": "repetition", "issue": "Meta linked twice"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "low", "lens": "fine readability", "issue": "CBRN stutter"}
+{"page": "open-weight-models-frontier-safety-gap", "severity": "high", "lens": "bias·trust", "issue": "Summary puts API-unenforceability in Papadatos's mouth; TechCrunch narration"}
+{"page": "open-weight-models-frontier-safety-gap", "severity": "medium", "lens": "narrative flow", "issue": "'OpenAI's breach' no antecedent"}
+{"page": "open-weight-models-frontier-safety-gap", "severity": "low", "lens": "argument quality", "issue": "Webster's conditional dropped"}
+{"page": "open-weight-models-frontier-safety-gap", "severity": "low", "lens": "argument quality", "issue": "'applies' vs 'could apply'"}
+{"page": "open-weight-models-frontier-safety-gap", "severity": "low", "lens": "information density", "issue": "Hugging Face unlinked"}
+{"page": "open-weight-models-frontier-safety-gap", "severity": "low", "lens": "fine readability", "issue": "Xi Jinping role missing"}
+{"page": "open-weight-models-frontier-safety-gap", "severity": "low", "lens": "bias·trust", "issue": "Far.ai attribution ambiguous"}
+{"page": "open-weight-models-frontier-safety-gap", "severity": "low", "lens": "argument quality", "issue": "GPT-5.5 frontier framing"}
+{"page": "open-weight-models-frontier-safety-gap", "severity": "low", "lens": "argument quality", "issue": "composite"}
+{"page": "open-weight-models-frontier-safety-gap", "severity": "low", "lens": "argument quality", "issue": "composite"}
+{"page": "open-weights-american-ai-leadership", "severity": "medium", "lens": "argument quality", "issue": "Summary flattens the distillation ask"}
+{"page": "open-weights-american-ai-leadership", "severity": "low", "lens": "fine readability", "issue": "signatory links inconsistent"}
+{"page": "openmdw-1-1-nvidia-adoption", "severity": "medium", "lens": "fine readability", "issue": "'under [[ModelLicensing]]' forced relation"}
+{"page": "openmdw-1-1-nvidia-adoption", "severity": "low", "lens": "fine readability", "issue": "CamelCase slug"}
+{"page": "open-source-ai-uniquely-dangerous", "reviewed": true, "defects": 12}
+{"page": "open-weight-models-frontier-safety-gap", "reviewed": true, "defects": 10}
+{"page": "open-weights-american-ai-leadership", "reviewed": true, "defects": 2}
+{"page": "openmdw-1-1-nvidia-adoption", "reviewed": true, "defects": 2}

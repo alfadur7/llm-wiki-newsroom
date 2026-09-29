@@ -1,0 +1,27 @@
+{"page": "rethinking-open-source-generative-ai", "severity": "medium", "lens": "argument quality", "issue": "'only BloomZ' walkthrough line presented as survey-wide"}
+{"page": "rethinking-open-source-generative-ai", "severity": "low", "lens": "argument quality", "issue": "'no datasheet' not in raw"}
+{"page": "rethinking-open-source-generative-ai", "severity": "low", "lens": "bias\u00b7trust", "issue": "open-washing definition credited to authors"}
+{"page": "rethinking-open-source-generative-ai", "severity": "low", "lens": "argument quality", "issue": "OLMo 'tops' singular"}
+{"page": "rethinking-open-source-generative-ai", "severity": "low", "lens": "fine readability", "issue": "FAccT unglossed"}
+{"page": "rethinking-open-source-generative-ai", "severity": "low", "lens": "fine readability", "issue": "CSAM unglossed"}
+{"page": "rethinking-open-source-generative-ai", "severity": "low", "lens": "information density", "issue": "five-sentence summary"}
+{"page": "open-future-osaid-step-forward", "severity": "medium", "lens": "argument quality", "issue": "RAIL exclusion stated as settled; raw says inferred"}
+{"page": "open-future-osaid-step-forward", "severity": "low", "lens": "fine readability", "issue": "'week before 2024-11-01'"}
+{"page": "open-future-osaid-step-forward", "severity": "low", "lens": "fine readability", "issue": "open washing hyphenation"}
+{"page": "open-future-osaid-step-forward", "severity": "low", "lens": "information density", "issue": "44 Key Claims"}
+{"page": "senators-question-meta-llama-leak", "severity": "medium", "lens": "bias\u00b7trust", "issue": "Key Quotes one camp only"}
+{"page": "senators-question-meta-llama-leak", "severity": "medium", "lens": "argument quality", "issue": "'experts dismiss as straw-man' plural erases Manning concession"}
+{"page": "senators-question-meta-llama-leak", "severity": "low", "lens": "fine readability", "issue": "bare 'Tuesday'"}
+{"page": "senators-question-meta-llama-leak", "severity": "low", "lens": "argument quality", "issue": "letter claimant alternates Blumenthal/Hawley"}
+{"page": "senators-question-meta-llama-leak", "severity": "low", "lens": "argument quality", "issue": "declined comment Meta vs Zuckerberg"}
+{"page": "senators-question-meta-llama-leak", "severity": "low", "lens": "argument quality", "issue": "parameter figures in Manning's mouth"}
+{"page": "senators-question-meta-llama-leak", "severity": "low", "lens": "fine readability", "issue": "Falcon name collision"}
+{"page": "senators-question-meta-llama-leak", "severity": "low", "lens": "fine readability", "issue": "Harris surname unintroduced"}
+{"page": "senators-question-meta-llama-leak", "severity": "low", "lens": "information density", "issue": "five-sentence summary"}
+{"page": "osi-meta-llama-license-still-not-open-source", "severity": "medium", "lens": "argument quality", "issue": "'a year earlier' in narrator voice vs 19 months"}
+{"page": "osi-meta-llama-license-still-not-open-source", "severity": "low", "lens": "fine readability", "issue": "Maris vs OSI attribution split"}
+{"page": "osi-meta-llama-license-still-not-open-source", "severity": "low", "lens": "fine readability", "issue": "freedom 0 unglossed at first mention"}
+{"page": "rethinking-open-source-generative-ai", "reviewed": true, "defects": 7}
+{"page": "open-future-osaid-step-forward", "reviewed": true, "defects": 4}
+{"page": "senators-question-meta-llama-leak", "reviewed": true, "defects": 9}
+{"page": "osi-meta-llama-license-still-not-open-source", "reviewed": true, "defects": 3}

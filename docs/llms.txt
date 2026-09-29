@@ -17,12 +17,14 @@ The production system runs on four loops. The first three mirror the software-fa
 - [README](https://github.com/alfadur7/llm-wiki-newsroom/blob/main/README.md): full overview, install, all 9 slash commands, architecture, feature reference
 - [Landing page](https://alfadur7.github.io/llm-wiki-newsroom/): concise overview and a comparison table against RAG
 - [The Knowledge Factory](https://alfadur7.github.io/llm-wiki-newsroom/knowledge-factory/): the full argument for the four-loop design — what harness engineering is, why the three coding loops do not cover knowledge work, and how the fourth loop closes it
+- [Scooping the Rice, Leaving the Stones](https://alfadur7.github.io/llm-wiki-newsroom/scooping-stones/): a preregistered, reproducible test of an external judge model (Jev) as a screener for defective wiki pages; a null result explained by the defect base rate, with all labels, scores and the analysis script published
 - [FAQ](https://alfadur7.github.io/llm-wiki-newsroom/faq/): what it is, how it differs from RAG, API-key needs, agent support, writer-reviewer split, self-evolving guidelines
 - [Browsable example wiki](https://github.com/alfadur7/llm-wiki-newsroom/wiki): the shipped corpus rendered as pages, no clone required
 
 ## Korean (한국어)
 - [소개 페이지 / Landing (KO)](https://alfadur7.github.io/llm-wiki-newsroom/ko/): concise Korean overview and a comparison table against RAG
 - [지식 팩토리 / The Knowledge Factory (KO)](https://alfadur7.github.io/llm-wiki-newsroom/ko/knowledge-factory/): the four-loop argument in Korean
+- [돌 섞인 쌀, 조리질로 돌 고르기 / Scooping the Rice, Leaving the Stones (KO)](https://alfadur7.github.io/llm-wiki-newsroom/ko/scooping-stones/): the judge-model experiment in Korean
 - [FAQ (KO)](https://alfadur7.github.io/llm-wiki-newsroom/ko/faq/): the same FAQ in Korean, for Korean-speaking engineers
 
 ## Key concepts and code

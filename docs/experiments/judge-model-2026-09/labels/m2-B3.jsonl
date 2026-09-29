@@ -1,0 +1,20 @@
+{"page": "mistral-small-3", "severity": "low", "lens": "fine readability", "issue": "MRL unglossed"}
+{"page": "mistral-small-3", "severity": "low", "lens": "fine readability", "issue": "'vendor-run' ambiguous"}
+{"page": "mistral-small-3", "severity": "low", "lens": "argument quality", "issue": "composite claim 7"}
+{"page": "infoworld-osi-unveils-osaid-1-0", "severity": "medium", "lens": "argument quality", "issue": "'year-long' InfoWorld narration attributed to OSI; vs two-year"}
+{"page": "infoworld-osi-unveils-osaid-1-0", "severity": "low", "lens": "bias\u00b7trust", "issue": "Bdeir co-designer grouped with endorsers"}
+{"page": "infoworld-osi-unveils-osaid-1-0", "severity": "low", "lens": "argument quality", "issue": "contradicts line on gap critique"}
+{"page": "infoworld-osi-unveils-osaid-1-0", "severity": "low", "lens": "fine readability", "issue": "unaliased TitleCase slug"}
+{"page": "eu-ai-act-gpai-guide-open-source-developers", "severity": "low", "lens": "fine readability", "issue": "mixed date notation"}
+{"page": "eu-ai-act-gpai-guide-open-source-developers", "severity": "low", "lens": "bias\u00b7trust", "issue": "'rather than' overstates disclaimer"}
+{"page": "eu-ai-act-gpai-guide-open-source-developers", "severity": "low", "lens": "argument quality", "issue": "composite claim 42"}
+{"page": "eu-ai-act-gpai-guide-open-source-developers", "severity": "low", "lens": "fine readability", "issue": "dangling medium-sized"}
+{"page": "open-model-licenses-concerning-restrictions", "severity": "medium", "lens": "bias\u00b7trust", "issue": "no 'no comment' note for licensors"}
+{"page": "open-model-licenses-concerning-restrictions", "severity": "low", "lens": "argument quality", "issue": "Wiggers interjection in Brand's mouth"}
+{"page": "open-model-licenses-concerning-restrictions", "severity": "low", "lens": "fine readability", "issue": "unaliased slugs"}
+{"page": "open-model-licenses-concerning-restrictions", "severity": "low", "lens": "fine readability", "issue": "Han-Chung Lee role missing"}
+{"page": "open-model-licenses-concerning-restrictions", "severity": "low", "lens": "argument quality", "issue": "composite claims"}
+{"page": "mistral-small-3", "reviewed": true, "defects": 3}
+{"page": "infoworld-osi-unveils-osaid-1-0", "reviewed": true, "defects": 4}
+{"page": "eu-ai-act-gpai-guide-open-source-developers", "reviewed": true, "defects": 4}
+{"page": "open-model-licenses-concerning-restrictions", "reviewed": true, "defects": 5}

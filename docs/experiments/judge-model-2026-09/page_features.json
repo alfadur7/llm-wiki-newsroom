@@ -1,0 +1,266 @@
+{
+ "ai-openness-oecd-gpai-open-weight-models": {
+  "trigger": 0,
+  "length": 7352
+ },
+ "anthropic-distillation-campaigns-alibaba-moonshot": {
+  "trigger": 0,
+  "length": 5605
+ },
+ "anthropic-position-open-weights-models": {
+  "trigger": 0,
+  "length": 8136
+ },
+ "apertus-fully-open-multilingual-llm": {
+  "trigger": 1,
+  "length": 6711
+ },
+ "beyond-deepseek-china-open-weight-ecosystem": {
+  "trigger": 0,
+  "length": 4526
+ },
+ "case-against-osaid": {
+  "trigger": 0,
+  "length": 2524
+ },
+ "debian-ai-gr-withdrawn": {
+  "trigger": 1,
+  "length": 6906
+ },
+ "debian-ai-models-dfsg": {
+  "trigger": 1,
+  "length": 5470
+ },
+ "deepseek-r1-release": {
+  "trigger": 1,
+  "length": 3395
+ },
+ "eleutherai-common-pile-dataset": {
+  "trigger": 1,
+  "length": 5496
+ },
+ "eu-ai-act-gpai-guide-open-source-developers": {
+  "trigger": 1,
+  "length": 10648
+ },
+ "eu-gpai-provider-guidelines": {
+  "trigger": 0,
+  "length": 4120
+ },
+ "euronews-meta-open-source-ai-not-all-it-seems": {
+  "trigger": 1,
+  "length": 6637
+ },
+ "fsf-free-ml-application-criteria": {
+  "trigger": 1,
+  "length": 4512
+ },
+ "gpt-oss-challenges-meta-open-weight": {
+  "trigger": 1,
+  "length": 6911
+ },
+ "hello-olmo-truly-open-llm": {
+  "trigger": 0,
+  "length": 5407
+ },
+ "infoworld-osi-unveils-osaid-1-0": {
+  "trigger": 1,
+  "length": 8235
+ },
+ "joint-statement-ai-safety-openness": {
+  "trigger": 1,
+  "length": 4349
+ },
+ "knives-out-open-weight-ai-models": {
+  "trigger": 1,
+  "length": 8241
+ },
+ "llama-2-meta-microsoft": {
+  "trigger": 1,
+  "length": 4432
+ },
+ "llama-3-1-community-license": {
+  "trigger": 1,
+  "length": 4582
+ },
+ "llama-chatgpt-not-open-source": {
+  "trigger": 1,
+  "length": 6529
+ },
+ "lwn-openmdw-license-review": {
+  "trigger": 0,
+  "length": 7767
+ },
+ "meta-muse-glimmer-apache-2-0": {
+  "trigger": 1,
+  "length": 8350
+ },
+ "mistral-ai-non-production-license": {
+  "trigger": 0,
+  "length": 3638
+ },
+ "mistral-small-3": {
+  "trigger": 1,
+  "length": 4891
+ },
+ "mozilla-celebrates-osaid": {
+  "trigger": 0,
+  "length": 1533
+ },
+ "mozilla-eleutherai-hf-sb-1047-letter": {
+  "trigger": 0,
+  "length": 6950
+ },
+ "ntia-open-model-weights-report": {
+  "trigger": 1,
+  "length": 4518
+ },
+ "open-future-osaid-step-forward": {
+  "trigger": 1,
+  "length": 11080
+ },
+ "open-model-licenses-concerning-restrictions": {
+  "trigger": 1,
+  "length": 7659
+ },
+ "open-secret-of-open-washing": {
+  "trigger": 0,
+  "length": 7674
+ },
+ "open-source-ai-llm-access-debate": {
+  "trigger": 1,
+  "length": 9306
+ },
+ "open-source-ai-models-how-open": {
+  "trigger": 0,
+  "length": 1515
+ },
+ "open-source-ai-path-forward": {
+  "trigger": 1,
+  "length": 8018
+ },
+ "open-source-ai-uniquely-dangerous": {
+  "trigger": 0,
+  "length": 7887
+ },
+ "open-washing-four-criteria": {
+  "trigger": 1,
+  "length": 8349
+ },
+ "open-weight-diplomacy-digital-silk-road": {
+  "trigger": 0,
+  "length": 9692
+ },
+ "open-weight-models-frontier-safety-gap": {
+  "trigger": 1,
+  "length": 7452
+ },
+ "open-weights-american-ai-leadership": {
+  "trigger": 0,
+  "length": 6005
+ },
+ "open-weights-not-enough-open-source-science": {
+  "trigger": 0,
+  "length": 8477
+ },
+ "open-weights-not-open-source-label-dispute": {
+  "trigger": 1,
+  "length": 7854
+ },
+ "openai-deepseek-free-riding-distillation": {
+  "trigger": 1,
+  "length": 6743
+ },
+ "openai-hack-open-source-ai-fight": {
+  "trigger": 0,
+  "length": 5874
+ },
+ "openmdw-1-1-nvidia-adoption": {
+  "trigger": 1,
+  "length": 4017
+ },
+ "osaid-take-it-or-leave-it": {
+  "trigger": 1,
+  "length": 7265
+ },
+ "osi-eu-code-of-practice-open-source": {
+  "trigger": 1,
+  "length": 5495
+ },
+ "osi-meta-llama-2-license-not-open-source": {
+  "trigger": 0,
+  "length": 4640
+ },
+ "osi-meta-llama-license-still-not-open-source": {
+  "trigger": 0,
+  "length": 4520
+ },
+ "osi-open-source-ai-definition": {
+  "trigger": 0,
+  "length": 1793
+ },
+ "osi-open-weights-good-open-source-better": {
+  "trigger": 0,
+  "length": 4006
+ },
+ "osi-readies-controversial-osaid": {
+  "trigger": 1,
+  "length": 8206
+ },
+ "red-hat-open-source-ai-point-of-view": {
+  "trigger": 1,
+  "length": 5727
+ },
+ "rethinking-open-source-generative-ai": {
+  "trigger": 1,
+  "length": 10835
+ },
+ "secrets-of-deepseek-r1-landmark-paper": {
+  "trigger": 1,
+  "length": 6154
+ },
+ "senators-question-meta-llama-leak": {
+  "trigger": 1,
+  "length": 7523
+ },
+ "sfc-osaid-erodes-open-source": {
+  "trigger": 1,
+  "length": 6442
+ },
+ "societal-impact-open-foundation-models": {
+  "trigger": 0,
+  "length": 3539
+ },
+ "tech-industry-open-source-ai-definition-problem": {
+  "trigger": 1,
+  "length": 11237
+ },
+ "techcrunch-osaid-official-definition": {
+  "trigger": 1,
+  "length": 7067
+ },
+ "true-open-source-ai-selective-transparency": {
+  "trigger": 0,
+  "length": 5512
+ },
+ "welcome-gpt-oss-openai": {
+  "trigger": 1,
+  "length": 6074
+ },
+ "what-does-open-source-ai-mean": {
+  "trigger": 1,
+  "length": 8970
+ },
+ "whats-next-chinese-open-source-ai": {
+  "trigger": 1,
+  "length": 9568
+ },
+ "zuckerberg-intensified-battle-ai-future": {
+  "trigger": 0,
+  "length": 7418
+ },
+ "zuckerberg-superintelligence-not-all-open-source": {
+  "trigger": 1,
+  "length": 5979
+ }
+}

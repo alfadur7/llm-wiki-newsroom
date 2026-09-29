@@ -109,6 +109,7 @@ Or click **["Use this template"](https://github.com/alfadur7/llm-wiki-newsroom/g
 - **[Full README](https://github.com/alfadur7/llm-wiki-newsroom#readme)** — install, commands, architecture, feature reference
 - **[FAQ]({{ '/faq/' | relative_url }})** — common questions answered
 - **[The Knowledge Factory]({{ '/knowledge-factory/' | relative_url }})** — the four-loop production system behind the newsroom, from the concept down to the implementation
+- **[Scooping the Rice, Leaving the Stones]({{ '/scooping-stones/' | relative_url }})** — a preregistered test of whether the Jev judge model can pick out an LLM wiki's bad pages, why it came back null, and why the defect base rate decides whether any screen can pay off
 - **[Browsable example wiki](https://github.com/alfadur7/llm-wiki-newsroom/wiki)** — the shipped corpus, no clone needed
 - **[Karpathy's original LLM Wiki gist](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f)** — the design inspiration
 

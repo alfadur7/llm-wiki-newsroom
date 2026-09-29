@@ -1,0 +1,22 @@
+{"page": "apertus-fully-open-multilingual-llm", "severity": "medium", "lens": "argument quality", "issue": "self-acknowledged limitation dropped"}
+{"page": "apertus-fully-open-multilingual-llm", "severity": "low", "lens": "bias\u00b7trust", "issue": "'open-weights posture' editor label"}
+{"page": "apertus-fully-open-multilingual-llm", "severity": "low", "lens": "fine readability", "issue": "HuggingFace notation split"}
+{"page": "apertus-fully-open-multilingual-llm", "severity": "low", "lens": "fine readability", "issue": "EUAIAct bare slug"}
+{"page": "apertus-fully-open-multilingual-llm", "severity": "low", "lens": "bias\u00b7trust", "issue": "'of its kind' dropped"}
+{"page": "apertus-fully-open-multilingual-llm", "severity": "low", "lens": "bias\u00b7trust", "issue": "'Currently' dropped"}
+{"page": "apertus-fully-open-multilingual-llm", "severity": "low", "lens": "argument quality", "issue": "defines typing of self-description"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "high", "lens": "bias\u00b7trust", "issue": "anchor asserts 'bedrock' quote in a source that lacks it"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "medium", "lens": "bias\u00b7trust", "issue": "innovation location misattributed"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "low", "lens": "fine readability", "issue": "bare TrainingData slug"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "low", "lens": "fine readability", "issue": "unaliased anchor"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "low", "lens": "narrative flow", "issue": "February no year"}
+{"page": "mozilla-eleutherai-hf-sb-1047-letter", "severity": "medium", "lens": "bias\u00b7trust", "issue": "joint letter claims under Mozilla alone"}
+{"page": "mozilla-eleutherai-hf-sb-1047-letter", "severity": "low", "lens": "argument quality", "issue": "cites vs references for co-signers"}
+{"page": "mozilla-eleutherai-hf-sb-1047-letter", "severity": "low", "lens": "fine readability", "issue": "signatory notation inconsistent"}
+{"page": "mozilla-eleutherai-hf-sb-1047-letter", "severity": "low", "lens": "bias\u00b7trust", "issue": "letter marker missing on two lines"}
+{"page": "mozilla-eleutherai-hf-sb-1047-letter", "severity": "low", "lens": "fine readability", "issue": "nested Wiener quote"}
+{"page": "zuckerberg-superintelligence-not-all-open-source", "severity": "low", "lens": "fine readability", "issue": "provenance note in Summary"}
+{"page": "apertus-fully-open-multilingual-llm", "reviewed": true, "defects": 7}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "reviewed": true, "defects": 5}
+{"page": "mozilla-eleutherai-hf-sb-1047-letter", "reviewed": true, "defects": 5}
+{"page": "zuckerberg-superintelligence-not-all-open-source", "reviewed": true, "defects": 1}

@@ -1,0 +1,30 @@
+{"page": "osaid-take-it-or-leave-it", "severity": "medium", "lens": "argument quality", "issue": "DeepSeek line carries no proposition; Connections resolves ambiguity"}
+{"page": "osaid-take-it-or-leave-it", "severity": "low", "lens": "prescription strength", "issue": "RAIL hedges and 'unlawful' dropped"}
+{"page": "osaid-take-it-or-leave-it", "severity": "low", "lens": "prescription strength", "issue": "'might lead to' firmed to 'expect'"}
+{"page": "osaid-take-it-or-leave-it", "severity": "low", "lens": "bias·trust", "issue": "openwashing vs industry capture framing"}
+{"page": "osaid-take-it-or-leave-it", "severity": "low", "lens": "fine readability", "issue": "training-data carve-out dropped from summary"}
+{"page": "osaid-take-it-or-leave-it", "severity": "low", "lens": "fine readability", "issue": "blog's '(ed)' insertion in OSI quote"}
+{"page": "osaid-take-it-or-leave-it", "severity": "low", "lens": "argument quality", "issue": "contradicts line rests on a hedged preference"}
+{"page": "osaid-take-it-or-leave-it", "severity": "low", "lens": "fine readability", "issue": "OpenAI plain text"}
+{"page": "osi-meta-llama-2-license-not-open-source", "severity": "low", "lens": "bias·trust", "issue": "conceded premise as active challenge"}
+{"page": "osi-meta-llama-2-license-not-open-source", "severity": "low", "lens": "bias·trust", "issue": "no note Meta's side absent"}
+{"page": "osi-meta-llama-2-license-not-open-source", "severity": "low", "lens": "fine readability", "issue": "Maffulli plain text in lead"}
+{"page": "osi-meta-llama-2-license-not-open-source", "severity": "low", "lens": "fine readability", "issue": "LLaMa/Llama alternation"}
+{"page": "osi-meta-llama-license-still-not-open-source", "severity": "medium", "lens": "bias·trust", "issue": "'a year after' in narrator voice vs 19 months"}
+{"page": "osi-meta-llama-license-still-not-open-source", "severity": "low", "lens": "argument quality", "issue": "evidence anchor on wrong claim"}
+{"page": "osi-meta-llama-license-still-not-open-source", "severity": "low", "lens": "argument quality", "issue": "FSF provenance dropped on two findings"}
+{"page": "osi-meta-llama-license-still-not-open-source", "severity": "low", "lens": "argument quality", "issue": "FSF connection should be cites:"}
+{"page": "osi-meta-llama-license-still-not-open-source", "severity": "low", "lens": "fine readability", "issue": "freedom 0 unglossed in lead"}
+{"page": "osi-meta-llama-license-still-not-open-source", "severity": "low", "lens": "fine readability", "issue": "endeavour spelling inconsistent"}
+{"page": "osi-open-source-ai-definition", "severity": "high", "lens": "bias·trust", "issue": "definition text imported from outside the raw"}
+{"page": "osi-open-source-ai-definition", "severity": "high", "lens": "bias·trust", "issue": "'validated as compliant' vs 'not certifications'"}
+{"page": "osi-open-source-ai-definition", "severity": "high", "lens": "bias·trust", "issue": "open-weights 'does not satisfy the freedoms' not in raw"}
+{"page": "osi-open-source-ai-definition", "severity": "medium", "lens": "bias·trust", "issue": "only Llama 2 named"}
+{"page": "osi-open-source-ai-definition", "severity": "low", "lens": "bias·trust", "issue": "'binary' not in raw"}
+{"page": "osi-open-source-ai-definition", "severity": "low", "lens": "fine readability", "issue": "landing page presented as the definition"}
+{"page": "osi-open-source-ai-definition", "severity": "low", "lens": "fine readability", "issue": "published date not in raw"}
+{"page": "osi-open-source-ai-definition", "severity": "low", "lens": "bias·trust", "issue": "endorsers/governance absent"}
+{"page": "osaid-take-it-or-leave-it", "reviewed": true, "defects": 8}
+{"page": "osi-meta-llama-2-license-not-open-source", "reviewed": true, "defects": 4}
+{"page": "osi-meta-llama-license-still-not-open-source", "reviewed": true, "defects": 6}
+{"page": "osi-open-source-ai-definition", "reviewed": true, "defects": 8}

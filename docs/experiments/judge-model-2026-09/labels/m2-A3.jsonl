@@ -1,0 +1,22 @@
+{"page": "gpt-oss-challenges-meta-open-weight", "severity": "low", "lens": "bias\u00b7trust", "issue": "'open' hedge stripped in [fact]"}
+{"page": "gpt-oss-challenges-meta-open-weight", "severity": "low", "lens": "bias\u00b7trust", "issue": "'requires' hardens 'best achieved'"}
+{"page": "gpt-oss-challenges-meta-open-weight", "severity": "low", "lens": "argument quality", "issue": "Qwen 'some' narrowed to one"}
+{"page": "gpt-oss-challenges-meta-open-weight", "severity": "low", "lens": "fine readability", "issue": "20b/20B casing"}
+{"page": "gpt-oss-challenges-meta-open-weight", "severity": "low", "lens": "fine readability", "issue": "mixed dates"}
+{"page": "gpt-oss-challenges-meta-open-weight", "severity": "low", "lens": "fine readability", "issue": "OSAID unglossed"}
+{"page": "infoworld-osi-unveils-osaid-1-0", "severity": "medium", "lens": "argument quality", "issue": "year-long vs two-year not surfaced"}
+{"page": "infoworld-osi-unveils-osaid-1-0", "severity": "medium", "lens": "bias\u00b7trust", "issue": "OSI self-assessments [fact], outsiders [analysis]"}
+{"page": "infoworld-osi-unveils-osaid-1-0", "severity": "low", "lens": "bias\u00b7trust", "issue": "Bdeir as endorser"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "medium", "lens": "bias\u00b7trust", "issue": "risk ratings inferred qualifier dropped"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "medium", "lens": "argument quality", "issue": "raw's Gemma license self-contradiction not noted"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "argument quality", "issue": "privacy connection dangling"}
+{"page": "meta-muse-glimmer-apache-2-0", "severity": "low", "lens": "repetition", "issue": "weights-only caveat repeated"}
+{"page": "open-weight-diplomacy-digital-silk-road", "severity": "medium", "lens": "bias\u00b7trust", "issue": "'reportedly' lines graded [fact]"}
+{"page": "open-weight-diplomacy-digital-silk-road", "severity": "low", "lens": "bias\u00b7trust", "issue": "Huawei balancing clause dropped"}
+{"page": "open-weight-diplomacy-digital-silk-road", "severity": "low", "lens": "argument quality", "issue": "'such as Qwen's' misattributes to brief"}
+{"page": "open-weight-diplomacy-digital-silk-road", "severity": "low", "lens": "fine readability", "issue": "undated events"}
+{"page": "open-weight-diplomacy-digital-silk-road", "severity": "low", "lens": "fine readability", "issue": "Entity List unglossed"}
+{"page": "gpt-oss-challenges-meta-open-weight", "reviewed": true, "defects": 6}
+{"page": "infoworld-osi-unveils-osaid-1-0", "reviewed": true, "defects": 3}
+{"page": "meta-muse-glimmer-apache-2-0", "reviewed": true, "defects": 4}
+{"page": "open-weight-diplomacy-digital-silk-road", "reviewed": true, "defects": 5}

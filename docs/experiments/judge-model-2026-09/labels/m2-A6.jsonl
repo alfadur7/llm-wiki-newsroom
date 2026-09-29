@@ -1,0 +1,27 @@
+{"page": "whats-next-chinese-open-source-ai", "severity": "medium", "lens": "bias\u00b7trust", "issue": "30% HF share put in Alibaba's mouth"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "medium", "lens": "argument quality", "issue": "Distillation defines line dangling"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "medium", "lens": "argument quality", "issue": "FineTuning connection dangling"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "argument quality", "issue": "composite three subjects"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "argument quality", "issue": "composite app+market"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "argument quality", "issue": "composite license+paper"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "argument quality", "issue": "two Liu claims merged"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "bias\u00b7trust", "issue": "CNBC attribution stretched"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "bias\u00b7trust", "issue": "'approach' softens 'match'"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "fine readability", "issue": "'August' no year"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "fine readability", "issue": "'January' no year"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "fine readability", "issue": "lone ISO date"}
+{"page": "whats-next-chinese-open-source-ai", "severity": "low", "lens": "fine readability", "issue": "Moonshot unlinked in claims"}
+{"page": "open-washing-four-criteria", "severity": "low", "lens": "fine readability", "issue": "EleutherAI/Ai2 unlinked"}
+{"page": "open-washing-four-criteria", "severity": "low", "lens": "fine readability", "issue": "OSI unglossed"}
+{"page": "open-washing-four-criteria", "severity": "low", "lens": "fine readability", "issue": "mixed dates"}
+{"page": "llama-chatgpt-not-open-source", "severity": "low", "lens": "bias\u00b7trust", "issue": "contested label absorbed"}
+{"page": "llama-chatgpt-not-open-source", "severity": "low", "lens": "bias\u00b7trust", "issue": "narration attributed to Liesenfeld"}
+{"page": "llama-chatgpt-not-open-source", "severity": "low", "lens": "fine readability", "issue": "'no response' vs Meta statement"}
+{"page": "llama-chatgpt-not-open-source", "severity": "low", "lens": "argument quality", "issue": "21 vs 20 counts"}
+{"page": "mistral-small-3", "severity": "low", "lens": "fine readability", "issue": "MRL unglossed"}
+{"page": "mistral-small-3", "severity": "low", "lens": "argument quality", "issue": "vendor caveat dropped"}
+{"page": "mistral-small-3", "severity": "low", "lens": "fine readability", "issue": "GPT4o-mini spelling"}
+{"page": "whats-next-chinese-open-source-ai", "reviewed": true, "defects": 13}
+{"page": "open-washing-four-criteria", "reviewed": true, "defects": 3}
+{"page": "llama-chatgpt-not-open-source", "reviewed": true, "defects": 4}
+{"page": "mistral-small-3", "reviewed": true, "defects": 3}

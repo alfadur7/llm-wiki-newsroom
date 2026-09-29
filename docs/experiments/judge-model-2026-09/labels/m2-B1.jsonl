@@ -1,0 +1,23 @@
+{"page": "open-washing-four-criteria", "severity": "low", "lens": "information density", "issue": "seven-sentence summary"}
+{"page": "open-washing-four-criteria", "severity": "low", "lens": "fine readability", "issue": "OSI unglossed"}
+{"page": "open-washing-four-criteria", "severity": "low", "lens": "fine readability", "issue": "Ai2/EleutherAI unlinked"}
+{"page": "open-washing-four-criteria", "severity": "low", "lens": "fine readability", "issue": "mixed date notation"}
+{"page": "open-washing-four-criteria", "severity": "low", "lens": "argument quality", "issue": "author's stricter test vs OSAID not distinguished"}
+{"page": "secrets-of-deepseek-r1-landmark-paper", "severity": "medium", "lens": "argument quality", "issue": "Summary gives both researchers both verdicts; Tunstall hedged"}
+{"page": "secrets-of-deepseek-r1-landmark-paper", "severity": "medium", "lens": "bias\u00b7trust", "issue": "OpenAI not quoted, no note"}
+{"page": "secrets-of-deepseek-r1-landmark-paper", "severity": "low", "lens": "bias\u00b7trust", "issue": "'distillation' inserted into reported suspicion"}
+{"page": "secrets-of-deepseek-r1-landmark-paper", "severity": "low", "lens": "bias\u00b7trust", "issue": "export-control clause under DeepSeek"}
+{"page": "secrets-of-deepseek-r1-landmark-paper", "severity": "low", "lens": "fine readability", "issue": "mixed date notation"}
+{"page": "debian-ai-gr-withdrawn", "severity": "low", "lens": "bias\u00b7trust", "issue": "quote weight tilts to one camp"}
+{"page": "debian-ai-gr-withdrawn", "severity": "low", "lens": "fine readability", "issue": "'preferred form of modification' unglossed"}
+{"page": "debian-ai-gr-withdrawn", "severity": "low", "lens": "bias\u00b7trust", "issue": "contradicts strips forecast's conditional"}
+{"page": "mozilla-eleutherai-hf-sb-1047-letter", "severity": "medium", "lens": "bias\u00b7trust", "issue": "joint letter claims under Mozilla alone"}
+{"page": "mozilla-eleutherai-hf-sb-1047-letter", "severity": "medium", "lens": "argument quality", "issue": "cites vs references for identical co-signers"}
+{"page": "mozilla-eleutherai-hf-sb-1047-letter", "severity": "medium", "lens": "bias\u00b7trust", "issue": "Wiener's words in signatories' Key Quote"}
+{"page": "mozilla-eleutherai-hf-sb-1047-letter", "severity": "low", "lens": "bias\u00b7trust", "issue": "letter claims missing marker"}
+{"page": "mozilla-eleutherai-hf-sb-1047-letter", "severity": "low", "lens": "fine readability", "issue": "signatory notation inconsistent"}
+{"page": "mozilla-eleutherai-hf-sb-1047-letter", "severity": "low", "lens": "bias\u00b7trust", "issue": "conciliatory statements dropped"}
+{"page": "open-washing-four-criteria", "reviewed": true, "defects": 5}
+{"page": "secrets-of-deepseek-r1-landmark-paper", "reviewed": true, "defects": 5}
+{"page": "debian-ai-gr-withdrawn", "reviewed": true, "defects": 3}
+{"page": "mozilla-eleutherai-hf-sb-1047-letter", "reviewed": true, "defects": 6}

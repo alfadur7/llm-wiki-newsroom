@@ -1,0 +1,28 @@
+{"page": "anthropic-distillation-campaigns-alibaba-moonshot", "severity": "medium", "lens": "narrative flow", "issue": "Connections introduces Amodei fact not in body"}
+{"page": "anthropic-distillation-campaigns-alibaba-moonshot", "severity": "low", "lens": "bias\u00b7trust", "issue": "purpose in narrator voice"}
+{"page": "anthropic-distillation-campaigns-alibaba-moonshot", "severity": "low", "lens": "argument quality", "issue": "comparison baseline narrowed"}
+{"page": "anthropic-distillation-campaigns-alibaba-moonshot", "severity": "low", "lens": "argument quality", "issue": "300k figure unattributed to campaign"}
+{"page": "anthropic-distillation-campaigns-alibaba-moonshot", "severity": "low", "lens": "fine readability", "issue": "Moonshot unlinked in claims"}
+{"page": "anthropic-distillation-campaigns-alibaba-moonshot", "severity": "low", "lens": "fine readability", "issue": "unclear military phrase"}
+{"page": "anthropic-distillation-campaigns-alibaba-moonshot", "severity": "low", "lens": "fine readability", "issue": "'reports on a report'"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "medium", "lens": "argument quality", "issue": "innovation location misstated"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "medium", "lens": "argument quality", "issue": "appositive misassigns 'calling themselves open'"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "medium", "lens": "argument quality", "issue": "anchor supports only half the claim"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "medium", "lens": "bias\u00b7trust", "issue": "'partially open' narrator rating attributed to OSI in contradicts"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "low", "lens": "bias\u00b7trust", "issue": "OSI authority hedges dropped"}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "severity": "low", "lens": "fine readability", "issue": "February no year"}
+{"page": "eleutherai-common-pile-dataset", "severity": "low", "lens": "fine readability", "issue": "'figures' with no figures"}
+{"page": "eleutherai-common-pile-dataset", "severity": "low", "lens": "fine readability", "issue": "'right a release'"}
+{"page": "eleutherai-common-pile-dataset", "severity": "low", "lens": "argument quality", "issue": "speaker link to org"}
+{"page": "eleutherai-common-pile-dataset", "severity": "low", "lens": "argument quality", "issue": "scale qualifier dropped in contradicts"}
+{"page": "eleutherai-common-pile-dataset", "severity": "low", "lens": "bias\u00b7trust", "issue": "Summary omits partners correction"}
+{"page": "open-secret-of-open-washing", "severity": "medium", "lens": "argument quality", "issue": "45 vs 46 unremarked"}
+{"page": "open-secret-of-open-washing", "severity": "low", "lens": "argument quality", "issue": "'deceptive' dropped from definition"}
+{"page": "open-secret-of-open-washing", "severity": "low", "lens": "fine readability", "issue": "Zuckerberg unlinked"}
+{"page": "open-secret-of-open-washing", "severity": "low", "lens": "fine readability", "issue": "Ballmer role missing"}
+{"page": "open-secret-of-open-washing", "severity": "low", "lens": "information density", "issue": "quote selection"}
+{"page": "open-secret-of-open-washing", "severity": "low", "lens": "fine readability", "issue": "OSI/IP unglossed"}
+{"page": "anthropic-distillation-campaigns-alibaba-moonshot", "reviewed": true, "defects": 7}
+{"page": "euronews-meta-open-source-ai-not-all-it-seems", "reviewed": true, "defects": 6}
+{"page": "eleutherai-common-pile-dataset", "reviewed": true, "defects": 5}
+{"page": "open-secret-of-open-washing", "reviewed": true, "defects": 6}

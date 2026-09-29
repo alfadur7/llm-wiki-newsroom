@@ -1,0 +1,19 @@
+{"page": "zuckerberg-superintelligence-not-all-open-source", "severity": "low", "lens": "fine readability", "issue": "pipeline self-reference"}
+{"page": "zuckerberg-superintelligence-not-all-open-source", "severity": "low", "lens": "argument quality", "issue": "composite Scale AI"}
+{"page": "zuckerberg-intensified-battle-ai-future", "severity": "medium", "lens": "bias\u00b7trust", "issue": "rebutted premise absent"}
+{"page": "zuckerberg-intensified-battle-ai-future", "severity": "low", "lens": "narrative flow", "issue": "undated 'Tuesday'"}
+{"page": "zuckerberg-intensified-battle-ai-future", "severity": "low", "lens": "argument quality", "issue": "analysis+forecast composite"}
+{"page": "zuckerberg-intensified-battle-ai-future", "severity": "low", "lens": "argument quality", "issue": "release+superlative composite"}
+{"page": "gpt-oss-challenges-meta-open-weight", "severity": "low", "lens": "argument quality", "issue": "Qwen scope narrowed"}
+{"page": "gpt-oss-challenges-meta-open-weight", "severity": "low", "lens": "fine readability", "issue": "OSAID/OSI unglossed"}
+{"page": "gpt-oss-challenges-meta-open-weight", "severity": "low", "lens": "fine readability", "issue": "20b/20B casing"}
+{"page": "gpt-oss-challenges-meta-open-weight", "severity": "low", "lens": "fine readability", "issue": "mixed dates"}
+{"page": "gpt-oss-challenges-meta-open-weight", "severity": "low", "lens": "fine readability", "issue": "anchor promises missing quote"}
+{"page": "gpt-oss-challenges-meta-open-weight", "severity": "low", "lens": "fine readability", "issue": "self-slug anchors"}
+{"page": "gpt-oss-challenges-meta-open-weight", "severity": "low", "lens": "argument quality", "issue": "composite release+GPT-5"}
+{"page": "osi-eu-code-of-practice-open-source", "severity": "medium", "lens": "argument quality", "issue": "AUP argument joined to Meta contradicts"}
+{"page": "osi-eu-code-of-practice-open-source", "severity": "low", "lens": "fine readability", "issue": "11 March no year"}
+{"page": "zuckerberg-superintelligence-not-all-open-source", "reviewed": true, "defects": 2}
+{"page": "zuckerberg-intensified-battle-ai-future", "reviewed": true, "defects": 4}
+{"page": "gpt-oss-challenges-meta-open-weight", "reviewed": true, "defects": 7}
+{"page": "osi-eu-code-of-practice-open-source", "reviewed": true, "defects": 2}

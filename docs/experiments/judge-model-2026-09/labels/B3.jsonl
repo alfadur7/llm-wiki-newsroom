@@ -1,0 +1,27 @@
+{"page": "osi-meta-llama-2-license-not-open-source", "severity": "medium", "lens": "bias/trust", "issue": "OSI's contested determination graded [fact]"}
+{"page": "osi-meta-llama-2-license-not-open-source", "severity": "low", "lens": "argument quality", "issue": "conceded premise turned into active challenge"}
+{"page": "osi-meta-llama-2-license-not-open-source", "severity": "low", "lens": "fine readability", "issue": "LLaMa/Llama notation mixed"}
+{"page": "osi-meta-llama-2-license-not-open-source", "severity": "low", "lens": "fine readability", "issue": "'fails the bar on discriminating' ambiguous"}
+{"page": "osi-meta-llama-2-license-not-open-source", "severity": "low", "lens": "bias/trust", "issue": "no scope note that Meta's side is absent"}
+{"page": "osi-meta-llama-2-license-not-open-source", "severity": "low", "lens": "information density", "issue": "Maffulli plain text in lead"}
+{"page": "welcome-gpt-oss-openai", "severity": "medium", "lens": "argument quality", "issue": "summary says body never mentions training data; raw does"}
+{"page": "welcome-gpt-oss-openai", "severity": "medium", "lens": "bias/trust", "issue": "anonymous commenter reports graded [fact]"}
+{"page": "welcome-gpt-oss-openai", "severity": "medium", "lens": "information density", "issue": "18 of 25 claims integration spec, buries openness claims"}
+{"page": "welcome-gpt-oss-openai", "severity": "low", "lens": "bias/trust", "issue": "only dissenting commenters surfaced"}
+{"page": "welcome-gpt-oss-openai", "severity": "low", "lens": "fine readability", "issue": "wikilink inside verbatim quote"}
+{"page": "welcome-gpt-oss-openai", "severity": "low", "lens": "fine readability", "issue": "participle misattaches to RoPE"}
+{"page": "welcome-gpt-oss-openai", "severity": "low", "lens": "fine readability", "issue": "product-name notation varies"}
+{"page": "welcome-gpt-oss-openai", "severity": "low", "lens": "fine readability", "issue": "MoE/MXFP4/RoPE/LoRA unglossed"}
+{"page": "anthropic-position-open-weights-models", "severity": "medium", "lens": "bias/trust", "issue": "Connections drop 'potentially' — categorical higher-risk claim"}
+{"page": "anthropic-position-open-weights-models", "severity": "low", "lens": "argument quality", "issue": "'worry' turned into 'expects'"}
+{"page": "anthropic-position-open-weights-models", "severity": "low", "lens": "fine readability", "issue": "'the CCP most capably' garbled; CCP unglossed"}
+{"page": "anthropic-position-open-weights-models", "severity": "low", "lens": "fine readability", "issue": "quote cut mid-sentence without ellipsis"}
+{"page": "anthropic-position-open-weights-models", "severity": "low", "lens": "argument quality", "issue": "contradicts line loses 'unnamed letter' hedge"}
+{"page": "anthropic-position-open-weights-models", "severity": "low", "lens": "bias/trust", "issue": "US-government support for primary concern dropped"}
+{"page": "societal-impact-open-foundation-models", "severity": "low", "lens": "fine readability", "issue": "CamelCase slug as noun"}
+{"page": "societal-impact-open-foundation-models", "severity": "low", "lens": "information density", "issue": "Maffulli plain text"}
+{"page": "societal-impact-open-foundation-models", "severity": "low", "lens": "argument quality", "issue": "bibliographic metadata as author claims"}
+{"page": "osi-meta-llama-2-license-not-open-source", "reviewed": true, "defects": 6}
+{"page": "welcome-gpt-oss-openai", "reviewed": true, "defects": 8}
+{"page": "anthropic-position-open-weights-models", "reviewed": true, "defects": 6}
+{"page": "societal-impact-open-foundation-models", "reviewed": true, "defects": 3}

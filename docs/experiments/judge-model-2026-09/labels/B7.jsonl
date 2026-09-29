@@ -1,0 +1,22 @@
+{"page": "mozilla-celebrates-osaid", "severity": "medium", "lens": "bias\u00b7trust", "issue": "Llama 3 openwashing framing dropped"}
+{"page": "mozilla-celebrates-osaid", "severity": "medium", "lens": "argument quality", "issue": "definition scope and data-compromise rationale omitted"}
+{"page": "mozilla-celebrates-osaid", "severity": "low", "lens": "argument quality", "issue": "composite forecast"}
+{"page": "deepseek-r1-release", "severity": "medium", "lens": "repetition", "issue": "MIT stated four times; implied prior license"}
+{"page": "deepseek-r1-release", "severity": "medium", "lens": "argument quality", "issue": "Hunton disagreement typed references not contradicts"}
+{"page": "deepseek-r1-release", "severity": "low", "lens": "bias\u00b7trust", "issue": "'fully open-source' graded [fact] vs performance [analysis]"}
+{"page": "deepseek-r1-release", "severity": "low", "lens": "fine readability", "issue": "'the wiki's' self-reference, packed sentence"}
+{"page": "open-weight-models-frontier-safety-gap", "severity": "high", "lens": "argument quality", "issue": "Summary puts API-unenforceability in Papadatos's mouth"}
+{"page": "open-weight-models-frontier-safety-gap", "severity": "medium", "lens": "bias\u00b7trust", "issue": "Webster concession dropped"}
+{"page": "open-weight-models-frontier-safety-gap", "severity": "medium", "lens": "fine readability", "issue": "'OpenAI's breach' no antecedent"}
+{"page": "open-weight-models-frontier-safety-gap", "severity": "low", "lens": "information density", "issue": "Hugging Face unlinked"}
+{"page": "open-weight-models-frontier-safety-gap", "severity": "low", "lens": "fine readability", "issue": "Far.ai/SaferAI no descriptor"}
+{"page": "open-weight-models-frontier-safety-gap", "severity": "low", "lens": "argument quality", "issue": "composite"}
+{"page": "red-hat-open-source-ai-point-of-view", "severity": "medium", "lens": "argument quality", "issue": "Summary substitutes warrant for preferred-form"}
+{"page": "red-hat-open-source-ai-point-of-view", "severity": "low", "lens": "fine readability", "issue": "claimant Red Hat vs Wright"}
+{"page": "red-hat-open-source-ai-point-of-view", "severity": "low", "lens": "fine readability", "issue": "OSAID gloss order"}
+{"page": "red-hat-open-source-ai-point-of-view", "severity": "low", "lens": "information density", "issue": "product catalog claims"}
+{"page": "red-hat-open-source-ai-point-of-view", "severity": "low", "lens": "argument quality", "issue": "contradicts description imprecise"}
+{"page": "mozilla-celebrates-osaid", "reviewed": true, "defects": 3}
+{"page": "deepseek-r1-release", "reviewed": true, "defects": 4}
+{"page": "open-weight-models-frontier-safety-gap", "reviewed": true, "defects": 6}
+{"page": "red-hat-open-source-ai-point-of-view", "reviewed": true, "defects": 5}

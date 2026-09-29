@@ -1,0 +1,15 @@
+{"page": "llama-2-meta-microsoft", "severity": "low", "lens": "fine readability", "issue": "lede has no main verb"}
+{"page": "llama-2-meta-microsoft", "severity": "low", "lens": "argument quality", "issue": "hedged 'would be challenging' hardened to 'could not build'"}
+{"page": "llama-2-meta-microsoft", "severity": "low", "lens": "narrative flow", "issue": "no date anywhere though URL carries 2023/07"}
+{"page": "llama-3-1-community-license", "severity": "medium", "lens": "argument quality", "issue": "5(c) termination narrowed to suits against Meta; raw: Meta or any entity"}
+{"page": "llama-3-1-community-license", "severity": "low", "lens": "fine readability", "issue": "'assigns' ownership vs 'as between you and Meta' recognition"}
+{"page": "mistral-ai-non-production-license", "severity": "low", "lens": "bias·trust", "issue": "license scope stated in narrator voice"}
+{"page": "mistral-ai-non-production-license", "severity": "low", "lens": "repetition", "issue": "six-sentence summary restates claims"}
+{"page": "mistral-ai-non-production-license", "severity": "low", "lens": "fine readability", "issue": "self-anchor alias renders 'self'"}
+{"page": "mozilla-celebrates-osaid", "severity": "medium", "lens": "bias·trust", "issue": "openwashing charge against Llama 3 softened to 'clarify'"}
+{"page": "mozilla-celebrates-osaid", "severity": "low", "lens": "argument quality", "issue": "Key Quotes keeps only TL;DR line"}
+{"page": "mozilla-celebrates-osaid", "severity": "low", "lens": "argument quality", "issue": "Meta relation should be contradicts:"}
+{"page": "llama-2-meta-microsoft", "reviewed": true, "defects": 3}
+{"page": "llama-3-1-community-license", "reviewed": true, "defects": 2}
+{"page": "mistral-ai-non-production-license", "reviewed": true, "defects": 3}
+{"page": "mozilla-celebrates-osaid", "reviewed": true, "defects": 3}

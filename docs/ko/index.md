@@ -112,6 +112,7 @@ cd llm-wiki-newsroom
 - [**README(영문)**](https://github.com/alfadur7/llm-wiki-newsroom#readme): 설치, 명령어, 구조, 기능 레퍼런스
 - **[FAQ(한국어)]({{ '/ko/faq/' | relative_url }})**: 자주 묻는 질문
 - **[지식 팩토리(한국어)]({{ '/ko/knowledge-factory/' | relative_url }})**: 편집국을 움직이는 4대 루프 지식 생산 체계를 개념부터 구현까지 설명
+- **[돌 섞인 쌀, 조리질로 돌 고르기(한국어)]({{ '/ko/scooping-stones/' | relative_url }})**: LLM 위키의 불량 페이지를 판정 모델 Jev가 골라낼 수 있는지 사전등록으로 시험한 기록. 효과가 없게 나온 이유와, 결함이 얼마나 흔한지가 선별의 쓸모를 정한다는 교훈
 - [**예제 위키 둘러보기**](https://github.com/alfadur7/llm-wiki-newsroom/wiki): 레포에 담긴 예제, clone 불필요
 - [**카파시의 원본 LLM Wiki gist**](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f): 설계 영감
 - [**외부 리뷰: 신문사 편집국처럼 굴러가는 LLM 지식 위키**](https://dbhyeong.github.io/blog/llm-wiki-newsroom-multi-agent-knowledge-wiki): 구조를 도식으로 풀고, 이 프로젝트의 주장을 레포·원문과 대조해 한계까지 짚은 제3자 글

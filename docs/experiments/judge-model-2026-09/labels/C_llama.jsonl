@@ -1,0 +1,7 @@
+{"page": "llama-3-1-community-license", "severity": "medium", "lens": "argument quality", "issue": "litigation trigger narrowed to suits against Meta"}
+{"page": "llama-3-1-community-license", "severity": "low", "lens": "argument quality", "issue": "'assigns' overstates"}
+{"page": "llama-3-1-community-license", "severity": "low", "lens": "argument quality", "issue": "indemnification omitted"}
+{"page": "llama-3-1-community-license", "severity": "low", "lens": "argument quality", "issue": "Summary MAU as standing condition"}
+{"page": "llama-3-1-community-license", "severity": "low", "lens": "argument quality", "issue": "Summary naming rule loosened"}
+{"page": "llama-3-1-community-license", "severity": "low", "lens": "fine readability", "issue": "'the raw' jargon"}
+{"page": "llama-3-1-community-license", "reviewed": true, "defects": 6}

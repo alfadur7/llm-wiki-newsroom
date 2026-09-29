@@ -43,3 +43,7 @@ defaults:
       path: ""
     values:
       image: /knowledge-graph.png
+
+# Experiment data is browsed on GitHub (linked from the articles), not rendered as site pages.
+exclude:
+  - experiments

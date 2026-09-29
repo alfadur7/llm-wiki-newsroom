@@ -1,0 +1,24 @@
+{"page": "zuckerberg-intensified-battle-ai-future", "severity": "medium", "lens": "argument quality", "issue": "rebutted premise absent"}
+{"page": "zuckerberg-intensified-battle-ai-future", "severity": "medium", "lens": "bias\u00b7trust", "issue": "asymmetric grading of direct quotes by camp"}
+{"page": "zuckerberg-intensified-battle-ai-future", "severity": "low", "lens": "argument quality", "issue": "Apple premise conclusion dropped"}
+{"page": "zuckerberg-intensified-battle-ai-future", "severity": "low", "lens": "argument quality", "issue": "composite release+claim"}
+{"page": "open-weights-not-enough-open-source-science", "severity": "medium", "lens": "bias\u00b7trust", "issue": "single-voice institutional piece not surfaced"}
+{"page": "open-weights-not-enough-open-source-science", "severity": "low", "lens": "argument quality", "issue": "'have closed' strengthens 'closing'"}
+{"page": "open-weights-not-enough-open-source-science", "severity": "low", "lens": "fine readability", "issue": "'last year' unanchored"}
+{"page": "open-weights-not-enough-open-source-science", "severity": "low", "lens": "fine readability", "issue": "editorial cross-ref in claim"}
+{"page": "open-weights-not-enough-open-source-science", "severity": "low", "lens": "bias\u00b7trust", "issue": "inconsistent Landay/HAI attribution"}
+{"page": "debian-ai-gr-withdrawn", "severity": "medium", "lens": "argument quality", "issue": "contradicts mistyped; conditional dropped"}
+{"page": "debian-ai-gr-withdrawn", "severity": "medium", "lens": "bias\u00b7trust", "issue": "OSI statement under reporter claimant"}
+{"page": "debian-ai-gr-withdrawn", "severity": "low", "lens": "argument quality", "issue": "backdoor demo purpose dropped"}
+{"page": "debian-ai-gr-withdrawn", "severity": "low", "lens": "argument quality", "issue": "composite dated actions"}
+{"page": "debian-ai-gr-withdrawn", "severity": "low", "lens": "argument quality", "issue": "composite demo+timeline"}
+{"page": "debian-ai-gr-withdrawn", "severity": "low", "lens": "fine readability", "issue": "45-word two-idea sentence"}
+{"page": "debian-ai-gr-withdrawn", "severity": "low", "lens": "fine readability", "issue": "'preferred form' unglossed"}
+{"page": "ai-openness-oecd-gpai-open-weight-models", "severity": "medium", "lens": "bias\u00b7trust", "issue": "authors' framing attributed to report"}
+{"page": "ai-openness-oecd-gpai-open-weight-models", "severity": "medium", "lens": "argument quality", "issue": "one-sided marginal-risk example"}
+{"page": "ai-openness-oecd-gpai-open-weight-models", "severity": "low", "lens": "argument quality", "issue": "DeepSeek connection dangling"}
+{"page": "ai-openness-oecd-gpai-open-weight-models", "severity": "low", "lens": "fine readability", "issue": "report named three ways"}
+{"page": "zuckerberg-intensified-battle-ai-future", "reviewed": true, "defects": 4}
+{"page": "open-weights-not-enough-open-source-science", "reviewed": true, "defects": 5}
+{"page": "debian-ai-gr-withdrawn", "reviewed": true, "defects": 7}
+{"page": "ai-openness-oecd-gpai-open-weight-models", "reviewed": true, "defects": 4}

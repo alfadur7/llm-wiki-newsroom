@@ -1,0 +1,9 @@
+{"page": "hello-olmo-truly-open-llm", "severity": "high", "lens": "bias\u00b7trust", "issue": "Horvitz advisory-board disclosure stripped"}
+{"page": "hello-olmo-truly-open-llm", "severity": "high", "lens": "argument quality", "issue": "'fuller reading of OpenSourceAI' gloss in Smith's line"}
+{"page": "hello-olmo-truly-open-llm", "severity": "medium", "lens": "bias\u00b7trust", "issue": "'limited transparency' retargeted at OpenWeights"}
+{"page": "hello-olmo-truly-open-llm", "severity": "low", "lens": "argument quality", "issue": "scope note 'external' vs 'independent'"}
+{"page": "hello-olmo-truly-open-llm", "severity": "low", "lens": "repetition", "issue": "Summary sentences 2-3 restate"}
+{"page": "hello-olmo-truly-open-llm", "severity": "low", "lens": "information density", "issue": "Hugging Face unlinked"}
+{"page": "hello-olmo-truly-open-llm", "severity": "low", "lens": "fine readability", "issue": "CSC unglossed"}
+{"page": "hello-olmo-truly-open-llm", "severity": "low", "lens": "fine readability", "issue": "Smith role strings"}
+{"page": "hello-olmo-truly-open-llm", "reviewed": true, "defects": 8}

@@ -1,0 +1,27 @@
+{"page": "openai-hack-open-source-ai-fight", "severity": "medium", "lens": "bias\u00b7trust", "issue": "'no comment from Hugging Face' contradicts claim"}
+{"page": "openai-hack-open-source-ai-fight", "severity": "low", "lens": "bias\u00b7trust", "issue": "letter identification unhedged"}
+{"page": "openai-hack-open-source-ai-fight", "severity": "low", "lens": "fine readability", "issue": "ambiguous clause, qualifier dropped"}
+{"page": "openai-hack-open-source-ai-fight", "severity": "low", "lens": "fine readability", "issue": "mixed dates"}
+{"page": "osi-eu-code-of-practice-open-source", "severity": "medium", "lens": "argument quality", "issue": "composite fact+characterization"}
+{"page": "osi-eu-code-of-practice-open-source", "severity": "medium", "lens": "argument quality", "issue": "rule-6 joined to Meta contradiction"}
+{"page": "osi-eu-code-of-practice-open-source", "severity": "low", "lens": "argument quality", "issue": "ModelLicensing connection dangling"}
+{"page": "osi-eu-code-of-practice-open-source", "severity": "low", "lens": "fine readability", "issue": "OSAID unglossed"}
+{"page": "osi-eu-code-of-practice-open-source", "severity": "low", "lens": "fine readability", "issue": "mixed dates"}
+{"page": "open-weights-not-open-source-label-dispute", "severity": "medium", "lens": "bias\u00b7trust", "issue": "no attribution-asymmetry note"}
+{"page": "open-weights-not-open-source-label-dispute", "severity": "medium", "lens": "argument quality", "issue": "composite verdict+fact"}
+{"page": "open-weights-not-open-source-label-dispute", "severity": "low", "lens": "bias\u00b7trust", "issue": "Maffulli stake dropped"}
+{"page": "open-weights-not-open-source-label-dispute", "severity": "low", "lens": "fine readability", "issue": "HAI unglossed"}
+{"page": "open-weights-not-open-source-label-dispute", "severity": "low", "lens": "fine readability", "issue": "OSAID unglossed"}
+{"page": "open-weights-not-open-source-label-dispute", "severity": "low", "lens": "fine readability", "issue": "FOSS unglossed"}
+{"page": "open-weights-not-open-source-label-dispute", "severity": "low", "lens": "information density", "issue": "critics listed without roles"}
+{"page": "open-secret-of-open-washing", "severity": "low", "lens": "fine readability", "issue": "Zuckerberg unlinked"}
+{"page": "open-secret-of-open-washing", "severity": "low", "lens": "fine readability", "issue": "AllenAI unlinked"}
+{"page": "open-secret-of-open-washing", "severity": "low", "lens": "fine readability", "issue": "BloomZ reads as two models"}
+{"page": "open-secret-of-open-washing", "severity": "low", "lens": "argument quality", "issue": "45 vs 46 unremarked"}
+{"page": "open-secret-of-open-washing", "severity": "low", "lens": "fine readability", "issue": "IP unglossed"}
+{"page": "open-secret-of-open-washing", "severity": "low", "lens": "fine readability", "issue": "paraphrase narrows"}
+{"page": "open-secret-of-open-washing", "severity": "low", "lens": "fine readability", "issue": "date form"}
+{"page": "openai-hack-open-source-ai-fight", "reviewed": true, "defects": 4}
+{"page": "osi-eu-code-of-practice-open-source", "reviewed": true, "defects": 5}
+{"page": "open-weights-not-open-source-label-dispute", "reviewed": true, "defects": 7}
+{"page": "open-secret-of-open-washing", "reviewed": true, "defects": 7}

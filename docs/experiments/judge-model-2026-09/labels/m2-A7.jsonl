@@ -1,0 +1,21 @@
+{"page": "beyond-deepseek-china-open-weight-ecosystem", "severity": "medium", "lens": "bias\u00b7trust", "issue": "Summary drops 'seem to' hedge"}
+{"page": "beyond-deepseek-china-open-weight-ecosystem", "severity": "medium", "lens": "bias\u00b7trust", "issue": "'not decisive' vs 'not the sole determinant'"}
+{"page": "beyond-deepseek-china-open-weight-ecosystem", "severity": "low", "lens": "bias\u00b7trust", "issue": "anonymous policymakers graded [fact]"}
+{"page": "eu-ai-act-gpai-guide-open-source-developers", "severity": "low", "lens": "bias\u00b7trust", "issue": "non-signatory inference in [fact]"}
+{"page": "eu-ai-act-gpai-guide-open-source-developers", "severity": "low", "lens": "fine readability", "issue": "'rather than' overstates disclaimer"}
+{"page": "eu-ai-act-gpai-guide-open-source-developers", "severity": "low", "lens": "fine readability", "issue": "FOSS unglossed"}
+{"page": "eu-ai-act-gpai-guide-open-source-developers", "severity": "low", "lens": "fine readability", "issue": "mixed dates"}
+{"page": "eu-ai-act-gpai-guide-open-source-developers", "severity": "low", "lens": "fine readability", "issue": "Ai2 unlinked in body"}
+{"page": "anthropic-distillation-campaigns-alibaba-moonshot", "severity": "low", "lens": "bias\u00b7trust", "issue": "purpose clause in narrator voice"}
+{"page": "anthropic-distillation-campaigns-alibaba-moonshot", "severity": "low", "lens": "bias\u00b7trust", "issue": "military-routing narration attributed to Anthropic"}
+{"page": "anthropic-distillation-campaigns-alibaba-moonshot", "severity": "low", "lens": "fine readability", "issue": "February without year"}
+{"page": "anthropic-distillation-campaigns-alibaba-moonshot", "severity": "low", "lens": "bias\u00b7trust", "issue": "'closed model' framing"}
+{"page": "secrets-of-deepseek-r1-landmark-paper", "severity": "low", "lens": "bias\u00b7trust", "issue": "'distillation' label in reported suspicion"}
+{"page": "secrets-of-deepseek-r1-landmark-paper", "severity": "low", "lens": "bias\u00b7trust", "issue": "joint verdict merges two researchers"}
+{"page": "secrets-of-deepseek-r1-landmark-paper", "severity": "low", "lens": "bias\u00b7trust", "issue": "export-control clause under DeepSeek"}
+{"page": "secrets-of-deepseek-r1-landmark-paper", "severity": "low", "lens": "bias\u00b7trust", "issue": "Tunstall second hedge dropped"}
+{"page": "secrets-of-deepseek-r1-landmark-paper", "severity": "low", "lens": "fine readability", "issue": "January without year"}
+{"page": "beyond-deepseek-china-open-weight-ecosystem", "reviewed": true, "defects": 3}
+{"page": "eu-ai-act-gpai-guide-open-source-developers", "reviewed": true, "defects": 5}
+{"page": "anthropic-distillation-campaigns-alibaba-moonshot", "reviewed": true, "defects": 4}
+{"page": "secrets-of-deepseek-r1-landmark-paper", "reviewed": true, "defects": 5}

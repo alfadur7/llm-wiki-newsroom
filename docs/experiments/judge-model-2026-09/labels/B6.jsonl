@@ -1,0 +1,25 @@
+{"page": "hello-olmo-truly-open-llm", "severity": "high", "lens": "bias\u00b7trust", "issue": "narrator verdict 'fuller reading of OpenSourceAI' in Smith's claim"}
+{"page": "hello-olmo-truly-open-llm", "severity": "medium", "lens": "bias\u00b7trust", "issue": "'limited transparency' retargeted at open-weights releases"}
+{"page": "hello-olmo-truly-open-llm", "severity": "medium", "lens": "bias\u00b7trust", "issue": "Horvitz Ai2 advisory-board tie dropped"}
+{"page": "hello-olmo-truly-open-llm", "severity": "low", "lens": "bias\u00b7trust", "issue": "Manninen/Ai2 two speakers in one claim"}
+{"page": "hello-olmo-truly-open-llm", "severity": "low", "lens": "fine readability", "issue": "Smith role strings inconsistent"}
+{"page": "hello-olmo-truly-open-llm", "severity": "low", "lens": "fine readability", "issue": "token notation switches"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "medium", "lens": "bias\u00b7trust", "issue": "Harris identified only as former Meta employee"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "medium", "lens": "argument quality", "issue": "EUAIAct connection says 'won' exemptions"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "medium", "lens": "argument quality", "issue": "Summary: pause presented as a rule for all AI"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "low", "lens": "bias\u00b7trust", "issue": "'uniquely' attributed to Harris, only in title"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "low", "lens": "bias\u00b7trust", "issue": "'selling' vs 'as a service'"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "low", "lens": "bias\u00b7trust", "issue": "3-item prohibition as 2"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "low", "lens": "fine readability", "issue": "C2PA unglossed"}
+{"page": "open-source-ai-uniquely-dangerous", "severity": "low", "lens": "fine readability", "issue": "Hugging Face/Mistral plain text"}
+{"page": "sfc-osaid-erodes-open-source", "severity": "low", "lens": "bias\u00b7trust", "issue": "Kuhn characterizations graded [fact]"}
+{"page": "sfc-osaid-erodes-open-source", "severity": "low", "lens": "fine readability", "issue": "FOSS/OSD unglossed"}
+{"page": "sfc-osaid-erodes-open-source", "severity": "low", "lens": "information density", "issue": "Knuth quote ornament"}
+{"page": "sfc-osaid-erodes-open-source", "severity": "low", "lens": "argument quality", "issue": "Kuhn self-inclusive admission omitted"}
+{"page": "open-weights-american-ai-leadership", "severity": "medium", "lens": "bias\u00b7trust", "issue": "Summary drops 'sweeping' on distillation"}
+{"page": "open-weights-american-ai-leadership", "severity": "low", "lens": "bias\u00b7trust", "issue": "signatories as claimant of host-page count"}
+{"page": "open-weights-american-ai-leadership", "severity": "low", "lens": "fine readability", "issue": "Mistral/Hugging Face unlinked"}
+{"page": "hello-olmo-truly-open-llm", "reviewed": true, "defects": 6}
+{"page": "open-source-ai-uniquely-dangerous", "reviewed": true, "defects": 8}
+{"page": "sfc-osaid-erodes-open-source", "reviewed": true, "defects": 4}
+{"page": "open-weights-american-ai-leadership", "reviewed": true, "defects": 3}

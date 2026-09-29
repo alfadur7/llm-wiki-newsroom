@@ -1,0 +1,21 @@
+{"page": "open-source-ai-llm-access-debate", "severity": "medium", "lens": "bias\u00b7trust", "issue": "Summary puts Dolly on LLaMA weights"}
+{"page": "open-source-ai-llm-access-debate", "severity": "medium", "lens": "argument quality", "issue": "Pineau leak quote claimed; she declined"}
+{"page": "open-source-ai-llm-access-debate", "severity": "low", "lens": "bias\u00b7trust", "issue": "Engler pro-open premise dropped"}
+{"page": "open-source-ai-llm-access-debate", "severity": "low", "lens": "fine readability", "issue": "relay provenance inconsistent"}
+{"page": "eleutherai-common-pile-dataset", "severity": "medium", "lens": "bias\u00b7trust", "issue": "Summary omits partner correction"}
+{"page": "eleutherai-common-pile-dataset", "severity": "low", "lens": "fine readability", "issue": "'right a release'"}
+{"page": "eleutherai-common-pile-dataset", "severity": "low", "lens": "fine readability", "issue": "'said' for written post, no venue"}
+{"page": "true-open-source-ai-selective-transparency", "severity": "low", "lens": "repetition", "issue": "component list repeated"}
+{"page": "true-open-source-ai-selective-transparency", "severity": "low", "lens": "bias\u00b7trust", "issue": "columnist characterization graded [fact]"}
+{"page": "true-open-source-ai-selective-transparency", "severity": "low", "lens": "fine readability", "issue": "date notation"}
+{"page": "true-open-source-ai-selective-transparency", "severity": "low", "lens": "fine readability", "issue": "LAION notation"}
+{"page": "lwn-openmdw-license-review", "severity": "medium", "lens": "argument quality", "issue": "Fontana's own correction of emphasis omitted"}
+{"page": "lwn-openmdw-license-review", "severity": "low", "lens": "bias\u00b7trust", "issue": "'fuzzy' attributed to reviewers"}
+{"page": "lwn-openmdw-license-review", "severity": "low", "lens": "fine readability", "issue": "forced link phrase"}
+{"page": "lwn-openmdw-license-review", "severity": "low", "lens": "fine readability", "issue": "OSD unglossed"}
+{"page": "lwn-openmdw-license-review", "severity": "low", "lens": "fine readability", "issue": "Freedom 0 unglossed"}
+{"page": "lwn-openmdw-license-review", "severity": "low", "lens": "fine readability", "issue": "50-word three-idea sentence"}
+{"page": "open-source-ai-llm-access-debate", "reviewed": true, "defects": 4}
+{"page": "eleutherai-common-pile-dataset", "reviewed": true, "defects": 3}
+{"page": "true-open-source-ai-selective-transparency", "reviewed": true, "defects": 4}
+{"page": "lwn-openmdw-license-review", "reviewed": true, "defects": 6}
