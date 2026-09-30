@@ -9,9 +9,9 @@
     "hub_nodes": 27,
     "hub_edges": 149,
     "isolated_hubs": 0,
-    "cluster_count": 4,
-    "unlabeled_clusters": 2,
-    "hysteresis_carried": 2,
+    "cluster_count": 3,
+    "unlabeled_clusters": 0,
+    "hysteresis_carried": 3,
     "sources_assigned": 66,
     "sources_unassigned": 0
   },
@@ -26,14 +26,17 @@
       "anchor_hits": 3,
       "match_method": "hysteresis",
       "hysteresis_jaccard": 1.0,
-      "size": 8,
+      "size": 11,
       "members": [
         "concepts/AISafety.md",
         "concepts/Distillation.md",
         "concepts/FineTuning.md",
+        "concepts/ModelLicensing.md",
         "concepts/OpenWeights.md",
         "entities/Anthropic.md",
         "entities/DeepSeek.md",
+        "entities/Meta.md",
+        "entities/MistralAI.md",
         "entities/MoonshotAI.md",
         "entities/OpenAI.md"
       ],
@@ -41,16 +44,23 @@
         "AI Safety",
         "Distillation",
         "Fine-Tuning",
+        "Model Licensing",
         "Open Weights",
         "Anthropic",
         "DeepSeek",
+        "Meta",
+        "Mistral AI",
         "Moonshot AI",
         "OpenAI"
       ],
       "top_tags": [
         [
           "open-weights",
-          8
+          10
+        ],
+        [
+          "licensing",
+          6
         ],
         [
           "ai-safety",
@@ -61,63 +71,61 @@
           3
         ],
         [
-          "licensing",
+          "open-source-ai",
           3
-        ],
-        [
-          "policy",
-          2
         ]
       ]
     },
     {
       "id": 1,
-      "slug": "open-source-ai-licensing",
-      "name": "open-source-ai-licensing",
-      "color": null,
-      "matched_label_slug": null,
-      "containment": null,
-      "anchor_hits": 0,
-      "match_method": null,
-      "hysteresis_jaccard": null,
-      "size": 7,
+      "slug": "open-model-governance",
+      "name": "Open-Model Governance",
+      "color": "#E0B87F",
+      "matched_label_slug": "open-model-governance",
+      "containment": 1.0,
+      "anchor_hits": 3,
+      "match_method": "hysteresis",
+      "hysteresis_jaccard": 1.0,
+      "size": 8,
       "members": [
         "concepts/EUAIAct.md",
-        "concepts/ModelLicensing.md",
-        "concepts/OpenSourceDefinition.md",
-        "concepts/OpenWashing.md",
+        "concepts/OpenMDW.md",
+        "entities/Ai2.md",
+        "entities/EleutherAI.md",
+        "entities/HuggingFace.md",
+        "entities/LinuxFoundation.md",
         "entities/MarkZuckerberg.md",
-        "entities/Meta.md",
         "entities/StefanoMaffulli.md"
       ],
       "member_labels": [
         "EU AI Act",
-        "Model Licensing",
-        "Open Source Definition",
-        "Open-Washing",
+        "OpenMDW",
+        "Ai2 (Allen Institute for AI)",
+        "EleutherAI",
+        "Hugging Face",
+        "Linux Foundation",
         "Mark Zuckerberg",
-        "Meta",
         "Stefano Maffulli"
       ],
       "top_tags": [
         [
           "open-source-ai",
-          5
-        ],
-        [
-          "licensing",
-          5
-        ],
-        [
-          "Meta",
-          2
-        ],
-        [
-          "Llama",
-          2
+          7
         ],
         [
           "open-weights",
+          3
+        ],
+        [
+          "licensing",
+          2
+        ],
+        [
+          "model-licensing",
+          2
+        ],
+        [
+          "training-data",
           2
         ]
       ]
@@ -132,22 +140,24 @@
       "anchor_hits": 4,
       "match_method": "hysteresis",
       "hysteresis_jaccard": 1.0,
-      "size": 7,
+      "size": 8,
       "members": [
         "concepts/ModelOpennessFramework.md",
         "concepts/OpenSourceAI.md",
+        "concepts/OpenSourceDefinition.md",
+        "concepts/OpenWashing.md",
         "concepts/TrainingData.md",
         "entities/FreeSoftwareFoundation.md",
-        "entities/MistralAI.md",
         "entities/Mozilla.md",
         "entities/OpenSourceInitiative.md"
       ],
       "member_labels": [
         "Model Openness Framework",
         "Open Source AI",
+        "Open Source Definition",
+        "Open-Washing",
         "Training Data",
         "Free Software Foundation",
-        "Mistral AI",
         "Mozilla",
         "Open Source Initiative"
       ],
@@ -158,7 +168,7 @@
         ],
         [
           "licensing",
-          3
+          4
         ],
         [
           "OSAID",
@@ -169,56 +179,8 @@
           2
         ],
         [
-          "training-data",
+          "OSI",
           2
-        ]
-      ]
-    },
-    {
-      "id": 3,
-      "slug": "open-source-ai-open-weights",
-      "name": "open-source-ai-open-weights",
-      "color": null,
-      "matched_label_slug": null,
-      "containment": null,
-      "anchor_hits": 0,
-      "match_method": null,
-      "hysteresis_jaccard": null,
-      "size": 5,
-      "members": [
-        "concepts/OpenMDW.md",
-        "entities/Ai2.md",
-        "entities/EleutherAI.md",
-        "entities/HuggingFace.md",
-        "entities/LinuxFoundation.md"
-      ],
-      "member_labels": [
-        "OpenMDW",
-        "Ai2 (Allen Institute for AI)",
-        "EleutherAI",
-        "Hugging Face",
-        "Linux Foundation"
-      ],
-      "top_tags": [
-        [
-          "open-source-ai",
-          4
-        ],
-        [
-          "open-weights",
-          2
-        ],
-        [
-          "model-licensing",
-          2
-        ],
-        [
-          "training-data",
-          2
-        ],
-        [
-          "licensing",
-          1
         ]
       ]
     }
@@ -227,38 +189,37 @@
     "concepts/AISafety.md": "open-weights",
     "concepts/Distillation.md": "open-weights",
     "concepts/FineTuning.md": "open-weights",
+    "concepts/ModelLicensing.md": "open-weights",
     "concepts/OpenWeights.md": "open-weights",
     "entities/Anthropic.md": "open-weights",
     "entities/DeepSeek.md": "open-weights",
+    "entities/Meta.md": "open-weights",
+    "entities/MistralAI.md": "open-weights",
     "entities/MoonshotAI.md": "open-weights",
     "entities/OpenAI.md": "open-weights",
-    "concepts/EUAIAct.md": "open-source-ai-licensing",
-    "concepts/ModelLicensing.md": "open-source-ai-licensing",
-    "concepts/OpenSourceDefinition.md": "open-source-ai-licensing",
-    "concepts/OpenWashing.md": "open-source-ai-licensing",
-    "entities/MarkZuckerberg.md": "open-source-ai-licensing",
-    "entities/Meta.md": "open-source-ai-licensing",
-    "entities/StefanoMaffulli.md": "open-source-ai-licensing",
+    "concepts/EUAIAct.md": "open-model-governance",
+    "concepts/OpenMDW.md": "open-model-governance",
+    "entities/Ai2.md": "open-model-governance",
+    "entities/EleutherAI.md": "open-model-governance",
+    "entities/HuggingFace.md": "open-model-governance",
+    "entities/LinuxFoundation.md": "open-model-governance",
+    "entities/MarkZuckerberg.md": "open-model-governance",
+    "entities/StefanoMaffulli.md": "open-model-governance",
     "concepts/ModelOpennessFramework.md": "open-source-ai-definition",
     "concepts/OpenSourceAI.md": "open-source-ai-definition",
+    "concepts/OpenSourceDefinition.md": "open-source-ai-definition",
+    "concepts/OpenWashing.md": "open-source-ai-definition",
     "concepts/TrainingData.md": "open-source-ai-definition",
     "entities/FreeSoftwareFoundation.md": "open-source-ai-definition",
-    "entities/MistralAI.md": "open-source-ai-definition",
     "entities/Mozilla.md": "open-source-ai-definition",
-    "entities/OpenSourceInitiative.md": "open-source-ai-definition",
-    "concepts/OpenMDW.md": "open-source-ai-open-weights",
-    "entities/Ai2.md": "open-source-ai-open-weights",
-    "entities/EleutherAI.md": "open-source-ai-open-weights",
-    "entities/HuggingFace.md": "open-source-ai-open-weights",
-    "entities/LinuxFoundation.md": "open-source-ai-open-weights"
+    "entities/OpenSourceInitiative.md": "open-source-ai-definition"
   },
   "source_assignments": {
     "sources/ai-openness-oecd-gpai-open-weight-models.md": {
       "primary": "open-weights",
       "weights": {
-        "open-weights": 0.714,
-        "open-source-ai-definition": 0.143,
-        "open-source-ai-licensing": 0.143
+        "open-weights": 0.857,
+        "open-source-ai-definition": 0.143
       }
     },
     "sources/anthropic-distillation-campaigns-alibaba-moonshot.md": {
@@ -277,23 +238,21 @@
       "primary": "open-source-ai-definition",
       "weights": {
         "open-source-ai-definition": 0.333,
-        "open-weights": 0.167,
-        "open-source-ai-open-weights": 0.167,
-        "open-source-ai-licensing": 0.333
+        "open-weights": 0.333,
+        "open-model-governance": 0.333
       }
     },
     "sources/beyond-deepseek-china-open-weight-ecosystem.md": {
       "primary": "open-weights",
       "weights": {
-        "open-weights": 0.8,
-        "open-source-ai-licensing": 0.2
+        "open-weights": 1.0
       }
     },
     "sources/case-against-osaid.md": {
       "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-definition": 0.667,
-        "open-source-ai-licensing": 0.333
+        "open-source-ai-definition": 0.833,
+        "open-weights": 0.167
       }
     },
     "sources/debian-ai-gr-withdrawn.md": {
@@ -306,50 +265,47 @@
     "sources/debian-ai-models-dfsg.md": {
       "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-definition": 0.5,
-        "open-weights": 0.167,
-        "open-source-ai-licensing": 0.333
+        "open-source-ai-definition": 0.667,
+        "open-weights": 0.333
       }
     },
     "sources/deepseek-r1-release.md": {
       "primary": "open-weights",
       "weights": {
-        "open-weights": 0.714,
-        "open-source-ai-licensing": 0.143,
+        "open-weights": 0.857,
         "open-source-ai-definition": 0.143
       }
     },
     "sources/eleutherai-common-pile-dataset.md": {
-      "primary": "open-source-ai-open-weights",
+      "primary": "open-model-governance",
       "weights": {
-        "open-source-ai-open-weights": 0.4,
+        "open-model-governance": 0.4,
         "open-source-ai-definition": 0.2,
-        "open-weights": 0.2,
-        "open-source-ai-licensing": 0.2
+        "open-weights": 0.4
       }
     },
     "sources/eu-ai-act-gpai-guide-open-source-developers.md": {
-      "primary": "open-source-ai-definition",
+      "primary": "open-weights",
       "weights": {
-        "open-source-ai-licensing": 0.2,
-        "open-source-ai-definition": 0.267,
-        "open-weights": 0.267,
-        "open-source-ai-open-weights": 0.267
+        "open-model-governance": 0.333,
+        "open-source-ai-definition": 0.2,
+        "open-weights": 0.467
       }
     },
     "sources/eu-gpai-provider-guidelines.md": {
-      "primary": "open-source-ai-licensing",
+      "primary": "open-weights",
       "weights": {
         "open-source-ai-definition": 0.25,
-        "open-source-ai-licensing": 0.5,
-        "open-weights": 0.25
+        "open-weights": 0.5,
+        "open-model-governance": 0.25
       }
     },
     "sources/euronews-meta-open-source-ai-not-all-it-seems.md": {
-      "primary": "open-source-ai-licensing",
+      "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-licensing": 0.667,
-        "open-source-ai-definition": 0.333
+        "open-model-governance": 0.222,
+        "open-source-ai-definition": 0.556,
+        "open-weights": 0.222
       }
     },
     "sources/fsf-free-ml-application-criteria.md": {
@@ -362,9 +318,8 @@
     "sources/gpt-oss-challenges-meta-open-weight.md": {
       "primary": "open-weights",
       "weights": {
-        "open-weights": 0.3,
-        "open-source-ai-licensing": 0.2,
-        "open-source-ai-open-weights": 0.2,
+        "open-weights": 0.5,
+        "open-model-governance": 0.2,
         "open-source-ai-definition": 0.3
       }
     },
@@ -372,101 +327,94 @@
       "primary": "open-source-ai-definition",
       "weights": {
         "open-source-ai-definition": 0.5,
-        "open-weights": 0.25,
-        "open-source-ai-licensing": 0.25
+        "open-weights": 0.5
       }
     },
     "sources/infoworld-osi-unveils-osaid-1-0.md": {
       "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-definition": 0.444,
-        "open-source-ai-licensing": 0.444,
-        "open-weights": 0.111
+        "open-source-ai-definition": 0.667,
+        "open-model-governance": 0.111,
+        "open-weights": 0.222
       }
     },
     "sources/joint-statement-ai-safety-openness.md": {
-      "primary": "open-source-ai-definition",
+      "primary": "open-weights",
       "weights": {
-        "open-source-ai-definition": 0.571,
-        "open-source-ai-licensing": 0.143,
-        "open-weights": 0.286
+        "open-source-ai-definition": 0.429,
+        "open-weights": 0.571
       }
     },
     "sources/knives-out-open-weight-ai-models.md": {
       "primary": "open-weights",
       "weights": {
         "open-weights": 0.833,
-        "open-source-ai-open-weights": 0.167
+        "open-model-governance": 0.167
       }
     },
     "sources/llama-2-meta-microsoft.md": {
       "primary": "open-weights",
       "weights": {
-        "open-source-ai-licensing": 0.333,
-        "open-source-ai-definition": 0.167,
-        "open-weights": 0.5
+        "open-weights": 0.833,
+        "open-source-ai-definition": 0.167
       }
     },
     "sources/llama-3-1-community-license.md": {
-      "primary": "open-source-ai-licensing",
+      "primary": "open-weights",
       "weights": {
-        "open-source-ai-licensing": 0.5,
-        "open-weights": 0.5
+        "open-weights": 1.0
       }
     },
     "sources/llama-chatgpt-not-open-source.md": {
-      "primary": "open-source-ai-licensing",
+      "primary": "open-weights",
       "weights": {
-        "open-source-ai-licensing": 0.333,
-        "open-weights": 0.333,
-        "open-source-ai-definition": 0.333
+        "open-weights": 0.5,
+        "open-source-ai-definition": 0.5
       }
     },
     "sources/lwn-openmdw-license-review.md": {
       "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-definition": 0.429,
-        "open-source-ai-open-weights": 0.286,
-        "open-source-ai-licensing": 0.286
+        "open-source-ai-definition": 0.571,
+        "open-model-governance": 0.286,
+        "open-weights": 0.143
       }
     },
     "sources/meta-muse-glimmer-apache-2-0.md": {
       "primary": "open-weights",
       "weights": {
-        "open-source-ai-licensing": 0.3,
-        "open-weights": 0.4,
-        "open-source-ai-definition": 0.2,
-        "open-source-ai-open-weights": 0.1
+        "open-weights": 0.6,
+        "open-model-governance": 0.2,
+        "open-source-ai-definition": 0.2
       }
     },
     "sources/mistral-ai-non-production-license.md": {
-      "primary": "open-source-ai-definition",
+      "primary": "open-weights",
       "weights": {
-        "open-source-ai-definition": 0.667,
-        "open-source-ai-licensing": 0.333
+        "open-weights": 0.667,
+        "open-source-ai-definition": 0.333
       }
     },
     "sources/mistral-small-3.md": {
       "primary": "open-weights",
       "weights": {
-        "open-source-ai-definition": 0.222,
-        "open-source-ai-licensing": 0.222,
-        "open-weights": 0.444,
-        "open-source-ai-open-weights": 0.111
+        "open-weights": 0.778,
+        "open-source-ai-definition": 0.111,
+        "open-model-governance": 0.111
       }
     },
     "sources/mozilla-celebrates-osaid.md": {
       "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-definition": 0.667,
-        "open-source-ai-licensing": 0.333
+        "open-source-ai-definition": 0.833,
+        "open-weights": 0.167
       }
     },
     "sources/mozilla-eleutherai-hf-sb-1047-letter.md": {
       "primary": "open-source-ai-definition",
       "weights": {
         "open-source-ai-definition": 0.429,
-        "open-source-ai-open-weights": 0.286,
+        "open-model-governance": 0.286,
         "open-weights": 0.286
       }
     },
@@ -480,74 +428,68 @@
     "sources/open-future-osaid-step-forward.md": {
       "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-definition": 0.417,
-        "open-source-ai-licensing": 0.417,
-        "open-weights": 0.167
+        "open-source-ai-definition": 0.583,
+        "open-weights": 0.333,
+        "open-model-governance": 0.083
       }
     },
     "sources/open-model-licenses-concerning-restrictions.md": {
-      "primary": "open-source-ai-licensing",
+      "primary": "open-weights",
       "weights": {
-        "open-source-ai-licensing": 0.375,
-        "open-source-ai-definition": 0.25,
-        "open-source-ai-open-weights": 0.125,
-        "open-weights": 0.25
+        "open-weights": 0.5,
+        "open-source-ai-definition": 0.375,
+        "open-model-governance": 0.125
       }
     },
     "sources/open-secret-of-open-washing.md": {
-      "primary": "open-source-ai-licensing",
+      "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-licensing": 0.625,
-        "open-source-ai-definition": 0.25,
-        "open-source-ai-open-weights": 0.125
+        "open-weights": 0.25,
+        "open-source-ai-definition": 0.5,
+        "open-model-governance": 0.25
       }
     },
     "sources/open-source-ai-llm-access-debate.md": {
       "primary": "open-weights",
       "weights": {
         "open-source-ai-definition": 0.273,
-        "open-source-ai-licensing": 0.182,
-        "open-weights": 0.364,
-        "open-source-ai-open-weights": 0.182
+        "open-weights": 0.545,
+        "open-model-governance": 0.182
       }
     },
     "sources/open-source-ai-models-how-open.md": {
-      "primary": "open-source-ai-definition",
+      "primary": "open-weights",
       "weights": {
         "open-source-ai-definition": 0.429,
-        "open-weights": 0.429,
-        "open-source-ai-licensing": 0.143
+        "open-weights": 0.571
       }
     },
     "sources/open-source-ai-path-forward.md": {
       "primary": "open-weights",
       "weights": {
-        "open-source-ai-licensing": 0.167,
-        "open-source-ai-definition": 0.167,
-        "open-weights": 0.667
+        "open-weights": 0.833,
+        "open-source-ai-definition": 0.167
       }
     },
     "sources/open-source-ai-uniquely-dangerous.md": {
       "primary": "open-weights",
       "weights": {
-        "open-source-ai-licensing": 0.286,
+        "open-weights": 0.571,
         "open-source-ai-definition": 0.286,
-        "open-weights": 0.429
+        "open-model-governance": 0.143
       }
     },
     "sources/open-washing-four-criteria.md": {
       "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-licensing": 0.25,
-        "open-source-ai-definition": 0.375,
-        "open-weights": 0.375
+        "open-source-ai-definition": 0.5,
+        "open-weights": 0.5
       }
     },
     "sources/open-weight-diplomacy-digital-silk-road.md": {
       "primary": "open-weights",
       "weights": {
-        "open-weights": 0.667,
-        "open-source-ai-licensing": 0.333
+        "open-weights": 1.0
       }
     },
     "sources/open-weight-models-frontier-safety-gap.md": {
@@ -560,26 +502,23 @@
     "sources/open-weights-american-ai-leadership.md": {
       "primary": "open-weights",
       "weights": {
-        "open-weights": 0.571,
-        "open-source-ai-definition": 0.286,
-        "open-source-ai-licensing": 0.143
+        "open-weights": 0.714,
+        "open-source-ai-definition": 0.286
       }
     },
     "sources/open-weights-not-enough-open-source-science.md": {
       "primary": "open-weights",
       "weights": {
-        "open-weights": 0.5,
-        "open-source-ai-definition": 0.375,
-        "open-source-ai-licensing": 0.125
+        "open-weights": 0.625,
+        "open-source-ai-definition": 0.375
       }
     },
     "sources/open-weights-not-open-source-label-dispute.md": {
-      "primary": "open-source-ai-licensing",
+      "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-definition": 0.231,
-        "open-source-ai-licensing": 0.385,
-        "open-weights": 0.154,
-        "open-source-ai-open-weights": 0.231
+        "open-source-ai-definition": 0.385,
+        "open-model-governance": 0.308,
+        "open-weights": 0.308
       }
     },
     "sources/openai-deepseek-free-riding-distillation.md": {
@@ -591,54 +530,53 @@
     "sources/openai-hack-open-source-ai-fight.md": {
       "primary": "open-weights",
       "weights": {
-        "open-source-ai-open-weights": 0.167,
-        "open-weights": 0.667,
-        "open-source-ai-licensing": 0.167
+        "open-model-governance": 0.167,
+        "open-weights": 0.833
       }
     },
     "sources/openmdw-1-1-nvidia-adoption.md": {
-      "primary": "open-source-ai-definition",
+      "primary": "open-weights",
       "weights": {
-        "open-source-ai-licensing": 0.25,
-        "open-weights": 0.25,
+        "open-weights": 0.5,
         "open-source-ai-definition": 0.5
       }
     },
     "sources/osaid-take-it-or-leave-it.md": {
       "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-definition": 0.4,
-        "open-source-ai-licensing": 0.4,
-        "open-weights": 0.2
+        "open-source-ai-definition": 0.5,
+        "open-weights": 0.4,
+        "open-model-governance": 0.1
       }
     },
     "sources/osi-eu-code-of-practice-open-source.md": {
-      "primary": "open-source-ai-licensing",
+      "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-definition": 0.286,
-        "open-source-ai-licensing": 0.714
+        "open-source-ai-definition": 0.571,
+        "open-model-governance": 0.143,
+        "open-weights": 0.286
       }
     },
     "sources/osi-meta-llama-2-license-not-open-source.md": {
-      "primary": "open-source-ai-licensing",
+      "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-definition": 0.286,
-        "open-source-ai-licensing": 0.714
+        "open-source-ai-definition": 0.571,
+        "open-weights": 0.286,
+        "open-model-governance": 0.143
       }
     },
     "sources/osi-meta-llama-license-still-not-open-source.md": {
-      "primary": "open-source-ai-licensing",
+      "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-definition": 0.429,
-        "open-source-ai-licensing": 0.571
+        "open-source-ai-definition": 0.714,
+        "open-weights": 0.286
       }
     },
     "sources/osi-open-source-ai-definition.md": {
       "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-definition": 0.429,
-        "open-weights": 0.143,
-        "open-source-ai-licensing": 0.429
+        "open-source-ai-definition": 0.571,
+        "open-weights": 0.429
       }
     },
     "sources/osi-open-weights-good-open-source-better.md": {
@@ -651,25 +589,24 @@
     "sources/osi-readies-controversial-osaid.md": {
       "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-definition": 0.625,
-        "open-source-ai-licensing": 0.25,
+        "open-source-ai-definition": 0.75,
+        "open-model-governance": 0.125,
         "open-weights": 0.125
       }
     },
     "sources/red-hat-open-source-ai-point-of-view.md": {
-      "primary": "open-source-ai-definition",
+      "primary": "open-weights",
       "weights": {
         "open-source-ai-definition": 0.429,
-        "open-weights": 0.429,
-        "open-source-ai-licensing": 0.143
+        "open-weights": 0.571
       }
     },
     "sources/rethinking-open-source-generative-ai.md": {
-      "primary": "open-source-ai-licensing",
+      "primary": "open-weights",
       "weights": {
-        "open-source-ai-licensing": 0.333,
-        "open-source-ai-definition": 0.333,
-        "open-weights": 0.333
+        "open-weights": 0.5,
+        "open-source-ai-definition": 0.417,
+        "open-model-governance": 0.083
       }
     },
     "sources/secrets-of-deepseek-r1-landmark-paper.md": {
@@ -677,95 +614,89 @@
       "weights": {
         "open-weights": 0.714,
         "open-source-ai-definition": 0.143,
-        "open-source-ai-open-weights": 0.143
+        "open-model-governance": 0.143
       }
     },
     "sources/senators-question-meta-llama-leak.md": {
       "primary": "open-weights",
       "weights": {
-        "open-source-ai-licensing": 0.167,
-        "open-weights": 0.667,
+        "open-weights": 0.833,
         "open-source-ai-definition": 0.167
       }
     },
     "sources/sfc-osaid-erodes-open-source.md": {
-      "primary": "open-source-ai-licensing",
+      "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-definition": 0.429,
-        "open-source-ai-licensing": 0.571
+        "open-source-ai-definition": 0.714,
+        "open-weights": 0.286
       }
     },
     "sources/societal-impact-open-foundation-models.md": {
       "primary": "open-weights",
       "weights": {
-        "open-weights": 0.667,
-        "open-source-ai-licensing": 0.333
+        "open-weights": 1.0
       }
     },
     "sources/tech-industry-open-source-ai-definition-problem.md": {
-      "primary": "open-source-ai-licensing",
+      "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-definition": 0.214,
-        "open-source-ai-licensing": 0.5,
-        "open-weights": 0.143,
-        "open-source-ai-open-weights": 0.143
+        "open-source-ai-definition": 0.357,
+        "open-model-governance": 0.357,
+        "open-weights": 0.286
       }
     },
     "sources/techcrunch-osaid-official-definition.md": {
       "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-definition": 0.444,
-        "open-source-ai-licensing": 0.444,
-        "open-weights": 0.111
+        "open-source-ai-definition": 0.556,
+        "open-model-governance": 0.111,
+        "open-weights": 0.333
       }
     },
     "sources/true-open-source-ai-selective-transparency.md": {
       "primary": "open-weights",
       "weights": {
-        "open-source-ai-licensing": 0.25,
-        "open-source-ai-definition": 0.25,
-        "open-weights": 0.5
+        "open-weights": 0.625,
+        "open-source-ai-definition": 0.375
       }
     },
     "sources/welcome-gpt-oss-openai.md": {
       "primary": "open-weights",
       "weights": {
-        "open-source-ai-open-weights": 0.125,
-        "open-weights": 0.375,
-        "open-source-ai-definition": 0.25,
-        "open-source-ai-licensing": 0.25
+        "open-model-governance": 0.125,
+        "open-weights": 0.5,
+        "open-source-ai-definition": 0.375
       }
     },
     "sources/what-does-open-source-ai-mean.md": {
-      "primary": "open-source-ai-licensing",
+      "primary": "open-source-ai-definition",
       "weights": {
-        "open-source-ai-licensing": 0.5,
-        "open-source-ai-definition": 0.4,
-        "open-weights": 0.1
+        "open-model-governance": 0.1,
+        "open-source-ai-definition": 0.6,
+        "open-weights": 0.3
       }
     },
     "sources/whats-next-chinese-open-source-ai.md": {
       "primary": "open-weights",
       "weights": {
-        "open-weights": 0.7,
-        "open-source-ai-open-weights": 0.1,
-        "open-source-ai-licensing": 0.2
+        "open-weights": 0.9,
+        "open-model-governance": 0.1
       }
     },
     "sources/zuckerberg-intensified-battle-ai-future.md": {
       "primary": "open-weights",
       "weights": {
-        "open-source-ai-licensing": 0.375,
-        "open-weights": 0.5,
+        "open-weights": 0.75,
+        "open-model-governance": 0.125,
         "open-source-ai-definition": 0.125
       }
     },
     "sources/zuckerberg-superintelligence-not-all-open-source.md": {
       "primary": "open-weights",
       "weights": {
-        "open-source-ai-licensing": 0.286,
-        "open-source-ai-definition": 0.286,
-        "open-weights": 0.429
+        "open-model-governance": 0.143,
+        "open-weights": 0.571,
+        "open-source-ai-definition": 0.286
       }
     }
   },

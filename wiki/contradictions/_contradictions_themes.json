@@ -1,8 +1,8 @@
 {
-  "derived_at": "2026-09-23",
+  "derived_at": "2026-09-29",
   "derived_by": "claude",
   "phase": 2,
-  "source_count": 23,
+  "source_count": 51,
   "themes": {
     "open-training-data-requirement": {
       "name": "OSAID Definition vs Open Training-Data Requirement",
@@ -12,11 +12,14 @@
         "db4e440b",
         "ad0e9a83",
         "b88775a5",
-        "9b189557"
+        "9b189557",
+        "9f692a03",
+        "bc483ca0",
+        "ef6566ca"
       ]
     },
     "llama-open-source-label": {
-      "name": "Meta's 'open source' label for Llama vs the OSI and critics' rejection",
+      "name": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics",
       "claim_ids": [
         "af196221",
         "fd7fe870",
@@ -25,7 +28,17 @@
         "5ce812a6",
         "ec2343f1",
         "ed3c0654",
-        "8db8a2ff"
+        "8db8a2ff",
+        "0238bf84",
+        "480ac9db",
+        "bd3b1fef",
+        "20d43732",
+        "f043d021",
+        "24326a43",
+        "7bae0343",
+        "b624cabd",
+        "3e0a49ae",
+        "03237af1"
       ]
     },
     "osaid-form-and-legitimacy": {
@@ -36,7 +49,9 @@
         "f53fe134",
         "f9dd3690",
         "1428e4bc",
-        "08b6d663"
+        "08b6d663",
+        "10e8ff50",
+        "55748f24"
       ]
     },
     "open-weights-safety-tradeoff": {
@@ -45,12 +60,31 @@
         "290b2e1f",
         "a55f49c0",
         "4511cf29",
-        "2c9da7fd"
+        "2c9da7fd",
+        "cdb90a3d",
+        "aa0f13f8",
+        "566d72b2",
+        "63a1b2ef",
+        "86de04c6"
+      ]
+    },
+    "distillation-free-riding-dispute": {
+      "name": "Distillation as theft vs distillation as a partial, industry-wide factor",
+      "claim_ids": [
+        "bcb48346",
+        "03b5b625",
+        "45dc7990"
       ]
     },
     "other-fragmentary": {
       "name": "Residual Fragmentary Issues",
-      "claim_ids": []
+      "claim_ids": [
+        "751df93e",
+        "49beed14",
+        "be20f3e0",
+        "fd3bf4ff",
+        "6ea90b63"
+      ]
     }
   },
   "unassigned": []

@@ -800,3 +800,46 @@ Deferred, so `lint.py` exits 1 until the Reground commit: the build now finds fo
 clusters, two of them unlabeled (new cluster slugs are operator-gated), the root
 overview is missing the new clusters, the contradiction aggregate declares 23 claims
 against 51, and the theme mapping has to take the new claims.
+
+## [2026-09-30] reground | the summaries that kept the claim and dropped who made it
+
+The ingest of 2026-09-28 left the derived layer describing thirty-four sources. This
+batch re-grounds it against sixty-six. The clustering was rebuilt from a cold start
+and settled on three clusters, one of them a new operator-approved slug,
+`open-model-governance`: the EU rules, the OpenMDW license and the fully open builders
+that the other two clusters argue about. It has one primary source and thirty-one that
+bear on it, so its overview is written as a bridge. The theme mapping took the new
+claims (23 → 51) in both phases. It added one operator-approved theme,
+`distillation-free-riding-dispute`, kept at three claims under the core-issue
+exception, folded a license group into the residual bucket, and widened the Llama
+theme to vendors' labels generally.
+
+Twelve pages were rewritten through a Columnist draft, a Desk pass against the
+originals and up to three review rotations. They are the three cluster overviews
+(one new), the five themes (one new), the residual bucket, the synthesis and both
+root pages; publishing the root pages and the seven rewrites that replaced more than
+half their text were operator-approved. The first Desk pass found 127 defects, 16 of
+them high, and every one was treated. Quotes and figures almost always matched the
+originals. What failed was compression: a page condensed from the layer beneath kept
+a claim and dropped its speaker, its concession or its qualifier. Among the cases:
+the OSI's "not certifications", OpenAI's own head of strategic futures doubting the
+distillation charge, DeepSeek's denial, the Sloan grant behind "goodbye to Meta's
+money", and one camp's own grounds. Antiga's "gaping hole" had reached two pages with
+its subject swapped from training-data licensing to weights, by way of a later column.
+The Llama theme lost its mediating position: Open Future's "open weights" name is
+stricter than the OSI's line, not between the camps.
+
+Fixes created defects of their own, 51 in all. From the second rotation on, immediate
+fixes were limited to open original findings and to critical or high defects in fix
+text; everything else was carried to the corpus. Three one-word fixes after the last
+rotation were applied on operator instruction, and the distillation theme was renamed
+to match its own labels. The last two re-passes, on the root overview and the
+synthesis, ran on the Columnists' model family after the reviewer's usage limit ran
+out (operator decision), so those two are not cross-family reviews. 179 defect records
+were appended; five guideline proposals the Desk raised — a D1 exemption for the
+residual bucket, qualifier retention in Part 1 overviews, a spelling variety, a
+name-form rule, and CamelCase slug aliases — are deferred, none applied.
+
+Source pages were not edited. The problems the authors and reviewers found in them go
+to the L2-1 Desk pass that follows. Still stale: about twenty hubs whose sources are
+newer, several now at odds with the pages above them — a hub batch, not this one.

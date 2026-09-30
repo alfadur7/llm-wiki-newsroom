@@ -2,7 +2,7 @@
   "_meta": {
     "phase": "dependencies",
     "note": "layer-cascade upstream index — page → {upstream pages it derives from, newest upstream date}. Consumed by tools/_lint/staleness.py (uniform staleness rule). Additive; no existing behavior changed.",
-    "page_count": 103
+    "page_count": 105
   },
   "pages": {
     "sources/ai-openness-oecd-gpai-open-weight-models.md": {
@@ -1014,87 +1014,137 @@
       ],
       "upstream_max_date": "2026-09-27"
     },
+    "overviews/open-model-governance.md": {
+      "last_updated": "2026-09-30",
+      "upstream": [
+        "concepts/EUAIAct.md",
+        "concepts/OpenMDW.md",
+        "entities/Ai2.md",
+        "entities/EleutherAI.md",
+        "entities/HuggingFace.md",
+        "entities/LinuxFoundation.md",
+        "entities/MarkZuckerberg.md",
+        "entities/StefanoMaffulli.md"
+      ],
+      "upstream_max_date": "2026-09-27"
+    },
     "overviews/open-source-ai-definition.md": {
-      "last_updated": "2026-09-24",
+      "last_updated": "2026-09-30",
       "upstream": [
         "concepts/ModelOpennessFramework.md",
         "concepts/OpenSourceAI.md",
+        "concepts/OpenSourceDefinition.md",
+        "concepts/OpenWashing.md",
         "concepts/TrainingData.md",
         "entities/FreeSoftwareFoundation.md",
-        "entities/MistralAI.md",
         "entities/Mozilla.md",
         "entities/OpenSourceInitiative.md"
       ],
       "upstream_max_date": "2026-09-27"
     },
     "overviews/open-weights.md": {
-      "last_updated": "2026-09-24",
+      "last_updated": "2026-09-30",
       "upstream": [
         "concepts/AISafety.md",
         "concepts/Distillation.md",
         "concepts/FineTuning.md",
+        "concepts/ModelLicensing.md",
         "concepts/OpenWeights.md",
         "entities/Anthropic.md",
         "entities/DeepSeek.md",
+        "entities/Meta.md",
+        "entities/MistralAI.md",
         "entities/MoonshotAI.md",
         "entities/OpenAI.md"
       ],
       "upstream_max_date": "2026-09-27"
     },
-    "contradictions/llama-open-source-label.md": {
-      "last_updated": "2026-09-24",
+    "contradictions/distillation-free-riding-dispute.md": {
+      "last_updated": "2026-09-30",
       "upstream": [
+        "sources/knives-out-open-weight-ai-models.md",
+        "sources/openai-deepseek-free-riding-distillation.md",
+        "sources/secrets-of-deepseek-r1-landmark-paper.md"
+      ],
+      "upstream_max_date": "2026-09-27"
+    },
+    "contradictions/llama-open-source-label.md": {
+      "last_updated": "2026-09-30",
+      "upstream": [
+        "sources/euronews-meta-open-source-ai-not-all-it-seems.md",
+        "sources/gpt-oss-challenges-meta-open-weight.md",
         "sources/llama-2-meta-microsoft.md",
+        "sources/llama-chatgpt-not-open-source.md",
         "sources/open-future-osaid-step-forward.md",
+        "sources/open-model-licenses-concerning-restrictions.md",
+        "sources/open-secret-of-open-washing.md",
         "sources/open-source-ai-path-forward.md",
+        "sources/osi-eu-code-of-practice-open-source.md",
         "sources/osi-meta-llama-2-license-not-open-source.md",
         "sources/osi-meta-llama-license-still-not-open-source.md",
         "sources/rethinking-open-source-generative-ai.md",
+        "sources/tech-industry-open-source-ai-definition-problem.md",
         "sources/techcrunch-osaid-official-definition.md",
+        "sources/true-open-source-ai-selective-transparency.md",
         "sources/what-does-open-source-ai-mean.md"
       ],
-      "upstream_max_date": "2026-09-23"
+      "upstream_max_date": "2026-09-27"
     },
     "contradictions/open-training-data-requirement.md": {
-      "last_updated": "2026-09-24",
+      "last_updated": "2026-09-30",
       "upstream": [
         "sources/case-against-osaid.md",
+        "sources/debian-ai-gr-withdrawn.md",
         "sources/debian-ai-models-dfsg.md",
+        "sources/eleutherai-common-pile-dataset.md",
+        "sources/infoworld-osi-unveils-osaid-1-0.md",
         "sources/open-future-osaid-step-forward.md",
         "sources/osi-readies-controversial-osaid.md",
         "sources/red-hat-open-source-ai-point-of-view.md",
         "sources/techcrunch-osaid-official-definition.md"
       ],
-      "upstream_max_date": "2026-09-23"
+      "upstream_max_date": "2026-09-27"
     },
     "contradictions/open-weights-safety-tradeoff.md": {
-      "last_updated": "2026-09-24",
+      "last_updated": "2026-09-30",
       "upstream": [
         "sources/anthropic-position-open-weights-models.md",
+        "sources/knives-out-open-weight-ai-models.md",
+        "sources/open-source-ai-llm-access-debate.md",
         "sources/open-source-ai-uniquely-dangerous.md",
         "sources/open-weight-models-frontier-safety-gap.md",
-        "sources/senators-question-meta-llama-leak.md"
+        "sources/openai-hack-open-source-ai-fight.md",
+        "sources/senators-question-meta-llama-leak.md",
+        "sources/zuckerberg-intensified-battle-ai-future.md"
       ],
-      "upstream_max_date": "2026-09-23"
+      "upstream_max_date": "2026-09-27"
     },
     "contradictions/osaid-form-and-legitimacy.md": {
-      "last_updated": "2026-09-24",
+      "last_updated": "2026-09-30",
       "upstream": [
         "sources/case-against-osaid.md",
+        "sources/open-weights-not-open-source-label-dispute.md",
         "sources/osaid-take-it-or-leave-it.md",
         "sources/rethinking-open-source-generative-ai.md",
         "sources/sfc-osaid-erodes-open-source.md",
+        "sources/tech-industry-open-source-ai-definition-problem.md",
         "sources/what-does-open-source-ai-mean.md"
       ],
-      "upstream_max_date": "2026-09-23"
+      "upstream_max_date": "2026-09-27"
     },
     "contradictions/other-fragmentary.md": {
-      "last_updated": "2026-09-24",
-      "upstream": [],
-      "upstream_max_date": null
+      "last_updated": "2026-09-30",
+      "upstream": [
+        "sources/debian-ai-gr-withdrawn.md",
+        "sources/eu-ai-act-gpai-guide-open-source-developers.md",
+        "sources/lwn-openmdw-license-review.md",
+        "sources/open-weight-diplomacy-digital-silk-road.md",
+        "sources/open-weights-not-open-source-label-dispute.md"
+      ],
+      "upstream_max_date": "2026-09-27"
     },
     "syntheses/open-source-ai-every-camp-standard.md": {
-      "last_updated": "2026-09-24",
+      "last_updated": "2026-09-30",
       "upstream": [
         "sources/osi-open-source-ai-definition.md",
         "sources/fsf-free-ml-application-criteria.md",
@@ -1106,30 +1156,44 @@
         "sources/open-future-osaid-step-forward.md",
         "sources/red-hat-open-source-ai-point-of-view.md",
         "sources/debian-ai-models-dfsg.md",
+        "sources/debian-ai-gr-withdrawn.md",
         "sources/mozilla-celebrates-osaid.md",
         "sources/open-source-ai-models-how-open.md",
-        "sources/techcrunch-osaid-official-definition.md"
+        "sources/techcrunch-osaid-official-definition.md",
+        "sources/open-washing-four-criteria.md",
+        "sources/apertus-fully-open-multilingual-llm.md",
+        "sources/eleutherai-common-pile-dataset.md",
+        "sources/eu-ai-act-gpai-guide-open-source-developers.md",
+        "sources/gpt-oss-challenges-meta-open-weight.md",
+        "sources/meta-muse-glimmer-apache-2-0.md",
+        "sources/open-weight-diplomacy-digital-silk-road.md",
+        "sources/lwn-openmdw-license-review.md",
+        "sources/open-weights-not-open-source-label-dispute.md",
+        "sources/true-open-source-ai-selective-transparency.md",
+        "sources/open-weights-not-enough-open-source-science.md"
       ],
-      "upstream_max_date": "2026-09-23"
+      "upstream_max_date": "2026-09-27"
     },
     "overview.md": {
       "last_updated": null,
       "upstream": [
+        "overviews/open-model-governance.md",
         "overviews/open-source-ai-definition.md",
         "overviews/open-weights.md"
       ],
-      "upstream_max_date": "2026-09-24"
+      "upstream_max_date": "2026-09-30"
     },
     "contradiction.md": {
       "last_updated": null,
       "upstream": [
+        "contradictions/distillation-free-riding-dispute.md",
         "contradictions/llama-open-source-label.md",
         "contradictions/open-training-data-requirement.md",
         "contradictions/open-weights-safety-tradeoff.md",
         "contradictions/osaid-form-and-legitimacy.md",
         "contradictions/other-fragmentary.md"
       ],
-      "upstream_max_date": "2026-09-24"
+      "upstream_max_date": "2026-09-30"
     }
   }
 }

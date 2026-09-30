@@ -1,5 +1,5 @@
 {
-  "_comment": "Cluster labels attach a human-readable name to each Leiden-detected community. This example corpus (open-source-AI debate) splits into two coherent sub-themes.",
+  "_comment": "Cluster labels attach a human-readable name to each Leiden-detected community. This example corpus (open-source-AI debate) splits into two coherent sub-themes plus a bridging layer of rules, fully-open builders and label-setters.",
   "_schema": "labels[]: {slug, name, color?, anchor_members[], paired_with?[]}. slug must be URL/filename-safe. color is optional hex (#RRGGBB).",
   "labels": [
     {
@@ -22,6 +22,17 @@
         "concepts/OpenWeights.md",
         "concepts/FineTuning.md",
         "entities/DeepSeek.md"
+      ],
+      "paired_with": []
+    },
+    {
+      "slug": "open-model-governance",
+      "name": "Open-Model Governance",
+      "color": "#E0B87F",
+      "anchor_members": [
+        "concepts/EUAIAct.md",
+        "concepts/OpenMDW.md",
+        "entities/LinuxFoundation.md"
       ],
       "paired_with": []
     }

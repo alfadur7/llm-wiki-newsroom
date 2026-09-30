@@ -11,10 +11,9 @@ For the full source list see the [source catalog](sources/_catalog.md), or brows
 
 | Cluster | Count | Catalog |
 |----------|------|---------|
-| Open Weights | 35 | [Open Weights catalog](sources/_catalog-open-weights.md) |
-| Open-Source AI Definition | 32 | [Open-Source AI Definition catalog](sources/_catalog-open-source-ai-definition.md) |
-| open-source-ai-licensing | 29 | [open-source-ai-licensing catalog](sources/_catalog-open-source-ai-licensing.md) |
-| open-source-ai-open-weights | 1 | [open-source-ai-open-weights catalog](sources/_catalog-open-source-ai-open-weights.md) |
+| Open Weights | 51 | [Open Weights catalog](sources/_catalog-open-weights.md) |
+| Open-Source AI Definition | 39 | [Open-Source AI Definition catalog](sources/_catalog-open-source-ai-definition.md) |
+| Open-Model Governance | 5 | [Open-Model Governance catalog](sources/_catalog-open-model-governance.md) |
 
 ## Entities (15)
 - [Ai2 (Allen Institute for AI)](entities/Ai2.md) — Ai2, the Allen Institute for AI, is the research institute behind the OLMo language models.
@@ -48,4 +47,4 @@ For the full source list see the [source catalog](sources/_catalog.md), or brows
 - [Training Data](concepts/TrainingData.md) — Training data is the corpus a model learns from, and whether it must be released is the central dispute in the OpenSourceAI debate.
 
 ## Analyses (1)
-- [What Counts as Open Source AI Under Every Camp's Standard](syntheses/open-source-ai-every-camp-standard.md) — No release in this corpus is documented as clearing every camp's bar for open source AI; Ai2's OLMo comes closest.
+- [What Counts as Open Source AI Under Every Camp's Standard](syntheses/open-source-ai-every-camp-standard.md) — No release in this corpus is documented as clearing every camp's bar for open source AI.

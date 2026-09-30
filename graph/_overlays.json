@@ -37,6 +37,9 @@
           "id": "sources/debian-ai-models-dfsg.md"
         },
         {
+          "id": "sources/debian-ai-gr-withdrawn.md"
+        },
+        {
           "id": "sources/mozilla-celebrates-osaid.md"
         },
         {
@@ -44,6 +47,39 @@
         },
         {
           "id": "sources/techcrunch-osaid-official-definition.md"
+        },
+        {
+          "id": "sources/open-washing-four-criteria.md"
+        },
+        {
+          "id": "sources/apertus-fully-open-multilingual-llm.md"
+        },
+        {
+          "id": "sources/eleutherai-common-pile-dataset.md"
+        },
+        {
+          "id": "sources/eu-ai-act-gpai-guide-open-source-developers.md"
+        },
+        {
+          "id": "sources/gpt-oss-challenges-meta-open-weight.md"
+        },
+        {
+          "id": "sources/meta-muse-glimmer-apache-2-0.md"
+        },
+        {
+          "id": "sources/open-weight-diplomacy-digital-silk-road.md"
+        },
+        {
+          "id": "sources/lwn-openmdw-license-review.md"
+        },
+        {
+          "id": "sources/open-weights-not-open-source-label-dispute.md"
+        },
+        {
+          "id": "sources/true-open-source-ai-selective-transparency.md"
+        },
+        {
+          "id": "sources/open-weights-not-enough-open-source-science.md"
         },
         {
           "id": "concepts/OpenSourceAI.md"
@@ -61,16 +97,34 @@
           "id": "concepts/OpenWashing.md"
         },
         {
+          "id": "concepts/ModelOpennessFramework.md"
+        },
+        {
+          "id": "concepts/OpenMDW.md"
+        },
+        {
           "id": "entities/OpenSourceInitiative.md"
         },
         {
           "id": "entities/FreeSoftwareFoundation.md"
         },
         {
+          "id": "entities/Ai2.md"
+        },
+        {
+          "id": "entities/EleutherAI.md"
+        },
+        {
           "id": "entities/Mozilla.md"
         },
         {
           "id": "entities/Meta.md"
+        },
+        {
+          "id": "entities/OpenAI.md"
+        },
+        {
+          "id": "entities/MoonshotAI.md"
         },
         {
           "id": "entities/DeepSeek.md"
@@ -112,13 +166,22 @@
         },
         {
           "id": "sources/osi-open-source-ai-definition.md"
+        },
+        {
+          "id": "sources/debian-ai-gr-withdrawn.md"
+        },
+        {
+          "id": "sources/infoworld-osi-unveils-osaid-1-0.md"
+        },
+        {
+          "id": "sources/eleutherai-common-pile-dataset.md"
         }
       ]
     },
     {
       "type": "contradiction",
       "slug": "llama-open-source-label",
-      "title": "Meta's 'open source' label for Llama vs the OSI and critics' rejection",
+      "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics",
       "flavor": "region",
       "members": [
         {
@@ -153,6 +216,36 @@
         },
         {
           "id": "concepts/OpenSourceAI.md"
+        },
+        {
+          "id": "sources/euronews-meta-open-source-ai-not-all-it-seems.md"
+        },
+        {
+          "id": "sources/llama-chatgpt-not-open-source.md"
+        },
+        {
+          "id": "sources/open-model-licenses-concerning-restrictions.md"
+        },
+        {
+          "id": "sources/open-secret-of-open-washing.md"
+        },
+        {
+          "id": "sources/tech-industry-open-source-ai-definition-problem.md"
+        },
+        {
+          "id": "sources/true-open-source-ai-selective-transparency.md"
+        },
+        {
+          "id": "sources/osi-eu-code-of-practice-open-source.md"
+        },
+        {
+          "id": "sources/gpt-oss-challenges-meta-open-weight.md"
+        },
+        {
+          "id": "sources/welcome-gpt-oss-openai.md"
+        },
+        {
+          "id": "entities/OpenSourceInitiative.md"
         }
       ]
     },
@@ -182,6 +275,12 @@
         },
         {
           "id": "sources/case-against-osaid.md"
+        },
+        {
+          "id": "sources/open-weights-not-open-source-label-dispute.md"
+        },
+        {
+          "id": "sources/tech-industry-open-source-ai-definition-problem.md"
         }
       ]
     },
@@ -208,6 +307,50 @@
         },
         {
           "id": "sources/senators-question-meta-llama-leak.md"
+        },
+        {
+          "id": "sources/knives-out-open-weight-ai-models.md"
+        },
+        {
+          "id": "sources/openai-hack-open-source-ai-fight.md"
+        },
+        {
+          "id": "sources/open-source-ai-llm-access-debate.md"
+        },
+        {
+          "id": "entities/OpenAI.md"
+        },
+        {
+          "id": "sources/zuckerberg-intensified-battle-ai-future.md"
+        },
+        {
+          "id": "sources/open-source-ai-path-forward.md"
+        }
+      ]
+    },
+    {
+      "type": "contradiction",
+      "slug": "distillation-free-riding-dispute",
+      "title": "Distillation as theft vs distillation as a partial, industry-wide factor",
+      "flavor": "region",
+      "members": [
+        {
+          "id": "sources/knives-out-open-weight-ai-models.md"
+        },
+        {
+          "id": "sources/anthropic-position-open-weights-models.md"
+        },
+        {
+          "id": "sources/openai-deepseek-free-riding-distillation.md"
+        },
+        {
+          "id": "entities/DeepSeek.md"
+        },
+        {
+          "id": "sources/secrets-of-deepseek-r1-landmark-paper.md"
+        },
+        {
+          "id": "entities/OpenAI.md"
         }
       ]
     }
@@ -227,7 +370,7 @@
       {
         "type": "contradiction",
         "slug": "llama-open-source-label",
-        "title": "Meta's 'open source' label for Llama vs the OSI and critics' rejection"
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
       }
     ],
     "sources/fsf-free-ml-application-criteria.md": [
@@ -246,7 +389,7 @@
       {
         "type": "contradiction",
         "slug": "llama-open-source-label",
-        "title": "Meta's 'open source' label for Llama vs the OSI and critics' rejection"
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
       }
     ],
     "sources/hello-olmo-truly-open-llm.md": [
@@ -289,7 +432,7 @@
       {
         "type": "contradiction",
         "slug": "llama-open-source-label",
-        "title": "Meta's 'open source' label for Llama vs the OSI and critics' rejection"
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
       },
       {
         "type": "contradiction",
@@ -311,7 +454,7 @@
       {
         "type": "contradiction",
         "slug": "llama-open-source-label",
-        "title": "Meta's 'open source' label for Llama vs the OSI and critics' rejection"
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
       }
     ],
     "sources/red-hat-open-source-ai-point-of-view.md": [
@@ -327,6 +470,18 @@
       }
     ],
     "sources/debian-ai-models-dfsg.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      },
+      {
+        "type": "contradiction",
+        "slug": "open-training-data-requirement",
+        "title": "OSAID Definition vs Open Training-Data Requirement"
+      }
+    ],
+    "sources/debian-ai-gr-withdrawn.md": [
       {
         "type": "synthesis",
         "slug": "open-source-ai-every-camp-standard",
@@ -366,7 +521,104 @@
       {
         "type": "contradiction",
         "slug": "llama-open-source-label",
-        "title": "Meta's 'open source' label for Llama vs the OSI and critics' rejection"
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
+      }
+    ],
+    "sources/open-washing-four-criteria.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "sources/apertus-fully-open-multilingual-llm.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "sources/eleutherai-common-pile-dataset.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      },
+      {
+        "type": "contradiction",
+        "slug": "open-training-data-requirement",
+        "title": "OSAID Definition vs Open Training-Data Requirement"
+      }
+    ],
+    "sources/eu-ai-act-gpai-guide-open-source-developers.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "sources/gpt-oss-challenges-meta-open-weight.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      },
+      {
+        "type": "contradiction",
+        "slug": "llama-open-source-label",
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
+      }
+    ],
+    "sources/meta-muse-glimmer-apache-2-0.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "sources/open-weight-diplomacy-digital-silk-road.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "sources/lwn-openmdw-license-review.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "sources/open-weights-not-open-source-label-dispute.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      },
+      {
+        "type": "contradiction",
+        "slug": "osaid-form-and-legitimacy",
+        "title": "A single binary definition vs graded openness or repeal"
+      }
+    ],
+    "sources/true-open-source-ai-selective-transparency.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      },
+      {
+        "type": "contradiction",
+        "slug": "llama-open-source-label",
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
+      }
+    ],
+    "sources/open-weights-not-enough-open-source-science.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
       }
     ],
     "concepts/OpenSourceAI.md": [
@@ -383,7 +635,7 @@
       {
         "type": "contradiction",
         "slug": "llama-open-source-label",
-        "title": "Meta's 'open source' label for Llama vs the OSI and critics' rejection"
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
       },
       {
         "type": "contradiction",
@@ -419,6 +671,20 @@
         "title": "What Counts as Open Source AI Under Every Camp's Standard"
       }
     ],
+    "concepts/ModelOpennessFramework.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "concepts/OpenMDW.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
     "entities/OpenSourceInitiative.md": [
       {
         "type": "synthesis",
@@ -432,11 +698,30 @@
       },
       {
         "type": "contradiction",
+        "slug": "llama-open-source-label",
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
+      },
+      {
+        "type": "contradiction",
         "slug": "osaid-form-and-legitimacy",
         "title": "A single binary definition vs graded openness or repeal"
       }
     ],
     "entities/FreeSoftwareFoundation.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "entities/Ai2.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      }
+    ],
+    "entities/EleutherAI.md": [
       {
         "type": "synthesis",
         "slug": "open-source-ai-every-camp-standard",
@@ -459,7 +744,31 @@
       {
         "type": "contradiction",
         "slug": "llama-open-source-label",
-        "title": "Meta's 'open source' label for Llama vs the OSI and critics' rejection"
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
+      }
+    ],
+    "entities/OpenAI.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      },
+      {
+        "type": "contradiction",
+        "slug": "open-weights-safety-tradeoff",
+        "title": "Openness as a safety mechanism vs open weights as uniquely hard to govern"
+      },
+      {
+        "type": "contradiction",
+        "slug": "distillation-free-riding-dispute",
+        "title": "Distillation as theft vs distillation as a partial, industry-wide factor"
+      }
+    ],
+    "entities/MoonshotAI.md": [
+      {
+        "type": "synthesis",
+        "slug": "open-source-ai-every-camp-standard",
+        "title": "What Counts as Open Source AI Under Every Camp's Standard"
       }
     ],
     "entities/DeepSeek.md": [
@@ -467,6 +776,11 @@
         "type": "synthesis",
         "slug": "open-source-ai-every-camp-standard",
         "title": "What Counts as Open Source AI Under Every Camp's Standard"
+      },
+      {
+        "type": "contradiction",
+        "slug": "distillation-free-riding-dispute",
+        "title": "Distillation as theft vs distillation as a partial, industry-wide factor"
       }
     ],
     "entities/HuggingFace.md": [
@@ -483,37 +797,103 @@
         "title": "OSAID Definition vs Open Training-Data Requirement"
       }
     ],
+    "sources/infoworld-osi-unveils-osaid-1-0.md": [
+      {
+        "type": "contradiction",
+        "slug": "open-training-data-requirement",
+        "title": "OSAID Definition vs Open Training-Data Requirement"
+      }
+    ],
     "sources/llama-2-meta-microsoft.md": [
       {
         "type": "contradiction",
         "slug": "llama-open-source-label",
-        "title": "Meta's 'open source' label for Llama vs the OSI and critics' rejection"
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
       }
     ],
     "sources/open-source-ai-path-forward.md": [
       {
         "type": "contradiction",
         "slug": "llama-open-source-label",
-        "title": "Meta's 'open source' label for Llama vs the OSI and critics' rejection"
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
+      },
+      {
+        "type": "contradiction",
+        "slug": "open-weights-safety-tradeoff",
+        "title": "Openness as a safety mechanism vs open weights as uniquely hard to govern"
       }
     ],
     "sources/osi-meta-llama-2-license-not-open-source.md": [
       {
         "type": "contradiction",
         "slug": "llama-open-source-label",
-        "title": "Meta's 'open source' label for Llama vs the OSI and critics' rejection"
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
       }
     ],
     "sources/what-does-open-source-ai-mean.md": [
       {
         "type": "contradiction",
         "slug": "llama-open-source-label",
-        "title": "Meta's 'open source' label for Llama vs the OSI and critics' rejection"
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
       },
       {
         "type": "contradiction",
         "slug": "osaid-form-and-legitimacy",
         "title": "A single binary definition vs graded openness or repeal"
+      }
+    ],
+    "sources/euronews-meta-open-source-ai-not-all-it-seems.md": [
+      {
+        "type": "contradiction",
+        "slug": "llama-open-source-label",
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
+      }
+    ],
+    "sources/llama-chatgpt-not-open-source.md": [
+      {
+        "type": "contradiction",
+        "slug": "llama-open-source-label",
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
+      }
+    ],
+    "sources/open-model-licenses-concerning-restrictions.md": [
+      {
+        "type": "contradiction",
+        "slug": "llama-open-source-label",
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
+      }
+    ],
+    "sources/open-secret-of-open-washing.md": [
+      {
+        "type": "contradiction",
+        "slug": "llama-open-source-label",
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
+      }
+    ],
+    "sources/tech-industry-open-source-ai-definition-problem.md": [
+      {
+        "type": "contradiction",
+        "slug": "llama-open-source-label",
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
+      },
+      {
+        "type": "contradiction",
+        "slug": "osaid-form-and-legitimacy",
+        "title": "A single binary definition vs graded openness or repeal"
+      }
+    ],
+    "sources/osi-eu-code-of-practice-open-source.md": [
+      {
+        "type": "contradiction",
+        "slug": "llama-open-source-label",
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
+      }
+    ],
+    "sources/welcome-gpt-oss-openai.md": [
+      {
+        "type": "contradiction",
+        "slug": "llama-open-source-label",
+        "title": "Vendors' \"open source\" labels, Llama above all, vs the OSI and critics"
       }
     ],
     "sources/osaid-take-it-or-leave-it.md": [
@@ -535,6 +915,11 @@
         "type": "contradiction",
         "slug": "open-weights-safety-tradeoff",
         "title": "Openness as a safety mechanism vs open weights as uniquely hard to govern"
+      },
+      {
+        "type": "contradiction",
+        "slug": "distillation-free-riding-dispute",
+        "title": "Distillation as theft vs distillation as a partial, industry-wide factor"
       }
     ],
     "sources/open-weights-american-ai-leadership.md": [
@@ -570,6 +955,53 @@
         "type": "contradiction",
         "slug": "open-weights-safety-tradeoff",
         "title": "Openness as a safety mechanism vs open weights as uniquely hard to govern"
+      }
+    ],
+    "sources/knives-out-open-weight-ai-models.md": [
+      {
+        "type": "contradiction",
+        "slug": "open-weights-safety-tradeoff",
+        "title": "Openness as a safety mechanism vs open weights as uniquely hard to govern"
+      },
+      {
+        "type": "contradiction",
+        "slug": "distillation-free-riding-dispute",
+        "title": "Distillation as theft vs distillation as a partial, industry-wide factor"
+      }
+    ],
+    "sources/openai-hack-open-source-ai-fight.md": [
+      {
+        "type": "contradiction",
+        "slug": "open-weights-safety-tradeoff",
+        "title": "Openness as a safety mechanism vs open weights as uniquely hard to govern"
+      }
+    ],
+    "sources/open-source-ai-llm-access-debate.md": [
+      {
+        "type": "contradiction",
+        "slug": "open-weights-safety-tradeoff",
+        "title": "Openness as a safety mechanism vs open weights as uniquely hard to govern"
+      }
+    ],
+    "sources/zuckerberg-intensified-battle-ai-future.md": [
+      {
+        "type": "contradiction",
+        "slug": "open-weights-safety-tradeoff",
+        "title": "Openness as a safety mechanism vs open weights as uniquely hard to govern"
+      }
+    ],
+    "sources/openai-deepseek-free-riding-distillation.md": [
+      {
+        "type": "contradiction",
+        "slug": "distillation-free-riding-dispute",
+        "title": "Distillation as theft vs distillation as a partial, industry-wide factor"
+      }
+    ],
+    "sources/secrets-of-deepseek-r1-landmark-paper.md": [
+      {
+        "type": "contradiction",
+        "slug": "distillation-free-riding-dispute",
+        "title": "Distillation as theft vs distillation as a partial, industry-wide factor"
       }
     ]
   }
