@@ -135,3 +135,31 @@ def test_missing_deps_file_still_exits_2(tmp_path, monkeypatch, capsys):
     assert staleness.run() == 2
     err = capsys.readouterr().err
     assert "build.py dependencies" in err
+
+
+def test_editor_date_sees_recreate_after_delete(tmp_path):
+    """A page deleted and then recreated has the recreate commit as its last EDITOR
+    change — the deletion commit must not be skipped over."""
+    import os
+    import subprocess
+
+    from _editor_date import editor_last_commit_date
+
+    def git(*a, date=None):
+        env = dict(os.environ)
+        if date:
+            env.update(GIT_AUTHOR_DATE=f"{date}T12:00:00", GIT_COMMITTER_DATE=f"{date}T12:00:00")
+        subprocess.run(["git", "-C", str(tmp_path), "-c", "user.name=t", "-c", "user.email=t@t",
+                        "-c", "commit.gpgsign=false", *a], check=True, capture_output=True, env=env)
+
+    git("init", "-q")
+    page = tmp_path / "p.md"
+    page.write_text("body A", encoding="utf-8")
+    git("add", "p.md")
+    git("commit", "-qm", "a", date="2026-01-01")
+    git("rm", "-q", "p.md")
+    git("commit", "-qm", "del", date="2026-02-01")
+    page.write_text("body B", encoding="utf-8")
+    git("add", "p.md")
+    git("commit", "-qm", "b", date="2026-03-01")
+    assert editor_last_commit_date(page) == "2026-03-01"

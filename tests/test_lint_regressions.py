@@ -538,3 +538,38 @@ def test_count_mentions_rejects_empty_matching_term(capsys):
     for t in ("Jane Doe|", "x*", ""):
         assert cm.run(t, claimant_only=False) == 2
         assert "matches the empty string" in capsys.readouterr().err
+
+
+def test_contradiction_themes_json_bad_themes_field_exits_2(tmp_path, monkeypatch):
+    """A non-object `themes` (or an unreadable file) is the guided exit-2 path, not a traceback."""
+    import contradiction as CT
+
+    tj = tmp_path / "_contradictions_themes.json"
+    tj.write_text('{"themes": ["oops"]}', encoding="utf-8")
+    monkeypatch.setattr(CT, "THEMES_JSON", tj)
+    assert CT.run() == 2
+    tj.write_bytes(b'{"themes": {"\xff": 1}}')
+    assert CT.run() == 2
+
+
+def test_contradiction_plan_reports_non_kebab_slug(tmp_path, monkeypatch):
+    """A JSON theme slug outside [a-z0-9-]+ is reported, not planned — safe_slug_path
+    would otherwise raise in --fix's create step."""
+    import contradiction as CT
+
+    monkeypatch.setattr(CT, "CONTRADICTIONS_DIR", tmp_path)
+    doc = {"themes": {"Bad_Slug": {"name": "x"}, "good-slug": {"name": "y"}}}
+    creates, deletes, invalid_name, invalid_slug = CT._plan_mapping_changes(doc, None)
+    assert creates == [("good-slug", "y")] and invalid_slug == ["Bad_Slug"]
+
+
+def test_contradiction_drift_reads_scalar_sources(tmp_path, monkeypatch):
+    """A scalar `sources:` (YAML left as a string) must not read as empty and report false drift."""
+    import contradiction as CT
+
+    monkeypatch.setattr(CT, "CONTRADICTIONS_DIR", tmp_path)
+    (tmp_path / "t.md").write_text("---" + chr(10) + "sources: alpha-src" + chr(10) + "---" + chr(10) + "body" + chr(10),
+                                   encoding="utf-8")
+    doc = {"themes": {"t": {"claim_ids": ["c1"]}}}
+    claims = [{"id": "c1", "source": "sources/alpha-src.md"}]
+    assert CT._check_frontmatter_drift(doc, claims) == []

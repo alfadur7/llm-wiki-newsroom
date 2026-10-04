@@ -163,7 +163,9 @@ def editor_last_commit_date(path: Path) -> str | None:
                 encoding="utf-8", errors="replace",
             )
             if r.returncode != 0:
-                return None
+                # The path is absent at that commit (a deletion commit) — compare
+                # it as its own state, or a delete-then-recreate is skipped over.
+                return "<absent>"
             return editor_hash(r.stdout)
         except (subprocess.SubprocessError, FileNotFoundError, OSError):
             return None

@@ -319,9 +319,13 @@ def _load_themes_json() -> tuple[dict | None, str | None]:
         data = json.loads(THEMES_JSON.read_text(encoding="utf-8"))
         if not isinstance(data, dict):
             return None, f"{THEMES_JSON}: top-level must be object"
+        if not isinstance(data.get("themes", {}), dict):
+            return None, f"{THEMES_JSON}: `themes` must be object — run `/wiki-lint contradiction theme --fix`"
         return data, None
     except json.JSONDecodeError as e:
         return None, f"{THEMES_JSON}: invalid JSON — {e}"
+    except (OSError, UnicodeDecodeError) as e:
+        return None, f"{THEMES_JSON}: unreadable — {e}"
 
 
 def _load_claims_json() -> list[dict]:
@@ -1306,7 +1310,7 @@ def _check_one_md(path: Path, fix: bool) -> tuple[list[str], int]:
 def _plan_mapping_changes(
     themes_doc: dict,
     only_theme: str | None,
-) -> tuple[list[tuple[str, str]], list[str], list[str]]:
+) -> tuple[list[tuple[str, str]], list[str], list[str], list[str]]:
     """Compute the JSON ↔ MD reconciliation plan (E) without mutating.
 
     Returns:
@@ -1315,6 +1319,7 @@ def _plan_mapping_changes(
                are skipped and surfaced as `invalid_name` instead.
       deletes: list of slugs whose MD exists but is not in the JSON SoT.
       invalid_name: list of JSON slugs whose `name` field is unusable.
+      invalid_slug: list of JSON slugs that violate [a-z0-9-]+ (no skeleton path).
 
     Pure planner — never reads or writes filesystem beyond the existing
     MD slug enumeration in _md_theme_slugs(). Execution (and the
@@ -1322,7 +1327,7 @@ def _plan_mapping_changes(
     """
     themes = themes_doc.get("themes", {})
     if not isinstance(themes, dict):
-        return [], [], []
+        return [], [], [], []
 
     json_slugs: set[str] = set(themes.keys())
     md_slugs = _md_theme_slugs()
@@ -1333,7 +1338,13 @@ def _plan_mapping_changes(
 
     creates: list[tuple[str, str]] = []
     invalid_name: list[str] = []
+    invalid_slug: list[str] = []
     for slug in sorted(json_slugs - md_slugs):
+        try:
+            safe_slug_path(CONTRADICTIONS_DIR, slug)
+        except ValueError:
+            invalid_slug.append(slug)
+            continue
         theme_obj = themes.get(slug, {})
         name = theme_obj.get("name") if isinstance(theme_obj, dict) else None
         if not isinstance(name, str) or not name.strip():
@@ -1342,7 +1353,7 @@ def _plan_mapping_changes(
         creates.append((slug, name))
 
     deletes = sorted(md_slugs - json_slugs)
-    return creates, deletes, invalid_name
+    return creates, deletes, invalid_name, invalid_slug
 
 
 def _execute_mapping_plan(
@@ -1413,9 +1424,7 @@ def _check_frontmatter_drift(themes_doc: dict, claims: list[dict], only_theme: s
             continue
         fm = parse_frontmatter(md_path.read_text(encoding="utf-8"))
         md_sources = {
-            str(s).removeprefix("sources/").removesuffix(".md")
-            for s in (fm.get("sources") or [])
-            if isinstance(s, str)
+            s.removeprefix("sources/").removesuffix(".md") for s in fm_sources(fm)
         }
 
         json_sources = _sources_for_claim_ids(theme.get("claim_ids", []) or [], by_id)
@@ -1550,8 +1559,9 @@ def run(target: str | None = None, fix: bool = False, auto_yes: bool = False) ->
     creates: list[tuple[str, str]] = []
     deletes: list[str] = []
     invalid_name: list[str] = []
+    invalid_slug: list[str] = []
     if scope != "aggregate":
-        creates, deletes, invalid_name = _plan_mapping_changes(themes_doc, only_theme)
+        creates, deletes, invalid_name, invalid_slug = _plan_mapping_changes(themes_doc, only_theme)
 
     map_actions = 0
     map_hard: list[str] = []
@@ -1559,6 +1569,11 @@ def run(target: str | None = None, fix: bool = False, auto_yes: bool = False) ->
     for slug in invalid_name:
         map_hard.append(
             f"  JSON-declared theme `{slug}` has empty/invalid name — "
+            f"cannot generate skeleton MD. Fix _contradictions_themes.json first."
+        )
+    for slug in invalid_slug:
+        map_hard.append(
+            f"  JSON-declared theme `{slug}` violates [a-z0-9-]+ — "
             f"cannot generate skeleton MD. Fix _contradictions_themes.json first."
         )
 
