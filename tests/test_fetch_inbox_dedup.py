@@ -44,7 +44,7 @@ def test_html_final_url_dedup_skips(monkeypatch):
     )
     monkeypatch.setattr(F, "save_markdown", lambda *a, **k: _fail_on_save())
     idx = {F.canonicalize_url("https://final.com/article"): "existing-slug"}
-    status, path = F.fetch_one("https://short.link/xyz", dedup_index=idx)
+    status, path, _ = F.fetch_one("https://short.link/xyz", dedup_index=idx)
     assert status == "SKIPPED:duplicate-of-existing-slug"
     assert path is None
 
@@ -60,7 +60,7 @@ def test_pdf_redirect_dedup_skips(monkeypatch):
     )
     monkeypatch.setattr(A, "save_pdf", lambda *a, **k: _fail_on_save())
     idx = {F.canonicalize_url("https://cdn.com/file.pdf"): "existing-pdf"}
-    status, path = F.fetch_one("https://short.link/pdf", dedup_index=idx)
+    status, path, _ = F.fetch_one("https://short.link/pdf", dedup_index=idx)
     assert status == "SKIPPED:duplicate-of-existing-pdf"
     assert path is None
 
@@ -77,7 +77,7 @@ def test_html_no_false_skip_when_final_url_novel(monkeypatch):
     )
     monkeypatch.setattr(F, "save_markdown", lambda *a, **k: saved)
     idx = {F.canonicalize_url("https://final.com/other"): "existing-slug"}
-    status, path = F.fetch_one("https://short.link/xyz", dedup_index=idx)
+    status, path, _ = F.fetch_one("https://short.link/xyz", dedup_index=idx)
     assert status == "OK"
     assert path == saved
 
@@ -98,10 +98,66 @@ def test_html_saves_under_redirect_resolved_url(monkeypatch):
         F, "save_markdown",
         lambda url, *a, **k: seen.setdefault("url", url) and None or Path("raw/x.md"),
     )
-    status, _ = F.fetch_one("https://short.link/xyz", dedup_index={})
+    status, _, _ = F.fetch_one("https://short.link/xyz", dedup_index={})
     assert status == "OK"
     assert seen["url"] == "https://final.com/article"
 
 
 def _fail_on_save():
     raise AssertionError("save_* must not be called when the final URL is a duplicate")
+
+
+def test_batch_registers_resolved_url_for_distinct_shortlinks(monkeypatch, tmp_path):
+    """Two different shortlinks that resolve to one article in the same batch save once.
+
+    Registering only the original inbox URL lets fetch_one's final-URL check miss,
+    and the article is saved twice (`_2`).
+    """
+    inbox = tmp_path / "_inbox.md"
+    inbox.write_text("https://short.link/a\nhttps://short.link/b\n", encoding="utf-8")
+    monkeypatch.setattr(F, "INBOX", inbox)
+    monkeypatch.setattr(F, "write_inbox", lambda *a, **k: None)
+    monkeypatch.setattr(F, "append_archive", lambda *a, **k: None)
+    monkeypatch.setattr(F, "load_source_map", lambda: {"by_url": {}})
+    monkeypatch.setattr(F, "unwrap_share_wrapper", lambda u: u)
+    monkeypatch.setattr(F, "is_pdf_url", lambda *a, **k: False)
+    monkeypatch.setattr(A, "is_pdf_url", lambda *a, **k: False)
+    monkeypatch.setattr(A, "safe_get_stream", lambda *a, **k: _FakeStream("https://final.com/article"))
+    monkeypatch.setattr(
+        F, "fetch_html",
+        lambda url, timeout=15: ("https://final.com/article", "T", "D", "x" * 200),
+    )
+    saves = []
+    monkeypatch.setattr(
+        F, "save_markdown",
+        lambda *a, **k: saves.append(a) or F.REPO_ROOT / "raw" / "a.md",
+    )
+    F.main()
+    assert len(saves) == 1, saves
+
+
+class _BodyStream(_FakeStream):
+    def __init__(self, url, body):
+        super().__init__(url, "application/pdf")
+        self._body = body
+
+    def iter_content(self, chunk_size=1):
+        yield self._body
+
+    def close(self):
+        pass
+
+
+def test_pdf_path_rejects_non_pdf_body(monkeypatch):
+    """A `.pdf` URL that serves a 200 HTML page is not saved; it fails and stays in the inbox."""
+    monkeypatch.setattr(F, "unwrap_share_wrapper", lambda u: u)
+    monkeypatch.setattr(F, "is_pdf_url", lambda u, ctype="": ctype == "application/pdf")
+    monkeypatch.setattr(A, "is_pdf_url", lambda u, ctype="": ctype == "application/pdf")
+    monkeypatch.setattr(
+        A, "safe_get_stream",
+        lambda *a, **k: _BodyStream("https://cdn.com/f.pdf", b"<html>login</html>"),
+    )
+    monkeypatch.setattr(A, "save_pdf", lambda *a, **k: _fail_on_save())
+    status, path, _ = F.fetch_one("https://short.link/pdf", dedup_index={})
+    assert status.startswith("FAILED:ValueError") and path is None
+    assert A._stream_pdf_body(_BodyStream("u", b"\n%PDF-1.7 ...")) == b"\n%PDF-1.7 ..."

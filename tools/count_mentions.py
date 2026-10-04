@@ -43,6 +43,11 @@ def run(term: str, claimant_only: bool) -> int:
     except re.error as e:
         print(f"ERROR: term is not a valid regex — {e}", file=sys.stderr)
         return 2
+    # A term that matches the empty string (`A|`, `x*`) matches every source
+    # zero-width, which can flip the stub threshold below.
+    if pat.search("") is not None:
+        print(f"ERROR: term {term!r} matches the empty string", file=sys.stderr)
+        return 2
     sa = _source_clusters()
     hits: list[tuple[str, str]] = []
     for fp in real_source_files():

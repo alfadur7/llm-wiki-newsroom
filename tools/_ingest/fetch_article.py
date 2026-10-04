@@ -486,7 +486,13 @@ def _stream_pdf_body(r: requests.Response) -> bytes:
                 f"(received {received:,} bytes from {r.url})"
             )
         chunks.append(chunk)
-    return b"".join(chunks)
+    body = b"".join(chunks)
+    # Trusting the `.pdf` extension or Content-Type alone saves a 200 HTML
+    # login/error page as raw/PDF/*.pdf. The spec allows the header anywhere
+    # in the first 1024 bytes.
+    if b"%PDF-" not in body[:1024]:
+        raise ValueError(f"not a PDF (no %PDF- header) from {r.url}")
+    return body
 
 
 def _pdf_title_from_response(r: requests.Response) -> str:
@@ -646,7 +652,7 @@ def main():
         except requests.exceptions.RequestException as e:
             print(f"PDF fetch failed: {e}")
             sys.exit(2)
-        except ValueError as e:  # PDF_MAX_BYTES cap (UnsafeURLError already caught above)
+        except ValueError as e:  # PDF_MAX_BYTES cap / no %PDF- header (UnsafeURLError already caught above)
             print(f"PDF fetch failed: {e}")
             sys.exit(2)
         pdf_path = save_pdf(url, body, title)
@@ -673,7 +679,7 @@ def main():
     except requests.exceptions.RequestException as e:
         print(f"Request failed: {e}")
         sys.exit(2)
-    except ValueError as e:  # PDF_MAX_BYTES cap in sniff_and_save_pdf
+    except ValueError as e:  # PDF_MAX_BYTES cap / no %PDF- header in sniff_and_save_pdf
         print(f"PDF fetch failed: {e}")
         sys.exit(2)
 

@@ -229,14 +229,14 @@ def append_archive(entries: list[tuple[str, str, str, str]]) -> None:
 
 def fetch_one(
     url: str, meta: dict | None = None, dedup_index: dict | None = None
-) -> tuple[str, Path | None]:
-    """Fetch URL and save under raw/. Returns (status, output_path).
+) -> tuple[str, Path | None, str | None]:
+    """Fetch URL and save under raw/. Returns (status, output_path, saved_url).
 
     `dedup_index` maps canonical-URL → existing source slug. The inbox-time
     dedup in main() only sees the original URL; this re-checks the *redirect-
     resolved* final URL (PDF-via-redirect's `r.url`, HTML's `_final_url`) before
     saving, so two different shortlinks to one target don't both persist. On a
-    hit returns ("SKIPPED:duplicate-of-<slug>", None) — main() drops it like an
+    hit returns ("SKIPPED:duplicate-of-<slug>", None, None) — main() drops it like an
     inbox-time skip. PDFs especially need this: they carry no frontmatter URL,
     so the next /wiki-ingest pass can't dedup them by URL.
 
@@ -258,10 +258,10 @@ def fetch_one(
             # need this (no frontmatter URL for a later pass to dedup by).
             dup = dedup_index.get(canonicalize_url(url))
             if dup:
-                return f"SKIPPED:duplicate-of-{dup}", None
+                return f"SKIPPED:duplicate-of-{dup}", None, None
             body, title = fetch_pdf(url)
             path = save_pdf(url, body, title)
-            return "OK", path
+            return "OK", path, url
 
         # PDF-via-redirect sniff, shared with fetch_article.main. The dedup
         # hook re-checks the redirect-resolved final URL before the body
@@ -274,28 +274,28 @@ def fetch_one(
         )
         if sniffed is not None:
             if sniffed[0] == "duplicate":
-                return f"SKIPPED:duplicate-of-{sniffed[1]}", None
-            return "OK", sniffed[1]
+                return f"SKIPPED:duplicate-of-{sniffed[1]}", None, None
+            return "OK", sniffed[1], sniffed[4]
 
         final_url, title, description, content = fetch_html(url, timeout=15)
         dup = dedup_index.get(canonicalize_url(final_url))
         if dup:
-            return f"SKIPPED:duplicate-of-{dup}", None
+            return f"SKIPPED:duplicate-of-{dup}", None, None
         if (not content) or len(content) < 100:
-            return f"FAILED:short-content({len(content)}chars)", None
+            return f"FAILED:short-content({len(content)}chars)", None, None
         # Save under the redirect-resolved URL too — dedup judges on final_url,
         # so saving the original leaves the keys mismatched and the same article
         # re-enters through the other URL. (The Wayback recovery path returns the
         # original url from fetch_html, so archive.org does not leak in here.)
         path = save_markdown(final_url, title, description, content, ingest_meta=meta)
-        return "OK", path
+        return "OK", path, final_url
     except UnsafeURLError as e:
-        return f"FAILED:BLOCKED({e})", None
+        return f"FAILED:BLOCKED({e})", None, None
     except requests.exceptions.HTTPError as e:
         code = e.response.status_code if e.response is not None else "?"
-        return f"FAILED:HTTP-{code}", None
+        return f"FAILED:HTTP-{code}", None, None
     except requests.exceptions.RequestException as e:
-        return f"FAILED:{type(e).__name__}", None
+        return f"FAILED:{type(e).__name__}", None, None
     except OSError as e:
         # Disk-side failure (full / permission / quota). Distinguish from
         # network errors so retry behavior at the caller can differ — and
@@ -303,11 +303,11 @@ def fetch_one(
         # without re-running with stack traces.
         import traceback
         traceback.print_exc(file=sys.stderr)
-        return f"FAILED:save-OSError({e.errno}:{e.strerror or e})", None
+        return f"FAILED:save-OSError({e.errno}:{e.strerror or e})", None, None
     except Exception as e:  # noqa: BLE001 — surface unexpected errors as FAILED
         import traceback
         traceback.print_exc(file=sys.stderr)
-        return f"FAILED:{type(e).__name__}({e})", None
+        return f"FAILED:{type(e).__name__}({e})", None, None
 
 
 def main() -> int:
@@ -342,7 +342,7 @@ def main() -> int:
             continue
 
         print(f"[FETCH] [{source}] {url}")
-        status, path = fetch_one(url, meta=meta, dedup_index=by_url_canon)
+        status, path, saved_url = fetch_one(url, meta=meta, dedup_index=by_url_canon)
         if status == "OK" and path is not None:
             # save_markdown / save_pdf return _REPO_ROOT-anchored absolute paths;
             # render relative to REPO_ROOT for a clean archive/log entry.
@@ -354,6 +354,10 @@ def main() -> int:
             # existing corpus only, so a URL repeated inside one batch was
             # missed by both this loop's check and fetch_one's.
             by_url_canon[canonicalize_url(url)] = rel
+            # The saved (redirect-resolved) URL too — fetch_one checks against
+            # it when a different shortlink resolves to the same article.
+            if saved_url:
+                by_url_canon[canonicalize_url(saved_url)] = rel
         elif status.startswith("SKIPPED:"):
             # Redirect-resolved final URL matched an existing source — drop it
             # (don't retain), like the inbox-time dedup at the top of the loop.

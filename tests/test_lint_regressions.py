@@ -528,3 +528,13 @@ def test_contradiction_run_fails_on_corrupt_claims_db(tmp_path, monkeypatch):
     assert CT.run() == 2
     bad.write_text('{"claims": []}', encoding="utf-8")
     assert CT.run() == 2
+
+
+def test_count_mentions_rejects_empty_matching_term(capsys):
+    """A term matching the empty string (`A|`, `x*`) would count every source and
+    could report the entity-stub threshold as met — reject it."""
+    import count_mentions as cm
+
+    for t in ("Jane Doe|", "x*", ""):
+        assert cm.run(t, claimant_only=False) == 2
+        assert "matches the empty string" in capsys.readouterr().err
