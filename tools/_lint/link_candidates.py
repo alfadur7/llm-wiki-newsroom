@@ -111,6 +111,10 @@ def run(*, min_seeds: int = DEFAULT_MIN_SEEDS,
     # No json_out parameter: `suggestions.run` is the only caller and it
     # renders the combined JSON document itself (one doc, not two
     # concatenated ones), returning before it reaches this function.
+    if not BACKLINKS_PATH.exists():
+        print("  ⚠️ wiki/_backlinks.json missing — re-run after `python tools/build.py` "
+              "(0 candidates cannot be judged)")
+        return 0
     results = _find(min_seeds=min_seeds)
 
     print(

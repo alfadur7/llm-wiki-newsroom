@@ -165,7 +165,7 @@ def index_hub_stems() -> tuple[set[str], dict[str, str]]:
     corpus, Hangul compounds (`_title_korean_aliases`).
     """
     out: set[str] = set()
-    alias_map: dict[str, str] = {}
+    alias_stems: dict[str, set[str]] = defaultdict(set)
 
     for sub in ("entities", "concepts"):
         d = WIKI / sub
@@ -195,9 +195,12 @@ def index_hub_stems() -> tuple[set[str], dict[str, str]]:
             if title and title != stem:
                 aliases = _title_english_aliases(title, stem) + _title_korean_aliases(title, stem)
                 for alias in aliases:
-                    if alias not in out:  # don't shadow real stems
-                        alias_map[alias] = stem
+                    alias_stems[alias].add(stem)
 
+    # An alias shared by several hubs has no single target — drop it. So does
+    # one that shadows a real stem; judged against the full stem set, so the
+    # result no longer depends on traversal order.
+    alias_map = {a: next(iter(s)) for a, s in alias_stems.items() if len(s) == 1 and a not in out}
     return out, alias_map
 
 

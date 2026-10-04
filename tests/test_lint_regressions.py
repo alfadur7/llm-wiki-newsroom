@@ -599,3 +599,42 @@ def test_claims_uncommitted_check_is_cwd_independent(tmp_path, monkeypatch):
     monkeypatch.setattr(T, "CLAIMS_JSON", claims)
     monkeypatch.chdir(elsewhere)
     assert T._claims_has_uncommitted() is True
+
+
+def test_hub_graph_load_failure_is_loud(tmp_path, monkeypatch, capsys):
+    """A missing/corrupt graph must warn — silently it turns every inbound count into 0."""
+    import _hub_common as H
+
+    monkeypatch.setattr(H, "GRAPH_JSON", tmp_path / "nope.json")
+    monkeypatch.setattr(H, "CLUSTERS_JSON", tmp_path / "nope2.json")
+    monkeypatch.setattr(H, "_GRAPH_CACHE", None)
+    H.load_graph()
+    err = capsys.readouterr().err
+    assert "_graph.json failed to load" in err and "_clusters.json failed to load" in err
+
+
+def test_link_candidates_without_backlinks_says_so(tmp_path, monkeypatch, capsys):
+    """No `_backlinks.json` means the candidate count cannot be judged, not that it is 0."""
+    import link_candidates as L
+
+    monkeypatch.setattr(L, "BACKLINKS_PATH", tmp_path / "nope.json")
+    assert L.run() == 0
+    assert "_backlinks.json missing" in capsys.readouterr().out
+
+
+def test_suggest_links_drops_ambiguous_and_shadowing_aliases(tmp_path, monkeypatch):
+    """An alias two hubs share has no single target; one that equals a real stem must
+    lose to the stem whichever file is walked first."""
+    from _ingest import suggest_links as S
+
+    for sub in ("entities", "concepts"):
+        (tmp_path / sub).mkdir()
+    for sub, stem in (("entities", "AlphaOne"), ("concepts", "BetaTwo"), ("concepts", "Zeta")):
+        (tmp_path / sub / f"{stem}.md").write_text(
+            "---" + chr(10) + f"title: {stem} Title" + chr(10) + "---" + chr(10), encoding="utf-8")
+    aliases = {"AlphaOne": ["shared alias", "Zeta"], "BetaTwo": ["shared alias", "beta only"], "Zeta": []}
+    monkeypatch.setattr(S, "WIKI", tmp_path)
+    monkeypatch.setattr(S, "_title_english_aliases", lambda title, stem: aliases[stem])
+    monkeypatch.setattr(S, "_title_korean_aliases", lambda title, stem: [])
+    stems, alias_map = S.index_hub_stems()
+    assert alias_map == {"beta only": "BetaTwo"}

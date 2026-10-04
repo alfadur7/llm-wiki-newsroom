@@ -230,6 +230,7 @@ def run(json_out: bool = False, threshold: float | None = None) -> int:
         weights="weight",
         resolution_parameter=RESOLUTION,
         seed=SEED,
+        n_iterations=-1,
     )
     quality_cold = cold_partition.quality()
     n_cold = len(set(cold_partition.membership))

@@ -54,16 +54,18 @@ def load_graph() -> dict:
             tgt, src = edge.get("to"), edge.get("from")
             if tgt and src:
                 inbound.setdefault(tgt, []).append(src)
-    except (OSError, ValueError):
-        pass
+    except (OSError, ValueError) as e:
+        print(f"⚠️ graph/_graph.json failed to load ({e}) — inbound judged as 0. "
+              f"Regenerate with `python tools/build.py`", file=sys.stderr)
     try:
         clusters = json.loads(CLUSTERS_JSON.read_text(encoding="utf-8"))
         node_cluster.update(clusters.get("hub_assignments", {}))
         for node, assign in clusters.get("source_assignments", {}).items():
             if isinstance(assign, dict) and assign.get("primary"):
                 node_cluster[node] = assign["primary"]
-    except (OSError, ValueError):
-        pass
+    except (OSError, ValueError) as e:
+        print(f"⚠️ graph/_clusters.json failed to load ({e}) — judged without cluster mapping. "
+              f"Regenerate with `python tools/build.py`", file=sys.stderr)
     _GRAPH_CACHE = {"inbound": inbound, "cluster": node_cluster}
     return _GRAPH_CACHE
 

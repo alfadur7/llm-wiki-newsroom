@@ -50,7 +50,9 @@ def run() -> None:
     missing = 0
     for n in nodes:
         nid = n["id"]
-        if Path(nid).name in ROOT_META:
+        # ROOT_META names wiki-root files; matching the basename alone also
+        # dropped a subdirectory page that happens to be called index.md.
+        if nid in ROOT_META:
             continue
         fp = WIKI / nid
         if not fp.exists():

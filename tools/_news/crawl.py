@@ -368,6 +368,8 @@ def crawl(seeds: list[str], *, vocab: dict[str, int], known: set[str],
             visited.append({"url": url, "depth": depth, "ok": False, "links": 0})
             continue
         final_url, html = page
+        # A redirected seed's landing page must not list itself as a candidate.
+        fetched_canon.add(canonicalize_url(final_url))
         links = extract_links(BeautifulSoup(html, "html.parser"), final_url)
         visited.append({"url": final_url, "depth": depth, "ok": True, "links": len(links)})
 

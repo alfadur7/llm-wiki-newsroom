@@ -289,3 +289,15 @@ def test_append_to_inbox_format(tmp_path, monkeypatch):
     text = inbox.read_text(encoding="utf-8")
     assert "https://etnews.com/a  # source=auto-crawl found_on=etnews.com score=3 ts=" in text
     assert C._inbox_queue_len() == 1
+
+
+def test_crawl_redirected_seed_does_not_list_itself(vocab):
+    """A seed that redirects lands on a page whose self-link must not come back as a candidate."""
+    pages = {"https://etnews.com/s": '<a href="https://etnews.com/final">신한은행 AI 도입</a>'}
+
+    def fetcher(url):
+        return ("https://etnews.com/final", pages[url]) if url in pages else None
+
+    res = C.crawl(["https://etnews.com/s"], vocab=vocab, known=set(),
+                  allowed={"etnews.com"}, fetcher=fetcher)
+    assert "https://etnews.com/final" not in [c["url"] for c in res["candidates"]]
