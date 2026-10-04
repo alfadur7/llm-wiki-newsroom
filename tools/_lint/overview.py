@@ -573,6 +573,14 @@ def _freshness_line(path: Path, last_updated: object) -> str | None:
 
 _WIKILINK_SLUG_RE = _LIB_WIKILINK_RE
 _SOURCE_TOTAL_RE = re.compile(r"(\d+)\s+total\b")
+_AUTO_MEMBER_HEAD_RE = re.compile(r"\*\*(Entities|Concepts)\*\*\s*\((\d+)\)")
+_NUM_WORDS = {w: i for i, w in enumerate(
+    "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen "
+    "fifteen sixteen seventeen eighteen nineteen twenty".split())}
+_NUM = r"(\d[\d,]*|" + "|".join(_NUM_WORDS) + r")"
+# Anchored phrasings only: "66 sources" (the wiki total) and "2026 sources" must stay silent.
+_ECHO_SRC_RE = re.compile(r"\b" + _NUM + r" sources in this cluster's catalog\b", re.I)
+_ECHO_HUB_RE = re.compile(r"\b(?:its|this cluster's) " + _NUM + r" hubs\b", re.I)
 
 DRIFT_JACCARD_STABLE = 0.85
 DRIFT_JACCARD_REWRITE = 0.70
@@ -606,6 +614,32 @@ def _auto_source_total(sources_body: str) -> int:
     """Parse the 'N total' count in the AUTO:SOURCES body. 0 if absent."""
     m = _SOURCE_TOTAL_RE.search(sources_body)
     return int(m.group(1)) if m else 0
+
+
+def _auto_echo_drift(editor: str, blocks: dict[str, str]) -> list[str]:
+    """EDITOR prose restating an AUTO count that no longer matches the AUTO block.
+
+    The build rewrites AUTO blocks but never the prose that copied their numbers,
+    so the two drift apart on every ingest. AUTO is the truth.
+    """
+    members = {m.group(1): int(m.group(2))
+               for m in _AUTO_MEMBER_HEAD_RE.finditer(blocks.get("MEMBERS", ""))}
+    hubs = sum(members.values()) if len(members) == 2 else None
+    expect = [("sources", _auto_source_total(blocks.get("SOURCES", "")) or None, _ECHO_SRC_RE),
+              ("hubs", hubs, _ECHO_HUB_RE)]
+    out: list[str] = []
+    for label, truth, rx in expect:
+        if truth is None:
+            continue
+        said = set()
+        for m in rx.finditer(editor):
+            tok = m.group(1).lower()
+            said.add(_NUM_WORDS[tok] if tok in _NUM_WORDS else int(tok.replace(",", "")))
+        out += [f"{label} {n} (AUTO {truth})" for n in sorted(said - {truth})]
+    if not out:
+        return []
+    return [f"      [AutoEcho] EDITOR states a count the AUTO block contradicts — "
+            f"{' · '.join(out)} · AUTO is correct; update the prose"]
 
 
 def _drift_line(path: Path, current_text: str) -> str | None:
@@ -1226,6 +1260,8 @@ def _check_overviews(clusters_data: dict, fix: bool, only_slug: str | None = Non
         drift = _drift_line(path, content)
         if drift:
             file_lines.append(drift)
+        file_lines.extend(_auto_echo_drift(AUTO_BLOCK_RE.sub("", content),
+                                           _extract_auto_blocks(content)))
         invasion = _anchor_invasion_line(content, path.stem, anchor_to_cluster, cluster_pairs)
         if invasion:
             file_lines.append(invasion)

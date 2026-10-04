@@ -110,6 +110,7 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+import subprocess
 import sys
 from pathlib import Path
 
@@ -344,6 +345,20 @@ def main() -> int:
              "timeline. see .claude/operations/gap-detection-rollout.md).",
     )
     args = ap.parse_args()
+
+    # A shallow clone gives every file the boundary commit's date, so the
+    # git-history checks (listed in agents/copyeditor.md) misread staleness.
+    try:
+        shallow = subprocess.run(
+            ["git", "-C", str(Path(__file__).parent), "rev-parse", "--is-shallow-repository"],
+            capture_output=True, text=True,
+        ).stdout.strip() == "true"
+    except OSError:  # git not installed — skip quietly, like the other git callers
+        shallow = False
+    if shallow:
+        print("⚠️ shallow clone — git-history checks (listed in agents/copyeditor.md) misread the "
+              "dates of files last changed before the boundary. Run `git fetch --unshallow`, then re-run.",
+              file=sys.stderr)
 
     if args.group == "all":
         if args.subcmd is not None:

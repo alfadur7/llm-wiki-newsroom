@@ -638,3 +638,37 @@ def test_suggest_links_drops_ambiguous_and_shadowing_aliases(tmp_path, monkeypat
     monkeypatch.setattr(S, "_title_korean_aliases", lambda title, stem: [])
     stems, alias_map = S.index_hub_stems()
     assert alias_map == {"beta only": "BetaTwo"}
+
+
+def test_lint_warns_on_shallow_clone(monkeypatch, capsys):
+    """A shallow clone must be announced — the git-history checks misread dates silently."""
+    import subprocess as sp
+    import types
+
+    import lint
+
+    real_run = sp.run
+
+    def fake_run(cmd, *a, **k):
+        if "--is-shallow-repository" in cmd:
+            return types.SimpleNamespace(stdout="true\n", returncode=0)
+        return real_run(cmd, *a, **k)
+
+    monkeypatch.setattr(lint.subprocess, "run", fake_run)
+    monkeypatch.setattr(sys, "argv", ["lint.py", "meta"])
+    lint.main()
+    assert "shallow clone" in capsys.readouterr().err
+
+
+def test_overview_auto_echo_catches_stale_counts():
+    """EDITOR prose that restates an AUTO count must match it; unanchored totals stay silent."""
+    import overview as O
+
+    blocks = {"MEMBERS": "**Entities** (6)\n- x\n**Concepts** (2)\n- y\n",
+              "SOURCES": "51 total — see catalog.\n"}
+    fine = ("39 of the 51 sources in this cluster's catalog. What its eight hubs share. "
+            "Only one of the wiki's 66 sources. None is settled in the 2026 sources.")
+    assert O._auto_echo_drift(fine, blocks) == []
+    stale = "39 of the 48 sources in this cluster's catalog. What its nine hubs share."
+    out = O._auto_echo_drift(stale, blocks)
+    assert len(out) == 1 and "sources 48 (AUTO 51)" in out[0] and "hubs 9 (AUTO 8)" in out[0]
