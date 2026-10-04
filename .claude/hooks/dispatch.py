@@ -562,7 +562,7 @@ _OP_CHARS = "();<>|&\n"
 _ADD_ALL = frozenset({"-A", "--all", "."})
 _ADD_TRACKED = frozenset({"-u", "--update"})
 # Git options whose value is the next token, so that value is not a pathspec.
-_GIT_VALUE_OPTS = frozenset({"-C", "-c", "--git-dir", "--work-tree",
+_GIT_VALUE_OPTS = frozenset({"-C", "-c", "--git-dir", "--work-tree", "--config-env",
                              "--namespace", "--exec-path", "--pathspec-from-file"})
 # Commit options whose value is the next token.
 _VALUE_OPTS = ("--message", "--file", "--author", "--date",
@@ -634,6 +634,21 @@ def _segment_head(seg: list[str]) -> list[str]:
     return seg[i:]
 
 
+def _git_sub(head: list[str]) -> str | None:
+    """The first non-option token after git (the subcommand), skipping the value of a
+    global option that takes one (`-C x`, `-c k=v`). Matching `commit` anywhere in the
+    arguments reads `git log --grep commit` as a commit."""
+    skip = False
+    for t in head[1:]:
+        if skip:
+            skip = False
+        elif t in _GIT_VALUE_OPTS:
+            skip = True
+        elif t[:1] != "-":
+            return t
+    return None
+
+
 def _git_segments(command: str, sub: str) -> list[list[str]]:
     """Shell segments whose first token is git and that carry `sub` as its own token.
 
@@ -653,7 +668,7 @@ def _git_segments(command: str, sub: str) -> list[list[str]]:
             break
         if _is_op(t):
             head = _segment_head(cur)
-            if head and os.path.basename(head[0]).removesuffix(".exe") == "git" and sub in head:
+            if head and os.path.basename(head[0]).removesuffix(".exe") == "git" and _git_sub(head) == sub:
                 segs.append(head)
             cur = []
         else:

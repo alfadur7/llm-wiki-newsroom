@@ -1870,13 +1870,6 @@
       "label": "gives figures for the industrial-scale distillation Dario Amodei urged a crackdo"
     },
     {
-      "from": "sources/anthropic-distillation-campaigns-alibaba-moonshot.md",
-      "to": "sources/anthropic-distillation-campaigns-alibaba-moonshot.md",
-      "type": "EXTRACTED",
-      "relation": "cites",
-      "evidence_grade": "fact"
-    },
-    {
       "from": "sources/anthropic-position-open-weights-models.md",
       "to": "concepts/OpenWeights.md",
       "type": "EXTRACTED",
@@ -1959,13 +1952,6 @@
       "label": "both sizes ship under a permissive open-source license that allows commercial us"
     },
     {
-      "from": "sources/apertus-fully-open-multilingual-llm.md",
-      "to": "sources/apertus-fully-open-multilingual-llm.md",
-      "type": "EXTRACTED",
-      "relation": "cites",
-      "evidence_grade": "analysis"
-    },
-    {
       "from": "sources/beyond-deepseek-china-open-weight-ecosystem.md",
       "to": "concepts/OpenWeights.md",
       "type": "EXTRACTED",
@@ -2024,7 +2010,7 @@
       "to": "entities/FreeSoftwareFoundation.md",
       "type": "EXTRACTED",
       "relation": "cites",
-      "label": "holds that a machine-learning application is not free unless its [[TrainingData]",
+      "label": "holds that a machine-learning application is not free unless its TrainingData an",
       "evidence_grade": "analysis"
     },
     {
@@ -2240,13 +2226,6 @@
       "type": "EXTRACTED",
       "relation": "contradicts",
       "label": "Open Future argues open resources lack the volume and diversity to train large f"
-    },
-    {
-      "from": "sources/eleutherai-common-pile-dataset.md",
-      "to": "sources/eleutherai-common-pile-dataset.md",
-      "type": "EXTRACTED",
-      "relation": "cites",
-      "evidence_grade": "fact"
     },
     {
       "from": "sources/eu-ai-act-gpai-guide-open-source-developers.md",
@@ -2595,13 +2574,6 @@
     },
     {
       "from": "sources/gpt-oss-challenges-meta-open-weight.md",
-      "to": "sources/gpt-oss-challenges-meta-open-weight.md",
-      "type": "EXTRACTED",
-      "relation": "cites",
-      "evidence_grade": "analysis"
-    },
-    {
-      "from": "sources/gpt-oss-challenges-meta-open-weight.md",
       "to": "entities/Ai2.md",
       "type": "EXTRACTED",
       "relation": "cites"
@@ -2635,13 +2607,6 @@
       "type": "EXTRACTED",
       "relation": "cites",
       "label": "quotes Meta's Chief AI Scientist Yann LeCun endorsing open foundation models",
-      "evidence_grade": "analysis"
-    },
-    {
-      "from": "sources/hello-olmo-truly-open-llm.md",
-      "to": "sources/hello-olmo-truly-open-llm.md",
-      "type": "EXTRACTED",
-      "relation": "cites",
       "evidence_grade": "analysis"
     },
     {
@@ -3134,13 +3099,6 @@
       "label": "frames the non-commercial license as consistent with the company's openness prin"
     },
     {
-      "from": "sources/mistral-ai-non-production-license.md",
-      "to": "sources/mistral-ai-non-production-license.md",
-      "type": "EXTRACTED",
-      "relation": "cites",
-      "evidence_grade": "fact"
-    },
-    {
       "from": "sources/mistral-small-3.md",
       "to": "entities/MistralAI.md",
       "type": "EXTRACTED",
@@ -3210,18 +3168,11 @@
       "evidence_grade": "fact"
     },
     {
-      "from": "sources/mistral-small-3.md",
-      "to": "sources/mistral-small-3.md",
-      "type": "EXTRACTED",
-      "relation": "cites",
-      "evidence_grade": "fact"
-    },
-    {
       "from": "sources/mozilla-celebrates-osaid.md",
       "to": "entities/Mozilla.md",
       "type": "EXTRACTED",
       "relation": "cites",
-      "label": "endorses the [[OpenSourceInitiative]]'s Open Source AI Definition as \"an importa",
+      "label": "endorses the OpenSourceInitiative's Open Source AI Definition as \"an important s",
       "evidence_grade": "fact"
     },
     {
@@ -3266,7 +3217,7 @@
       "to": "entities/Mozilla.md",
       "type": "EXTRACTED",
       "relation": "cites",
-      "label": "states that Mozilla, [[HuggingFace]] and EleutherAI sent a letter on SB 1047 to ",
+      "label": "states that Mozilla, HuggingFace and EleutherAI sent a letter on SB 1047 to Sena",
       "evidence_grade": "fact"
     },
     {
@@ -3334,13 +3285,6 @@
       "type": "EXTRACTED",
       "relation": "references",
       "label": "recommends monitoring the risks of open model weights rather than restricting th"
-    },
-    {
-      "from": "sources/ntia-open-model-weights-report.md",
-      "to": "sources/ntia-open-model-weights-report.md",
-      "type": "EXTRACTED",
-      "relation": "cites",
-      "evidence_grade": "fact"
     },
     {
       "from": "sources/open-future-osaid-step-forward.md",
@@ -3656,7 +3600,7 @@
       "to": "concepts/OpenWeights.md",
       "type": "EXTRACTED",
       "relation": "defines",
-      "label": "releases weights and parameters for [[FineTuning]] but typically withholds train",
+      "label": "releases weights and parameters for FineTuning but typically withholds training ",
       "evidence_grade": "analysis"
     },
     {
@@ -3874,13 +3818,6 @@
       "type": "EXTRACTED",
       "relation": "references",
       "label": "another essay on Kimi K3 and China's AI diplomacy, which reports that the weight"
-    },
-    {
-      "from": "sources/open-washing-four-criteria.md",
-      "to": "sources/open-washing-four-criteria.md",
-      "type": "EXTRACTED",
-      "relation": "cites",
-      "evidence_grade": "analysis"
     },
     {
       "from": "sources/open-weight-diplomacy-digital-silk-road.md",
@@ -4269,13 +4206,6 @@
       "label": "recalls R1's Lunar New Year launch and its claim of top-tier performance on far "
     },
     {
-      "from": "sources/openai-deepseek-free-riding-distillation.md",
-      "to": "sources/openai-deepseek-free-riding-distillation.md",
-      "type": "EXTRACTED",
-      "relation": "cites",
-      "evidence_grade": "fact"
-    },
-    {
       "from": "sources/openai-hack-open-source-ai-fight.md",
       "to": "entities/HuggingFace.md",
       "type": "EXTRACTED",
@@ -4372,13 +4302,6 @@
       "type": "EXTRACTED",
       "relation": "references",
       "label": "the OpenMDW license extends its terms to data alongside models, code, and docume"
-    },
-    {
-      "from": "sources/openmdw-1-1-nvidia-adoption.md",
-      "to": "sources/openmdw-1-1-nvidia-adoption.md",
-      "type": "EXTRACTED",
-      "relation": "cites",
-      "evidence_grade": "fact"
     },
     {
       "from": "sources/osaid-take-it-or-leave-it.md",
@@ -4629,7 +4552,7 @@
       "to": "entities/OpenSourceInitiative.md",
       "type": "EXTRACTED",
       "relation": "cites",
-      "label": "defines an [[OpenSourceAI]] system by four freedoms (use, study, modify, share) ",
+      "label": "defines an OpenSourceAI system by four freedoms (use, study, modify, share) plus",
       "evidence_grade": "fact"
     },
     {
@@ -4950,13 +4873,6 @@
       "type": "EXTRACTED",
       "relation": "references",
       "label": "argues the Act's exemption for openly licensed models makes open source status a"
-    },
-    {
-      "from": "sources/rethinking-open-source-generative-ai.md",
-      "to": "sources/rethinking-open-source-generative-ai.md",
-      "type": "EXTRACTED",
-      "relation": "cites",
-      "evidence_grade": "fact"
     },
     {
       "from": "sources/rethinking-open-source-generative-ai.md",
@@ -13763,13 +13679,13 @@
   ],
   "stats": {
     "node_count": 93,
-    "edge_count": 1342,
-    "extracted_edges": 727,
+    "edge_count": 1330,
+    "extracted_edges": 715,
     "inferred_edges": 615,
     "relations": {
       "defines": 133,
       "references": 332,
-      "cites": 211,
+      "cites": 199,
       "contradicts": 51
     },
     "types": {

@@ -573,3 +573,29 @@ def test_contradiction_drift_reads_scalar_sources(tmp_path, monkeypatch):
     doc = {"themes": {"t": {"claim_ids": ["c1"]}}}
     claims = [{"id": "c1", "source": "sources/alpha-src.md"}]
     assert CT._check_frontmatter_drift(doc, claims) == []
+
+
+def test_claims_uncommitted_check_is_cwd_independent(tmp_path, monkeypatch):
+    """`_claims_has_uncommitted` must see an edit whatever the caller's cwd — run from
+    outside the repo, a bare `git status` fails and reads as "no edits"."""
+    import subprocess
+
+    import contradiction_theme as T
+
+    repo, elsewhere = tmp_path / "repo", tmp_path / "elsewhere"
+    repo.mkdir()
+    elsewhere.mkdir()
+    claims = repo / "_contradictions.json"
+    claims.write_text("[]", encoding="utf-8")
+
+    def git(*a):
+        subprocess.run(["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@t",
+                        "-c", "commit.gpgsign=false", *a], check=True, capture_output=True)
+
+    git("init", "-q")
+    git("add", "_contradictions.json")
+    git("commit", "-qm", "a")
+    claims.write_text("[ ]", encoding="utf-8")
+    monkeypatch.setattr(T, "CLAIMS_JSON", claims)
+    monkeypatch.chdir(elsewhere)
+    assert T._claims_has_uncommitted() is True

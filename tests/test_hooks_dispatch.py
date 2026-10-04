@@ -327,6 +327,7 @@ def _bash(command):
 FIRES = [
     "git commit -m 'x'",
     "git -C . commit -m 'x'",
+    "git -c user.name=x commit -m 'x'",             # a global option's value is not the subcommand
     "git  commit",                                   # two spaces
     "git add CLAUDE.md && git commit -F /tmp/m.txt",
     "python tools/lint.py meta; git commit -m 'x'",
@@ -344,6 +345,8 @@ SILENT = [
     "grep -rn 'git commit' log.md",                  # the first token is not git
     "echo 'run git commit next'",
     "git commit -m 'docs: how to git commit'",       # the message folds into one token
+    "git log --grep commit --oneline",               # `commit` in argument position is not the subcommand
+    "git branch -d commit",
 ]
 
 
@@ -354,7 +357,7 @@ def _segs(command):
 def test_commit_segments_anchor_on_command_position():
     for c in FIRES:
         assert _segs(c), c
-    for c in SILENT[:4]:
+    for c in SILENT[:4] + SILENT[5:]:
         assert not _segs(c), c
 
 

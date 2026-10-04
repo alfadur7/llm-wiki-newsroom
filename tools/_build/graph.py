@@ -259,6 +259,8 @@ def run() -> None:
             return _relation_at(spans, pos)
 
         def _consider(target: str, relation: str, label: str | None, grade: str | None) -> None:
+            if target == rel:  # a self link (`[[Self#Key Quotes]]`) is a self-loop — it inflates inbound counts
+                return
             existing = per_target.get(target)
             if existing is None:
                 per_target[target] = {"relation": relation, "label": label, "grade": grade}
@@ -290,7 +292,9 @@ def run() -> None:
             if not target:
                 orphan_targets[raw] += 1
                 continue
-            label = m.group(2).strip()[:80]
+            # Wikilinks and bold inside the description are markup, not hover text.
+            label = re.sub(r"\[\[([^\]|]+)(?:\|([^\]]*))?\]\]", lambda w: w.group(2) or w.group(1),
+                           m.group(2)).replace("**", "").strip()[:80]
             line = _line_at(content, m.start())
             _consider(target, _resolve_relation(m.start()), label, _line_grade(line))
 

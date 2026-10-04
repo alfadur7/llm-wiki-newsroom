@@ -34,7 +34,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from _lib import WIKI  # noqa: E402
 sys.path.insert(0, str(Path(__file__).parent))
-from _editor_date import last_commit_date  # noqa: E402
+from _editor_date import _git_repo_rel, last_commit_date  # noqa: E402
 
 CONTRADICTIONS_DIR = WIKI / "contradictions"
 CLAIMS_JSON = CONTRADICTIONS_DIR / "_contradictions.json"
@@ -75,9 +75,13 @@ def _claims_last_change_date() -> str | None:
 
 def _claims_has_uncommitted() -> bool:
     """True if `_contradictions.json` has uncommitted edits."""
+    rr = _git_repo_rel(CLAIMS_JSON)
+    if rr is None:
+        return False
+    toplevel, rel = rr
     try:
         r = subprocess.run(
-            ["git", "status", "--porcelain", "--", str(CLAIMS_JSON)],
+            ["git", "-C", toplevel, "status", "--porcelain", "--", rel],
             capture_output=True, text=True, timeout=5, check=False,
             encoding="utf-8", errors="replace",
         )
