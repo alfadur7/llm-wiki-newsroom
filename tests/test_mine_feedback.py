@@ -120,3 +120,23 @@ def test_relay_preamble_does_not_bypass_the_tag_filter():
     # a genuine operator utterance is still kept
     real = "그게 아니야, 다시 해"
     assert mf.extract_user_text({"type": "user", "message": {"content": real}}) == real
+
+
+def test_load_history_refuses_unreadable_file(tmp_path):
+    """The write-path history loader never folds an unreadable file into an empty
+    history — that would overwrite the committed history.
+
+    A BOM file reads (utf-8-sig), a corrupt file raises SystemExit, absence is a
+    first checkpoint (empty list).
+    """
+    import _review
+
+    p = tmp_path / "wm.json"
+    assert _review.load_history(p) == []
+    p.write_text('﻿{"last_review": "2026-01-01", "history": [{"a": 1}]}', encoding="utf-8")
+    assert _review.load_history(p) == [{"a": 1}]
+    assert _review.read_watermark(p) == "2026-01-01"
+    p.write_text('{"history": [', encoding="utf-8")
+    with pytest.raises(SystemExit):
+        _review.load_history(p)
+    assert _review.read_watermark(p) is None  # the read path stays fail-open

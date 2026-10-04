@@ -19,6 +19,7 @@ from _net import (
     "0.0.0.0",            # unspecified
     "::1",                # v6 loopback
     "::ffff:127.0.0.1",   # v6-mapped v4 — explicit unwrap path
+    "100.100.100.200",    # CGNAT 100.64/10 — Alibaba metadata
     "not-an-ip",          # unparseable → fail-closed
 ])
 def test_blocked_ips(addr):
@@ -35,6 +36,7 @@ def test_public_ips_allowed(addr):
     "gopher://x/",
     "ftp://x/",
     "https://",   # no host
+    r"http://127.0.0.1\@example.com/",  # urlparse/requests parser mismatch bypass
 ])
 def test_validate_url_rejects_without_dns(url):
     # Scheme/host validation must fail before DNS resolution (network-independent).

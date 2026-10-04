@@ -19,7 +19,7 @@ def _load(path: Path) -> dict:
     list/str root as-is takes down `mine_feedback`/`mine_failures` with an
     AttributeError."""
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         return {}
     return data if isinstance(data, dict) else {}
@@ -50,8 +50,24 @@ def in_window(when: str | None, since: str | None) -> bool:
 
 
 def load_history(path: Path) -> list:
-    """Existing review-history list (the caller computes recurrence from this history)."""
-    return _load(path).get("history") or []
+    """Existing review-history list (the caller computes recurrence from this history).
+
+    Its only callers are write paths (append, then write_review), so it does not
+    use _load's fail-open: a file that exists but cannot be read would proceed as
+    an empty list and overwrite the whole committed history. Only absence means
+    a first checkpoint."""
+    if not path.exists():
+        return []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as e:
+        raise SystemExit(f"{path} unreadable — aborting to avoid overwriting the history ({e})")
+    h = data.get("history") if isinstance(data, dict) else None
+    if h is None:
+        return []
+    if not isinstance(h, list):
+        raise SystemExit(f"{path} history is not a list — aborting to avoid overwriting the history")
+    return h
 
 
 def write_review(path: Path, when: str, history: list) -> None:

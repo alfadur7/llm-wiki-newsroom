@@ -516,3 +516,15 @@ def test_g2_not_applicable_in_english(monkeypatch):
     assert g2().endswith("—")
     monkeypatch.setenv("WIKI_LANG", "ko")
     assert g2().endswith("⚠️")
+
+
+def test_contradiction_run_fails_on_corrupt_claims_db(tmp_path, monkeypatch):
+    """A corrupt `_contradictions.json` must exit 2, not fold to [] and pass X1 trivially."""
+    import contradiction as CT
+
+    bad = tmp_path / "_contradictions.json"
+    bad.write_text('[{"claim": ', encoding="utf-8")
+    monkeypatch.setattr(CT, "CLAIMS_JSON", bad)
+    assert CT.run() == 2
+    bad.write_text('{"claims": []}', encoding="utf-8")
+    assert CT.run() == 2

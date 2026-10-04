@@ -94,6 +94,7 @@ from _schema_common import (  # noqa: E402
     section_present as _section_present,
 )
 from contradiction_theme import (  # noqa: E402
+    _load_json,
     _print_rewrite_block as _print_theme_rewrite_block,
     is_themes_json_stale,
 )
@@ -1477,6 +1478,13 @@ def run(target: str | None = None, fix: bool = False, auto_yes: bool = False) ->
         print(f"ERROR: {themes_err}", file=sys.stderr)
         return 2
     assert themes_doc is not None
+    # A corrupt claims DB folds to [] in _load_claims_json, turning X1 into a
+    # trivial PASS — stop here instead. Absence stays [] (first build).
+    if CLAIMS_JSON.exists():
+        claims_doc, claims_err = _load_json(CLAIMS_JSON)
+        if claims_err or not isinstance(claims_doc, list):
+            print(f"ERROR: {claims_err or f'{CLAIMS_JSON}: top-level must be list'}", file=sys.stderr)
+            return 2
 
     # target dispatch — "aggregate" is a reserved value like "theme",
     # handled by a dedicated branch that skips theme-level processing.

@@ -36,6 +36,7 @@ import tempfile
 from urllib.parse import quote, urljoin, urlparse
 
 import requests
+import urllib3
 
 # Categorically reject any non-http(s) scheme. file://, gopher://, ftp://,
 # data:// are never legitimate ingest targets.
@@ -74,6 +75,7 @@ def _is_blocked_ip(addr: str) -> bool:
         or ip.is_multicast
         or ip.is_reserved
         or ip.is_unspecified
+        or not ip.is_global  # CGNAT 100.64/10 (Alibaba metadata, Tailscale)
     )
 
 
@@ -88,7 +90,17 @@ def _validate_url(url: str) -> None:
     scheme = parsed.scheme.lower()
     if scheme not in ALLOWED_SCHEMES:
         raise UnsafeURLError(f"scheme `{scheme}` not in {sorted(ALLOWED_SCHEMES)}: {url}")
-    host = parsed.hostname
+    # Take the host from the parser the request itself uses: urlparse and
+    # requests disagree on `\@` userinfo (`http://127.0.0.1\@example.com/` is
+    # example.com to urlparse but 127.0.0.1 on the wire). Backslashes are
+    # rejected outright — curl_get's parser is a third one.
+    if "\\" in url:
+        raise UnsafeURLError(f"backslash in URL: {url}")
+    try:
+        prepared = requests.Request("GET", url).prepare().url
+    except requests.exceptions.RequestException as e:
+        raise UnsafeURLError(f"invalid URL: {url}: {e}") from e
+    host = (urllib3.util.parse_url(prepared).host or "").strip("[]")
     if not host:
         raise UnsafeURLError(f"no host in URL: {url}")
     try:
