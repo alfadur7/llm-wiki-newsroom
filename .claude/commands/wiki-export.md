@@ -27,12 +27,12 @@ Outside the matrix — Meta layer (deterministic). The Editor-in-Chief calls `to
 **Claude.ai project instruction document** (`README.md`)
 - `README.md` — the **complete custom-instruction document**: 2-tier structure explanation + file-structure table (derived from ROOT_META + FOLDER_MERGES + index, drift-impossible) + **upload budget guide** (Core/Optional are auto-filled greedily up to `_CONTEXT_LIMIT` in `_TIER_PRIORITY` order and split — as the corpus grows, large synthesis files are auto-demoted to Optional; fixed numbers, drift-impossible) + answer rules + deep-link convention + wiki-structure reference. **Paste this entire document into the Claude.ai project instruction field.** The per-file handoff block is discarded (the instruction field is the single channel — removing the 11× ~9K-token duplication).
 
-**2-tier model**: RAG (synthesis layer + directory) = answer synthesis / Graph (entity·concept·source full text) = deep-link drill-down. The RAG corpus is kept at 0.93 MB by excluding entity·concept bodies, and the Core set is auto-selected within the limit by priority-greedy fill.
+**2-tier model**: RAG (synthesis layer + directory) = answer synthesis / Graph (entity·concept·source full text) = deep-link drill-down. The RAG corpus excludes entity·concept bodies, and the Core set is auto-selected within the limit by priority-greedy fill.
 
 **Excluded**: `_`-prefixed files (auto-generated JSON, etc.). Stale artifacts dropped from FOLDER_MERGES (`all-entities.md`, etc.) are cleaned up by `_prune_stale` on every run.
 
 **Hosting deploy assets** (`_site/` — `<slug>.html` + `<slug>-{graph,clusters,overlays,pages}.json`)
-- `stage_site()` in `tools/_export/site.py` copies `graph/graph.html` (no inline, ~90KB) + `_graph.json`·`_clusters.json`·`_overlays.json`·`_pages.json` into `_site/` **with a `<slug>-` prefix**, and injects `<meta robots noindex>` + `window.ASSET_PREFIX="<slug>-"` into the HTML. graph.html fetches the JSON from the obscure path with that prefix (graph/clusters at init, pages lazily on click). For hosting and viewing from a phone ([`operations/graph-hosting-setup.md`](../operations/graph-hosting-setup.md) SoT).
+- `stage_site()` in `tools/_export/site.py` copies `graph/graph.html` (no inline) + `_graph.json`·`_clusters.json`·`_overlays.json`·`_pages.json` into `_site/` **with a `<slug>-` prefix**, and injects `<meta robots noindex>` + `window.ASSET_PREFIX="<slug>-"` into the HTML. graph.html fetches the JSON from the obscure path with that prefix (graph/clusters at init, pages lazily on click). For hosting and viewing from a phone ([`operations/graph-hosting-setup.md`](../operations/graph-hosting-setup.md) SoT).
 - The filenames and RAG link template are determined by the `tools/_lib.py` constants `BASE_URL`·`STANDALONE_SLUG` (shared by export and briefing) (single SoT, drift-impossible). **The data JSON carries the same slug prefix**, so the path is unguessable → without the slug you cannot fetch the data either.
 
 **Deep-link convention (single SoT)**: when `BASE_URL` is set, `export.py`'s `_deeplink_protocol()` builds the convention text and embeds it into `README.md` (single channel for the instruction field). The convention directs **all entity·concept·source deep links**:
@@ -52,4 +52,4 @@ The output automatically reports file sizes and total volume + RAG budget (Core/
 
 ## Human Reviewer Gate
 
-- External commit·push (a GitHub push is needed for the Project Knowledge integration — explicit approval from the wiki operator)
+The global gate is SoT at [`CLAUDE.md` "Human Reviewer Gate"](../../CLAUDE.md#human-reviewer-gate). This command has no gate of its own (the push the Project Knowledge integration needs falls under the global gate).

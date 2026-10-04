@@ -28,7 +28,7 @@ The two areas map naturally to a Korean newspaper's "reporting mode"·"writing m
 - Broad read for simple answers·explanations for `/wiki-query`·`/wiki-discover`
 - Spot check (assisting other roles' verification — quote accuracy, etc.)
 - breadth-first parallel spawn (e.g. searching 10 clusters concurrently)
-- Run the first-pass quantitative lint on its own authored source·stub (confirm `python tools/lint.py source <slug>` PASS — on FAIL, re-run its own ADAPT before handing off)
+- Run the first-pass quantitative lint on its own authored source·stub (source: confirm `python tools/lint.py source <slug>` PASS; stub: `python tools/lint.py hub schema` + `hub body` with 0 items naming its own file — on FAIL, re-run its own ADAPT before handing off)
 
 **X — what not to do**:
 - Expanding the stub target set by its own threshold judgment — the Editor-in-Chief judges the creation threshold and hands over the approved targets (contract SoT: [`layers/hub.md`](../layers/hub.md) stub authoring)

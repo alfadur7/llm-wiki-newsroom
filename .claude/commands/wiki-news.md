@@ -74,7 +74,7 @@ This command is responsible only up to WebSearch·report·`_inbox.md` append. Th
 
 ## Human Reviewer Gate
 
-- Discovery of a new cluster slug (an external keyword does not fit existing clusters)
-- Person entity stub candidate ([`policies/naming.md`](../policies/naming.md) entity-stub threshold — only for key people cited multiple times)
+The global gate is SoT at [`CLAUDE.md` "Human Reviewer Gate"](../../CLAUDE.md#human-reviewer-gate). Gates specific to this command:
+
 - Ingest decision (chain into `/wiki-ingest` — explicit approval)
 - **`--gap` mode** — no per-query gate: the automatic channel is a link crawl with no queries to approve. Ingest is still the explicit `/wiki-ingest inbox`

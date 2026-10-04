@@ -34,11 +34,12 @@ L2-2 timeline content. The page format·authoring standard·Rubric have their So
 3. Read each source → 1-2 lines of key facts. **entry-date guard**: the entry date must be directly backed by the source's `published` (or an occurrence date stated in the body) — it cannot be later than `scraped` (year typo), and when splitting one source across multiple points in time, each point must be stated in the body (otherwise demote to the hub `## Timeline`, no standalone timeline exposure).
 4. **History·future anchors** (mature topics): include pre-ingest events·future roadmaps not in the backlinks as `- **YYYY** — [[Entity]] description` / `- **YYYY (planned)** —`. No drops (lossless).
 5. **Flow summary** (required, at top) — structure per [`layers/timeline.md`](../layers/timeline.md).
-6. Output grouped by year (newest→oldest, reverse), with each dated item's **first link = `[[source-id]]`** (entity-first only for history anchors).
+6. Write `wiki/timelines/<slug>.md` grouped by year (newest→oldest, reverse), with each dated item's **first link = `[[source-id]]`** (entity-first only for history anchors).
 7. self-VERIFY₀: `python tools/lint.py timeline <slug>` → confirm `→ path`.
-8. Save (when the gate is passed): `wiki/timelines/<slug>.md` + `log.md` append `## [YYYY-MM-DD] timeline | <entity name>`.
+8. Publish (when the gate is passed): `log.md` append `## [YYYY-MM-DD] timeline | <entity name>`.
 
 ## Human Reviewer Gate
 
-- New person entity stub (only for key people cited multiple times — [`policies/naming.md`](../policies/naming.md) entity-stub threshold).
+The global gate is SoT at [`CLAUDE.md` "Human Reviewer Gate"](../../CLAUDE.md#human-reviewer-gate). Gates specific to this command:
+
 - Desk qualitative defects of critical/high.

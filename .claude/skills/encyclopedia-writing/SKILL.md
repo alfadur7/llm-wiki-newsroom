@@ -11,7 +11,7 @@ Neutral-reference writing craft drawn from the encyclopedic editing tradition (t
 
 A reference's value comes from the link density that lets a reader move to adjacent concepts; at the same time, re-linking the same target within one section is visual noise.
 
-- **enc.link-density** — the EDITOR region (excluding AUTO blocks) holds at least the threshold number of `[[wikilink]]`s. "Articles on highly technical subjects might demand a higher density of links," so technical/finance domains are allowed slightly above the ceiling.
+- **enc.link-density** — the EDITOR region (excluding AUTO blocks) holds at least the threshold number of `[[wikilink]]`s. "Articles on highly technical subjects might demand a higher density of links," so technical/finance pages may warrant a count above the floor.
 - **enc.first-mention** — "link a term at most once per major section, at first occurrence." A second link of the same stem within a section becomes plain text. A section that structurally cites the same target twice (e.g. adjacent-field boundary prose) is exempted via the manifest's `exempt_sections`.
 - **enc.lead-body** — "the lead of an article usually has a greater density of links than later parts of the article"; this is expected, since the reader's first encounter is where navigation options should be densest. Because which span counts as the lead is content-type-bound, the orchestrator measures it.
 

@@ -139,7 +139,7 @@ Update obligations belong to three responsibilities — **Record · Propose · G
 
 ### Record
 
-Input arrives through **two channels** that ride the same flow — operator utterances (`mine_feedback`) and verifier-grounded recurring defects (the corpus that lint·Desk load via `log_defect`, which `mine_failures` bundles).
+Input arrives through **two channels** that ride the same flow — operator utterances (`mine_feedback`) and verifier-grounded recurring defects (the corpus that verification surfaces load via `log_defect`, which `mine_failures` bundles — which surfaces load it: [`tools/log_defect.py`](../../tools/log_defect.py) `STAGES` is the SoT).
 
 - **Transition loading** (on the accept·reject decision) — Acceptance·rejection transitions are loaded into the corpus via `log_defect` as `kind:transition` (surface·held-in/out delta·decision — the audit ledger). A rejected edit direction (ladder rung·Desk·held-out gate·wiki-operator rejection) is additionally recorded in `.claude/memory/` as the rejected direction + rationale (the lookup obligation is § Propose, Re-proposal avoidance).
 - **Working-memory provenance** — items in `.claude/memory/` (rejected directions·local decisions·`mine_feedback` CORRECTION encodings) carry their provenance (one or more of: session id·commit·`log.md` date·incident date) — an item without provenance cannot be traced·re-confirmed.

@@ -182,7 +182,7 @@ No skipping.
 #### 2. Domain-Context Grouping — No Keyword Match
 
 Group by the **issue's logical structure**, not by surface keywords in the claim text. Belonging to the same theme means:
-- Contributing to the **same contradiction axis** (e.g., "vendor claim vs empirical research," "regulation tightening vs innovation hindrance")
+- Contributing to the **same contradiction axis** (e.g., "vendor claim vs empirical research," "stricter regulation vs looser regulation")
 - Even different-time statements by the **same actor/organization/person** belong to the same theme if the change of stance is the issue
 - Pieces of evidence showing the **opposing perspective of the same phenomenon**
 

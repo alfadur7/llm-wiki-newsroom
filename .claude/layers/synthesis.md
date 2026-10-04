@@ -68,7 +68,7 @@ A synthesis follows craft drawn from journalism explainer reporting, management-
 | `## N.` analysis sections | `jrn.explainer` · `jrn.inverted-pyramid` · `con.bold-bullet` |
 | Inline source attribution in body | `cit.grounding` · `cit.grade-meta` · `cit.cite-type-meta` |
 | `## Connections` per-axis roster | `enc.connection-grouping` |
-| Notation·neutrality | `enc.link-density` · `enc.slug-alias` · `enc.first-mention` · `enc.verdict-restraint` · `enc.summary-style` · `enc.coatrack` |
+| Notation·neutrality | `enc.link-density` · `enc.slug-alias` · `enc.verdict-restraint` · `enc.summary-style` · `enc.coatrack` |
 | Numbers | `con.numeric-precision` · `con.numeric-density` |
 
 > **A synthesis does not use `cit.cite-consistency`** (typed-prefix consistency) — because, unlike a source page, its `## Connections` has no `cites:`·`references:` prefixes. A synthesis's citation discipline is inline-claim → source attribution in the body (`cit.grounding`).
@@ -122,8 +122,11 @@ This Rubric pairs with "how to write" (Authoring) to judge "how well it was writ
 |---|---|---|---|---|
 | `struct.schema-sections` | Required sections complete | `## Summary` + `## Connections` present AND ≥ 1 numbered `## N.` analysis section | A | ✅ |
 | `struct.source-coverage` | Sources reappear in body | of frontmatter `sources:`, the share reappearing as `[[slug]]` in the body ≥ 70% | A | ✅ |
+| `struct.source-exists` | Declared sources exist | each slug in frontmatter `sources:` is a real file at `wiki/sources/<slug>.md` | A | ✅ |
 | `struct.through-line` | Through-running narrative | a single question·tension threading the sections is stated (not a mere topic listing) | M | ✅ |
 | `struct.join-grounded` | Integration join verified | a claim fusing ≥2 sources is verified by span comparison of each component — no fact fabricated at the seam | M | ✅ |
+
+House-style (roster optional): `house.repetition` · `house.date-format` · `house.sentence-length` — definitions and PASS conditions are the SoT in the [overview.md](overview.md#common-authoring-principles-applies-to-part-1-and-part-2) house-style block.
 
 **Completion conditions** (roster `synthesis.roster` — 28 criteria):
 - All 9 required (roster `required`: struct.schema-sections·struct.source-coverage·struct.source-exists·struct.through-line·struct.join-grounded·enc.broken-link·jrn.lede·con.scr·cit.grounding) PASS

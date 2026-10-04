@@ -39,5 +39,6 @@ Report after the build: node count · edge count · per-type distribution · mos
 
 ## Human Reviewer Gate
 
-- Adding a new label to `cluster_labels.json` (no automatic Claude edits — consistent with `policies/directory-layout.md`)
-- Naming a new cluster slug
+The global gate is SoT at [`CLAUDE.md` "Human Reviewer Gate"](../../CLAUDE.md#human-reviewer-gate). Gates specific to this command:
+
+- `cluster_labels.json` labels — no automatic Claude edits (consistent with `policies/directory-layout.md`)

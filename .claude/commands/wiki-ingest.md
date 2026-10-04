@@ -27,7 +27,7 @@ L2-1 source + L2-2 stub cycle + Meta (full rebuild) — Writing-driven, tightly 
 | Person incumbency check | GROUND external | Reporter (mode=ground, WebSearch) |
 | Source verification (1st) | VERIFY₁ | Reporter self (right after authoring, confirm `python tools/lint.py source <slug>` PASS — self-ADAPT on FAIL) |
 | Source verification (2nd, sub-trigger) | VERIFY₂ | Editor-in-Chief — invoke the Desk on sources meeting `[fact]≥7 AND citations≥3` (based on the `tools/_lint/source.py` Advisory auto-surface, batched at the post-fanout stage). SoT: [`agents/desk.md`](../agents/desk.md) L2-1 source VERIFY₂. |
-| Hub verification (1st) | VERIFY | Reporter (single-source stub during fanout) · Editor-in-Chief (post-fanout cross-source stub) — `python tools/lint.py hub schema` |
+| Hub verification (1st) | VERIFY | Reporter (single-source stub during fanout) · Editor-in-Chief (post-fanout cross-source stub) — `python tools/lint.py hub schema` + `hub body`, corpus-wide, so confirm 0 items naming the file written |
 | Cascade update | (deterministic) | Editor-in-Chief → `tools/build.py` (graph → clusters → contradictions → index → dependencies) + hub `sources:` sync |
 | Batch verification (full) | VERIFY | Editor-in-Chief — **after contradiction consolidation** (§ Parallel Batch chain · 12-step 11) `python tools/build.py` + `python tools/lint.py` all groups rc=0 (deterministic check, so done directly by main — the deliberate lint cycle that needs `lint-report.md` output is delegated to the Copy Editor = `/wiki-lint`) |
 | Log append + defect logging | — | Editor-in-Chief (`log.md` append + batch this cycle's lint FAILs and Desk-actionable defects → `tools/log_defect.py` corpus). SoT: [`agents/editor-in-chief.md`](../agents/editor-in-chief.md) self-evolution automatic channel |
@@ -93,7 +93,7 @@ Race avoidance: two sub-agents never write to the same file simultaneously. `wik
     - `python tools/lint.py graph clusters` — check isolated hubs · unnamed groups · unassigned sources
     - On finding an isolated hub: `python tools/lint.py graph structure --fix` (appends `[[hub]]` to matching source pages' `## Connections`, corpus-wide) → `python tools/lint.py graph orphans --fix` (syncs the hub's `sources:`) → rebuild. The two are a pair — stopping after the first leaves the hub frontmatter out of step with the link just appended
     - For unnamed groups, suggest adding a label to `cluster_labels.json` (no automatic Claude edits — human reviewer approval)
-11. **Desk VERIFY₂ (stub unconditional + source sub-trigger)** — the Editor-in-Chief invokes the Desk in batch on two target sets: (a) **every L2-2 stub created or updated this cycle** (`wiki/entities·concepts·timelines/*.md` — mandatory per the Layer × Cycle matrix, format·attribution·narrative tone scope; byproduct stubs included), and (b) the source list meeting `[fact]≥7 AND citations≥3` from the `python tools/lint.py source` Advisory output. The Desk returns a defect list → Reporter ADAPT₂ → re-lint. SoT: [`agents/desk.md`](../agents/desk.md) owned cells + [`agents/README.md`](../agents/README.md) "L2-2 stub obligation".
+11. **Desk VERIFY₂ (stub unconditional + source sub-trigger)** — the Editor-in-Chief invokes the Desk in batch on two target sets: (a) **every L2-2 file created or updated this cycle** (`wiki/entities·concepts·timelines/*.md` — each at its own row of the `agents/desk.md` owned-cells matrix: entity·concept stubs → L2-2 stub (mandatory; format·attribution·narrative tone scope) · `timelines/*.md` → L2-2 timeline; byproduct stubs included), and (b) the source list meeting `[fact]≥7 AND citations≥3` from the `python tools/lint.py source` Advisory output. The Desk returns a defect list → Reporter ADAPT₂ → re-lint. SoT: [`agents/desk.md`](../agents/desk.md) owned cells + [`agents/README.md`](../agents/README.md) "L2-2 stub obligation".
     - **When Desk VERIFY₂ ends**, integrate contradictions only if this cycle added a `contradicts:` line or ADAPT₂ edited one — that line's text is the whole `claim_id`, and `## Key Claims` claimant edits, stub edits and theme-MD edits carry none. When it applies: `python tools/build.py` rebuild → **integrate contradictions** → `python tools/build.py` + `python tools/lint.py` all groups. When it does not, the closing lint alone stands; `contradiction theme` is what reports an id that drifted anyway. **The serial mode does the same** — the `claim_id` hashing argument is mode-independent.
 12. **Cycle defect batch-logging** — batch-log this cycle's escaped lint FAILs and Desk-actionable defects once into the `tools/log_defect.py` corpus (`tools/_defect-log.jsonl`) (`caught_at`=`<stage>:<detail>`·`cluster` slug·`severity`·`addressable`). `mine_failures` bundles end-to-end recurrence rates and feeds them into the SoT self-evolution automatic channel. SoT: [`agents/editor-in-chief.md`](../agents/editor-in-chief.md).
 
@@ -103,7 +103,7 @@ Report on completion: pages added · pages created/updated · contradictions fou
 
 ## Human Reviewer Gate
 
-- New person entity stub ([`policies/naming.md`](../policies/naming.md) entity-stub threshold — only for key people cited multiple times across multiple sources)
-- New cluster slug / unnamed group label (no automatic Claude edits)
-- Commit·push after ingest ([`CLAUDE.md`](../../CLAUDE.md) § Human Reviewer Gate, external commit/push)
+The global gate is SoT at [`CLAUDE.md` "Human Reviewer Gate"](../../CLAUDE.md#human-reviewer-gate). Gates specific to this command:
+
+- Unnamed group label (no automatic Claude edits)
 - A contradiction flag strongly affecting an existing theme (potential theme-MD rewrite trigger)

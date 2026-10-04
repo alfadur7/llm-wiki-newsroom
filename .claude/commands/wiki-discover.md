@@ -91,7 +91,7 @@ When interpretation is ambiguous, quote and report the `thresholds` block of `li
 - Re-run `/wiki-discover <hub>` with 1–2 top hubs as the seed → 2-hop analysis
 - If the user wants, route a deeper `/wiki-query` on a specific bridge hub, or new [[wikilink]] enrichment work
 - If there is intent to enrich the Track A items from the Mode 3 results, call `/wiki-news --gap <G>`
-- Delegate Track C items to `/wiki-lint contradiction theme --fix`
+- Delegate Track C items by type: orphan-claims to `/wiki-lint contradiction theme --fix`, stale-theme to `/wiki-lint contradiction <theme-slug> --fix`; cap-theme is an early warning with no fix entry point (`theme --fix` emits no block for it)
 - Delegate Track D items to a Columnist authoring chain (`/wiki-lint synthesis|trail <slug> --fix` → authoring → self-VERIFY₀ → Desk VERIFY₂)
 
 ## Human Reviewer Gate

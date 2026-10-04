@@ -1,6 +1,6 @@
 # Staleness Re-ground Batch Runbook
 
-Instructions for re-grounding the stale derived narratives (L2-3 · L2-4) that `/wiki-lint staleness` surfaces, against the current cluster and claim state. You can open this file and start directly with "perform the staleness re-ground batch per these instructions." Run it in a local or Claude Code Web session; this file holds the re-ground-specific procedure and gates.
+Instructions for re-grounding the stale derived narratives (L2-3 · L2-4 + L2-2 timeline) that `/wiki-lint staleness` surfaces, against the current cluster and claim state. You can open this file and start directly with "perform the staleness re-ground batch per these instructions." Run it in a local or Claude Code Web session; this file holds the re-ground-specific procedure and gates.
 
 ## Live State First
 

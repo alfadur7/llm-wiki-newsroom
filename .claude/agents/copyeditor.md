@@ -13,7 +13,7 @@ The copy editor of a Korean newspaper. Owns checks of format·spelling·grammar�
 
 The copy editor does no semantic analysis·qualitative evaluation; it performs only dictionary·threshold·count·schema checks. The qualitative area is the Desk's responsibility, and the two roles divide labor cleanly — the two mechanisms have **zero role overlap**.
 
-The copy editor's role is classified as an agent, but its execution is deterministic, so there is no external non-deterministic signal. Same input → same output. Self-fixable (formattable) areas are auto-repaired.
+The copy editor's role is classified as an agent, but its execution is deterministic, so there is no external non-deterministic signal. Same tree, same input files → same output. **The exception is the checks that read git** — `_editor_date.py` takes commit dates via `git log` and that revision's body via `git show`, and `staleness`·`hub_schema`·`overview`·`contradiction`·`contradiction_theme` use it (`contradiction_theme` also checks for uncommitted changes via `git status`). On the same tree, a different history (a fresh-history mirror·shallow clone) or a different commit state changes those verdicts. Self-fixable (formattable) areas are auto-repaired.
 
 ## Capability Boundary
 
@@ -48,7 +48,7 @@ The copy editor's role is classified as an agent, but its execution is determini
 
 **Output**:
 - `lint-report.md` (a human-readable Markdown report) — informational subcommands (`graph gaps`·`hub promotion`·`hub demotion`·`hub suggestions`·`staleness`) are also included in their group section as **a single aggregate line** (count + grade distribution, ℹ️ advisory, regardless of pass/fail); individual enumeration is omitted.
-- new lines in `graph/_health-log.jsonl` (on a cluster-group check)
+- new lines in `graph/_health-log.jsonl` (on a `graph clusters` check)
 - exit code (0=PASS, non-0=FAIL)
 - (with the --json option) JSON output (for automation·pipelines)
 - (with --fix) auto-repair changes to wiki/* files

@@ -60,9 +60,9 @@ A timeline follows the encyclopedic summary-style and verifiable-attribution tra
 
 | Timeline component | Corresponding craft criterion (dotted ID) |
 |---|---|
-| `## Flow Summary` trajectory narrative | `enc.summary-style` · `jrn.lede` (one-line overview) · `enc.first-mention` |
+| `## Flow Summary` trajectory narrative | `enc.summary-style` · `enc.first-mention` |
 | `### YYYY` dated entries | `struct.source-indexed` (first link = source) · `enc.broken-link` |
-| Overall prose notation | `enc.link-density` · `house.sentence-length` |
+| Overall prose notation | `house.sentence-length` · `house.date-format` |
 
 ### Execution order (step-by-step guide)
 

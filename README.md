@@ -10,7 +10,7 @@
 
 ![The interactive knowledge graph browser — every page a node, every wikilink an edge, auto-grouped into color-coded clusters with relationship-typed links](docs/knowledge-graph.png)
 
-<sub>The interactive knowledge graph (`graph/graph.html`) — every page a node, every wikilink an edge, color-coded by auto-detected cluster, with a live physics layout and filter/search built in. Shown here on a larger private deployment (~2,300 nodes) to convey how it scales; **this repo ships a deliberately small 15-node example corpus** you can browse the exact same way. (Interface shown in the optional Korean `WIKI_LANG=ko` mode.)</sub>
+<sub>The interactive knowledge graph (`graph/graph.html`) — every page a node, every wikilink an edge, color-coded by auto-detected cluster, with a live physics layout and filter/search built in. Shown here on a larger private deployment (~2,300 nodes) to convey how it scales; **this repo ships a deliberately small example corpus** you can browse the exact same way. (Interface shown in the optional Korean `WIKI_LANG=ko` mode.)</sub>
 
 ## The concept
 
@@ -277,7 +277,7 @@ The wiki body is not typed by humans. Two kinds of automation handle it in layer
 - **Deterministic automation**: Python scripts generate mechanical outputs like links, rankings, and catalogs
 - **Probabilistic automation**: Claude writes narrative prose following authoring guidelines and an evaluation rubric, self-verifying and rewriting against `/wiki-lint`'s automated metrics — the inner loop at work
 
-The human operator's role is tuning the guidelines and rubric and making the final acceptance call — focusing on **directional oversight** rather than sentence-level copyediting. When the guidelines and rubric are fully captured in `CLAUDE.md`, any other Claude session rewrites to the same quality.
+The human operator's role is tuning the guidelines and rubric and making the final acceptance call — focusing on **directional oversight** rather than sentence-level copyediting. When the guidelines and rubric are fully captured in the instruction layer (`CLAUDE.md` + `.claude/`), any other Claude session rewrites to the same quality.
 
 #### Separation of authoring and review
 
@@ -339,7 +339,7 @@ The three layers from [the concept](#the-concept) live in `raw/` (Layer 1), `wik
 For example, ingesting one article with `/wiki-ingest` creates L2-1 and L2-2 at the same time. When the next full rebuild recomputes clusters, the relevant per-domain overviews (L2-3) are automatically affected, and Claude rewrites them against the evaluation rubric as needed. The global overview (L2-4) is rewritten periodically once the per-domain overviews stabilize, keeping it current. Each sub-layer is responsible only for its own axis (**per-domain overview** or **issue/contradiction**), so editing one page leaves the other axis's files untouched.
 
 <details>
-<summary><strong>Full directory layout</strong> — where every file lives. <em>Skim only if you want the exact on-disk structure.</em></summary>
+<summary><strong>Full directory layout</strong> — where the main files live. <em>Skim only if you want the exact on-disk structure.</em></summary>
 
 ```
 raw/                       # Layer 1: original sources (immutable)
@@ -351,8 +351,8 @@ raw/                       # Layer 1: original sources (immutable)
 
 wiki/                      # Layer 2: agent-managed wiki
   index.md                 #   full page catalog + drill-down entry point (auto-generated)
-  overview.md              #   per-domain overview global aggregation — landscape axis (human + LLM co-managed)
-  contradiction.md         #   per-theme contradiction analysis global aggregation — conflict axis (human + LLM co-managed)
+  overview.md              #   per-domain overview global aggregation — landscape axis (auto skeleton + agent-written narrative)
+  contradiction.md         #   per-theme contradiction analysis global aggregation — conflict axis (auto skeleton + agent-written narrative)
   _backlinks.json          #   backlink index (auto-generated)
   sources/                 #   individual source pages + catalog
     _source_map.json       #   ingest deduplication map (auto-generated)
@@ -365,7 +365,7 @@ wiki/                      # Layer 2: agent-managed wiki
   contradictions/          #   per-theme contradiction analyses (conflict per theme)
     _contradictions.json        #     contradiction source DB — per claim (auto-generated)
     _contradictions_themes.json #     theme ↔ claim mapping SoT (Claude-generated)
-    <theme>.md                  #     per-theme deep analysis (human + LLM co-managed)
+    <theme>.md                  #     per-theme deep analysis (auto skeleton + agent-written narrative)
   syntheses/               #   saved query answers (Q-A)
   trails/                  #   associative trails (Memex)
 
@@ -394,7 +394,7 @@ tools/                     # Python tools (no API key required)
 | Type | Prefix | Examples |
 |------|--------|------|
 | **Auto-generated data** — scripts overwrite it every run, so do not edit directly | `_` | `_backlinks.json`, `_graph.json`, `_clusters.json`, `_catalog*.md`, `_contradictions.json` |
-| **Human-edited** — for manual editing or viewing | none | `index.md`, `overview.md`, `contradiction.md`, `graph.html`, **`graph/cluster_labels.json`** |
+| **Human-edited** — for manual editing or viewing | none | `index.md` (for viewing — body auto-generated), `overview.md` (for viewing — body agent-written), `contradiction.md` (for viewing — body agent-written), `graph.html`, **`graph/cluster_labels.json`** |
 
 Naming rule: an underscore prefix **means** a script output (don't touch it); **no prefix** means a file humans edit or read.
 
@@ -656,16 +656,16 @@ A small knowledge base mapping the debate over what "open source" should mean fo
 
 | Item | Count |
 |------|------|
-| Source pages | 4 |
-| Entity pages | 5 (companies · institutions) |
-| Concept pages | 6 (technology · licensing · policy) |
+| Source pages | 66 |
+| Entity pages | 15 (companies · institutions · people) |
+| Concept pages | 12 (technology · licensing · policy) |
 | **Per-domain overviews (Cluster Overview)** | **3** (covering the whole open-source-AI debate) |
-| **Per-theme contradiction analyses** | **2** |
-| Knowledge graph | 15 nodes, 80 edges (many with relation labels) |
-| Backlink index | 11 targets |
-| Contradiction tracking | 1 item (classified into 2 themes) |
+| **Per-theme contradiction analyses** | **6** (5 themes + other-fragmentary) |
+| Knowledge graph | 93 nodes, 1,330 edges (many with relation labels) |
+| Backlink index | 67 targets |
+| Contradiction tracking | 51 items (classified into 5 themes + other-fragmentary) |
 
-**Main topics** (3 domain clusters): the open-source AI definition, open weights, and licensing · open-washing — plus 2 contradiction themes cutting across them. (Associative trails and timelines ship empty here; one example synthesis is included — generate more with `/wiki-query`, `/wiki-trail`, and `/wiki-timeline` once you've added sources.)
+**Main topics** (3 domain clusters): the open-source AI definition, open weights, and licensing · open-washing — plus 5 contradiction themes cutting across them. (Associative trails and timelines ship empty here; one example synthesis is included — generate more with `/wiki-query`, `/wiki-trail`, and `/wiki-timeline` once you've added sources.)
 
 ---
 
