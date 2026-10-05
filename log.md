@@ -843,3 +843,42 @@ name-form rule, and CamelCase slug aliases — are deferred, none applied.
 Source pages were not edited. The problems the authors and reviewers found in them go
 to the L2-1 Desk pass that follows. Still stale: about twenty hubs whose sources are
 newer, several now at odds with the pages above them — a hub batch, not this one.
+
+## [2026-10-05] refactor | a ported audit, and checks that reported nothing when they had read nothing
+
+A sibling implementation's code and guideline audits were reviewed commit by commit
+for what applies here: of 158 commits, about 140 were content, inbox, corpus or
+Korean-only work, and the rest came down to two audit commits and a few small ones.
+Each candidate was checked against this repository's code before it was ported,
+since several of the upstream facts are not true here.
+
+The code audit landed in five batches, ordered by severity. The worst finding was a
+URL check that validated one host while the request connected to another, because
+two URL parsers disagree on a backslash before the user-info separator; private
+CGNAT addresses also passed. Next came two data paths that turned a read failure
+into an empty value and carried on: the review watermark, which would then
+overwrite the committed history, and the claims database, which made a coverage
+check pass with nothing to cover. Most of the rest share that shape — a missing
+graph file judged every inbound count as zero, a missing backlinks file reported a
+healthy zero, a git status run outside the repo read as no edits. Every fix got a
+regression test, and every test was run against the old code to confirm it fails
+there; one did not at first, because its one-letter fixture happened to give the
+right answer under the bug, and was rewritten.
+
+The guideline audit was ported as one change across 22 files. Its blind review
+converged in two rotations. Both high findings were in explanatory clauses the port
+had added — a sentence saying lint computes none of the theme burn criteria, when
+it prints the size signal for two of them, and a README caption that kept an old
+node count beside a refreshed table — and both were closed by deleting the clause
+rather than rewording it. Nine medium and low findings were carried to the corpus.
+Every substantive hunk aligned a document with a rule that lint, the manifest
+roster, a hook or the Desk matrix already enforces; the operator confirmed that
+places them outside the measurement obligation.
+
+Released as v0.6.4. The range contains one commit typed `feat`, a shallow-clone
+warning and an overview count check, both inside existing lint groups; the type was
+copied from the upstream commit, and the release is a patch for that reason. Still
+open: the two carried medium findings, a Desk re-adjudication rule that changes the
+ADAPT chain and awaits the operator, five operator decisions (L2-1 review of every
+source, CI, a per-commit lint, an external-send gate, a shallow-clone hook) and the
+audit's remaining low-severity and refactoring items.
