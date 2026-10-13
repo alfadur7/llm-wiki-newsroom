@@ -931,6 +931,6 @@ rule. The operator adopted the rule; the gap is in the corpus.
 The rule's blind review converged on its second rotation. The first found one high: the
 Desk's own prompt template still stated the one-pass rule without the exception, which
 is the text the Desk receives. It was fixed together with the two sentences of the same
-kind beside it. Four medium and seven low findings were carried, among them that the
+kind beside it. Four medium and six low findings were carried, among them that the
 re-adjudication pass has no reply form of its own and that the escalation count does not
 say whether the extra treatment counts toward it.
