@@ -18,6 +18,8 @@
         not auto-removed (editorial decision).
 
 With --fix:
+  0. Unregister a hub from a source's `sources:` entry when an uncommitted
+     edit to that source dropped its link to the hub (the reverse of step 1).
   1. Sync each source's `## Connections` wikilinks into the referenced hub's
      `sources:` frontmatter (legacy tools/_backfill_source_slugs.py).
   2. Auto-correct HIGH-confidence typo slugs in hub frontmatter.
@@ -271,6 +273,53 @@ def _apply_typo_fixes(
     return len(touched), len(fixed_slugs)
 
 
+def _apply_prune() -> int:
+    """The reverse of the backfill — drop a hub's `sources:` entry for a source
+    whose uncommitted edit removed its link to that hub. Registration follows
+    links automatically but nothing ever unregistered, so every fix that
+    removed a link left an orphan entry behind.
+
+    Scoped to links dropped since HEAD: an entry the source never linked may
+    have been added by the hub's author on body evidence, so it is not removed
+    without a judgment. An entry the hub body still cites directly is kept.
+    Returns the number of hub files updated."""
+    import subprocess
+    root = WIKI.parent
+    try:
+        # -z: a quoted non-ASCII path would otherwise fail p.exists() silently.
+        # --relative: paths relative to `root`, which need not be the repo top.
+        out = subprocess.run(["git", "diff", "-z", "--relative", "--name-only", "HEAD", "--", "wiki/sources"],
+                             cwd=root, capture_output=True, encoding="utf-8", check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return 0   # no git (copy, archive) — skip the prune; leaving an entry is the safe side
+    # Same hub set as _apply_backfill, keyed by bare stem as links are.
+    hubs = {p.stem: p for sub in ("entities", "concepts") for p in (WIKI / sub).glob("*.md")
+            if not p.name.startswith("_")}
+    links = lambda t: {L.split("#", 1)[0].strip() for L in LINK_RE.findall(t)}  # noqa: E731
+    drops: dict[str, list[str]] = defaultdict(list)
+    for rel in filter(None, out.split("\0")):
+        p = root / rel
+        if not rel.endswith(".md") or p.name.startswith("_") or not p.exists():
+            continue
+        old = subprocess.run(["git", "show", f"HEAD:./{rel}"], cwd=root,
+                             capture_output=True, encoding="utf-8").stdout
+        for hub in (links(old) - links(read_text_cached(p))) & hubs.keys():
+            drops[hub].append(p.stem)
+    n = removed = 0
+    for hub, stems in drops.items():
+        text = read_text_cached(hubs[hub])
+        cited = links(FRONTMATTER_BLOCK_RE.sub("", text, count=1))
+        existing = _hub_sources(text)
+        kept = [s for s in existing if not (s in stems and s not in cited)]
+        if kept != existing:
+            atomic_write_text(hubs[hub], _rewrite_sources(text, kept))
+            n += 1
+            removed += len(existing) - len(kept)
+    if n:
+        print(f"\n[--fix] Pruned {removed} dropped-link source entr(ies) from {n} hub frontmatter(s).")
+    return n
+
+
 def _apply_conn_source_backfill(conn_unregistered: dict[str, list[str]]) -> int:
     """Register each hub's own `## Connections` source links into its frontmatter
     `sources:` list. Returns the number of hub files updated."""
@@ -438,6 +487,7 @@ def run(*, json_out: bool = False, fix: bool = False) -> int:
                 print(f"    {page_id}: {len(slugs)} — {slugs[:5]}")
 
     if fix:
+        _apply_prune()
         _apply_backfill()
         slugs_n = 0
         if fixable:
