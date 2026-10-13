@@ -64,6 +64,8 @@ A timeline follows the encyclopedic summary-style and verifiable-attribution tra
 | `### YYYY` dated entries | `struct.source-indexed` (first link = source) · `enc.broken-link` |
 | Overall prose notation | `house.sentence-length` · `house.date-format` |
 
+`house.*` IDs are not craft-skill criteria — their definitions and PASS conditions are the SoT in the [overview.md](overview.md#common-authoring-principles-applies-to-part-1-and-part-2) house-style block.
+
 ### Execution order (step-by-step guide)
 
 1. **GROUND — identify sources**: identify topic-related sources in `wiki/sources/` in time order (`mcp__qmd__query`, pre-loaded via `ToolSearch` — Glob where unavailable). For each event → fix the corresponding source-id **after confirming it exists** (do not invent one).

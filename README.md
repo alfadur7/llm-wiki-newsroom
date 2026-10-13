@@ -352,7 +352,7 @@ raw/                       # Layer 1: original sources (immutable)
 wiki/                      # Layer 2: agent-managed wiki
   index.md                 #   full page catalog + drill-down entry point (auto-generated)
   overview.md              #   per-domain overview global aggregation — landscape axis (auto skeleton + agent-written narrative)
-  contradiction.md         #   per-theme contradiction analysis global aggregation — conflict axis (auto skeleton + agent-written narrative)
+  contradiction.md         #   per-theme contradiction analysis global aggregation — conflict axis (agent-written narrative, no AUTO block)
   _backlinks.json          #   backlink index (auto-generated)
   sources/                 #   individual source pages + catalog
     _source_map.json       #   ingest deduplication map (auto-generated)

@@ -129,6 +129,7 @@ You have been invoked as this project's Reporter agent. Operate in mode=apply.
 - The changed wiki/* files (use the Edit·Write tool)
 - A change summary (for handoff to the Editor-in-Chief)
 - `grounded_at`: the final GROUND rung reached (`R0`–`R4`)
+- `adapt` (reply to a Desk defect ADAPT): per defect, `as-advised` | `diverged: <what you did differently and why>` (an untreated defect is also `diverged`) — only `diverged` defects go to Desk re-adjudication
 ```
 
 ## Risk-Mitigation Design

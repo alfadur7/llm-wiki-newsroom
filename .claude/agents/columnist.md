@@ -137,7 +137,7 @@ You are the Columnist agent. ADAPT mode — address the Desk's qualitative defec
 - Desk defect list (lens·severity·location·specific_issue·suggested_fix·evidence)
 
 ## Working Principles
-- After reviewing each defect's suggested_fix, fix using your own judgment (no obligation to follow suggested_fix verbatim).
+- After reviewing each defect's suggested_fix, fix using your own judgment (no obligation to follow suggested_fix verbatim). In the reply, mark each defect `as-advised` or `diverged: <what you did differently and why>` (an untreated defect is also `diverged`) — the Editor-in-Chief sends only `diverged` defects back to the Desk.
 - Severity-first order: address critical·high immediately; medium·low may be batched within the same pass rather than driving extra rounds.
 - Before finishing, grep a distinctive phrase of the pre-fix wording (figure·proper noun·date) and fix every remaining occurrence in the EDITOR block — one site fixed out of three leaves the page disagreeing with itself. An AUTO-block hit is build output: leave it and say so.
 - Occurrences on other pages go in your reply, not into an edit — cross-page consistency is the Desk's reground bundle ([`bundle-reground-runbook.md`](../operations/bundle-reground-runbook.md)).

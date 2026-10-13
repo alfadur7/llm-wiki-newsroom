@@ -882,3 +882,55 @@ open: the two carried medium findings, a Desk re-adjudication rule that changes 
 ADAPT chain and awaits the operator, five operator decisions (L2-1 review of every
 source, CI, a per-commit lint, an external-send gate, a shallow-clone hook) and the
 audit's remaining low-severity and refactoring items.
+
+## [2026-10-13] refactor | a hub entry that outlived its link, and a desk pass for treatments that departed from the fix
+
+Ported from a sibling implementation: `graph orphans --fix` now unregisters a hub's
+`sources:` entry when an uncommitted edit to that source dropped its link to the hub.
+Registration followed links automatically and nothing ever removed one, so every fix
+that took a link out left an orphan entry behind. The prune reads git paths with `-z`
+and `--relative` and keys hubs by bare stem, since this repo's hub map keys by
+`subdir/stem`; the regression test was confirmed to fail on three mutations.
+
+Nine of the eleven findings carried from the 2026-10-05 review were closed: the root
+`contradiction.md` described as having an AUTO block in three places, the copy editor's
+determinism note omitting the checks that read the clock, the L1 raw-slug rule stated
+without its length and hyphen floor, `paired_with` missing from the cluster-label field
+lists, a `house.*` mapping with no pointer to its definitions, cap-theme described as
+having no fix path, a gate bullet restating the global gate, and the theme burn criteria
+not saying which of their size signals lint already prints. Two were left by design: the
+stub self-check that runs `hub body` (removing it changes the copy editor's matrix) and
+the graph command's label gate (it covers every label edit, not only new slugs). Blind
+review found no critical or high finding on the first pass. Two of its medium
+findings were false statements in text written this round, a lint module listed as
+comparing dates when it only stamps one and a claim that every listed check changes its
+verdict by day; both were closed by deleting the clause. Those deletions were
+re-reviewed in a second rotation, which converged; it raised the cap-theme pointer to
+medium, because the command it names emits no re-derivation block on a fresh map.
+Two medium and four low findings remain open in the corpus.
+
+The operator declined five deferred proposals: Desk review of every new source, the CI
+workflow with its per-commit lint, the external-send gate and the shallow-clone hook.
+
+The operator chose to measure the Desk re-adjudication rule before adopting it. A Desk
+defect whose suggested fix would have credited a claim to a speaker the raw never quotes
+was given to four reporters, two with the rule in their prompt. All four declined the
+fix correctly, so the sibling's motivating failure (deleting the claim instead) did not
+reproduce, and both control reporters reported the departure without being asked. Two
+of the four, one in each arm, also appended a narrator-voice sentence saying the column
+offered no evidence; the scrape drops link targets, so the raw cannot support that. The
+re-adjudication caught it as high in the treatment arm and the treatment closed it; in
+the control arm it stayed. Two blind judges scored that pair for the treatment and split
+on the other pair over one low-severity paraphrase. On a second page where the rule had
+nothing to do it fired zero times. The second page also exposed a gap the rule does not
+cover: its Desk fix deleted a clause `layers/source.md` requires for vendor-only sources,
+and five of six reporters applied it as advised in both arms. A treatment marked
+as-advised is never re-adjudicated, so a wrong fix that is followed is invisible to this
+rule. The operator adopted the rule; the gap is in the corpus.
+
+The rule's blind review converged on its second rotation. The first found one high: the
+Desk's own prompt template still stated the one-pass rule without the exception, which
+is the text the Desk receives. It was fixed together with the two sentences of the same
+kind beside it. Four medium and seven low findings were carried, among them that the
+re-adjudication pass has no reply form of its own and that the escalation count does not
+say whether the extra treatment counts toward it.

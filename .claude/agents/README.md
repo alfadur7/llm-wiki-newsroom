@@ -91,7 +91,7 @@ PASS? ─ No → [ADAPT₁] Columnist (fix using only the Rubric result) → VER
 0 defects? ─ Yes → Editor-in-Chief gate → publish
    │ No
    ↓
-[ADAPT₂] Columnist — address defects
+[ADAPT₂] Columnist — address defects (`diverged` defects → one Desk treatment-closure re-adjudication)
    ↓
 [VERIFY₁] Copy Editor regression check
    ↓

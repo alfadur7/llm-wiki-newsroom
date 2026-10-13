@@ -32,7 +32,7 @@ A Claude with no prior knowledge must be able to read this SoT alone and reprodu
 - Format·link-count·attribution-count checks (Copy Editor territory; the Rubric has already PASSED these)
 - Direct output edits (Write·Edit) — the Columnist's ADAPT territory; the desk returns only a defect list
 - Verifying new facts·external lookup (WebSearch·WebFetch) — Reporter territory
-- More than 1 pass per ADAPT cycle (1 pass per cycle — prevents infinite loops)
+- More than 1 pass per ADAPT cycle (1 pass per cycle — prevents infinite loops; the one exception is the `diverged` re-adjudication in § Risk-Mitigation Design)
 - Encroaching on the deterministic lint domain (role overlap risks hallucination·conflicting decisions)
 
 ## I/O Contract
@@ -327,7 +327,7 @@ Qualitative review of <target file>. Return a defect list (no direct edits to th
 - Self-preference favorable assessment is the main threat to this verification
 - No encroaching on the Rubric domain — when you find a defect, ask yourself "isn't this an area the Rubric should catch," and if yes, do not report it
 - Report only actionable defects — no abstract criticism ("it's abstract overall")
-- 1 pass per ADAPT cycle (prevents infinite loops)
+- 1 pass per ADAPT cycle (prevents infinite loops), except the `diverged` re-adjudication (§ Risk-Mitigation Design)
 - Mandatory two-persona cross-check
 
 ## Output Format
@@ -349,7 +349,9 @@ Reading only the target file and skipping the layers/ guide·source spot check l
 **Risk — violating 1 pass per cycle (infinite loop)**:
 If the desk is invoked for 2+ passes in the same cycle, ADAPT escalation runs away.
 
-**Mitigation**: the Editor-in-Chief permits only 1 desk pass within one ADAPT cycle. A unit cycle is defined as one bundle: **VERIFY₂ (desk invocation) → defect found → ADAPT (Columnist fix) → VERIFY₁ (Copy Editor regression) PASS**. Re-invoking the desk before this bundle ends is forbidden — the next desk invocation is allowed only in a new cycle. If 2 desk passes enter the same bundle, the role division breaks.
+**Mitigation**: the Editor-in-Chief permits only 1 desk pass within one ADAPT cycle, plus the one exception below. A unit cycle is defined as one bundle: **VERIFY₂ (desk invocation) → defect found → ADAPT (Columnist fix) → VERIFY₁ (Copy Editor regression) PASS**. Otherwise, re-invoking the desk before this bundle ends is forbidden — the next desk invocation is allowed only in a new cycle.
+
+**Exception — `diverged` re-adjudication**: when the author's ADAPT reply marks a defect `diverged` (treated differently from the suggested_fix, or left untreated), the Editor-in-Chief invokes the desk once more on those defects only. Lint does not judge whether a departure from the fix introduced a fact·attribution defect. This pass judges only whether each `diverged` defect is closed and reports fact·attribution defects the treatment created, graded by § Execution Order step 7. Anything still open or newly created is treated once more in the same ADAPT round and closes at VERIFY₁ without another desk pass — the cap of one keeps the loop from growing.
 
 **Risk — defect abstraction (loss of actionability)**:
 Abstract criticism like "scattered overall"·"lacks clarity" is 0 actionable.
