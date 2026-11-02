@@ -966,3 +966,31 @@ article said too that this wiki would send every source page to the Desk, which 
 operator declined on 2026-10-13. Both articles now open with a dated note, and an update
 section before Limits says what changed, and the FAQ answer is corrected in both
 languages. The original text stays as it was published.
+
+## [2026-11-02] port | a sibling round with one graph change the filter could not see, and v0.6.6
+
+The sibling had landed 182 commits since the last checkpoint. 158 were content:
+ingest, reground sweeps, briefings and ledgers. Of the 24 that touched code or
+instructions, the G1/G2 retirement was taken (entry above). The fetch step's automatic
+`published:` extraction was declined: its date handling assumes Korean outlets and
+Korean time. Five were left until this corpus has something for them to act on, a
+hub-reground runbook among them; no hub here reaches its 6,000-character cohort floor.
+
+The first pass missed one commit. It changed `graph/graph.html`, and the filter that
+picked out shared surfaces covered `tools/`, `.claude/`, the root guides and `docs/`
+but not `graph/`. The operator asked about it by name. The change seeds each cluster's
+starting angle from the circular order that puts the most cross-cluster edges between
+neighbours, instead of member-count order. Here it changes nothing: with three clusters
+every pair is adjacent in any ring, so the search keeps list order. It was ported anyway,
+because the engine ships to wikis with more clusters than this one. Tested in node over
+0, 1, 3, 4, 9 and 10 clusters and on this corpus; the page itself was not loaded in a
+browser.
+
+Released as v0.6.6. The graph commit is typed `feat`, but the release is a patch: both
+changes adjust existing stages. On a fresh clone pytest passed 295, `lint.py meta`
+exited 0 and `lint all` passed 17 of 18 groups, the eighteenth failing for the usual
+reason that `raw/` is not in the clone. The pre-tag build changed only
+`evidence_strength` in the claims database, which drifts with the date, so it was
+restored rather than committed.
+
+The local judge-model scorer stays where it is, uncommitted, by the operator's decision.
