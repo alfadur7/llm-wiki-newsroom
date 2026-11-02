@@ -469,10 +469,34 @@ const graph = new Graph({ multi: false, type: 'undirected' });
 // room to breathe so the first-second "flash" of rapid reshuffling is
 // much subtler.
 const INIT_RADIUS = 200;
+// Sector order = the ring that maximizes cross-cluster edges between
+// neighbours. List order (member count) can seed tightly-linked clusters
+// on opposite sides, so FA2 drags them across the canvas. Brute force over
+// rings with the first slug fixed: (n-1)! orders, e.g. 6 clusters = 120.
+const pairKey = (a, b) => (a < b ? a + '|' + b : b + '|' + a);
+const pairW = {};
+for (const e of rawEdges) {
+  const a = CLUSTER_BY_NODE[e.from], b = CLUSTER_BY_NODE[e.to];
+  if (a && b && a !== b) pairW[pairKey(a, b)] = (pairW[pairKey(a, b)] || 0) + 1;
+}
+let ring = uniqueSlugs, ringScore = -1;
+if (uniqueSlugs.length <= 9) {  // 9 → 40,320 orders; beyond that keep list order
+  const permute = (seq, rest) => {
+    if (!rest.length) {
+      let s = 0;
+      for (let i = 0; i < seq.length; i++) s += pairW[pairKey(seq[i], seq[(i + 1) % seq.length])] || 0;
+      if (s > ringScore) { ringScore = s; ring = seq; }
+      return;
+    }
+    rest.forEach((x, i) => permute([...seq, x], rest.filter((_, j) => j !== i)));
+  };
+  permute(uniqueSlugs.slice(0, 1), uniqueSlugs.slice(1));
+}
 const clusterAngle = {};
-uniqueSlugs.forEach((slug, i) => {
-  clusterAngle[slug] = (i / uniqueSlugs.length) * 2 * Math.PI;
+ring.forEach((slug, i) => {
+  clusterAngle[slug] = (i / ring.length) * 2 * Math.PI;
 });
+console.log(`Cluster seed ring: ${ring.join(' → ')} (neighbour cross-edges ${ringScore})`);
 
 // Node size formula: sqrt-scaled degree for non-source nodes. sqrt gives
 // better contrast at the top than log (log compressed top-tier hubs too
