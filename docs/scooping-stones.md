@@ -15,6 +15,8 @@ hreflang_ko: "https://alfadur7.github.io/llm-wiki-newsroom/ko/scooping-stones/"
 
 *Read this in [한국어]({{ '/ko/scooping-stones/' | relative_url }}).*
 
+> **Update, November 2, 2026.** Two things this piece describes changed after it went up: the private wiki has retired Jev, and the public wiki did not move every source page to the Desk. The findings stand; the details are in [the update below](#update-2026-11).
+
 A common complaint about AI-maintained wikis is that they're easy to build and hard to keep good. Once there are a few thousand pages, nobody re-reads them all, and the mistakes that matter (a quote pinned on the wrong person, a hedge that quietly disappeared) sit there looking exactly like the pages that are fine.
 
 In September 2026, [TypeSafe AI](https://docs.typesafe.ai) released Jev, a judge model that doesn't generate text at all: you ask it a yes/no question and it returns a probability. The idea seemed obvious. Score every page, re-read the lowest-scoring ones first, and quality maintenance stops being a matter of luck.
@@ -133,6 +135,16 @@ We ran the same kind of experiment on two wikis and hit both ends:
 So the change we're making is boring. The private wiki already sends every new source page to the Desk, and the public wiki will now do the same for all of its source pages, starting with the reviews the experiment held back. It has no backlog big enough to need a queue. The scorer that calls Jev stays in a local, uncommitted folder.
 
 We don't think this says Jev is a bad model. On the private wiki its ranking was the best signal we'd measured, and it's still in use there for the backlog. It says a ranker is only worth adding where defects are neither everywhere nor nowhere, and you have to measure the defect rate to know where that is.
+
+## Update (November 2026) {#update-2026-11}
+
+Two plans in the section above changed after this piece was published.
+
+**The private wiki retired Jev on October 18.** Its last job was setting the order in which the old backlog gets re-read, and two later measurements took that job away too. On two older cohorts its page-level AUC came in between 0.47 and 0.61, no better than chance. On a random sample of 40 backlog pages its ranking did separate somewhat (AUC 0.71, interval 0.52–0.87), but the half it ranked cleaner still averaged 0.60 critical or high defects per page, against 0.95 in the other half, so it gave no grounds for skipping anything. If every page gets read anyway, reading the newest articles first, the ones queries and briefings lean on most, beats Jev's order. The scorer, its score log and its lint check are gone from the private wiki. Where this piece calls Jev's ranking the best signal we'd measured, that was true of the measurements we had in September.
+
+**The public wiki did not move every source page to the Desk.** We decided against it in October. The source-page Desk still runs only on the cheap trigger described above, and the reviews this experiment held back haven't been run, so the "What we're changing" bullet and the plan above didn't happen as written.
+
+The lesson holds, and the backlog confirmed it: a ranker earns its place only where defects are neither everywhere nor nowhere, and the private backlog had stones in both halves.
 
 ## Limits
 
