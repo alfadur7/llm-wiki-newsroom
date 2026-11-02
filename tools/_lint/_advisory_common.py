@@ -33,6 +33,29 @@ def mark(ok) -> str:
     return "✅" if ok else "⚠️"
 
 
+# The wiki's internal schema leaking into a synthesis page's body (theme ·
+# aggregate · overview). internal = source `## Connections` typing, section names
+# and classifier fields; grade_tag = evidence-grade tags. Readers can decode
+# neither — a grade is written as attribution ("X's analysis"). The Korean
+# alternatives are the WIKI_LANG=ko schema markers; they never match English text.
+SCHEMA_INTERNAL_RE = re.compile(
+    r"\b(?:cites|references|contradicts|defines)\s*:"
+    r"|`##\s*(?:Connections|Key Claims|Key Quotes|연결|주요 주장|주요 인용)`"
+    r"|\btype\s*=\s*(?:real|soft|superseded|related)\b"
+    r"|\b(?:evidence_strength|type_score)\s*[=\d]"
+)
+SCHEMA_GRADE_TAG_RE = re.compile(r"\[(?:fact|analysis|forecast|자료|분석|전망)\]")
+
+
+def schema_leak_line(text: str, indent: str = "    ") -> str | None:
+    """One body-schema-leak advisory line, or None when there is nothing to report."""
+    internal = len(SCHEMA_INTERNAL_RE.findall(text))
+    grade = len(SCHEMA_GRADE_TAG_RE.findall(text))
+    if not (internal or grade):
+        return None
+    return f"{indent}[Advisory] schema leak: internal={internal} grade_tag={grade} ⚠️"
+
+
 def iter_md(directory: Path):
     """Walk the `_`-excluding .md corpus — yields (path, cached text)."""
     for path in sorted(directory.glob("*.md")):

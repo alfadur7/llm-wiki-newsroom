@@ -78,7 +78,7 @@
     }
   },
   "overview-cluster": {
-    "_note": "L2-3 cluster overview. Craft: jrn (the landscape narrative) · con (Executive Summary, figures) · enc (links, notation, neutrality) · cit (schema meta). Structural and house-style criteria with no external craft source (struct.*/house.*) are defined in the structural section of overview.md. checks = fixed-threshold craft; roster = completion count (out of 30).",
+    "_note": "L2-3 cluster overview. Craft: jrn (the landscape narrative) · con (Executive Summary, figures) · enc (links, notation, neutrality). Structural and house-style criteria with no external craft source (struct.*/house.*) are defined in the structural section of overview.md. checks = fixed-threshold craft; roster = completion count (out of 28).",
     "checks": {
       "enc.link-density": {
         "skill": "encyclopedia-writing",
@@ -97,14 +97,6 @@
             "## Recent Changes"
           ]
         }
-      },
-      "cit.grade-meta": {
-        "skill": "scholarly-citation",
-        "threshold": 2
-      },
-      "cit.cite-type-meta": {
-        "skill": "scholarly-citation",
-        "threshold": 1
       },
       "enc.verdict-restraint": {
         "skill": "encyclopedia-writing",
@@ -160,14 +152,12 @@
         "enc.verdict-restraint",
         "house.date-format",
         "enc.abbr-gloss",
-        "house.sentence-length",
-        "cit.grade-meta",
-        "cit.cite-type-meta"
+        "house.sentence-length"
       ]
     }
   },
   "overview-aggregate": {
-    "_note": "L2-4 root overview. Shares the cluster checks + aggregate bundles (D1 con.mece-clusters · D2 enc.summary-style · F1 enc.coatrack · D3 jrn.due-impartiality). Shared parsing (section_spans, all_links, theme_stems) is injected by the orchestrator (overview.py). Structural and house-style criteria share the structural section of overview.md Part 1 (scope = aggregate). roster = completion count (out of 29).",
+    "_note": "L2-4 root overview. Shares the cluster checks + aggregate bundles (D1 con.mece-clusters · D2 enc.summary-style · F1 enc.coatrack · D3 jrn.due-impartiality). Shared parsing (section_spans, all_links, theme_stems) is injected by the orchestrator (overview.py). Structural and house-style criteria share the structural section of overview.md Part 1 (scope = aggregate). roster = completion count (out of 27).",
     "checks": {
       "enc.link-density": {
         "skill": "encyclopedia-writing",
@@ -190,14 +180,6 @@
             "## Recent Changes"
           ]
         }
-      },
-      "cit.grade-meta": {
-        "skill": "scholarly-citation",
-        "threshold": 2
-      },
-      "cit.cite-type-meta": {
-        "skill": "scholarly-citation",
-        "threshold": 1
       },
       "enc.verdict-restraint": {
         "skill": "encyclopedia-writing",
@@ -273,23 +255,13 @@
         "enc.verdict-restraint",
         "house.date-format",
         "enc.abbr-gloss",
-        "house.sentence-length",
-        "cit.grade-meta",
-        "cit.cite-type-meta"
+        "house.sentence-length"
       ]
     }
   },
   "contradiction-theme": {
-    "_note": "L2-3 theme contradiction. cit.* (L2·L3·L4·G1·G2) → scholarly-citation · enc.* (N1·N2·N5·N7·W1·L1·X2) → encyclopedia-writing · jrn.* (T1·T3·T4·D1·D2·D5·D6) → journalism-writing. Structural criteria with no external craft source (N3·D4·S1·S2·S3·X1) and house-style criteria (N4·N6, recurring) are defined in the structural and house-style sections of contradiction.md (no craft ID assigned). The bundles get wiki-wide state (sources_dir) and shared parsing (claim_sources, evidence_slugs, conflict_section) injected by the orchestrator. checks = G1·G2 schema meta-use (fixed thresholds). roster = completion count (out of 28).",
+    "_note": "L2-3 theme contradiction. cit.* (L2·L3·L4) → scholarly-citation · enc.* (N1·N2·N5·N7·W1·L1·X2) → encyclopedia-writing · jrn.* (T1·T3·T4·D1·D2·D5·D6) → journalism-writing. Structural criteria with no external craft source (N3·D4·S1·S2·S3·X1) and house-style criteria (N4·N6, recurring) are defined in the structural and house-style sections of contradiction.md (no craft ID assigned). The bundles get wiki-wide state (sources_dir) and shared parsing (claim_sources, evidence_slugs, conflict_section) injected by the orchestrator. roster = completion count (out of 26).",
     "checks": {
-      "cit.grade-meta": {
-        "skill": "scholarly-citation",
-        "threshold": 2
-      },
-      "cit.cite-type-meta": {
-        "skill": "scholarly-citation",
-        "threshold": 1
-      }
     },
     "bundles": {
       "scholarly-citation": {
@@ -351,23 +323,13 @@
         "enc.back-reference",
         "enc.slug-alias",
         "cit.grounding",
-        "cit.anchor-evidence",
-        "cit.grade-meta",
-        "cit.cite-type-meta"
+        "cit.anchor-evidence"
       ]
     }
   },
   "contradiction-aggregate": {
-    "_note": "L2-4 aggregate contradiction. con (D1 MECE axes) · enc (N1·N2·N5·N7·D2·D3·F1·W1) · jrn (T1·T4) · cit (G1·G2 schema meta-use). Structural criteria (N3·S1·S2·X1·F2, self-aggregated) remain in the structural section of contradiction.md. Shared parsing (insights, the analysis section, all_links, axes_named) is injected by the orchestrator. checks = G1·G2 (fixed thresholds). roster = completion count (out of 19).",
+    "_note": "L2-4 aggregate contradiction. con (D1 MECE axes) · enc (N1·N2·N5·N7·D2·D3·F1·W1) · jrn (T1·T4). Structural criteria (N3·S1·S2·X1·F2, self-aggregated) remain in the structural section of contradiction.md. Shared parsing (insights, the analysis section, all_links, axes_named) is injected by the orchestrator. roster = completion count (out of 17).",
     "checks": {
-      "cit.grade-meta": {
-        "skill": "scholarly-citation",
-        "threshold": 2
-      },
-      "cit.cite-type-meta": {
-        "skill": "scholarly-citation",
-        "threshold": 1
-      }
     },
     "bundles": {
       "consulting-writing": {
@@ -413,9 +375,7 @@
         "enc.label-neutral",
         "struct.insights-count",
         "enc.link-density",
-        "enc.due-balance",
-        "cit.grade-meta",
-        "cit.cite-type-meta"
+        "enc.due-balance"
       ]
     }
   },
@@ -450,9 +410,7 @@
         "con.numeric-density",
         "house.repetition",
         "house.date-format",
-        "house.sentence-length",
-        "cit.grade-meta",
-        "cit.cite-type-meta"
+        "house.sentence-length"
       ]
     }
   },

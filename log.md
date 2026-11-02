@@ -934,3 +934,35 @@ is the text the Desk receives. It was fixed together with the two sentences of t
 kind beside it. Four medium and six low findings were carried, among them that the
 re-adjudication pass has no reply form of its own and that the escalation count does not
 say whether the extra treatment counts toward it.
+
+## [2026-11-02] guideline | the metric that paid for the leak it was meant to prevent, and a correction to the Jev article
+
+The sibling retired two floor metrics on its synthesis pages, and the reason held here
+too. G1 counted evidence-grade expressions and G2 citation-type expressions, and both
+counted the schema's own tokens, the `[analysis]` tags and `contradicts:` prefixes that
+the natural-absorption rule tells writers to keep out of prose. G2 had already been
+switched off in English for that reason in September; G1 was still scoring. Measured
+before and after across the overview, contradiction and synthesis lints, removing them
+deleted the G1/G2 lines (four were warnings) and changed nothing else. The new advisory
+that counts leaked schema instead fires on one page, `osaid-form-and-legitimacy`, for
+two `[analysis]-grade` tags. That is the page G1 had scored highest. The page is left
+for its next rewrite.
+
+The rosters lose two criteria each: cluster overview 28, root overview 27, theme 26,
+aggregate contradiction 17, synthesis 26. Natural absorption is now a notation rule: a
+grade is written as speaker and verb, and the Desk has each counted exposure rewritten
+unless the sentence is about the classification scheme itself.
+
+The blind review converged on its first rotation with no critical or high findings.
+Three medium and ten low were carried to the corpus. Two of the mediums are the
+detector's reach: it flags list colons in ordinary English (`defines:`) and misses
+classifier fields written as `key: value`. The third is a scope gap: the policy limits
+the rule to theme, aggregate and overview pages while the skill applies it to every
+synthesizing piece.
+
+The sibling also retired Jev on 2026-10-18, so the published article and FAQ said
+something that was no longer true: that Jev still orders the private backlog. The
+article said too that this wiki would send every source page to the Desk, which the
+operator declined on 2026-10-13. Both articles now open with a dated note, and an update
+section before Limits says what changed, and the FAQ answer is corrected in both
+languages. The original text stays as it was published.

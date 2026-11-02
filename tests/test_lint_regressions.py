@@ -23,7 +23,6 @@ def test_w2_unmeasurable_is_pass_in_both_paths():
         "r1_hot": [], "r2_violations": [], "b1_hits": [],
         "l1_violations": [], "l2_violations": [], "l3_violations": [],
         "s6_long": [], "s6_para_anti": [],
-        "g1_grade_meta": 99, "g2_cite_type_meta": 99,
         "duplicates": [],
     }
     lines = overview._format_metrics_line(m)
@@ -498,24 +497,18 @@ def test_ari_boundaries():
     assert 0.0 < _ari([0, 0, 1, 1], [0, 0, 1, 2]) < 1.0     # partial agreement
 
 
-def test_g2_not_applicable_in_english(monkeypatch):
-    """In English G2 shows as not applicable (—) whatever the count; under ko it is judged."""
-    import overview
+def test_schema_leak_counts_internal_schema_not_prose():
+    """Synthesis-page schema-leak advisory — internal typing, fields and grade tags
+    are caught; ordinary prose and a bare field name are not."""
+    from _advisory_common import schema_leak_line
 
-    m = {
-        "total": 200, "lead_density": 1.0, "body_density": 0.0, "lead_body_ratio": 2.0,
-        "dup_total": 0, "contradiction_refs": 1,
-        "r1_hot": [], "r2_violations": [], "b1_hits": [],
-        "l1_violations": [], "l2_violations": [], "l3_violations": [],
-        "s6_long": [], "s6_para_anti": [],
-        "g1_grade_meta": 99, "g2_cite_type_meta": 0,
-        "duplicates": [],
-    }
-    g2 = lambda: next(s for l in overview._format_metrics_line(m) for s in l.split("  ") if s.startswith("G2"))
-    monkeypatch.setenv("WIKI_LANG", "en")
-    assert g2().endswith("—")
-    monkeypatch.setenv("WIKI_LANG", "ko")
-    assert g2().endswith("⚠️")
+    assert schema_leak_line("The Register's analysis. Typing speed rose.") is None
+    assert schema_leak_line("the classifier assigns `evidence_strength`") is None  # field name, no value
+    line = schema_leak_line(
+        "the source's `## Connections` types this as `contradicts:` (type=real, "
+        "evidence_strength=0.59). It is [analysis]-grade argument."
+    )
+    assert "internal=4" in line and "grade_tag=1" in line
 
 
 def test_contradiction_run_fails_on_corrupt_claims_db(tmp_path, monkeypatch):

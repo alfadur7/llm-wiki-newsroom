@@ -19,7 +19,7 @@ A readability discipline for wiki body text and analysis pieces. Keep prose plai
 - **Write verb-first** — make a person, institution, or thing the subject and say what it did, rather than lining up abstract nouns. ✅ "Anthropic outpaced OpenAI in revenue for two straight quarters." ❌ "A continuation of revenue overtaking is observed."
 - **One idea per sentence.** Don't stack modifying clauses into a long run; break them up.
 - **Prefer the active voice** and plain connectives; avoid nominalizations and double passives.
-- **Do not alter facts, figures, proper nouns, evidence grades (`[fact]` · `[analysis]` · `[forecast]`), or quotations** — even when you tighten a sentence, the assertion strength and attribution discipline stay intact.
+- **Do not alter facts, figures, proper nouns, evidence grades (`[fact]` · `[analysis]` · `[forecast]`), or quotations** — even when you tighten a sentence, the assertion strength and attribution discipline stay intact. In the body of a theme, aggregate or overview page, write the grade as speaker + verb rather than as a tag — readers cannot decode internal tags. What stays unaltered is the grade, not its tag notation (exception and judgment criterion: [`layers/contradiction.md`](../layers/contradiction.md) "Natural absorption").
 
 The semantic judgments (verb-first, inanimate subject, sentence-breaking) are handled by the Desk's qualitative review ([../agents/desk.md](../agents/desk.md)).
 

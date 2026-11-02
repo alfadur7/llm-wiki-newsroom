@@ -66,7 +66,7 @@ A synthesis follows craft drawn from journalism explainer reporting, management-
 | `## Summary` (question, conclusion up front) | `jrn.lede` · `jrn.nutgraf` · `con.scr` · `con.so-what` |
 | `## Summary` tension framing | `jrn.page` |
 | `## N.` analysis sections | `jrn.explainer` · `jrn.inverted-pyramid` · `con.bold-bullet` |
-| Inline source attribution in body | `cit.grounding` · `cit.grade-meta` · `cit.cite-type-meta` |
+| Inline source attribution in body | `cit.grounding` |
 | `## Connections` per-axis roster | `enc.connection-grouping` |
 | Notation·neutrality | `enc.link-density` · `enc.slug-alias` · `enc.verdict-restraint` · `enc.summary-style` · `enc.coatrack` |
 | Numbers | `con.numeric-precision` · `con.numeric-density` |
@@ -96,7 +96,7 @@ Craft principles, criteria, and thresholds are the SoT in the craft skills' `cri
 
 ### Feedback loop (iterate until Rubric conditions met)
 
-Iterate and improve until the synthesis meets the completion condition (roster `synthesis.roster` — 9 required PASS + 26+/28 total PASS).
+Iterate and improve until the synthesis meets the completion condition (roster `synthesis.roster` — 9 required PASS + 24+/26 total PASS).
 
 1. **Iteration 1 (draft)**: author per the execution order above.
 2. **Evaluation**: the `[Rubric]` line (automatic metrics) in `python tools/lint.py synthesis <slug>` output + a body review against the mapping-table M criteria.
@@ -114,7 +114,7 @@ This Rubric pairs with "how to write" (Authoring) to judge "how well it was writ
 - **Automatic (A)** = metrics from `python tools/lint.py synthesis [<slug>]` output. What synthesis lint measures automatically is only **structural (schema-sections·source-coverage·source-exists) + enc.slug-alias (L1) + MarkupLeak (tool-call markup leak) + Type (frontmatter `type`) — the last two hard-gate even in advisory mode** + advisories (W1·F1·Placement·J1). J1 is **not the verdict metric for `struct.join-grounded` but a surfacing metric** — it counts only the join locations; whether each holds is judged by the desk (M).
 - **Manual (M)** = judged by Claude·Desk reading the body (most of the craft mapping-table dotted IDs — `jrn.*`·`con.*`·`cit.grounding`·`enc.connection-grouping`, etc.).
 
-**Criteria SoT**: the criterion roster·required are `_manifest.json` `synthesis.roster` (28 criteria); craft definitions·PASS conditions are the mapping-table skills' `criteria.json`·SKILL.md. Structural criteria with no external craft source are in the section below.
+**Criteria SoT**: the criterion roster·required are `_manifest.json` `synthesis.roster` (26 criteria); craft definitions·PASS conditions are the mapping-table skills' `criteria.json`·SKILL.md. Structural criteria with no external craft source are in the section below.
 
 #### Structural criteria (not craft — held solely by layers)
 
@@ -128,9 +128,9 @@ This Rubric pairs with "how to write" (Authoring) to judge "how well it was writ
 
 House-style (roster optional): `house.repetition` · `house.date-format` · `house.sentence-length` — definitions and PASS conditions are the SoT in the [overview.md](overview.md#common-authoring-principles-applies-to-part-1-and-part-2) house-style block.
 
-**Completion conditions** (roster `synthesis.roster` — 28 criteria):
+**Completion conditions** (roster `synthesis.roster` — 26 criteria):
 - All 9 required (roster `required`: struct.schema-sections·struct.source-coverage·struct.source-exists·struct.through-line·struct.join-grounded·enc.broken-link·jrn.lede·con.scr·cit.grounding) PASS
-- **26 or more of the 28 total PASS** (= total−2, computed by `_manifest_counts` · PARTIAL excluded)
+- **24 or more of the 26 total PASS** (= total−2, computed by `_manifest_counts` · PARTIAL excluded)
 - `enc.slug-alias` (L1) is **optional (advisory)** for synthesis — inline source citations and cross-layer links legitimately expose long kebab slugs, so it is not a hard gate (report only)
 - `python tools/lint.py synthesis <slug> --fix` rewrite block computes the completion-condition string from the roster
 
@@ -161,4 +161,4 @@ This lint is in **advisory mode** (`synthesis.py` `ADVISORY_MODE = True`) — un
 
 ## Sources
 
-The primary sources for the craft criteria are the SoT in each craft skill's SKILL.md `## Sources` — [`journalism-writing`](../skills/journalism-writing/SKILL.md) (Lede·Nut graph·Explainer·PAGE·inverted pyramid)·[`consulting-writing`](../skills/consulting-writing/SKILL.md) (SCR·So-what·Bold-bullet·numbers)·[`encyclopedia-writing`](../skills/encyclopedia-writing/SKILL.md) (links·notation·neutrality·connection grouping)·[`scholarly-citation`](../skills/scholarly-citation/SKILL.md) (grounding·grade/cite-type meta). Structural criteria have no external source (own convention).
+The primary sources for the craft criteria are the SoT in each craft skill's SKILL.md `## Sources` — [`journalism-writing`](../skills/journalism-writing/SKILL.md) (Lede·Nut graph·Explainer·PAGE·inverted pyramid)·[`consulting-writing`](../skills/consulting-writing/SKILL.md) (SCR·So-what·Bold-bullet·numbers)·[`encyclopedia-writing`](../skills/encyclopedia-writing/SKILL.md) (links·notation·neutrality·connection grouping)·[`scholarly-citation`](../skills/scholarly-citation/SKILL.md) (grounding·schema meta-use). Structural criteria have no external source (own convention).

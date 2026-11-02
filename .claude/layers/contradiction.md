@@ -33,7 +33,6 @@ The table below is the **mapping** of which part of an issue page corresponds to
 | `## Derived Tensions & Generational Readings` (Derived Tensions · Generational Readings — rebuttal·qualifier) | `jrn.rebuttal` · `jrn.qualifier` |
 | `## Interpretive Direction` (Interpretive Direction — synthesis) | `jrn.monitoring-balance` · `enc.verdict-restraint` |
 | Notation·linking throughout the document | `enc.link-density` · `enc.slug-alias` · `enc.back-reference` |
-| Use of schema metadata | `cit.grade-meta` · `cit.cite-type-meta` |
 | (Part 2 additional) Tension-axis completeness · drill · balance · scope | `con.mece-axes` · `enc.summary-style` · `enc.due-balance` · `enc.coatrack` |
 
 The `Claim type 4-way classification` (the `type` field in `_contradictions.json` — **real**: clear opposition · **superseded**: a resolved past issue · **related**: reference · **soft**: classification failed) is a term in this wiki's data schema, and it governs theme tone and qualifier strength (structural `struct.type-reflection`).
@@ -110,14 +109,14 @@ Below are principles specific to **this wiki's data (`_contradictions.json` scor
 - **Source-selection 3-stage set relationship (Select → Read → Cite)**: execution-order steps 4·6·7 make the frontmatter the topmost set and Read · body cite subsets — `Claim-related sources ⊇ Frontmatter ⊇ {Read, Body cite}` (S2 evidence = Read ∩ Body cite · background context = Body cite − Read). The body ⊆ frontmatter consistency is enforced by `cit.cite-consistency`; the representative-evidence Read discipline (preventing narration that guesses from claim text · partial gaming is the editor's self-discipline) is enforced by the `cit.grounding` craft (skill SoT).
 - **Citation anchor · recency (project application)**: the anchor format and the definition of anchorable sections (`#Summary` · `#Key Claims` · `#Key Quotes`) are owned by [`source.md` "Evidence anchor"](source.md) · `cit.anchor-evidence` as SoT. **The frontmatter `sources:` lists slugs only, without anchors** (protecting the graph dedup key); anchors are a body-wikilink notation matter only. recency is built into `evidence_strength` (weight 0.15), so no separate check is needed — `[Claims drift] top5_new` is consistently recency-primary.
 
-#### Use of Phase 2 source-schema metadata (cit.grade-meta · cit.cite-type-meta)
+#### Use of Phase 2 source-schema metadata
 
-The theme body narrative consciously reflects the evidence grade (`[fact]` Data / `[analysis]` Analysis / `[forecast]` Forecast), claimant, and citation type (`cites` / `references` / `contradicts` / `defines`) schema that source pages emit, adding attribution depth. The craft definition for this use is owned by [`scholarly-citation`](../skills/scholarly-citation/SKILL.md) "Use of schema metadata" as SoT. Caveats specific to this wiki's conflict axis:
+The theme body narrative consciously reflects the evidence grade, claimant, and citation type of the source pages, adding attribution depth. The craft definition for this use is owned by [`scholarly-citation`](../skills/scholarly-citation/SKILL.md) "Schema meta-use" as SoT. Caveats specific to this wiki's conflict axis:
 
 - **No blanket camp demotion**: when absorbing grade asymmetry, do not flatly demote one camp as "second-tier analysis grade." Confirm via the actual sources whether the opposing camp also holds primary material before describing it — demoting only one camp is a bias that bypasses due weight.
 - **State the absence of the A camp's voice**: if one side of the opposition (especially a frequently-cited big company) has no first-person self-defense voice within the source scope, do not fill in its position with narrator assertion. Instead state in the body that "this camp's official voice is absent from the source scope, and its position is reconstructed from the opposing/third-party voices" — blocking the paradox where the camp with the weakest attribution is described most assertively.
 - **Name the speaking actor**: carry the claimant from a source's `## Key Claims` into the body as the speaking actor (`[[KISA]] released the first breach statistics ([[slug|source]])`) — when it is an entity, that wikilink also strengthens graph connectivity. Carry a plain-text claimant across as plain text; linking a page that does not exist leaves only a broken link.
-- **Natural absorption (block ritual compliance)**: do not expose schema vocabulary in the body as label prefixes or schema dumps (`[fact] [[claimant]] — `) for the sake of hitting a count. Introducing it once + 2–3 natural occurrences is the healthy pattern, and up to 2–3× the count threshold is normal; beyond that triggers Desk qualitative review. When the count is exceeded, the Desk separately judges the frequency of schema dumps from the frequency of evaluative-proposition absorption (if absorbed via the latter, it PASSes even when over the count).
+- **Natural absorption**: write evidence grade and citation type as speaker + verb (`the OSI's analysis` · `Meta projected` · `primary record`). Grade tags (`[fact]` · `[analysis]` · `[forecast]`), source `## Connections` typing (`cites:` · `contradicts:` etc.) and classifier fields (`type=` · `evidence_strength`) stay out of the body — readers cannot decode the wiki's internal schema. lint `[Advisory] schema leak` counts the exposures; when it is non-zero, the Desk has each exposure rewritten as speaker + verb — the only exception is a sentence describing this wiki's classification scheme itself (the schema is that sentence's subject). No floor metric rewards the exposure count — it pulls writing toward more tags.
 
 #### `other-fragmentary.md` special case
 
@@ -130,7 +129,7 @@ The theme body narrative consciously reflects the evidence grade (`[fact]` Data 
 
 #### Feedback loop (iterate until the Rubric conditions are met)
 
-Iterate and improve the theme file until it meets the completion conditions (roster `contradiction-theme.roster` — required 11 PASS + overall 26+/28 PASS; `other-fragmentary` exempts 4 criteria (N2·D5·D6·S3): -4 total / -1 required → 10 required + overall 22+/24 PASS). No limit on the number of iterations.
+Iterate and improve the theme file until it meets the completion conditions (roster `contradiction-theme.roster` — required 11 PASS + overall 24+/26 PASS; `other-fragmentary` exempts 4 criteria (N2·D5·D6·S3): -4 total / -1 required → 10 required + overall 20+/22 PASS). No limit on the number of iterations.
 
 1. **Iteration 1 (draft)**: author the 4 H2 sections based on the input material (`_contradictions_themes.json` claim_ids + `_contradictions.json` records + Read of the core sources).
 2. **Evaluation**: judge the automated (A) criteria via the `[Rubric]` line in the `python tools/lint.py contradiction <theme>` output, and the manual (M) criteria via body review as PASS/PARTIAL/FAIL.
@@ -171,9 +170,9 @@ L2-4-specific principles (apply to Part 2 only):
 - **No landscape-axis references**: do not use `[[<cluster-slug>]]`-form references. This file is conflict-axis only; the `wiki/index.md` exclusively handles landscape-axis entry points (.claude/layers/README.md). Same logic as Wikipedia:Coatrack — the nominal subject (the conflict survey) must not be obscured by the tangential subject (landscape).
 - **The aggregate file has no frontmatter**: the root meta-file convention (.claude/layers/README.md (Root Meta Files Exception)) — start from the root heading `# Contradictions by Theme`. `last_updated` management is replaced by recording the re-aggregation event in `log.md`.
 
-#### Use of Phase 2 source-schema metadata (cit.grade-meta · cit.cite-type-meta)
+#### Use of Phase 2 source-schema metadata
 
-Apply the same craft as Part 1 ([`scholarly-citation`](../skills/scholarly-citation/SKILL.md) "Use of schema metadata" SoT) at aggregate scale. The **cross-theme meta-observations** that cannot be derived from a single theme — comparing per-axis evidence-grade distributions · attaching attribution strength to `## Implications` bullets · reflecting the distinction between cites/references — become possible with this added dimension. Part 1's conflict-axis caveats (no blanket camp demotion · state the absence of the A camp's voice · natural absorption) apply the same. In particular, **preserve drill-up attribution**: an absence of a camp's voice or an attribution asymmetry that a child theme MD explicitly handled is inherited in the aggregate summary too as a one-clause hedge (no narrator flattening into assertion).
+Apply the same craft as Part 1 ([`scholarly-citation`](../skills/scholarly-citation/SKILL.md) "Schema meta-use" SoT) at aggregate scale. The **cross-theme observations** that cannot be derived from a single theme — comparing per-axis evidence-grade distributions · attaching evidence strength to `## Implications` bullets — become possible with this added dimension. Part 1's conflict-axis caveats (no blanket camp demotion · state the absence of the A camp's voice · natural absorption) apply the same. In particular, **preserve drill-up attribution**: an absence of a camp's voice or an attribution asymmetry that a child theme MD explicitly handled is inherited in the aggregate summary too as a one-clause hedge (no narrator flattening into assertion).
 
 #### L2-4-specific structure template
 
@@ -234,12 +233,12 @@ Same as L2-3 — iterate until the required Rubric criteria PASS. Confirm automa
 
 This Rubric pairs with `.claude/layers/contradiction.md` defining "how to write" by providing the evaluation criteria that judge "how well it was written." Apply only the relevant Part depending on the scope of your work:
 
-- **Part 1 — Theme Contradiction Rubric (L2-3)**: targets `wiki/contradictions/<theme>.md`. 28 criteria (`contradiction-theme.roster`).
-- **Part 2 — Aggregate Contradictions Rubric (L2-4)**: targets `wiki/contradiction.md`. 19 criteria (`contradiction-aggregate.roster`) — Part 1 common craft + L2-4-specific (D1·D2·D3·F1·F2).
+- **Part 1 — Theme Contradiction Rubric (L2-3)**: targets `wiki/contradictions/<theme>.md`. 26 criteria (`contradiction-theme.roster`).
+- **Part 2 — Aggregate Contradictions Rubric (L2-4)**: targets `wiki/contradiction.md`. 17 criteria (`contradiction-aggregate.roster`) — Part 1 common craft + L2-4-specific (D1·D2·D3·F1·F2).
 
 ### Part 1 — Theme Contradiction Evaluation Rubric
 
-**Criteria SoT**: the theme evaluation criterion roster (applicable criteria · required) is `_manifest.json` `contradiction-theme.roster` (28 criteria); the definition · PASS condition · measurement of each craft criterion is owned by the "Which writing tradition" mapping-table skill's `criteria.json` · SKILL.md (NPOV `enc.*` · Toulmin/Hegel `jrn.*` · citation consistency `cit.*`). The structural · house-style criteria with no external craft original are in the section below.
+**Criteria SoT**: the theme evaluation criterion roster (applicable criteria · required) is `_manifest.json` `contradiction-theme.roster` (26 criteria); the definition · PASS condition · measurement of each craft criterion is owned by the "Which writing tradition" mapping-table skill's `criteria.json` · SKILL.md (NPOV `enc.*` · Toulmin/Hegel `jrn.*` · citation consistency `cit.*`). The structural · house-style criteria with no external craft original are in the section below.
 
 #### structural · house-style criteria (not craft — owned solely by layers)
 
@@ -257,11 +256,11 @@ Structural and mechanical conventions with no external craft original. Measureme
 | `house.source-repetition` (N4) | source slug reappearance ≤2 | source-slug reappearance ≤2 (introduce + deepen, 2 times standard). Entity/concept wikilinks excluded from the count | A (warning) |  |
 | `house.figure-repetition` (N6) | figure-token reappearance ≤2 | no 3+ reappearance of the same figure token (a different measurement plane from N4 — the text surface). On reappearance in the derived-tensions position, advisory if no timeline/context-shift keyword is present | A (warning) |  |
 
-**Completion conditions** (roster `contradiction-theme.roster` — 28 criteria):
+**Completion conditions** (roster `contradiction-theme.roster` — 26 criteria):
 - All 11 required (roster `required`: N1·N2·N3·T1·T3·T4·D2·S1·S2·W4·L2) PASS
-- **26 or more PASS** of the 28 total (= total−2, computed by `_manifest_counts` · PARTIAL excluded from the count — strict)
+- **24 or more PASS** of the 26 total (= total−2, computed by `_manifest_counts` · PARTIAL excluded from the count — strict)
 - For advisory FAILs (structural · house-style · `cit.*` etc.), reinforce by referring to the relevant craft skill · structural-section criteria; if still short, return to a follow-up iteration
-- **`other-fragmentary` exception**: due to the absence of a single axis of contention, 4 criteria — N2 (due weight) · D5 (C size) · D6 (C naming) · S3 (lead density) — are exempted (lint shows `—`). The completion condition is total −4 · required −1 (only N2 required) → **10 required + overall 22+/24 PASS** (computed by `_manifest_counts` `exclude_total=4 · exclude_required=1`)
+- **`other-fragmentary` exception**: due to the absence of a single axis of contention, 4 criteria — N2 (due weight) · D5 (C size) · D6 (C naming) · S3 (lead density) — are exempted (lint shows `—`). The completion condition is total −4 · required −1 (only N2 required) → **10 required + overall 20+/22 PASS** (computed by `_manifest_counts` `exclude_total=4 · exclude_required=1`)
 
 **Evaluation execution order**:
 1. Automated (A) criteria — judge immediately via the `[Rubric]` line of the `python tools/lint.py contradiction <theme>` output.
@@ -270,19 +269,19 @@ Structural and mechanical conventions with no external craft original. Measureme
 
 #### Interpreting the automated (A) metric output
 
-The lint output is labeled with **legacy codes** (N4·N5·S2·X1·G1 etc.) for readability — the correspondence with the mapping-table dotted IDs is owned by the `legacy` field of each craft skill's `criteria.json` as SoT (e.g. N7=`enc.label-neutral` · T4=`jrn.qualifier` · L2=`cit.cite-consistency` · N4=`house.source-repetition` · S2=`struct.evidence-count`). Running `python tools/lint.py contradiction [<theme>]` prints **four lines** per theme file (split by dimension — the automated 20 criteria in a 4-line structure):
+The lint output is labeled with **legacy codes** (N4·N5·S2·X1 etc.) for readability — the correspondence with the mapping-table dotted IDs is owned by the `legacy` field of each craft skill's `criteria.json` as SoT (e.g. N7=`enc.label-neutral` · T4=`jrn.qualifier` · L2=`cit.cite-consistency` · N4=`house.source-repetition` · S2=`struct.evidence-count`). Running `python tools/lint.py contradiction [<theme>]` prints **three lines** per theme file (split by dimension — the automated 17 criteria in a 3-line structure):
 
 ```
   contradictions/<theme>.md:
     [Rubric] S1=4/4 todo=0 ✅  S2 evidence=5 slugs=4 ✅  S3 lead nums=3/wiki=4 ✅  W1 links=38 ✅  D1 labels=2 ✅  D5 C=0/A=85/B=92 ✅  D6 C_meta=0 ✅
     [Rubric] N4 reuse_max=2 ✅  N5 verdict_fails=1 ✅  N6 num_reuse_max=2 ✅  N7 label_skew=0 ✅  T4 qualifiers=2 ✅
     [Rubric] X1 source_refs=5/8 (63%) ⚠️  X2 landscape=1 ✅  L1 raw_slugs=0 ✅  L2 cite_miss=0 ✅  L3 grounded=2/5 ✅
-    [Rubric] G1 grade_meta=3 ✅  G2 cite_type_meta=1 —
 ```
 
 If there is an upper-bound exceedance, a reappearing token, or a consistency violation, the following supplementary advisory lines are appended, one per line:
 
 ```
+    [Advisory] schema leak: internal=2 grade_tag=5 ⚠️   (body schema exposure — omitted when 0; natural-absorption rule)
     [Rubric] N4 over-reused slugs: <source-slug>×N, <source-slug>×N
     [Rubric] N6 over-reused figures: "METR 19%"×4, "Llama 405B"×3
     [Rubric] N7 label value-words: A=[], B=[empirical evidence, skepticism]
@@ -290,14 +289,12 @@ If there is an upper-bound exceedance, a reappearing token, or a consistency vio
     [Rubric] L1 raw slug samples: [...]
     [Rubric] L2 missing from frontmatter: [slug1, slug2]
     [Rubric] L3 missing evidence grounding: [slug1, slug2]
-    [Rubric] G1 grade meta below threshold (need ≥2)
-    [Rubric] G2 cite-type meta below threshold (need ≥1)
 ```
 
-- **✅ = PASS**, **⚠️ = FAIL**, **— = exempt or not applicable** (`other-fragmentary`'s N2·D5·D6·S3; G2 outside WIKI_LANG=ko)
+- **✅ = PASS**, **⚠️ = FAIL**, **— = exempt or not applicable** (`other-fragmentary`'s N2·D5·D6·S3)
 - Output token = threshold (each criterion's definition SoT is the mapping-table skill's `criteria.json` or the structural section above):
   - dialectic · NPOV craft → skill: `N5 verdict_fails ≤2` · `N7 label_skew ==0` · `T4 qualifiers ≥1` · `D1 labels ≥2` · `D5 C_words ≤ max(A,B)` · `D6 C_meta ==0`
-  - citation · linking craft → skill: `W1 links ≥30` · `X2 landscape ≥1` · `L1 raw_slugs ==0` · `L2 cite_miss ==0` · `L3 grounded ≥1` · `G1 grade_meta ≥2` · `G2 cite_type_meta ≥1` (WIKI_LANG=ko only)
+  - citation · linking craft → skill: `W1 links ≥30` · `X2 landscape ≥1` · `L1 raw_slugs ==0` · `L2 cite_miss ==0` · `L3 grounded ≥1`
   - structural · house → structural section above: `S1 4/4 todo=0` · `S2 evidence/slug 3~7` · `S3 lead nums≤4 wiki≤5` · `X1 source_refs/total ≥0.7` · `N4 reuse_max ≤2` · `N6 num_reuse_max ≤2`
 - Measurement nuance (skill `checks.py` · `tools/_lint/contradiction.py` is SoT): `N4` · `S2` are by source slug (entity/concept wikilinks excluded from the count) · the `X1` denominator is the JSON SoT (no editor gaming) · `L2` is the set difference claim source ∩ body − frontmatter (non-claim mentions excluded from the count) · `L3` blocks only the "0 Reads extreme" (partial gaming is the editor's self-discipline) · the figure vocabulary (`NUMBER_TOKEN_RE`) is owned by the skill `checks.py` (encyclopedia-writing) and consumed by contradiction.py, while the assertion/qualifier/camp-word dictionaries are owned by the skill `checks.py` (encyclopedia-writing · journalism-writing) as SoT.
 - **W4** (required) is separate: 0 broken links in `python tools/lint.py graph structure`.
@@ -353,7 +350,7 @@ But to prevent recency bias, at least 1 item from the mid/old segment of the ful
 
 ### Part 2 — Aggregate Contradictions Evaluation Rubric
 
-**Criteria SoT**: the `wiki/contradiction.md` evaluation criterion roster is `_manifest.json` `contradiction-aggregate.roster` (19 criteria); the craft definitions · PASS conditions · measurement are owned by the "Which writing tradition" mapping-table skill's `criteria.json` · SKILL.md above. Part 1 common craft (`enc.npov-asf` · `enc.due-weight` · `enc.verdict-restraint` · `enc.label-neutral` · `jrn.toulmin-claim` · `jrn.qualifier` · `enc.link-density` · `cit.grade-meta` · `cit.cite-type-meta`) applies at aggregate scale (the unit being the theme summary), while the **L2-4-specific craft** is `con.mece-axes` (D1 tension-axis MECE) · `enc.summary-style` (D2 drill-down alias) · `enc.due-balance` (D3 per-axis balance ≤4:1) · `enc.coatrack` (F1 landscape blocking). structural is in the section below. Since Part 1/Part 2 point at the same criterion via the roster, mirror duplication and drift monitoring are unnecessary.
+**Criteria SoT**: the `wiki/contradiction.md` evaluation criterion roster is `_manifest.json` `contradiction-aggregate.roster` (17 criteria); the craft definitions · PASS conditions · measurement are owned by the "Which writing tradition" mapping-table skill's `criteria.json` · SKILL.md above. Part 1 common craft (`enc.npov-asf` · `enc.due-weight` · `enc.verdict-restraint` · `enc.label-neutral` · `jrn.toulmin-claim` · `jrn.qualifier` · `enc.link-density`) applies at aggregate scale (the unit being the theme summary), while the **L2-4-specific craft** is `con.mece-axes` (D1 tension-axis MECE) · `enc.summary-style` (D2 drill-down alias) · `enc.due-balance` (D3 per-axis balance ≤4:1) · `enc.coatrack` (F1 landscape blocking). structural is in the section below. Since Part 1/Part 2 point at the same criterion via the roster, mirror duplication and drift monitoring are unnecessary.
 
 #### structural criteria (not craft — owned solely by layers)
 
@@ -366,27 +363,27 @@ But to prevent recency bias, at least 1 item from the mid/old segment of the ful
 | `struct.headline-stats` (F2) | Preamble statistics match | "N source-to-source contradictions" = the number of records in `_contradictions.json`; "M topic clusters" = the number of non-`other-fragmentary` themes in `_contradictions_themes.json` | A | ✅ |
 | `enc.broken-link` (W4) | real filenames | 0 broken wikilinks (`python tools/lint.py graph structure`) | A | ✅ |
 
-**Completion conditions** (roster `contradiction-aggregate.roster` — 19 criteria):
+**Completion conditions** (roster `contradiction-aggregate.roster` — 17 criteria):
 - All 12 required (roster `required`: N1·N2·N3·T1·T4·S1·W4·X1·D1·D2·F1·F2) PASS
-- **17 or more PASS** of the 19 total (= total−2, computed by `_manifest_counts`)
+- **15 or more PASS** of the 17 total (= total−2, computed by `_manifest_counts`)
 - D3 (`enc.due-balance`) is a warning — a FAIL judgment is accompanied by a human reviewer (natural skew in per-axis theme counts is possible)
 
 **Evaluation execution order**: same as Part 1 — automated (A) via the `[Rubric L2-4]` line of the `python tools/lint.py contradiction aggregate` output, manual (M) via body review.
 
 #### Interpreting the automated (A) metric output
 
-Running `python tools/lint.py contradiction aggregate` prints each `wiki/contradiction.md` evaluation result in **four lines** (same hierarchy as the overview aggregate · 4-line structure — dimension split):
+Running `python tools/lint.py contradiction aggregate` prints each `wiki/contradiction.md` evaluation result in **three lines** (plus one `[Advisory] schema leak` line when there is an exposure · 3-line structure — dimension split):
 
 ```
 wiki/contradiction.md:
   [Rubric L2-4] T4 qualifiers=N ✅/⚠️  S1 sections=4/4 ✅  S2 insights=N ✅/⚠️  W1 links=N ✅/⚠️
   [Rubric L2-4] N5 verdict_fails=N ✅/⚠️  N7 axis_skew=N ✅/⚠️
   [Rubric L2-4] X1 theme_coverage=M/M ✅  D1 axes=N ✅/⚠️  D2 alias=N/N ✅  D3 balance=max/min=R ✅/⚠️  F1 cluster_refs=N ✅/⚠️  F2 stats=ok/drift ✅/⚠️
-  [Rubric L2-4] G1 grade_meta=N ✅/⚠️  G2 cite_type_meta=N ✅/⚠️
+  [Advisory] schema leak: internal=N grade_tag=M ⚠️   (omitted when 0)
 ```
 
 - **✅ = PASS**, **⚠️ = FAIL** · output token = threshold (definition SoT is the mapping-table skill or the structural section above · **aggregate-scale thresholds**):
-  - craft → skill: `N5 verdict_fails ≤2` (implications) · `N7 axis_skew ==0` (axis titles) · `T4 qualifiers ≥1` (implications) · `W1 links ≥50` · `D1 axes 2~4` (`### Other` excluded from the count) · `D2 alias N/N` (theme-reference pipe alias) · `D3 balance max/min ≤4` (warning) · `F1 cluster_refs ==0` · `G1 grade_meta ≥2` · `G2 cite_type_meta ≥1` (WIKI_LANG=ko only)
+  - craft → skill: `N5 verdict_fails ≤2` (implications) · `N7 axis_skew ==0` (axis titles) · `T4 qualifiers ≥1` (implications) · `W1 links ≥50` · `D1 axes 2~4` (`### Other` excluded from the count) · `D2 alias N/N` (theme-reference pipe alias) · `D3 balance max/min ≤4` (warning) · `F1 cluster_refs ==0`
   - structural → section above: `S1 sections 4/4` · `S2 insights ≥3` · `X1 theme_coverage M/M` · `F2 stats ok` (preamble statistics)
 - Reuses the same measurement dictionaries as Part 1 (assertion/camp-word/qualifier — skill `checks.py`). **W4** (required) is separate: 0 broken links in `graph structure`.
 

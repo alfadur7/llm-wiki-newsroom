@@ -41,8 +41,8 @@ from datetime import date as _date, datetime as _datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from _lib import AUTO_BLOCK_RE, CLUSTERS_JSON, REPO_ROOT, fm_sources, WIKI, WIKILINK_TARGET_RE, atomic_write_text, confirm_changes, korean_mode, parse_frontmatter, print_delete_cleanup_advisory, read_source_date, real_source_files, safe_slug_path, section_body, slug_only, strip_frontmatter  # noqa: E402
-from _advisory_common import mark  # noqa: E402
+from _lib import AUTO_BLOCK_RE, CLUSTERS_JSON, REPO_ROOT, fm_sources, WIKI, WIKILINK_TARGET_RE, atomic_write_text, confirm_changes, parse_frontmatter, print_delete_cleanup_advisory, read_source_date, real_source_files, safe_slug_path, section_body, slug_only, strip_frontmatter  # noqa: E402
+from _advisory_common import mark, schema_leak_line  # noqa: E402
 from _manifest_counts import _load_manifest, counts as _roster_counts, threshold_label  # noqa: E402
 
 import importlib.util as _ilu  # noqa: E402
@@ -205,18 +205,6 @@ DIALECTIC_LABEL_RE = enc_skill.DIALECTIC_LABEL_RE
 # copy here); consume it directly so the two cannot diverge.
 NUMBER_TOKEN_RE = enc_skill.NUMBER_TOKEN_RE
 N6_MIN_TOKEN_LEN = 3  # A unit-bearing token of 2 chars or fewer is not meaningful. Safety guard.
-
-
-# G1·G2 — Phase 2 source schema meta-use (dimension 6).
-# Measurement (count_grade_meta·count_cite_type_meta) is owned by the
-# scholarly-citation skill (migrated from legacy _contradiction_meta_patterns).
-# theme, aggregate, and cluster overview share the same craft functions for
-# metric consistency. The threshold VALUE is injected from manifest checks.
-_G1_THRESHOLD = _MANIFEST["contradiction-theme"]["checks"]["cit.grade-meta"]["threshold"]            # =2
-_G2_THRESHOLD = _MANIFEST["contradiction-theme"]["checks"]["cit.cite-type-meta"]["threshold"]        # =1
-_L24_G1_THRESHOLD = _MANIFEST["contradiction-aggregate"]["checks"]["cit.grade-meta"]["threshold"]    # =2
-_L24_G2_THRESHOLD = _MANIFEST["contradiction-aggregate"]["checks"]["cit.cite-type-meta"]["threshold"]  # =1
-
 
 
 WIKILINK_RE = WIKILINK_TARGET_RE  # captures the target (including #anchor) — _slug_only normalizes it
@@ -569,12 +557,8 @@ def _rubric_metrics(
     )
     lead_wikilinks = len(WIKILINK_RE.findall(lead_text))
 
-    # G1·G2 — Phase 2 source schema meta-use (advisory, dimension 6).
-    # Whole body (frontmatter excluded) — theme MDs have no AUTO blocks, so
-    # body is used as-is. In the aggregate path this is called via a separate
-    # EDITOR-only extraction function.
-    g1_grade_meta = cit_skill.count_grade_meta(body)
-    g2_cite_type_meta = cit_skill.count_cite_type_meta(body)
+    # Body schema-leak advisory — theme MDs have no AUTO blocks, so the whole body.
+    schema_leak = schema_leak_line(body)
 
     # enc.* (W1·N4·N5·N6·N7·L1·X2) measurement moved to the encyclopedia-writing skill.
     # Shared sections (conflict was extracted at D1/D5), source_slugs, and cluster_slugs are injected.
@@ -601,8 +585,7 @@ def _rubric_metrics(
         "X1_source_refs": source_refs,
         "X1_source_total": source_total,
         **_cit_contra,
-        "G1_grade_meta": g1_grade_meta,
-        "G2_cite_type_meta": g2_cite_type_meta,
+        "schema_leak": schema_leak,
     }
 
 
@@ -839,11 +822,6 @@ def _format_metrics_line(m: dict, exempt: set[str] | None = None) -> list[str]:
     else:
         l3_ok = m["L3_grounded"] >= 1
 
-    # G1·G2 — Phase 2 schema meta-use (advisory, dimension 6).
-    # Thresholds: G1 ≥ 2 (grade meta), G2 ≥ 1 (citation-type meta).
-    g1_ok = m["G1_grade_meta"] >= _G1_THRESHOLD
-    g2_ok = m["G2_cite_type_meta"] >= _G2_THRESHOLD if korean_mode() else None
-
     ab_str = f"A={m['D5_words']['A']}/B={m['D5_words']['B']}"
     d5_str = f"C={c_w}/{ab_str}"
     x1_pct = (m["X1_source_refs"] / m["X1_source_total"] * 100) if m["X1_source_total"] else 0
@@ -869,9 +847,9 @@ def _format_metrics_line(m: dict, exempt: set[str] | None = None) -> list[str]:
         f"L1 raw_slugs={m['L1_raw_slugs']} {_mark('L1', l1_ok)}  "
         f"L2 cite_miss={m['L2_missing_count']} {_mark('L2', l2_ok)}  "
         f"L3 grounded={l3_str} {_mark('L3', l3_ok)}",
-        f"    [Rubric] G1 grade_meta={m['G1_grade_meta']} {_mark('G1', g1_ok)}  "
-        f"G2 cite_type_meta={m['G2_cite_type_meta']} {_mark('G2', g2_ok)}",
     ]
+    if m["schema_leak"]:
+        lines.append(m["schema_leak"])
     if m["N4_top"] and m["N4_reuse_max"] > N4_REUSE_MAX:
         top_str = ", ".join(f"{stem}×{n}" for stem, n in m["N4_top"] if n > N4_REUSE_MAX)
         if top_str:
@@ -1134,19 +1112,13 @@ def _check_contradictions_md(
         f"F1 cluster_refs={f1_count} {ok(f1_ok)}  "
         f"F2 stats={'drift' if f2_drift else 'ok'} {ok(f2_ok)}"
     )
-    # G1·G2 — Phase 2 source schema meta-use (advisory, dimension 6 aggregate).
-    # Applies to the entire EDITOR region of the aggregate body, outside any AUTO
-    # block (AUTO_BLOCK_RE is the single SoT — see _lib; the aggregate currently
+    # Body schema-leak advisory — the EDITOR region outside any AUTO block
+    # (AUTO_BLOCK_RE is the single SoT — see _lib; the aggregate currently
     # carries none, so this is a defensive strip).
     aggregate_editor = AUTO_BLOCK_RE.sub("", content)
-    g1_grade_meta = cit_skill.count_grade_meta(aggregate_editor)
-    g2_cite_type_meta = cit_skill.count_cite_type_meta(aggregate_editor)
-    g1_ok = g1_grade_meta >= _L24_G1_THRESHOLD
-    g2_ok = g2_cite_type_meta >= _L24_G2_THRESHOLD if korean_mode() else None
-    metrics_lines.append(
-        f"  [Rubric L2-4] G1 grade_meta={g1_grade_meta} {ok(g1_ok)}  "
-        f"G2 cite_type_meta={g2_cite_type_meta} {ok(g2_ok)}"
-    )
+    leak = schema_leak_line(aggregate_editor, indent="  ")
+    if leak:
+        metrics_lines.append(leak)
     if axis_skew_hits:
         metrics_lines.append(
             f"    [Rubric L2-4] N7 skewed axes: {axis_skew_hits}"

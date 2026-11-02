@@ -31,9 +31,9 @@ A piece synthesizing many sources follows Select→Read→Cite discipline — th
 - **cit.grounding** — a source offered as representative evidence must actually be read and used. When at least one of the source's direct-quote / key-claim items appears in the body as a substring, that is objective evidence of having read it (writing from a one-line summary by memory/guess risks divergence from the source). The deterministic lint blocks only the "never read at all" extreme; full read-through rests on editor self-discipline.
 - **cit.anchor-evidence** — when a direct quote is placed in representative evidence, mark the citation location with a source section anchor (`[[slug#section]]`; ko `[[slug#섹션]]`) — the same Xanadu principle applied to synthesis evidence. A gradual migration, so advisory.
 
-## Schema meta-use (cit.grade-meta · cit.cite-type-meta)
+## Schema meta-use
 
-The synthesizing piece's narrative consciously reflects the evidence-grade (`[fact]`·`[analysis]`·`[forecast]`) and citation-type (`cites:`·`references:`·`contradicts:`·`defines:`) schema attached to sources — noting which grades the evidence base rests on, the dominant claimant, strong coupling (cites) vs context (references) — to deepen attribution. Confine attribution strength to factual statements; do not let it spill into verdict conclusions. Deterministic measurement (`count_grade_meta`·`count_cite_type_meta`) counts grade/cite-type meta expressions as advisory; the lints judge the cite-type count only under WIKI_LANG=ko.
+The synthesizing piece's narrative consciously reflects the evidence grade and citation type attached to sources — which grades the evidence base rests on, the dominant claimant, direct quotation vs context reference — to deepen attribution. Express it as attribution in prose (speaker + verb: "X's analysis", "Y projected", "primary record"), not as the schema's own tokens (grade tags, link-type prefixes, classifier field names) — readers cannot decode them. Confine attribution strength to factual statements; do not let it spill into verdict conclusions.
 
 ## Sources
 

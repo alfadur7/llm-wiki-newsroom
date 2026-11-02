@@ -34,7 +34,6 @@ The table below **maps** each part of this wiki's overview pages to the craft cr
 | `## Key Trends & Figures` (Key Trends & Figures) | `jrn.inverted-pyramid` · `con.bold-bullet` |
 | Document-wide notation/neutrality | `enc.link-density` · `enc.first-mention` · `enc.lead-body` · `enc.verdict-restraint` · `enc.slug-alias` · `enc.abbr-gloss` |
 | Numeric precision/density | `con.numeric-precision` · `con.numeric-density` |
-| Leveraging schema metadata | `cit.grade-meta` · `cit.cite-type-meta` |
 | (Part 2 additions) cluster completeness/drill/balance/scope | `con.mece-clusters` · `enc.summary-style` · `jrn.due-impartiality` · `enc.coatrack` |
 
 For the genre framing of the overview file itself (Beat reporting · Forrester Landscape) and entity grouping (stakeholder map), see the `jrn`/`con` SKILL.md.
@@ -144,9 +143,9 @@ Along with the common authoring principles (block above), the following items ap
 - **Explicit adjacent fields and scope**: clusters auto-grouped by the Leiden clustering algorithm do not have cleanly cut topic boundaries, so make the scope distinction from adjacent clusters explicit in a `## Adjacent Domains & Scope` subsection. The content is one bullet per adjacent cluster (1–4), each a `[[<adjacent-cluster-slug>|<cluster name>]]`-format wikilink (the alias principle is in the common block, e.g., `[[open-weights|Open Weights]]` covers the release model · `[[open-source-ai-definition|Open-Source AI Definition]]` covers the definition dispute) + a one-line description of the boundary with that field's content. This section includes only references to adjacent overviews within the landscape axis — conflict-axis theme links (per X2) are placed separately in the body such as `## Overview`/`## Subtopics`. `python tools/lint.py overview` automatically detects alias-less cluster-slug links in this section.
 - **Leveraging paired_exempt + semantic branching of anchor invasion**: the `paired_with` field in `graph/cluster_labels.json` defines an essential coupling between clusters, and the lint anchor-invasion advisory computes a paired-exempt count separately (e.g., `[paired-exempt: 3 refs — <paired-slug>(3)]`). paired-exempt is an essential coupling, so it is not a target for narrative-separation treatment. If invasion beyond paired-exempt is found, branch semantically in the following two directions — **(i) Integrate**: if the invading anchor touches this cluster's essence, naturally integrate it within the narrative (keep the first-mention wikilink, annotate the role); **(ii) Demote**: if it is outside this cluster's essence, demote to plain text or weaken to a single cross-reference word, and guide the narrative's main body to the adjacent cluster overview. The integrate-vs-demote decision must be consistent with the cluster's identity definition (the `## Overview` paragraph), and a cross-reference meta-note like "the main narrative is the [[<adjacent-cluster-slug>|<Name>]] cluster; this cluster covers only the ... aspect" is the standard pattern when demoting. This branching judgment is the Desk's qualitative-review domain, not a target for automatic lint exemption (false-negative risk).
 
-#### Leveraging source schema metadata (`cit.grade-meta` · `cit.cite-type-meta`)
+#### Leveraging source schema metadata
 
-The cluster overview narrative consciously reflects the evidence-grade (`[fact]` ["source/primary"] · `[analysis]` ["analysis"] · `[forecast]` ["forecast"]) and citation-type (`cites:` · `references:` · `contradicts:` · `defines:`) schema emitted by source pages — adding depth by meta-mentioning the evidence-base grade, the dominant claimant, and the cites-vs-references distinction. The authoring/measurement criteria are owned by [`scholarly-citation`](../skills/scholarly-citation/SKILL.md) as SoT. Keep attribution limited to factual statements, consistent with `enc.verdict-restraint` (verdict restraint).
+The cluster overview narrative consciously reflects the evidence grade and citation type of the source pages — adding depth by describing the grade make-up of the evidence base, the dominant claimant, and the difference between direct quotation and context reference. Write it as speaker + verb; grade tags, `## Connections` typing and classifier fields stay out of the body — readers cannot decode them (lint `[Advisory] schema leak` counts them). The authoring criteria are owned by [`scholarly-citation`](../skills/scholarly-citation/SKILL.md) as SoT. Keep attribution limited to factual statements, consistent with `enc.verdict-restraint` (verdict restraint).
 
 Evaluation/iteration follows the [`### Common Feedback Loop`](#common-feedback-loop-applies-to-part-1-and-part-2) above (Part 1 lint = `python tools/lint.py overview <slug>`, including the `[Freshness]` warning).
 
@@ -172,7 +171,7 @@ Along with the common authoring principles (block above), the following items ap
 
 - **`## Recent Changes` (right after the lead)**: a timeliness channel that surfaces the core events of the last ~3 months across all clusters in 5–7 bullets, reverse chronological (newest on top). Each bullet `YYYY-MM[-DD]` + one line + one hub `[[wikilink]]`. Separate it from the timeless connecting narrative of the cluster sections so recent events are not buried. Theme links forbidden (F1); `[Recency]` advisory when over 90 days. Before dropping a bullet from the list, check whether that fact appears in another body section; if it does not, move it there first and only then delete it — an unchecked delete is fact loss, not an update. The cluster sections below maintain the following 4-beat.
 - **Bottom-up roll-up + 4-beat paragraph structure**: each cluster section restates the lower files' `## Overview` + `## Key Trends & Figures` in **3–4 paragraphs**, separating the following 4 beats into distinct paragraphs — **(1) Branch point**: the core event/figure/timing that defined the cluster, in one paragraph. **(2) Main body**: the core entities, camps, and anchor concepts, in one paragraph. **(3) Tension axis**: the head-on colliding camps or the core contradiction, in one paragraph. **(4) Drill-down**: close with `Details: [[<slug>|<Name>]]` (may be appended to the end of the preceding paragraph). overview.md holds the **connecting narrative laid on top**, not details that duplicate the lower files, but the "compress the whole cluster into one paragraph" pattern is forbidden (see the common authoring principles "paragraph-separation principle").
-- **Compression carries its qualifiers**: the four things a lower file attached to a fact — **(1) the named speaker (2) the evidence-grade marker (3) the denominator/basis of a figure (4) the conditions and premises** (a non-binding LOI, a review stage, a separately-secured condition) — move to the root restatement with it. Present in the lower file and absent at the root means the sentence is unfinished. A party the lower file named stays named at the root: swapping in a collective noun ("the industry", "some observers", "experts") leaves the link count and grade count untouched, so the quantitative checks cannot see the loss.
+- **Compression carries its qualifiers**: the four things a lower file attached to a fact — **(1) the named speaker (2) the evidence grade (as speaker + verb) (3) the denominator/basis of a figure (4) the conditions and premises** (a non-binding LOI, a review stage, a separately-secured condition) — move to the root restatement with it. Present in the lower file and absent at the root means the sentence is unfinished. A party the lower file named stays named at the root: swapping in a collective noun ("the industry", "some observers", "experts") leaves the link count untouched, so the quantitative checks cannot see the loss.
 - **Drill-down link**: at the end of each cluster section, provide an entry point to the lower file in the form `Details: [[<slug>|<cluster name>]]` — the Wikipedia `{{Main}}` template convention.
 - **Cross-domain narrative**: organize 2–3 macro topics that cut across multiple clusters into separate subsections. The connecting topics not absorbable into a single cluster section are the heart of editorial value.
 - **Conflict-axis reference ban**: do not use `[[<theme>]]`-format references. This file is landscape-axis only; the conflict-axis entry point is the sole responsibility of `wiki/index.md` (.claude/layers/README.md). The same logic as Wikipedia:Coatrack — the nominal subject (the landscape overview) must not be obscured by a tangential subject (the conflict axis).
@@ -180,9 +179,9 @@ Along with the common authoring principles (block above), the following items ap
 - **Cluster section order**: topic-flow driven (maintain domain adjacency such as definition · weights · licensing). Sorting by the `size` in `_clusters.json` is not required.
 - **Lead figure SoT**: scale statistics (counts of sources · entities · concepts · overview · synthesis · trail · timeline) take the values in `wiki/index.md` as SoT. If a discrepancy is found across `graph/_clusters.json`/the sources catalog, it is a target for editor review.
 
-#### Leveraging source schema metadata (`cit.grade-meta` · `cit.cite-type-meta`)
+#### Leveraging source schema metadata
 
-Apply Part 1's schema-metadata leverage at aggregate scale — meta-mention not at the cluster unit but the **whole-wiki evidence-base strength/attribution anchor** in the lead/cross-domain narrative (e.g., a particular hub being the dominant claimant across several clusters). Place it in the EDITOR region outside the AUTO:STATS block. The authoring/measurement criteria are owned by [`scholarly-citation`](../skills/scholarly-citation/SKILL.md) as SoT.
+Apply Part 1's schema-metadata leverage at aggregate scale — meta-mention not at the cluster unit but the **whole-wiki evidence-base strength/attribution anchor** in the lead/cross-domain narrative (e.g., a particular hub being the dominant claimant across several clusters). Place it in the EDITOR region outside the AUTO:STATS block. Notation is the same as Part 1, and the authoring criteria are owned by [`scholarly-citation`](../skills/scholarly-citation/SKILL.md) as SoT.
 
 Evaluation/iteration follows the [`### Common Feedback Loop`](#common-feedback-loop-applies-to-part-1-and-part-2) above (Part 2 lint = `python tools/lint.py overview aggregate`). Part 2 specific craft reinforcement keys: `con.mece-clusters` (cluster completeness) · `enc.summary-style` (drill-down) · `jrn.due-impartiality` (cross-cluster balance) · `enc.coatrack` (theme-axis blocking). With no frontmatter, the `[Freshness]` warning does not apply — after editing, record the re-roll-up event in `log.md`.
 
@@ -190,8 +189,8 @@ Evaluation/iteration follows the [`### Common Feedback Loop`](#common-feedback-l
 
 This Rubric pairs with `.claude/layers/overview.md` defining "how to write," providing the evaluation criteria that judge "how well it was written." Apply only the relevant Part depending on the task scope:
 
-- **Part 1 — Cluster Overview Rubric (L2-3)**: targets `wiki/overviews/<cluster>.md`. 30 criteria (`overview-cluster.roster`).
-- **Part 2 — Root Overview Rubric (L2-4)**: targets `wiki/overview.md`. 29 criteria (`overview-aggregate.roster`) — Part 1 common + L2-4 specific craft (D1 · D2 · D3 · F1).
+- **Part 1 — Cluster Overview Rubric (L2-3)**: targets `wiki/overviews/<cluster>.md`. 28 criteria (`overview-cluster.roster`).
+- **Part 2 — Root Overview Rubric (L2-4)**: targets `wiki/overview.md`. 27 criteria (`overview-aggregate.roster`) — Part 1 common + L2-4 specific craft (D1 · D2 · D3 · F1).
 
 **Judgment method**:
 - Each criterion is judged in 3 levels, **PASS / PARTIAL / FAIL** (PARTIAL is excluded from the completion count — strict judgment).
@@ -221,10 +220,10 @@ Structural and mechanical rules with no external craft source text. Measurement 
 | `house.date-format` (L2) | Date notation unified | Mixed forms other than YYYY-MM-DD/YYYY-MM ≤ 3 | A (warning) |  |
 | `house.sentence-length` (S6) | Sentence-length cap | One sentence ≤ 200 characters, ≤ 3 exceedances | A (warning) |  |
 
-**Completion conditions** (criterion roster/required are owned by `_manifest.json` `overview-cluster.roster` — currently 30 criteria):
+**Completion conditions** (criterion roster/required are owned by `_manifest.json` `overview-cluster.roster` — currently 28 criteria):
 - All 11 required (roster `required`) PASS
-- **≥ 28 of all 30 PASS** (= total−2, computed from the roster · PARTIAL excluded from the count — strict)
-- For advisory (structural/house-style/`cit.*` etc.) FAILs, reinforce by reference to the relevant craft skill/structural-section criteria; if unmet, return to a follow-up iteration
+- **≥ 26 of all 28 PASS** (= total−2, computed from the roster · PARTIAL excluded from the count — strict)
+- For advisory (structural/house-style etc.) FAILs, reinforce by reference to the relevant craft skill/structural-section criteria; if unmet, return to a follow-up iteration
 - The `python tools/lint.py overview <slug>` rewrite block computes the completion-condition string from the roster (`_manifest_counts`)
 
 **Evaluation execution order**:
@@ -234,23 +233,22 @@ Structural and mechanical rules with no external craft source text. Measurement 
 
 #### Interpreting the automatic (A) metric output
 
-The lint output is notated for readability with **legacy codes** (W1 · W2 · W3 · X2 · G1 · G2 etc.) — the correspondence with the mapping-table dotted IDs is owned by the `legacy` field of each craft skill's `criteria.json` as SoT (e.g., W1=`enc.link-density` · G1=`cit.grade-meta` · X2=`struct.theme-drilldown`). When `python tools/lint.py overview` runs, the following one-line format is output for each overview file:
+The lint output is notated for readability with **legacy codes** (W1 · W2 · W3 · X2 etc.) — the correspondence with the mapping-table dotted IDs is owned by the `legacy` field of each craft skill's `criteria.json` as SoT (e.g., W1=`enc.link-density` · X2=`struct.theme-drilldown`). When `python tools/lint.py overview` runs, the following one-line format is output for each overview file:
 
 ```
   overviews/<slug>.md:
     [Rubric] W1 links=119 (≥150) ⚠️  W2 lead/body=5.5/6.93 ratio=0.79 ⚠️  W3 dup=15 ⚠️  X2 contradiction_refs=4 ✅
-    [Rubric] G1 grade_meta=0 ⚠️  G2 cite_type_meta=0 —
+    [Advisory] schema leak: internal=3 grade_tag=8 ⚠️
 ```
 (The R1 · R2 · B1 · L1 · L2 · L3 · S6 advisory lines are omitted in this excerpt — the full set of lines is owned by `tools/_lint/overview.py` as SoT)
 
-- **✅ = PASS** (criterion met), **⚠️ = FAIL** (criterion unmet, an iteration target), **— = not applicable** (G2 outside WIKI_LANG=ko)
+- **✅ = PASS** (criterion met), **⚠️ = FAIL** (criterion unmet, an iteration target)
 - PASS condition per metric:
   - **W1**: `links` value **≥ 150** (count of wikilinks in the EDITOR region, excluding the AUTO block)
   - **W2**: `ratio` **≥ 1.0** (`## Overview` per-paragraph link density ≥ the body sections' average)
   - **W3**: `dup == 0` — duplicate wikilinks of the same term within a section must be 0 to PASS (`_W3_THRESHOLD` = manifest `enc.first-mention` threshold = 0; even 1 means FAIL). The `## Adjacent Domains & Scope` section is excluded from the count because its structure cites each adjacent cluster twice in the form `[[slug|Display Name]]` + boundary description.
   - **X2**: `contradiction_refs ≥ 1` — count of `[[<theme>]]`-format references
-  - **G1**: `grade_meta ≥ 2` — number of evidence-grade/attribution meta-expressions appearing in the EDITOR region. The lint matches the English tokens `[fact]` · `[analysis]` · `[forecast]`, `attribution`, `grade A/B/C`, and `evidence grade`. (Korean/ko-mode meta-phrases — `1차 fact`, `발화 주체`, `fact급`/`analysis급`/`forecast급`, `증거 등급` — are dormant on the English corpus.)
-  - **G2**: `cite_type_meta ≥ 1` — number of citation-type meta-expressions appearing in the EDITOR region, judged only under WIKI_LANG=ko (Korean meta-phrases — `정의 attribution`, `맥락 참조`, `인용 강도`, `강한 결합`, `약한 참조`). In English the lint shows `—`.
+  - **schema leak** (advisory, omitted when 0): count of grade tags (`grade_tag`) and `## Connections` typing/classifier fields (`internal`) in the EDITOR region — natural-absorption violation candidates the Desk judges
 - **W4** (required) is checked separately: after running `python tools/lint.py graph structure`, the overview file in question must not be in the "Broken links" list to PASS
 - **C2 · S4 · S5** are outside the automatic-metric output range and are manually confirmed in the Desk's qualitative review (they require semantic analysis, outside the deterministic-lint domain).
 
@@ -266,7 +264,7 @@ The lint output is notated for readability with **legacy codes** (W1 · W2 · W3
 - **uncommitted case**: EDITOR-region edits in the working tree (AUTO-block-only rebuilds do not warn) + `last_updated` earlier than today → requests a frontmatter update before commit
 - **commit-elapsed case**: the date of the most recent commit that changed the EDITOR region (AUTO blocks excluded) > `last_updated` → the update was missed in a past iteration
 
-Reason it is not incorporated as a Rubric criterion: it is **metadata hygiene**, not quality evaluation (the 30-criterion roster), so it sits as a separate advisory layer. No effect on the exit code. Silently skipped when git is not installed or on error.
+Reason it is not incorporated as a Rubric criterion: it is **metadata hygiene**, not quality evaluation (the 28-criterion roster), so it sits as a separate advisory layer. No effect on the exit code. Silently skipped when git is not installed or on error.
 
 #### `[AUTO drift]` warning (advisory outside the Rubric)
 
@@ -294,11 +292,11 @@ The AUTO:SOURCES sort in `tools/_build/clusters.py:_render_sources_block()` is i
 
 ### Part 2 — Root Overview Evaluation Rubric
 
-Evaluation specific to `wiki/overview.md`. The criterion roster/required are owned by `_manifest.json` `overview-aggregate.roster` (29 criteria); the craft definitions/PASS-conditions/measurement by the mapping-table skill `criteria.json`/SKILL.md. structural/house-style share the dotted IDs of the Part 1 structural section above, but the scope is aggregate (baseline = cluster overview, unit = cluster section). **L2-4 specific craft**: `con.mece-clusters` (D1 cluster completeness) · `enc.summary-style` (D2 drill-down `{{Main}}`) · `jrn.due-impartiality` (D3 cross-cluster reference balance) · `enc.coatrack` (F1 theme-axis blocking).
+Evaluation specific to `wiki/overview.md`. The criterion roster/required are owned by `_manifest.json` `overview-aggregate.roster` (27 criteria); the craft definitions/PASS-conditions/measurement by the mapping-table skill `criteria.json`/SKILL.md. structural/house-style share the dotted IDs of the Part 1 structural section above, but the scope is aggregate (baseline = cluster overview, unit = cluster section). **L2-4 specific craft**: `con.mece-clusters` (D1 cluster completeness) · `enc.summary-style` (D2 drill-down `{{Main}}`) · `jrn.due-impartiality` (D3 cross-cluster reference balance) · `enc.coatrack` (F1 theme-axis blocking).
 
-**Completion conditions** (roster `overview-aggregate.roster` — 29 criteria):
+**Completion conditions** (roster `overview-aggregate.roster` — 27 criteria):
 - All 10 required (roster `required`) PASS
-- **≥ 27 of all 29 PASS** (= total−2, computed from the roster · PARTIAL excluded from the count)
+- **≥ 25 of all 27 PASS** (= total−2, computed from the roster · PARTIAL excluded from the count)
 - For advisory (`jrn.due-impartiality`/house-style etc.) FAILs, reinforce by reference to the relevant skill/structural section (D3/house-style accompanied by human review)
 
 **Evaluation execution order**: same as Part 1 — automatic (A) is the `[Rubric L2-4]` line of `python tools/lint.py overview aggregate` output, manual (M) is body review.
@@ -312,7 +310,7 @@ wiki/overview.md:
   [Rubric L2-4] W1 links=N (≥200) ✅/⚠️  W2 ratio=X ✅/⚠️  W3 dup=N ✅/⚠️
   [Rubric L2-4] D1 clusters=N/N ✅  D2 drilldowns=N/N ✅  D3 balance=max/min ratio ✅/⚠️  F1 theme_refs=N ✅/⚠️
   [Rubric L2-4] R1 hot_tokens=N ✅/⚠️  L1 raw_slugs=N ✅/⚠️
-  [Rubric L2-4] G1 grade_meta=N ✅/⚠️  G2 cite_type_meta=N ✅/⚠️
+  [Advisory] schema leak: internal=N grade_tag=M ⚠️   (omitted when 0)
 ```
 (The R2 dense_paras · B1 verdicts · L2 date_nonstd · L3 abbr_unexplained · S6 long_sents lines are omitted in this excerpt — the full set of lines is owned by `tools/_lint/overview.py` as SoT)
 

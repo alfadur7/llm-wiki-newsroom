@@ -36,7 +36,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from _lib import CLUSTER_LABELS_JSON, CLUSTERS_JSON, WIKI, WIKILINK_ANY_RE, WIKILINK_RE as _LIB_WIKILINK_RE, WIKILINK_TARGET_RE, atomic_write_text, confirm_changes, korean_mode, parse_frontmatter, print_delete_cleanup_advisory, read_text_cached, safe_slug_path, slug_only, strip_frontmatter  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).parent))
-from _advisory_common import mark  # noqa: E402
+from _advisory_common import mark, schema_leak_line  # noqa: E402
 from _manifest_counts import counts as _roster_counts, threshold_label  # noqa: E402
 from _editor_date import AUTO_BLOCK_RE, editor_hash as _editor_hash, editor_last_commit_date as _editor_last_commit_date, git_head_text  # noqa: E402
 
@@ -116,14 +116,6 @@ def _load_skill(name, alias):
     return mod
 con_skill = _load_skill("consulting-writing", "con_checks_ov")
 jrn_skill = _load_skill("journalism-writing", "jrn_checks_ov")
-# The cit G1·G2 schema meta-use measurement is owned by the scholarly-citation
-# skill (moved from legacy _contradiction_meta_patterns). The threshold VALUE is
-# manifest-checks-injected.
-cit_skill = _load_skill("scholarly-citation", "cit_checks_ov")
-_G1_THRESHOLD = _L23["cit.grade-meta"]["threshold"]            # =2
-_G2_THRESHOLD = _L23["cit.cite-type-meta"]["threshold"]        # =1
-_L24_G1_THRESHOLD = _L24["cit.grade-meta"]["threshold"]        # =2
-_L24_G2_THRESHOLD = _L24["cit.cite-type-meta"]["threshold"]    # =1
 # Encyclopedic-notation craft(B1·L1·L3)→enc · numeric density(R2)→con measurement
 # moved out. Thresholds·algorithm params are manifest-injected (same value for
 # cluster·aggregate). R1·L2·S6 remain house-style.
@@ -490,13 +482,7 @@ def _link_metrics(content: str) -> dict:
     s6_long = _s6_long_sentences(editor)
     s6_para_anti = _s6_paragraph_no_period(editor)
 
-    # G1·G2 — Phase 2 source schema meta-use (advisory, new dimension 7).
-    # The body should differentiate a source's evidence grade (data/analysis/
-    # forecast)·attribution strength·citation type. The Phase 2 schema attached
-    # this to 1283 sources, so this auto-measures the gap where the cluster
-    # overview EDITOR fails to leverage it.
-    g1_grade_meta = cit_skill.count_grade_meta(editor)
-    g2_cite_type_meta = cit_skill.count_cite_type_meta(editor)
+    schema_leak = schema_leak_line(editor)  # body schema-leak advisory
 
     return {
         "total": total,
@@ -515,8 +501,7 @@ def _link_metrics(content: str) -> dict:
         "l3_violations": l3_violations,
         "s6_long": s6_long,
         "s6_para_anti": s6_para_anti,
-        "g1_grade_meta": g1_grade_meta,
-        "g2_cite_type_meta": g2_cite_type_meta,
+        "schema_leak": schema_leak,
     }
 
 
@@ -966,9 +951,6 @@ def _format_metrics_line(m: dict) -> list[str]:
     l3 = mark(len(m["l3_violations"]) <= _L3_ABBR_MAX)
     s6 = mark(len(m["s6_long"]) <= 3)
     s6_pa = mark(len(m["s6_para_anti"]) == 0)
-    # G1·G2 — Phase 2 source schema meta-use (advisory, dimension 7).
-    g1 = mark(m["g1_grade_meta"] >= _G1_THRESHOLD)
-    g2 = mark(m["g2_cite_type_meta"] >= _G2_THRESHOLD if korean_mode() else None)
 
     ratio_str = f"{m['lead_body_ratio']:.2f}" if m["lead_body_ratio"] is not None else "n/a"
     lines = [
@@ -984,9 +966,9 @@ def _format_metrics_line(m: dict) -> list[str]:
         f"L3 abbr_unexplained={len(m['l3_violations'])} {l3}  "
         f"S6 long_sents={len(m['s6_long'])} {s6}  "
         f"S6 para_anti={len(m['s6_para_anti'])} {s6_pa}",
-        f"    [Rubric] G1 grade_meta={m['g1_grade_meta']} {g1}  "
-        f"G2 cite_type_meta={m['g2_cite_type_meta']} {g2}",
     ]
+    if m.get("schema_leak"):
+        lines.append(m["schema_leak"])
     if m["duplicates"]:
         top = sorted(m["duplicates"], key=lambda x: -x[1])[:3]
         dup_str = ", ".join(f"{stem}×{n}" for stem, n in top)
@@ -1451,18 +1433,10 @@ def _check_overview_md(cluster_slugs: set[str]) -> tuple[list[str], list[str]]:
         f"S6 long_sents={len(s6_long)} {ok(s6_ok)}  "
         f"S6 para_anti={len(s6_para_anti)} {ok(s6_para_ok)}"
     )
-    # G1·G2 — Phase 2 source schema meta-use (advisory, dimension 7 aggregate).
-    # Measure only the EDITOR region outside the AUTO:STATS block — the statistics
-    # lines in aggregate `wiki/overview.md` are auto-refreshed by build.py and lie
-    # outside the EDIT writer's responsibility (`editor` reused).
-    g1_grade_meta = cit_skill.count_grade_meta(editor)
-    g2_cite_type_meta = cit_skill.count_cite_type_meta(editor)
-    g1_ok = g1_grade_meta >= _L24_G1_THRESHOLD
-    g2_ok = g2_cite_type_meta >= _L24_G2_THRESHOLD if korean_mode() else None
-    metrics_lines.append(
-        f"  [Rubric L2-4] G1 grade_meta={g1_grade_meta} {ok(g1_ok)}  "
-        f"G2 cite_type_meta={g2_cite_type_meta} {ok(g2_ok)}"
-    )
+    # Body schema-leak advisory — the EDITOR region outside AUTO:STATS (`editor` reused).
+    leak = schema_leak_line(editor, indent="  ")
+    if leak:
+        metrics_lines.append(leak)
     if r1_hot:
         top = r1_hot[:3]
         metrics_lines.append(
