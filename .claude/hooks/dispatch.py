@@ -676,6 +676,42 @@ def _git_segments(command: str, sub: str) -> list[list[str]]:
     return segs
 
 
+_CD_CMDS = frozenset({"cd", "pushd", "set-location", "sl", "chdir"})
+
+
+def _cd_before(command: str, sub: str) -> str | None:
+    """The directory a `cd` chain **before** the first `git <sub>` segment points to.
+
+    None when there is no such cd or it cannot be read. `cd ../other && git commit`
+    commits another repository — asking for the toplevel from the hook's cwd reads it
+    as this repo and pushes this repo's gate onto someone else's commit. A relative
+    cd joins onto the previous one; a `$` or backtick substitution cannot be resolved
+    without a shell, so it returns None (the caller falls back to the hook location).
+    Git Bash `/c/...` is rewritten to `C:/...`, which native git can read. Same lexer
+    and `<` stop as `_git_segments`.
+    """
+    last, cur = None, []
+    for t in [*_lex(command), ";"]:
+        if "<" in t and _is_op(t):
+            break
+        if not _is_op(t):
+            cur.append(t)
+            continue
+        head = _segment_head(cur)
+        cur = []
+        if head and os.path.basename(head[0]).removesuffix(".exe") == "git" and _git_sub(head) == sub:
+            return last
+        if head and head[0].lower() in _CD_CMDS:
+            args = [a for a in head[1:] if not a.startswith("-")]
+            if not args:
+                continue
+            if "$" in args[0] or "`" in args[0]:
+                return None
+            d = re.sub(r"^/([A-Za-z])/", r"\1:/", os.path.expanduser(args[0]))
+            last = os.path.join(last, d) if last and not os.path.isabs(d) else d
+    return last
+
+
 def _guideline_paths(paths) -> list[str]:
     """Keep only guideline files — used for porcelain lines and command arguments alike."""
     return sorted({p for p in paths if is_guideline_path(p)})
@@ -848,7 +884,15 @@ def run_pre_bash(data: dict) -> int:
     seg = segs[0]
     head = seg[:seg.index("commit")]
     at = head.index("-C") + 1 if "-C" in head else None
-    root = _git(head[at] if at and at < len(head) else ROOT, "rev-parse", "--show-toplevel")
+    # Without `-C`, an earlier `cd <dir>` in the same command decides the repository;
+    # an unreadable one falls back to the hook location.
+    cd_dir = None if at else _cd_before(command, "commit")
+    base = head[at] if at and at < len(head) else (cd_dir or ROOT)
+    root = _git(base, "rev-parse", "--show-toplevel")
+    if cd_dir and not (root or "").strip():
+        # The cd path did not resolve (a `..` chain read against the hook cwd, etc.) —
+        # asking from the hook location is cheaper than going silent.
+        root = _git(ROOT, "rev-parse", "--show-toplevel")
     if not root or Path(root.strip()) != ROOT:
         return 0
 

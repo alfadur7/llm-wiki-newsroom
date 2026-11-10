@@ -40,7 +40,7 @@ The top level is a JSON array, and each element is a record with the fields belo
 | `status` | Currently fixed at `"open"` | Unused |
 | `type` | Auto-classification result — one of 4 values `real` · `superseded` · `related` · `soft` (explained below) | Priority-Read selection · auxiliary grouping judgment |
 | `type_score` | Type-category keyword-match score 0.0–1.0 (sum of regex weights capped at 1.0) | Lower = weaker classification signal (re-classification candidate) |
-| `evidence_strength` | Phase 2 meta-based evidence strength 0.0–1.0 — anchor presence 0.30 + source recency 0.15 + ratio of `## Key Claims` primary sources 0.40 + target hub type 0.15 | Higher = strong contradiction (priority `## Representative Evidence` candidate). Lower = weak signal (consider drop) |
+| `evidence_strength` | Phase 2 meta-based evidence strength 0.0–1.0 — source recency · ratio of `## Key Claims` primary sources · target hub type in a 0.15:0.40:0.15 ratio, normalized to sum 1 | Higher = strong contradiction (priority `## Representative Evidence` candidate). Lower = weak signal (consider drop) |
 
 **Orthogonality of the two score dimensions**:
 - High `type_score` + low `evidence_strength` → clear keyword match + weak evidence (weasel risk)

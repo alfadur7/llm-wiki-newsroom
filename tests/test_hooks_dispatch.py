@@ -557,6 +557,28 @@ def test_pre_bash_silent_for_another_repository(tmp_path, capsys, monkeypatch):
     assert _payload(capsys) == ""
 
 
+def test_cd_into_another_repo_is_not_this_repos_commit(tmp_path, capsys, monkeypatch):
+    """`cd <other repo> && git commit` — without `-C`, an earlier cd decides the repository."""
+    r, other = _repo(tmp_path), _repo(tmp_path / "b")
+    (r / "CLAUDE.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    dispatch.run_pre_bash(_bash(f"cd {other.as_posix()} && git add -A && git commit -m x"))
+    assert _payload(capsys) == ""
+    # A cd into a subdirectory of this repo is still this repo's commit.
+    (r / "sub").mkdir()
+    dispatch.run_pre_bash(_bash(f"cd {(r / 'sub').as_posix()} && git add -A && git commit -m x"))
+    assert "CLAUDE.md" in _payload(capsys)
+    assert dispatch._cd_before("cd /c/x && git commit", "commit") == "c:/x"
+    # A shell substitution cannot be resolved — None, so the caller falls back to the
+    # hook location and the gate does not switch off.
+    assert dispatch._cd_before('cd "$CLAUDE_PROJECT_DIR" && git commit', "commit") is None
+    dispatch.run_pre_bash(_bash('cd "$CLAUDE_PROJECT_DIR" && git add -A && git commit -m x'))
+    assert "CLAUDE.md" in _payload(capsys)
+    # An unresolvable cd chain (nonexistent path) does not go silent either.
+    dispatch.run_pre_bash(_bash("cd no-such-dir-xyz && git add -A && git commit -m x"))
+    assert "CLAUDE.md" in _payload(capsys)
+
+
 def test_pre_bash_commit_all_reads_the_whole_repo(tmp_path, capsys, monkeypatch):
     """`git commit -am` names no path — with nothing to narrow by, the whole repo is right."""
     r = _repo(tmp_path)

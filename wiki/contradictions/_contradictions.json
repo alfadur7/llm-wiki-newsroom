@@ -6,7 +6,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.31
+    "evidence_strength": 0.33
   },
   {
     "id": "08b6d663",
@@ -15,7 +15,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.35
+    "evidence_strength": 0.5
   },
   {
     "id": "9f692a03",
@@ -24,7 +24,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.32
+    "evidence_strength": 0.46
   },
   {
     "id": "751df93e",
@@ -33,7 +33,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.3
+    "evidence_strength": 0.44
   },
   {
     "id": "e58ac91a",
@@ -42,7 +42,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.36
+    "evidence_strength": 0.51
   },
   {
     "id": "ef6566ca",
@@ -51,7 +51,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.27
+    "evidence_strength": 0.39
   },
   {
     "id": "fd3bf4ff",
@@ -60,7 +60,7 @@
     "status": "open",
     "type": "real",
     "type_score": 0.8,
-    "evidence_strength": 0.39
+    "evidence_strength": 0.56
   },
   {
     "id": "0238bf84",
@@ -69,7 +69,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.37
+    "evidence_strength": 0.53
   },
   {
     "id": "480ac9db",
@@ -78,7 +78,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.29
+    "evidence_strength": 0.42
   },
   {
     "id": "03237af1",
@@ -87,7 +87,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.37
+    "evidence_strength": 0.53
   },
   {
     "id": "3e0a49ae",
@@ -96,7 +96,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.3
+    "evidence_strength": 0.42
   },
   {
     "id": "bc483ca0",
@@ -105,7 +105,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.41
+    "evidence_strength": 0.58
   },
   {
     "id": "bcb48346",
@@ -114,7 +114,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.44
+    "evidence_strength": 0.63
   },
   {
     "id": "cdb90a3d",
@@ -123,7 +123,7 @@
     "status": "open",
     "type": "real",
     "type_score": 0.6,
-    "evidence_strength": 0.44
+    "evidence_strength": 0.63
   },
   {
     "id": "af196221",
@@ -132,7 +132,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.53
+    "evidence_strength": 0.76
   },
   {
     "id": "bd3b1fef",
@@ -141,7 +141,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.4
+    "evidence_strength": 0.56
   },
   {
     "id": "49beed14",
@@ -150,7 +150,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.31
+    "evidence_strength": 0.44
   },
   {
     "id": "db4e440b",
@@ -159,7 +159,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.32
+    "evidence_strength": 0.45
   },
   {
     "id": "fd7fe870",
@@ -168,7 +168,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.32
+    "evidence_strength": 0.45
   },
   {
     "id": "20d43732",
@@ -177,7 +177,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.31
+    "evidence_strength": 0.44
   },
   {
     "id": "f043d021",
@@ -186,7 +186,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.26
+    "evidence_strength": 0.37
   },
   {
     "id": "63a1b2ef",
@@ -195,7 +195,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.33
+    "evidence_strength": 0.47
   },
   {
     "id": "566d72b2",
@@ -204,7 +204,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.25
+    "evidence_strength": 0.36
   },
   {
     "id": "fb98dd8f",
@@ -213,7 +213,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.34
+    "evidence_strength": 0.48
   },
   {
     "id": "a55f49c0",
@@ -222,7 +222,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.19
+    "evidence_strength": 0.27
   },
   {
     "id": "6ea90b63",
@@ -231,7 +231,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.43
+    "evidence_strength": 0.62
   },
   {
     "id": "4511cf29",
@@ -240,7 +240,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.39
+    "evidence_strength": 0.45
   },
   {
     "id": "10e8ff50",
@@ -249,7 +249,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.39
+    "evidence_strength": 0.56
   },
   {
     "id": "be20f3e0",
@@ -258,7 +258,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.38
+    "evidence_strength": 0.54
   },
   {
     "id": "03b5b625",
@@ -267,7 +267,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.4
+    "evidence_strength": 0.58
   },
   {
     "id": "aa0f13f8",
@@ -276,7 +276,7 @@
     "status": "open",
     "type": "real",
     "type_score": 0.6,
-    "evidence_strength": 0.47
+    "evidence_strength": 0.57
   },
   {
     "id": "74636332",
@@ -285,7 +285,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.26
+    "evidence_strength": 0.37
   },
   {
     "id": "b624cabd",
@@ -294,7 +294,7 @@
     "status": "open",
     "type": "real",
     "type_score": 0.8,
-    "evidence_strength": 0.36
+    "evidence_strength": 0.51
   },
   {
     "id": "fb1a019e",
@@ -303,7 +303,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.29
+    "evidence_strength": 0.42
   },
   {
     "id": "5ce812a6",
@@ -312,7 +312,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.28
+    "evidence_strength": 0.4
   },
   {
     "id": "ad0e9a83",
@@ -321,7 +321,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.33
+    "evidence_strength": 0.47
   },
   {
     "id": "b88775a5",
@@ -330,7 +330,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.27
+    "evidence_strength": 0.38
   },
   {
     "id": "ec2343f1",
@@ -339,7 +339,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.32
+    "evidence_strength": 0.46
   },
   {
     "id": "cec6e13f",
@@ -348,7 +348,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.26
+    "evidence_strength": 0.38
   },
   {
     "id": "45dc7990",
@@ -357,7 +357,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.44
+    "evidence_strength": 0.63
   },
   {
     "id": "2c9da7fd",
@@ -366,7 +366,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.29
+    "evidence_strength": 0.41
   },
   {
     "id": "f53fe134",
@@ -375,7 +375,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.3
+    "evidence_strength": 0.43
   },
   {
     "id": "f9dd3690",
@@ -384,7 +384,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.36
+    "evidence_strength": 0.52
   },
   {
     "id": "24326a43",
@@ -393,7 +393,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.33
+    "evidence_strength": 0.48
   },
   {
     "id": "55748f24",
@@ -402,7 +402,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.33
+    "evidence_strength": 0.48
   },
   {
     "id": "8db8a2ff",
@@ -411,7 +411,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.39
+    "evidence_strength": 0.56
   },
   {
     "id": "9b189557",
@@ -420,7 +420,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.38
+    "evidence_strength": 0.54
   },
   {
     "id": "7bae0343",
@@ -429,7 +429,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.31
+    "evidence_strength": 0.45
   },
   {
     "id": "1428e4bc",
@@ -438,7 +438,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.33
+    "evidence_strength": 0.48
   },
   {
     "id": "ed3c0654",
@@ -447,7 +447,7 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.39
+    "evidence_strength": 0.56
   },
   {
     "id": "86de04c6",
@@ -456,6 +456,6 @@
     "status": "open",
     "type": "soft",
     "type_score": 0.0,
-    "evidence_strength": 0.33
+    "evidence_strength": 0.47
   }
 ]

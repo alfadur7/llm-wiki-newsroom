@@ -9,7 +9,7 @@ Pipeline:
      tools/_contradiction_rules.json (regex keyword patterns, priority cascade).
      The matching score is emitted as `type_score` (0.0~1.0).
   3. Compute `evidence_strength` (0.0~1.0) per claim from Phase 2 metadata —
-     anchor presence in claim wikilink, source date recency, source primary
+     source date recency, source primary
      evidence ratio (`[fact]`/`[analysis]`/`[forecast]` distribution in `## Key Claims`),
      and target hub type (entity/concept/source).
   4. Write wiki/contradictions/_contradictions.json (enriched with
@@ -69,13 +69,16 @@ SKIP_MARKERS = {
 
 TYPE_ORDER = ["real", "superseded", "related", "soft"]
 
-# evidence_strength weights — sum 1.0
-EVIDENCE_WEIGHTS = {
-    "anchor": 0.30,    # Xanadu citation anchoring presence in claim wikilink
+# evidence_strength weights — normalized to sum 1.0 (raw ratio 0.15:0.40:0.15).
+# No anchor term: `contradicts:` lines never carry `#section` (source.md
+# `## Connections` format), so a 0.30 anchor weight was always 0 and capped
+# the scale at 0.70.
+_RAW_WEIGHTS = {
     "recency": 0.15,   # source date freshness (≤90d / ≤365d / else)
     "primary": 0.40,   # source's [fact]/[analysis]/[forecast] primary ratio
     "hub_type": 0.15,  # entity (specific) vs concept (abstract) vs source target
 }
+EVIDENCE_WEIGHTS = {k: v / sum(_RAW_WEIGHTS.values()) for k, v in _RAW_WEIGHTS.items()}
 
 # Recency tiers (days since source date)
 RECENCY_RECENT = 90
@@ -94,7 +97,7 @@ HUB_TYPE_SCORE = {
 # `## Connections` lines emitted by the contradicts collector follow the canonical
 # format `- contradicts: [[Hub]] — desc`, so the first link in `claim_text`
 # is always the contradicts target; this regex powers `_evidence_strength`'s
-# anchor presence + hub_type lookup. When a claim line embeds multiple
+# hub_type lookup. When a claim line embeds multiple
 # wikilinks (e.g. `[[A]] vs [[B]] take opposing positions`), only A is read —
 # evidence_strength then reflects A only, by design.
 _FIRST_WIKILINK_RE = re.compile(
@@ -260,24 +263,19 @@ def _evidence_strength(
 ) -> float:
     """Compute evidence_strength 0.0~1.0 from Phase 2 metadata signals.
 
-    Four weighted dimensions (weights sum to 1.0):
-      - anchor (0.30):  claim wikilink has `#section` anchor → quote-grounded
-      - recency (0.15): source date ≤90d (1.0) / ≤365d (0.5) / else (0.2)
-      - primary (0.40): source's `## Key Claims` [fact] grade ratio (0~1)
-      - hub_type (0.15): target hub category — entity (1.0) / concept (0.6) /
-                         source (0.5) / missing (0.0)
+    Three weighted dimensions (EVIDENCE_WEIGHTS, normalized to 1.0):
+      - recency (≈0.21): source date ≤90d (1.0) / ≤365d (0.5) / else (0.2)
+      - primary (≈0.57): source's `## Key Claims` [fact] grade ratio (0~1)
+      - hub_type (≈0.21): target hub category — entity (1.0) / concept (0.6) /
+                          source (0.5) / missing (0.0)
 
     Orthogonal to `type_score` — measures attribution rigor of the
     underlying evidence, not classification keyword match strength.
     """
     claim = item["claim"]
-    # A. Anchor presence (first wikilink in claim)
+    # A. Target hub (first wikilink in claim)
     first_link = _FIRST_WIKILINK_RE.search(claim)
-    target_slug: str | None = None
-    anchor_score = 0.0
-    if first_link:
-        target_slug = first_link.group(1).strip()
-        anchor_score = 1.0 if first_link.group(2) else 0.0
+    target_slug = first_link.group(1).strip() if first_link else None
 
     # B. Source recency — derive stem from "sources/<stem>.md"
     source_path = item["source"]
@@ -310,8 +308,7 @@ def _evidence_strength(
     )
 
     strength = (
-        EVIDENCE_WEIGHTS["anchor"] * anchor_score
-        + EVIDENCE_WEIGHTS["recency"] * recency_score
+        EVIDENCE_WEIGHTS["recency"] * recency_score
         + EVIDENCE_WEIGHTS["primary"] * primary_score
         + EVIDENCE_WEIGHTS["hub_type"] * hub_type_score
     )

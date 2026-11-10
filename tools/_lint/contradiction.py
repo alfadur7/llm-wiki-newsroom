@@ -795,8 +795,10 @@ def _format_metrics_line(m: dict, exempt: set[str] | None = None) -> list[str]:
     t4_ok = m["T4_qualifiers"] >= 1
     d1_ok = m["D1_labels"] >= 2
     c_w = m["D5_words"]["C"]
-    ab_max = max(m["D5_words"]["A"], m["D5_words"]["B"])
-    d5_ok = (c_w == 0) or (c_w <= ab_max and ab_max > 0)
+    # C stays within EACH of A and B — capping it only by the longer side lets a C
+    # longer than the shorter camp read as the main clash (jrn.c-section-size).
+    ab_min = min(m["D5_words"]["A"], m["D5_words"]["B"])
+    d5_ok = (c_w == 0) or (c_w <= ab_min and ab_min > 0)
     d6_ok = m["D6_c_meta_count"] == 0
     s2_ok = (
         S2_EVIDENCE_MIN <= m["S2_evidence"] <= S2_EVIDENCE_MAX
