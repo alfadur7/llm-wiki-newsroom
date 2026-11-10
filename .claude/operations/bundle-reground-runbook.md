@@ -32,7 +32,7 @@ A bundle is every published derived page of **one cluster**, read in a single De
 3. **Route by defect kind**:
    - coverage lag → Columnist re-ground of the lagging page → Desk VERIFY₂ → deterministic lint
    - count drift → check first whether **both** sides are machine-written; if so it is a build defect, not a page defect ([`../agents/copyeditor.md`](../agents/copyeditor.md) § Risk Mitigation Design). Only author-editable prose is fixed on the page.
-   - notation → fix on the affected pages; recurring cases are promotion candidates
+   - notation → the authoring role of that layer (L2-1 Reporter · L2-2·L2-3 Columnist) fixes the affected pages; recurring cases are promotion candidates
    - differing attribution → **not the Desk's authority to settle** (it cannot verify new facts). Hand to the Reporter for a raw-source comparison.
 4. **Gate** — see below, then re-publish.
 
@@ -47,7 +47,7 @@ Run in the main session after fixes (don't trust an agent's self-report):
 ## Human Reviewer Gate
 
 - L2-4 root content · >50% body rewrite · a new stub · a new theme or cluster slug · external commit/push.
-- Desk `high` defects are treated via ADAPT and re-published.
+- A coverage-lag rewrite follows the Standard ADAPT chain. After a correction treatment (count drift · notation · attribution), the pass and termination follow the [`../agents/desk.md`](../agents/desk.md) § Risk-Mitigation Design correction-round paragraph.
 - Promoting an observed defect class into a deterministic check is an **operator decision** (below).
 
 ## Cadence & Exit

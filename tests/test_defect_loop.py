@@ -61,6 +61,28 @@ def test_validate_rejects_bad_kind_and_missing_keys():
     assert ld.validate(_valid_transition()) is None
 
 
+def test_validate_closure_row():
+    ok = {"kind": "closure", "ref_line": 12, "verdict": "invalid", "run": "x-run"}
+    assert ld.validate(ok) is None
+    assert ld.validate({**ok, "verdict": "open"})
+    assert ld.validate({**ok, "ref_line": "12"})
+    assert ld.validate({**ok, "ref_line": True})
+    assert ld.validate({k: v for k, v in ok.items() if k != "run"})
+
+
+def test_closure_must_point_to_an_existing_defect_row(tmp_path):
+    p = tmp_path / "log.jsonl"
+    p.write_text('{"kind":"transition"}\n{"kind":"defect"}\n', encoding="utf-8")
+    row = {"kind": "closure", "verdict": "closed", "run": "r"}
+    assert ld.append_records([{**row, "ref_line": 2}], path=p) == 1
+    for bad in (1, 99):  # a transition row · past the end
+        try:
+            ld.append_records([{**row, "ref_line": bad}], path=p)
+        except ValueError:
+            continue
+        raise AssertionError(f"ref_line {bad} accepted")
+
+
 def test_validate_enforces_cluster_slug():
     assert ld.validate(_valid_defect(cluster="Not A Slug"))
     assert ld.validate(_valid_transition(cluster="UPPER@desk"))

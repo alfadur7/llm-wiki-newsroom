@@ -1518,6 +1518,14 @@ def run(target: str | None = None, fix: bool = False, auto_yes: bool = False) ->
             print(f"Valid MD slugs: {sorted(md_slugs)}", file=sys.stderr)
             return 2
 
+    # The --fix rewrite instruction branches on whether an authored overview existed
+    # before this run — it takes the zero-base update path, which does not read the
+    # previous body (layers/overview.md "Updating an existing overview"). A skeleton
+    # still carrying `_TODO` placeholders is first authoring: it has no axes to hand over.
+    _target_md = OVERVIEWS_DIR / f"{target}.md"
+    target_existed = (scope == "cluster" and _target_md.exists()
+                      and "_TODO" not in _target_md.read_text(encoding="utf-8"))
+
     ov_issues: list[str] = []
     ov24_issues: list[str] = []
     ov24_metrics: list[str] = []
@@ -1585,12 +1593,19 @@ def run(target: str | None = None, fix: bool = False, auto_yes: bool = False) ->
             print("Execution order (Claude):")
             print("  1. Read .claude/layers/overview.md → Part 1 (Cluster Overview)")
             print("  2. Read .claude/layers/overview.md → Part 1 Rubric (Evaluation Rubric)")
-            print(f"  3. Read wiki/overviews/{target}.md (current state)")
-            print("  4. Authoring Guide Part 1 → perform execution steps 1–7")
-            p1 = _roster_counts("overview-cluster")
-            print(f"  5. Re-run `python tools/lint.py overview {target}` → check Rubric metrics·Freshness")
-            print(f"  6. Iterate until {threshold_label(p1)} is achieved")
-            print("  7. When done, update frontmatter `last_updated` to today's date")
+            if target_existed:
+                print("  3. Existing overview — handle it as a zero-base update round per layers/overview.md")
+                print("     \"Updating an existing overview\" (the author does not Read the previous EDITOR body)")
+                print("  4. Round procedure·gates·termination: the cluster overview item of")
+                print("     operations/staleness-reground-runbook.md — after the last desk pass the body is")
+                print("     not edited, even if a Rubric criterion is unmet")
+            else:
+                print(f"  3. Read wiki/overviews/{target}.md (the skeleton)")
+                print("  4. Authoring Guide Part 1 → perform execution steps 1–7")
+                p1 = _roster_counts("overview-cluster")
+                print(f"  5. Re-run `python tools/lint.py overview {target}` → check Rubric metrics·Freshness")
+                print(f"  6. Iterate until {threshold_label(p1)} is achieved")
+                print("  7. When done, update frontmatter `last_updated` to today's date")
         elif scope == "aggregate":
             cluster_count = sum(
                 1 for p in OVERVIEWS_DIR.glob("*.md") if not p.name.startswith("_")

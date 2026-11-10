@@ -86,7 +86,7 @@ You have been invoked as this project's Columnist agent. You own authoring of <L
 <one of: new authoring / rewrite / aggregation>: <target file path>
 
 ## Required Read (Cognition Principle 1 — full context, own GROUND)
-1. <target file> (existing output — empty file if new)
+1. <target file> (existing output — empty file if new; not read in a cluster overview zero-base update, which gets the axis checklist instead and writes to a scratch file — round SoT: the cluster overview item of [`operations/staleness-reground-runbook.md`](../operations/staleness-reground-runbook.md))
 2. .claude/layers/<source|hub|overview|contradiction|synthesis|trail|timeline>.md (authoring standard + verification Rubric combined)
 3. the craft skill SKILL.md from that guide's "which writing tradition" mapping table (whichever of jrn·con·enc·cit applies — authoring-standard SoT, criteria.json dotted-ID definitions)
 4. `.claude/policies/language.md` § Prose Style — body-sentence discipline.
@@ -139,6 +139,7 @@ You are the Columnist agent. ADAPT mode — address the Desk's qualitative defec
 ## Working Principles
 - After reviewing each defect's suggested_fix, fix using your own judgment (no obligation to follow suggested_fix verbatim). In the reply, mark each defect `as-advised` or `diverged: <what you did differently and why>` (an untreated defect is also `diverged`) — the Editor-in-Chief sends only `diverged` defects back to the Desk.
 - Severity-first order: address critical·high immediately; medium·low may be batched within the same pass rather than driving extra rounds.
+- In a cluster overview zero-base round the re-judgment checks closure of every defect, not only `diverged` ones; ADAPT₂ treats only the unclosed defects and new highs, ADAPT₃ only highs (scope SoT: the cluster overview item of [`operations/staleness-reground-runbook.md`](../operations/staleness-reground-runbook.md)). In a correction round, a treatment that fixes the re-judgment's highs fixes only highs (scope SoT: the [`desk.md`](desk.md) § Risk-Mitigation Design correction-round paragraph).
 - Before finishing, grep a distinctive phrase of the pre-fix wording (figure·proper noun·date) and fix every remaining occurrence in the EDITOR block — one site fixed out of three leaves the page disagreeing with itself. An AUTO-block hit is build output: leave it and say so.
 - Occurrences on other pages go in your reply, not into an edit — cross-page consistency is the Desk's reground bundle ([`bundle-reground-runbook.md`](../operations/bundle-reground-runbook.md)).
 - After fixing, the Copy Editor must be invoked for a regression check (to confirm the Rubric was not broken).

@@ -994,3 +994,60 @@ reason that `raw/` is not in the clone. The pre-tag build changed only
 restored rather than committed.
 
 The local judge-model scorer stays where it is, uncommitted, by the operator's decision.
+
+## [2026-11-10] port | a score that could never pass 0.70, a hook that judged other repositories' commits, and two termination rules
+
+The sibling had landed 82 commits since the last checkpoint; 19 touched code or
+instructions, none of them carrying this repo's work back. Six were taken, by the
+operator's choice; the rest were already here, rest on machinery this repo does not
+have (hub freshness, a pending channel, a screening log, briefings), or are
+Korean-only.
+
+**The contradiction evidence score.** `evidence_strength` gave 0.30 of its weight to an
+anchor in the claim's wikilink, but a `contradicts:` line never carries one: 0 of this
+corpus's 51 lines did. The score therefore topped out at 0.70 and in practice at 0.53.
+The anchor term is gone and the remaining three are renormalized to sum to 1 (the
+range is now 0.27–0.76). Every threshold the theme guide reads off the score was
+divided by 0.7 so that each claim lands in the same cell as before: 0.3 → 0.43,
+0.5 → 0.71, 0.6 → 0.85.
+
+**D5.** The mediating C paragraph of a theme page was capped by the longer of the two
+camps. A C longer than the shorter camp reads as the main clash, so the cap is now the
+shorter one. All six theme pages still pass.
+
+**The commit hook.** `cd ../other && git commit` was answered with this repository's
+staged guideline files, because the hook asked for the toplevel from its own location.
+It now reads a `cd` chain before the commit; a substitution it cannot resolve, or a path
+that does not resolve, falls back to the hook location rather than going silent.
+
+**Cluster overview updates.** An update of an existing overview is now a zero-base
+rewrite: the author never reads the previous body and gets only an axis checklist, and
+the round runs a fixed sequence with a pass cap of three after VERIFY₂, no edits after
+the last pass, and one post-publication measurement. Taken only in part. The sibling
+also has a monthly append between quarterly rewrites, a 92-day window, a weekly-briefing
+map as input, and a 20,000-character budget; the budget is counted in Hangul, there are
+no briefings here, and ingest comes in batches rather than weekly, so none of those were
+ported. The input map became the delta of sources scraped since the page's body edit.
+
+**Correction rounds.** Four kinds of post-publication correction now share one rule:
+one fresh Desk pass after the first edit, highs only after that, at most two passes,
+then the operator. `log_defect.py` gained a `closure` record so a triage of open ledger
+defects can skip the ones already closed or found wrong.
+
+Deferred this round: retiring the regex claim `type` in favour of Desk-judged
+relations. It needs the adjudication ledger this repo deferred on 2026-07-19, and that
+ledger's trigger has still not fired.
+
+Ladder: rung 1 PASS (`lint.py meta`, pytest 318). Blind review by a different model
+family took two rotations. The first found four highs, all places where the new rules met
+old text that still said the opposite: the `/wiki-lint` rewrite procedure and the
+Columnist's authoring template both told the author to read the page the zero-base rule
+forbids reading; the `--fix` branch would have sent a fresh `_TODO` skeleton into the
+update round; and the contradiction guide's paragraph table still capped C by the longer
+camp. All four were fixed and the second rotation found them closed, with no new high.
+Fourteen mediums and twelve of the thirteen lows from the first rotation, and two mediums
+from the second, went to the defect corpus as `run: carryover-round-22`. The thirteenth
+low, an ambiguous "either A or B", was fixed along with the fourth high. Among the carried mediums: the
+zero-base round asks more of the Desk (citation coverage, raw reads) than desk.md's own
+scope allows, and `--fix` sends every authored overview to the zero-base path, even
+when the run is only repairing a Rubric failure.

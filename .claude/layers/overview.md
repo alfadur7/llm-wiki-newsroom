@@ -47,7 +47,7 @@ The definitions, criteria, and thresholds for craft principles (numeric precisio
 - **`house.date-format`** (date notation): the house date format is YYYY-MM-DD or YYYY-MM only. Frontmatter and git metadata are exceptions. (Korean-style forms such as `YYYY년 M월` ["YYYY year M month"] or `YYYY 1~3월` ["YYYY Jan–Mar"] are flagged only under WIKI_LANG=ko.)
 - **`house.sentence-length`** (sentence length): one sentence ≤ 200 characters, and **≤ 3 independent events** serialized (in English, with "and" or a serial comma/`·`; a single list-subject "A, B, and C did ~", counting as one event, is an exception). When exceeded, break with periods into units of 2–3 events. Character length is caught by S6, but event serialization is a semantic judgment and therefore the authoring/Desk domain. (The Korean connectives `~고`/`~며` are counted only under WIKI_LANG=ko.)
 - **Paragraph separation (structural)**: each paragraph has 2–4 short sentences, no single-sentence standalone paragraphs (except a one-line section closer), composed of ≥ 2 paragraphs. The **anti-pattern** "one paragraph = one very long sentence" is the direct cause of simultaneous S6/R2/W2 advisory violations — after drafting, count the paragraphs and sentences in each section to self-verify, and when you identify a target for separation, also check the adjacent paragraphs (before and after) for the same pattern.
-- **Numeric precision baseline**: the comparison baseline is, for Part 1, the relevant section of `wiki/overview.md`; for Part 2, the union of the cluster overviews' `## Key Trends & Figures` sections.
+- **Numeric precision baseline**: the comparison baseline is, for Part 1, the relevant section of `wiki/overview.md` (for a zero-base update, the sources); for Part 2, the union of the cluster overviews' `## Key Trends & Figures` sections.
 
 **Alias application convention** (`enc.slug-alias` craft as applied in this wiki — when a kebab-case filename is exposed, a pipe alias `[[FileName|DisplayName]]` is required, across concepts, clusters, and entities):
 - **concept**: e.g., `[[OpenWeights|open weights]]` · `[[OpenWashing|open-washing]]` · `[[ModelLicensing|model licensing]]` · `[[OpenSourceAI|open-source AI]]`.
@@ -59,7 +59,7 @@ The definitions, criteria, and thresholds for craft principles (numeric precisio
 
 ### Common Feedback Loop (applies to Part 1 and Part 2)
 
-Iterate and improve until the overview file meets the completion conditions (the mapping-table craft criteria + structural/house-style, manifest roster counts). There is no limit on the number of iterations. The lint command is, for Part 1, `python tools/lint.py overview <slug>`; for Part 2, `python tools/lint.py overview aggregate`.
+Iterate and improve until the overview file meets the completion conditions (the mapping-table craft criteria + structural/house-style, manifest roster counts). There is no limit on the number of iterations — except in an update round of an existing cluster overview, which the runbook's termination rule ends ("Updating an existing overview" below). The lint command is, for Part 1, `python tools/lint.py overview <slug>`; for Part 2, `python tools/lint.py overview aggregate`.
 
 1. **Iteration 1 (draft)**: write/rewrite the EDITOR block from the input material.
 2. **Evaluation**: automatic (A) criteria are judged from the lint output `[Rubric]` line (for Part 2, `[Rubric L2-4]`); manual (M) criteria are judged PASS/PARTIAL/FAIL by reviewing the body.
@@ -99,6 +99,15 @@ The concrete procedure a Claude performing this task for the first time should f
 2. **The target overview file's `AUTO:MEMBERS` block** — an auto-selected top list of entities/concepts. The starting point for meaningful grouping; the ranking is "top N by in-cluster connections" (based on how often it is referenced within that cluster).
 3. **The top 20–40 entries of `wiki/sources/_catalog-<cluster>.md`** — the source catalog belonging to the cluster. The raw material for finding concrete figures, project names, and recent cases.
 4. **Related `wiki/contradictions/<theme>.md` files** — analysis documents that separately organize the tensions/oppositions of this field. Reference material for the tension-axis narrative and a deep-link target.
+
+#### Updating an existing overview — zero-base rewrite
+
+An update that carries upstream change into an existing cluster overview is a zero-base rewrite. Corrections follow the [`agents/desk.md`](../agents/desk.md) § Risk-Mitigation Design correction-round paragraph for the pass and termination after treatment. Execution-order steps 3·4·6·7·8 and "Input material detail" above are for first authoring. The round procedure and gates are owned by the cluster overview item of [`operations/staleness-reground-runbook.md`](../operations/staleness-reground-runbook.md).
+
+- **No prior body**: the author does not read the previous EDITOR body. The Editor-in-Chief hands over only an **axis checklist** — the full text of the previous `## Overview` paragraph 4 and the `## Subtopics` headings — and the author re-checks that paragraph's figures and dates against the sources. Frontmatter and AUTO blocks are preserved at the merge step. Carrying over more of the previous sentences carries over their old errors too.
+- **Input**: the cluster's sources (`wiki/sources/_catalog-<slug>.md`), reading in full the delta — primary sources in `graph/_clusters.json::source_assignments` scraped after the page's body edit date — plus the related theme files. Hubs are signposts only: re-check every fact at the source, because a hub not re-grounded since its sources changed hands its stale prose straight to the overview.
+- **Axis disposition**: for each checklist axis, reply with keep · reorganize · demote · drop and the reason. An axis with no new source that still explains the present stays. Without a written disposition, an axis dropped by judgment and one dropped by omission look the same.
+- **Required criterion S1** (`struct.scope-match`): the baseline is the axis checklist plus the delta sources. The relevant section of `wiki/overview.md` derives from the previous overview, so it is not the baseline.
 
 #### Six EDITOR section role split
 
@@ -208,7 +217,7 @@ Structural and mechanical rules with no external craft source text. Measurement 
 
 | Dotted ID (legacy) | Criterion | PASS condition | Judgment | Required |
 |---|---|---|---|---|
-| `struct.scope-match` (S1) | Scope match | Covers + extends all items the relevant section of `wiki/overview.md` covers | M | ✅ |
+| `struct.scope-match` (S1) | Scope match | Covers + extends all items the relevant section of `wiki/overview.md` covers (a zero-base update uses the baseline in "Updating an existing overview") | M | ✅ |
 | `struct.cross-tension` (X1) | Tension-axis cross | Each tension axis declared in the Overview reappears in ≥ 2 subtopics | M | ✅ |
 | `struct.auto-editor` (X3) | AUTO-EDITOR separation | `## Key Entities & Concepts` is grouping/role annotation, not a plain copy of AUTO:MEMBERS | M | ✅ |
 | `enc.broken-link` (W4) | Real filenames | 0 broken wikilinks (`python tools/lint.py graph structure`) | A | ✅ |
@@ -229,7 +238,7 @@ Structural and mechanical rules with no external craft source text. Measurement 
 **Evaluation execution order**:
 1. Automatic (A) criteria — judge immediately from the `[Rubric]` line of `python tools/lint.py overview` output.
 2. Manual (M) criteria — Claude/a human reviewer reads the body and judges PASS/PARTIAL/FAIL (criteria from the mapping-table skill SKILL.md).
-3. If required criteria are unmet → return to the Authoring Guide feedback loop (Iteration N+1).
+3. If required criteria are unmet → return to the Authoring Guide feedback loop (Iteration N+1); an update round follows the runbook termination rule instead.
 
 #### Interpreting the automatic (A) metric output
 

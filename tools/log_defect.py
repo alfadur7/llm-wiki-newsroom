@@ -16,13 +16,20 @@ Why the ingest point is a single batch at the cycle gate rather than every lint 
 self-VERIFY₀ + VERIFY₁ + regression repetition double-counts the same FAIL and inflates
 commit noise. One batch → low noise.
 
-Two record kinds (`kind`):
+Three record kinds (`kind`):
 - defect:     {date, layer, target, caught_at, check, cluster, mechanism, severity, addressable,
                grounded_at?, run}
 - transition: {date, cluster, surface, change, held_in_delta, held_out_delta, decision,
                rationale, model, note, commit, held_in_sampled, held_out_sampled}
                # model = the measuring apparatus's model generation (MODELS — a join key)
                # note  = prose about the apparatus's composition (which role, how many rotations)
+- closure:    {date, ref_line, verdict, run, note?}
+               # ref_line = line number of the judged defect row in this file (append-only, so
+               # stable — rows already logged only, never a row in the same batch)
+               # verdict = closed (the defect is gone from the current body) | invalid (the
+               # finding itself was wrong). A triage of open ledger defects skips the rows a
+               # closure points to — without it every round re-reads the closed rows, and a
+               # wrong finding reaches the next judge as if it stood
 
 `cluster` is the slugified mechanism-cluster key (kebab-case; transitions may
 suffix `@<stage>`) — the join key between defects, transitions, and the
@@ -78,7 +85,9 @@ LOG_PATH = Path(__file__).resolve().parent / "_defect-log.jsonl"
 REQUIRED = {
     "defect": ("target", "cluster", "caught_at"),
     "transition": ("cluster", "surface", "decision", "rationale", "model"),
+    "closure": ("ref_line", "verdict", "run"),
 }
+CLOSURE_VERDICTS = ("closed", "invalid")
 # `cluster` join key: kebab-case slug; transitions may carry an `@<stage>` suffix.
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*(@[a-z0-9-]+)?$")
 DECISIONS = ("accept", "reject", "defer")
@@ -153,6 +162,13 @@ def validate(rec: dict) -> str | None:
     missing = [k for k in REQUIRED[kind] if not rec.get(k)]
     if missing:
         return f"{kind} missing required keys: {missing}"
+    if kind == "closure":
+        ref = rec["ref_line"]
+        if not isinstance(ref, int) or isinstance(ref, bool) or ref < 1:
+            return f"closure ref_line must be an integer >= 1 (got {ref!r})"
+        if rec["verdict"] not in CLOSURE_VERDICTS:
+            return f"closure verdict must be one of {list(CLOSURE_VERDICTS)} (got {rec['verdict']!r})"
+        return None
     if not SLUG_RE.match(str(rec["cluster"])):
         return f"cluster must be a kebab-case slug (got {rec['cluster']!r})"
     if kind == "transition":
@@ -191,10 +207,19 @@ def validate(rec: dict) -> str | None:
 def append_records(records: list[dict], path: Path = LOG_PATH) -> int:
     """Append validated records to the corpus. Fill in today's date if missing. Return the number appended."""
     lines = []
+    existing = None
     for rec in records:
         err = validate(rec)
         if err:
             raise ValueError(err)
+        if rec["kind"] == "closure":
+            # A ref_line typo silently closes the wrong row — check the target is a defect row.
+            if existing is None:
+                existing = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
+            ref = rec["ref_line"]
+            if ref > len(existing) or json.loads(existing[ref - 1]).get("kind") != "defect":
+                raise ValueError(f"closure ref_line {ref} does not point to an existing defect row "
+                                 "(a row logged in the same batch cannot be a target)")
         rec.setdefault("date", date.today().isoformat())
         lines.append(json.dumps(rec, ensure_ascii=False))
     if not lines:

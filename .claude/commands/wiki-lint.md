@@ -36,7 +36,7 @@ A verify-and-fix cycle. The Copy Editor is the lead; when `--fix` is set, the Co
 | Mode | Cycle | Owner |
 |---|---|---|
 | **Check only** (no `--fix`) | VERIFY | Copy Editor (`tools/lint.py`) — exit code + lint-report.md |
-| **`overview/contradiction <target> --fix`** (L2-3·L2-4 rewrite) | VERIFY → ADAPT → APPLY → VERIFY | Copy Editor (VERIFY₁) → Columnist (ADAPT) → Copy Editor → Desk (VERIFY₂) → Editor-in-Chief gate |
+| **`overview/contradiction <target> --fix`** (L2-3·L2-4 rewrite) | VERIFY → ADAPT → APPLY → VERIFY | Copy Editor (VERIFY₁) → Columnist (ADAPT) → Copy Editor → Desk (VERIFY₂) → Editor-in-Chief gate (an existing cluster overview: the round in the cluster overview item of [`staleness-reground-runbook.md`](../operations/staleness-reground-runbook.md)) |
 | **Other group `--fix`** (`graph`·`hub`, etc. — auto-enrich/correct) | (deterministic) | Copy Editor (formattable-area auto-fix only; no meaning-affecting changes) |
 
 In this chain, `--yes` is **Claude's explicit opt-in to executing the chain** — deferring to `lint-report.md` violates the opt-in intent (`.claude/hooks/lint-chain-guard.sh` enforces this at the system level).
@@ -247,7 +247,7 @@ Exit code 0 means required criteria within scope pass. 1 means schema issues rem
 
 ### Rewrite Mode (`--fix` + target required)
 
-The script **does not edit the EDITOR area directly**. Instead, at the end of the diagnostic output it emits a "Claude rewrite instruction block," handing the execution order to Claude. Claude follows this procedure:
+The script **does not edit the EDITOR area directly**. Instead, at the end of the diagnostic output it emits a "Claude rewrite instruction block," handing the execution order to Claude. Claude follows this procedure — except for an authored cluster overview, which takes the zero-base update round in the cluster overview item of [`staleness-reground-runbook.md`](../operations/staleness-reground-runbook.md) instead (no Read of the previous body, a capped round, `last_updated` set at the merge):
 
 **Common procedure**:
 

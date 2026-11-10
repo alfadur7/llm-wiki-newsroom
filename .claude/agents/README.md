@@ -100,6 +100,8 @@ PASS + 0 defects → publish / otherwise ADAPT escalation +1
 3rd FAIL on same cause → Editor-in-Chief escalates to human
 ```
 
+A zero-base update of an existing cluster overview branches from this chain after VERIFY₂ — its re-judgment resumes the VERIFY₂ Desk (an exception to the no-resume rule in § Execution Mechanism: judging closure of its own findings needs their context) and its confirmation pass is called fresh. The round procedure is owned by the cluster overview item of [`operations/staleness-reground-runbook.md`](../operations/staleness-reground-runbook.md). A post-publication correction round (L2-1–L2-4 alike) branches too — the judgment that produced the defect list stands in VERIFY₂'s place, and the pass after the first edit, termination, and cap are owned by the [`desk.md`](desk.md) § Risk-Mitigation Design correction-round paragraph.
+
 self-VERIFY₀ is outside the ADAPT counter (the author's self-check *before* hand-off). VERIFY₁ (Copy Editor) always runs regardless of whether self-VERIFY₀ passed — it is a regression safety net that catches the slight difference in check scope between mid-authoring self-lint and post-authoring batch lint.
 
 L2-1 source applies Desk VERIFY₂ when its sub-trigger is met (`[fact] ≥ 7 AND quoted citations ≥ 3`, surfaced automatically as a lint advisory); L2-2 stubs (all 5 kinds at once) apply Desk VERIFY₂ unconditionally.
@@ -146,7 +148,7 @@ The matrix and ADAPT chain above are independent of the execution mechanism — 
 
 | Mechanism | When | Context | `disallowedTools` | Report delivery (measured) |
 |---|---|---|---|---|
-| **sub-Agent** — anonymous `Agent(subagent_type: <role>)` | **default** for every role invocation (including parallel fanout — spawn N anonymous sub-Agents concurrently) | fresh per invocation; each ADAPT is a re-invocation that re-reads its GROUND. (Resuming by `agentId` carries context forward instead — never for a call whose premise is fresh eyes or isolation, since the resumed agent keeps context that premise excludes) | **enforced** — the role frontmatter applies | the final text (`end_turn`) **reaches the caller automatically** |
+| **sub-Agent** — anonymous `Agent(subagent_type: <role>)` | **default** for every role invocation (including parallel fanout — spawn N anonymous sub-Agents concurrently) | fresh per invocation; each ADAPT is a re-invocation that re-reads its GROUND. (Resuming by `agentId` carries context forward instead — never for a call whose premise is fresh eyes or isolation, since the resumed agent keeps context that premise excludes; the cluster overview zero-base re-judgment is the exception — § Standard ADAPT chain) | **enforced** — the role frontmatter applies | the final text (`end_turn`) **reaches the caller automatically** |
 | **teammate** — named `Agent(name: ..., subagent_type: <role>)` | **adversarial faction authoring only** (§ below) | persistent across turns | **NOT enforced** — the spawn brief is the only enforcement channel ([editor-in-chief.md](editor-in-chief.md) step 2) | the final text does **not** reach main — main gets only an idle notification; delivery happens only via `SendMessage(to: "main")`. `SendMessage` is a deferred tool: pre-load it via `ToolSearch` in the brief, or the teammate cannot report at all |
 
 ### Report delivery
