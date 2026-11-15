@@ -214,6 +214,42 @@ def _compute_initial_membership(
     return initial
 
 
+def anchor_start(sorted_nodes: list[str]) -> tuple[list[int] | None, list[bool] | None]:
+    """Anchor-pinned start partition — each label's `anchor_members` are fixed to
+    that label's cluster, every other hub starts as a singleton. A pure cold run
+    uses anchors only for naming, so a partition that ignores the declared
+    boundaries can score higher; comparing against it counts the cost of keeping
+    those boundaries as drift.
+
+    Returns (initial_membership, is_fixed) in `sorted_nodes` order, or (None, None)
+    when no anchor is in the graph (the caller then falls back to a pure cold start).
+    """
+    pos = set(sorted_nodes)
+    comm: dict[str, int] = {}
+    for lbl in _load_labels():
+        hits = [a for a in lbl.get("anchor_members", []) if a in pos and a not in comm]
+        if hits:
+            k = len(set(comm.values()))
+            for a in hits:
+                comm[a] = k
+    if not comm:
+        return None, None
+    # Community ids must stay below the node count — anchor clusters ≤ anchors, so
+    # adding one singleton per remaining node never exceeds it.
+    nxt = len(set(comm.values()))
+    initial: list[int] = []
+    fixed: list[bool] = []
+    for n in sorted_nodes:
+        if n in comm:
+            initial.append(comm[n])
+            fixed.append(True)
+        else:
+            initial.append(nxt)
+            nxt += 1
+            fixed.append(False)
+    return initial, fixed
+
+
 def _load_prev_assignments() -> dict[str, set[str]]:
     """Read previous-build cluster -> members mapping for hysteresis matching.
 
@@ -413,6 +449,7 @@ def _run_louvain(G_nx, resolution: float, seed: int) -> list[set[str]]:
 def _run_leiden(
     G_nx, resolution: float, seed: int,
     initial_membership: list[int] | None = None,
+    fixed: list[bool] | None = None,
 ) -> list[set[str]]:
     """Run Leiden community detection on a NetworkX weighted graph.
 
@@ -432,37 +469,50 @@ def _run_leiden(
     (alphabetical sort key change → vertex index reshuffle → cold-start
     Leiden lands at a different local optimum). Pass None for cold start.
 
+    `fixed` (anchor pinning): the per-vertex flags `anchor_start` returns; a True
+    vertex never leaves its `initial_membership` community.
+
     Without igraph/leidenalg installed this delegates to `_run_louvain`, which
-    ignores `initial_membership` — that path cannot warm-start.
+    ignores `initial_membership` and `fixed` — that path can neither warm-start
+    nor pin anchors.
     """
     if _leiden_backend() == "louvain":
         return _run_louvain(G_nx, resolution, seed)
 
+    g_ig = to_igraph(G_nx)
+    partition = leiden_partition(g_ig, resolution, seed, initial_membership, fixed)
+    return [set(g_ig.vs[i]["name"] for i in c) for c in partition]
+
+
+def leiden_partition(g_ig, resolution: float, seed: int,
+                     initial_membership: list[int] | None = None,
+                     fixed: list[bool] | None = None):
+    """One RBConfiguration Leiden run — the single entry point the build and
+    `lint graph drift` share, so both measure the same thing. Returns the
+    leidenalg partition (for `.membership` / `.quality()`)."""
     import leidenalg
 
-    g_ig = to_igraph(G_nx)
-
-    kwargs = {
-        "weights": "weight",
-        "resolution_parameter": resolution,
-        "seed": seed,
-        # leidenalg defaults to n_iterations=2 — a fixed cut, not convergence.
-        # Since the warm start feeds the prior build's own partition back in as
-        # the initial membership, leaving it cut turns successive builds into a
-        # relay: one build publishes a pre-convergence partition and the next
-        # picks up where it left off. A negative value iterates until no further
-        # improvement, so a single build lands on the fixed point.
-        "n_iterations": -1,
-    }
-    if initial_membership is not None:
-        kwargs["initial_membership"] = initial_membership
-
-    partition = leidenalg.find_partition(
-        g_ig,
-        leidenalg.RBConfigurationVertexPartition,
-        **kwargs,
+    if fixed is not None:
+        # find_partition does not take is_membership_fixed, so drive the Optimiser directly.
+        partition = leidenalg.RBConfigurationVertexPartition(
+            g_ig, weights="weight", resolution_parameter=resolution,
+            initial_membership=initial_membership,
+        )
+        opt = leidenalg.Optimiser()
+        opt.set_rng_seed(seed)
+        opt.optimise_partition(partition, n_iterations=-1, is_membership_fixed=fixed)
+        return partition
+    # leidenalg defaults to n_iterations=2 — a fixed cut, not convergence.
+    # Since the warm start feeds the prior build's own partition back in as
+    # the initial membership, leaving it cut turns successive builds into a
+    # relay: one build publishes a pre-convergence partition and the next
+    # picks up where it left off. A negative value iterates until no further
+    # improvement, so a single build lands on the fixed point.
+    return leidenalg.find_partition(
+        g_ig, leidenalg.RBConfigurationVertexPartition, weights="weight",
+        resolution_parameter=resolution, seed=seed, n_iterations=-1,
+        initial_membership=initial_membership,
     )
-    return [set(g_ig.vs[i]["name"] for i in c) for c in partition]
 
 
 def build_hub_graph(verbose: bool = True):
@@ -520,9 +570,11 @@ def build_hub_graph(verbose: bool = True):
     return G, hub_labels, data, id_map, isolated_hubs
 
 
-def run(cold: bool = False) -> None:
+def run(cold: bool = False, anchored: bool = False) -> None:
     """Build _clusters.json. cold=True forces fresh Leiden (singleton start);
-    default uses warm-start from previous _clusters.json when available."""
+    anchored=True is a cold start with `cluster_labels.json` anchors pinned to
+    their declared cluster. Default uses warm-start from previous _clusters.json
+    when available."""
     backend = _leiden_backend()
 
     # Load previous-build assignments BEFORE we start writing the new
@@ -537,7 +589,7 @@ def run(cold: bool = False) -> None:
     # the path entirely — read-only work (label edits, tag edits, re-derived
     # pages) never has to touch community detection at all.
     communities_raw = (
-        None if backend == "native" or cold else _committed_partition(G, data)
+        None if backend == "native" or cold or anchored else _committed_partition(G, data)
     )
     if communities_raw is not None:
         method = "leiden-reused"
@@ -570,10 +622,15 @@ def run(cold: bool = False) -> None:
         # backend accepts an initial partition — see `_run_louvain`.
         sorted_hubs = sorted(G.nodes())
         prev_membership = (
-            _load_prev_membership() if backend == "native" and not cold else None
+            _load_prev_membership() if backend == "native" and not (cold or anchored) else None
         )
         initial_membership = _compute_initial_membership(G, sorted_hubs, prev_membership)
-        if initial_membership is not None:
+        fixed = None
+        if anchored and backend == "native":
+            initial_membership, fixed = anchor_start(sorted_hubs)
+            print(f"Anchored-start: {sum(fixed)} anchor hubs pinned, rest singleton"
+                  if fixed else "Anchored-start: no anchor in graph — falling back to cold")
+        elif initial_membership is not None:
             n_known = sum(1 for n in sorted_hubs if n in (prev_membership or {}))
             n_inherited = len(sorted_hubs) - n_known
             print(
@@ -582,7 +639,8 @@ def run(cold: bool = False) -> None:
             )
         else:
             reason = (
-                "--cold" if cold
+                "louvain fallback cannot pin anchors" if anchored
+                else "--cold" if cold
                 else "louvain fallback cannot warm-start" if backend != "native"
                 else "no prior _clusters.json"
             )
@@ -590,7 +648,7 @@ def run(cold: bool = False) -> None:
 
         communities_raw = _run_leiden(
             G, resolution=RESOLUTION, seed=SEED,
-            initial_membership=initial_membership,
+            initial_membership=initial_membership, fixed=fixed,
         )
     communities = [
         set(c) for c in sorted(communities_raw, key=lambda c: (-len(c), min(c)))

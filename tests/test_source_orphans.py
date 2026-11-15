@@ -56,3 +56,35 @@ def test_prune_only_dropped_links(tmp_path, monkeypatch):
     b = source_orphans._hub_sources((w / "entities" / "B.md").read_text(encoding="utf-8"))
     assert a == ["s2", "s3", "s4"]  # only the dropped link (s1) pruned
     assert b == ["s1"]  # hub body cites s1 directly — kept
+
+
+def test_prune_uncommitted_backfill(tmp_path, monkeypatch):
+    """A new source (no HEAD) or a link attached and removed before the commit is
+    invisible to the source side, so the hub side unregisters it."""
+    w = tmp_path / "wiki"
+    for d in ("entities", "concepts", "sources"):
+        (w / d).mkdir(parents=True)
+    (w / "entities" / "A.md").write_text(_HUB.format(s="s0", cite=""), encoding="utf-8")
+    (w / "entities" / "Neue Hub é.md").write_text(_HUB.format(s="s0", cite=""), encoding="utf-8")  # non-ASCII + space
+    (w / "entities" / "T.md").write_text(_HUB.format(s="s4-typoo", cite=""), encoding="utf-8")
+    (w / "sources" / "s0.md").write_text("## Connections\n- [[A]] [[Neue Hub é]]\n", encoding="utf-8")
+    for s in ("s1", "s3", "s4"):
+        (w / "sources" / f"{s}.md").write_text("## Connections\n- no link\n", encoding="utf-8")
+    _git(tmp_path, "init", "-q")
+    _git(tmp_path, "add", ".")
+    _git(tmp_path, "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "x")
+    # Before the commit: a backfill registered s1 (existing) and s2 (new), then later
+    # edits removed the links.
+    (w / "sources" / "s1.md").write_text("## Connections\n- no link (reworded)\n", encoding="utf-8")
+    (w / "sources" / "s2.md").write_text("## Connections\n- [[B]]\n", encoding="utf-8")
+    (w / "entities" / "A.md").write_text(_HUB.format(s="s0, s1, s2, s3", cite=""), encoding="utf-8")  # s3: hand entry, source untouched
+    (w / "entities" / "Neue Hub é.md").write_text(_HUB.format(s="s0, s2", cite=""), encoding="utf-8")
+    (w / "entities" / "T.md").write_text(_HUB.format(s="s4", cite=""), encoding="utf-8")  # typo correction
+    (w / "entities" / "N.md").write_text(_HUB.format(s="s2", cite=""), encoding="utf-8")  # new stub, staged
+    _git(tmp_path, "add", "wiki/entities/N.md")
+    monkeypatch.setattr(source_orphans, "WIKI", w)
+    source_orphans._apply_prune()
+    hs = lambda n: source_orphans._hub_sources((w / "entities" / f"{n}.md").read_text(encoding="utf-8"))  # noqa: E731
+    assert hs("A") == ["s0", "s3"]
+    assert hs("Neue Hub é") == ["s0"]
+    assert hs("T") == ["s4"] and hs("N") == ["s2"]  # untouched source and new hub are kept

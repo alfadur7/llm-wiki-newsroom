@@ -676,7 +676,7 @@ def _git_segments(command: str, sub: str) -> list[list[str]]:
     return segs
 
 
-_CD_CMDS = frozenset({"cd", "pushd", "set-location", "sl", "chdir"})
+_CD_CMDS = frozenset({"cd", "pushd", "push-location", "set-location", "sl", "chdir"})
 
 
 def _cd_before(command: str, sub: str) -> str | None:
@@ -687,10 +687,11 @@ def _cd_before(command: str, sub: str) -> str | None:
     as this repo and pushes this repo's gate onto someone else's commit. A relative
     cd joins onto the previous one; a `$` or backtick substitution cannot be resolved
     without a shell, so it returns None (the caller falls back to the hook location).
-    Git Bash `/c/...` is rewritten to `C:/...`, which native git can read. Same lexer
-    and `<` stop as `_git_segments`.
+    Git Bash `/c/...` is rewritten to `C:/...`, which native git can read. A cd inside
+    a subshell `( … )`/`$( … )` is undone at its closing paren, a pushd at its popd.
+    Same lexer and `<` stop as `_git_segments`.
     """
-    last, cur = None, []
+    last, cur, subshells, pushed = None, [], [], []
     for t in [*_lex(command), ";"]:
         if "<" in t and _is_op(t):
             break
@@ -701,15 +702,38 @@ def _cd_before(command: str, sub: str) -> str | None:
         cur = []
         if head and os.path.basename(head[0]).removesuffix(".exe") == "git" and _git_sub(head) == sub:
             return last
-        if head and head[0].lower() in _CD_CMDS:
+        if head and head[0].lower() in ("popd", "pop-location"):
+            last = pushed.pop() if pushed else None
+        elif head and head[0].lower() in _CD_CMDS:
+            if head[0].lower() in ("pushd", "push-location"):
+                pushed.append(last)
             args = [a for a in head[1:] if not a.startswith("-")]
-            if not args:
-                continue
-            if "$" in args[0] or "`" in args[0]:
+            if args and ("$" in args[0] or "`" in args[0]):
                 return None
-            d = re.sub(r"^/([A-Za-z])/", r"\1:/", os.path.expanduser(args[0]))
-            last = os.path.join(last, d) if last and not os.path.isabs(d) else d
+            if args:
+                d = re.sub(r"^/([A-Za-z])/", r"\1:/", os.path.expanduser(args[0]))
+                last = os.path.join(last, d) if last and not os.path.isabs(d) else d
+        for c in t:                     # the lexer groups operators into one token, e.g. `)&&`
+            if c == "(":
+                subshells.append(last)
+            elif c == ")" and subshells:
+                last = subshells.pop()
     return last
+
+
+def _under(prefix: str, t: str) -> str:
+    """Repo-relative form of a path argument given after a `cd` into subdirectory `prefix`.
+
+    Falls back to reading it from the repo root when it does not exist under the cd
+    directory but does at the root — a `git add` placed before the `cd`. Existence
+    decides rather than position in the command; when both or neither exist, the cd
+    reading wins.
+    """
+    t = t.replace("\\", "/")
+    p = os.path.normpath(os.path.join(prefix, t)).replace("\\", "/")
+    if prefix and not (ROOT / p).exists() and (ROOT / t).exists():
+        return os.path.normpath(t).replace("\\", "/")
+    return p
 
 
 def _guideline_paths(paths) -> list[str]:
@@ -738,8 +762,11 @@ def _porcelain_paths(porcelain: str, tracked_only: bool = False) -> list[str]:
     return out
 
 
-def _staged_scope(command: str) -> tuple[list[str], bool]:
+def _staged_scope(command: str, prefix: str = "") -> tuple[list[str], bool]:
     """(pathspec this command's `git add`s cover, whether they can stage an untracked file).
+
+    `prefix` is the subdirectory a `cd`/`-C` moved into; named paths are read against
+    it (see `_under`).
 
     Each `git add` contributes its own scope and they union: a broad flag with a pathspec
     is broad only inside it (`git add -A tools/`), a broad flag alone covers everything,
@@ -761,7 +788,7 @@ def _staged_scope(command: str) -> tuple[list[str], bool]:
                 skip = True
                 continue
             if tok[:1] != "-" and tok != "add" and tok not in _ADD_ALL:
-                named.append(tok.replace("\\", "/"))
+                named.append(_under(prefix, tok))
         broad = any(tok in _ADD_ALL or tok in _ADD_TRACKED for tok in seg)
         untracked = untracked or not any(tok in _ADD_TRACKED for tok in seg)
         paths += named or (list(GUIDE_SCOPE) if broad else [])
@@ -815,10 +842,8 @@ def _commit_pathspec(seg: list[str], root: Path, cwd: str | None = None) -> list
     # git resolves a pathspec against the invoking directory, not the repo root, while
     # the lookups below run under `git -C ROOT` — so every operand is re-expressed
     # relative to the root before it is used, and one that lands outside the repo voids
-    # the whole set. `cwd` is the hook payload's working directory, which is where the
-    # Bash tool starts the command; a `cd` *inside* the command is not visible here, so
-    # a same-named file at the root can still win. That residual is filed, not fixed —
-    # closing it means parsing the chain's own directory changes.
+    # the whole set. `cwd` is the directory the commit runs in — the subdirectory a
+    # `cd`/`-C` in the command moved into, else the hook payload's working directory.
     #
     # Bare operands are additionally all-or-nothing on existence. Without `--` there
     # is no declaration that these are paths: an unbalanced quote (a PowerShell
@@ -895,6 +920,8 @@ def run_pre_bash(data: dict) -> int:
         root = _git(ROOT, "rev-parse", "--show-toplevel")
     if not root or Path(root.strip()) != ROOT:
         return 0
+    # A commit after `cd`/`-C` into a subdirectory reads its path arguments from there.
+    prefix = (_git(base, "rev-parse", "--show-prefix") or "").strip() if base is not ROOT else ""
 
     # What the commit actually carries — the index first. A `git add X && git commit`
     # in one call has an empty index at this point, so the working tree is narrowed
@@ -906,7 +933,7 @@ def run_pre_bash(data: dict) -> int:
     commit_all = any(t == "--all" or (t[:2] != "--" and "a" in t) for t in flags)
     # A commit pathspec decides alone — those paths are committed and nothing else is,
     # whatever the index holds and whatever `git add` staged before it.
-    pathspec = _commit_pathspec(seg, ROOT, data.get("cwd"))
+    pathspec = _commit_pathspec(seg, ROOT, str(ROOT / prefix) if prefix else data.get("cwd"))
     staged = _git(ROOT, "diff", "--cached", "--name-only", "--", *(pathspec or GUIDE_SCOPE))
     hits = _guideline_paths((staged or "").splitlines())
     if not hits:
@@ -917,7 +944,7 @@ def run_pre_bash(data: dict) -> int:
         elif commit_all:
             scope, untracked = list(GUIDE_SCOPE), False
         else:
-            scope, untracked = _staged_scope(command)
+            scope, untracked = _staged_scope(command, prefix)
         if scope:
             # `-uall`: without it git collapses an untracked directory to a single `??
             # <dir>/` line, so a new guideline file in a new directory is never named.

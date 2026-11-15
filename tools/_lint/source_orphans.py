@@ -18,8 +18,10 @@
         not auto-removed (editorial decision).
 
 With --fix:
-  0. Unregister a hub from a source's `sources:` entry when an uncommitted
-     edit to that source dropped its link to the hub (the reverse of step 1).
+  0. Unregister a source from a hub's `sources:` entry when an uncommitted
+     edit to that source dropped its link to the hub, or when an uncommitted
+     backfill added it to a tracked hub that the source no longer links (the
+     reverse of step 1).
   1. Sync each source's `## Connections` wikilinks into the referenced hub's
      `sources:` frontmatter (legacy tools/_backfill_source_slugs.py).
   2. Auto-correct HIGH-confidence typo slugs in hub frontmatter.
@@ -279,32 +281,58 @@ def _apply_prune() -> int:
     links automatically but nothing ever unregistered, so every fix that
     removed a link left an orphan entry behind.
 
-    Scoped to links dropped since HEAD: an entry the source never linked may
-    have been added by the hub's author on body evidence, so it is not removed
-    without a judgment. An entry the hub body still cites directly is kept.
-    Returns the number of hub files updated."""
+    Scoped to entries the uncommitted work touched: an entry the source never
+    linked may have been added by the hub's author on body evidence, so it is
+    not removed without a judgment. An entry the hub body still cites directly
+    is kept. Returns the number of hub files updated."""
     import subprocess
     root = WIKI.parent
-    try:
+
+    def git(*a: str) -> list[str]:
         # -z: a quoted non-ASCII path would otherwise fail p.exists() silently.
-        # --relative: paths relative to `root`, which need not be the repo top.
-        out = subprocess.run(["git", "diff", "-z", "--relative", "--name-only", "HEAD", "--", "wiki/sources"],
-                             cwd=root, capture_output=True, encoding="utf-8", check=True).stdout
+        # --relative / ls-files: paths relative to `root`, which need not be the repo top.
+        out = subprocess.run(["git", *a], cwd=root, capture_output=True,
+                             encoding="utf-8", check=True).stdout
+        return list(filter(None, out.split("\0")))
+
+    try:
+        changed = git("diff", "-z", "--relative", "--name-only", "HEAD", "--", "wiki/sources")
+        new_src = git("ls-files", "-z", "-o", "--exclude-standard", "--", "wiki/sources")
+        hub_changed = git("diff", "-z", "--relative", "--name-only", "--diff-filter=M", "HEAD",
+                          "--", "wiki/entities", "wiki/concepts")
     except (OSError, subprocess.CalledProcessError):
         return 0   # no git (copy, archive) — skip the prune; leaving an entry is the safe side
+    head = lambda rel: subprocess.run(["git", "show", f"HEAD:./{rel}"], cwd=root,  # noqa: E731
+                                      capture_output=True, encoding="utf-8").stdout
     # Same hub set as _apply_backfill, keyed by bare stem as links are.
     hubs = {p.stem: p for sub in ("entities", "concepts") for p in (WIKI / sub).glob("*.md")
             if not p.name.startswith("_")}
     links = lambda t: {L.split("#", 1)[0].strip() for L in LINK_RE.findall(t)}  # noqa: E731
     drops: dict[str, list[str]] = defaultdict(list)
-    for rel in filter(None, out.split("\0")):
+    # Source side — a hub link the source had at HEAD is gone now.
+    for rel in changed:
         p = root / rel
         if not rel.endswith(".md") or p.name.startswith("_") or not p.exists():
             continue
-        old = subprocess.run(["git", "show", f"HEAD:./{rel}"], cwd=root,
-                             capture_output=True, encoding="utf-8").stdout
-        for hub in (links(old) - links(read_text_cached(p))) & hubs.keys():
+        for hub in (links(head(rel)) - links(read_text_cached(p))) & hubs.keys():
             drops[hub].append(p.stem)
+    # Hub side — an entry the HEAD hub did not have, from a source that no longer links
+    # it. The source side reads only the source's HEAD links, so it misses a new source
+    # (no HEAD) and a link attached and removed again before the commit. Candidates are
+    # limited to sources created or edited in this work: a link can only disappear after
+    # the backfill through a source edit, while a typo correction or an entry the hub's
+    # author added by hand usually comes from an untouched source. Existing hubs only
+    # (`--diff-filter=M`) — a new stub's hand-added entries are registered from sources
+    # before they link it.
+    touched = {Path(r).stem for r in changed + new_src}
+    for rel in hub_changed:
+        p = root / rel
+        if hubs.get(p.stem) != p:
+            continue
+        for s in (set(_hub_sources(read_text_cached(p))) - set(_hub_sources(head(rel)))) & touched:
+            sp = WIKI / "sources" / f"{s}.md"
+            if sp.exists() and p.stem not in links(read_text_cached(sp)):
+                drops[p.stem].append(s)
     n = removed = 0
     for hub, stems in drops.items():
         text = read_text_cached(hubs[hub])

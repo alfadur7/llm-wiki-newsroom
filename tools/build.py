@@ -57,8 +57,8 @@ def _phase_graph() -> None:
     graph.run()
 
 
-def _phase_clusters(cold: bool = False) -> None:
-    clusters.run(cold=cold)
+def _phase_clusters(cold: bool = False, anchored: bool = False) -> None:
+    clusters.run(cold=cold, anchored=anchored)
     clusters.run_catalogs()
     clusters.run_pages()
     pages.run()
@@ -106,6 +106,9 @@ def main() -> int:
                     help="(clusters phase only) force fresh Leiden start (singleton init). "
                          "Default is warm-start from previous _clusters.json. "
                          "Use periodically to escape stale local optima.")
+    ap.add_argument("--anchored", action="store_true",
+                    help="(clusters phase only) cold start with cluster_labels.json anchors pinned "
+                         "to their declared cluster — the re-anchor `lint graph drift` recommends.")
     args = ap.parse_args()
 
     phases = PIPELINE if args.phase == "all" else [args.phase]
@@ -114,7 +117,7 @@ def main() -> int:
         if name == "contradictions":
             PHASES[name](dry_run=args.dry_run)
         elif name == "clusters":
-            PHASES[name](cold=args.cold)
+            PHASES[name](cold=args.cold, anchored=args.anchored)
         else:
             PHASES[name]()
     return 0

@@ -1,19 +1,27 @@
 """Cluster drift signal — is the current partition the one the graph implies?
 
-Three signals: (1) the quality gap against a single cold run, (2) the ARI
-against the consensus partition of N cold runs, (3) a per-cluster split rate.
+Three signals: (1) the quality gap against a single anchor-pinned run, (2) the
+ARI against the consensus partition of N anchor-pinned runs, (3) a per-cluster
+split rate.
 (2) exists because modularity is degenerate — Good, de Montjoye & Clauset
 (Phys Rev E 81 046106, 2010) show exponentially many high-scoring partitions
 that disagree with each other, so one quality number cannot justify "this
 community count is right".
 
 Reads the current `graph/_clusters.json` (warm-start product) and runs a
-transient cold-start Leiden on the same graph to compute the quality gap.
-Cold > warm by more than DEFAULT_QUALITY_THRESHOLD signals that warm-start is
-stuck in a stale local optimum — operator should consider
-`python tools/build.py clusters --cold` to re-anchor.
+transient anchor-pinned Leiden on the same graph (`cluster_labels.json` anchors
+fixed to their cluster, every other hub from a singleton — a pure cold start
+when no anchor is in the graph) to compute the quality gap. Baseline > warm by
+more than DEFAULT_QUALITY_THRESHOLD signals that warm-start is stuck in a stale
+local optimum — operator should consider `python tools/build.py clusters
+--anchored` to re-anchor. The baseline is anchor-pinned rather than pure cold
+because a pure cold run may break the declared anchor boundaries, and the
+quality that buys would read as drift (upstream measurement on a 681-hub
+corpus: +2.9% gap and ARI 0.483 against pure cold — a false alarm — vs +0.4% and
+0.749 against the anchor-pinned baseline). Pure cold quality is printed as a
+reference line only.
 
-Opt-in subcommand (NOT in `all`): cold Leiden runs the full partition
+Opt-in subcommand (NOT in `all`): Leiden runs the full partition
 algorithm again — adds ~2-5 seconds vs <100ms for the rest of the lint
 suite, so we keep it explicit. Designed to be run periodically (e.g.,
 monthly) or after suspect changes.
@@ -23,8 +31,8 @@ CLI:
     python tools/lint.py graph drift --json    # machine output
 
 Exit codes:
-    0 — partition healthy (warm within threshold of cold optimum)
-    1 — drift detected (cold optimum significantly better)
+    0 — partition healthy (warm within threshold of the baseline optimum)
+    1 — drift detected (baseline significantly better, or consensus diverged)
     2 — missing dependency (leidenalg/igraph) or missing graph/_clusters.json
 """
 from __future__ import annotations
@@ -42,13 +50,13 @@ from _lib import CLUSTERS_JSON as CLUSTERS_PATH  # noqa: E402
 # so a fixed absolute number is meaningless across builds and corpus sizes,
 # and absolute values are not comparable across corpora. Use ratio instead:
 #   delta / warm_quality > _resolved_threshold() → advisory.
-# 0.005 (0.5%) picked as the gap where cold-start is meaningfully better;
+# 0.005 (0.5%) picked as the gap where the baseline is meaningfully better;
 # below this is partition-tie-breaking noise. Override with the
 # `WIKI_LINT_DRIFT_THRESHOLD` env var or the `--threshold` CLI flag when
 # operator data suggests the default is too tight or too loose.
 DEFAULT_QUALITY_THRESHOLD = 0.005
 
-# Consensus stability — the complement to a single cold comparison. Lancichinetti
+# Consensus stability — the complement to a single baseline comparison. Lancichinetti
 # & Fortunato (Sci Rep 2:336, 2012) is the standard answer to degeneracy: run the
 # partition N times, keep the pairs that co-occur often enough, and re-cluster that
 # co-assignment graph into a consensus partition. How closely warm matches it (ARI)
@@ -60,7 +68,8 @@ CONSENSUS_CO_THRESHOLD = 0.5    # LF2012's recommendation — keep a pair only i
 # warm scored 0.781 against consensus while independent cold runs agreed with each
 # other at 0.706 — i.e. it fires only when warm diverges further than two cold runs
 # routinely do. Re-derive it here once this corpus is large enough for the consensus
-# to have anything to disagree about.
+# to have anything to disagree about. Those two figures predate the anchor-pinned
+# baseline; against it the same corpus scored warm 0.749.
 CONSENSUS_ARI_FLOOR = 0.60
 # A run counts as a split when the largest surviving piece holds less than this share
 # of the original cluster — the line between a few boundary nodes moving and a chunk
@@ -89,7 +98,7 @@ def _ari(a: list[int], b: list[int]) -> float:
 
 def _split_rates(partitions: list[list[int]], clusters_data: dict,
                  node_index: dict[str, int]) -> list[tuple[str, int, float, float]]:
-    """Per-cluster split rate — how often a cluster's members scatter across cold runs.
+    """Per-cluster split rate — how often a cluster's members scatter across the consensus runs.
 
     Reuses the partitions consensus already ran (no extra Leiden calls). It is an axis
     neither containment nor the consensus ARI can see: a cluster whose declared anchors
@@ -116,23 +125,22 @@ def _split_rates(partitions: list[list[int]], clusters_data: dict,
     return out
 
 
-def _consensus(ig, leidenalg, g_ig, n_vertices: int,
-               resolution: float) -> tuple[list[int], int, list[list[int]]]:
-    """LF2012 consensus — re-cluster the co-assignment graph of N cold runs.
+def _consensus(ig, leidenalg, g_ig, n_vertices: int, resolution: float,
+               start: tuple) -> tuple[list[int], int, list[list[int]]]:
+    """LF2012 consensus — re-cluster the co-assignment graph of N anchor-pinned runs.
 
-    Returns (membership, run_count, partitions). Each run is a cold start under its
-    own seed, so none of them inherits the warm history; `partitions` comes back so
+    Returns (membership, run_count, partitions). Each run starts from `start`
+    (the `anchor_start` result — pure cold when there is no anchor) under its own
+    seed, so none of them inherits the warm history; `partitions` comes back so
     `_split_rates` can reuse the same runs.
     """
     from collections import Counter
     from itertools import combinations
+    from _build.clusters import leiden_partition
     co: Counter = Counter()
     partitions: list[list[int]] = []
     for seed in range(1, CONSENSUS_RUNS + 1):
-        part = leidenalg.find_partition(
-            g_ig, leidenalg.RBConfigurationVertexPartition, weights="weight",
-            resolution_parameter=resolution, seed=seed, n_iterations=-1,
-        )
+        part = leiden_partition(g_ig, resolution, seed, *start)
         partitions.append(list(part.membership))
         by_comm: dict[int, list[int]] = {}
         for vertex, comm in enumerate(part.membership):
@@ -173,7 +181,7 @@ def run(json_out: bool = False, threshold: float | None = None) -> int:
         import igraph as ig
     except ImportError:
         # Deliberately does NOT use the build's Louvain fallback: this check
-        # compares a warm partition against a transient cold one, and a
+        # compares a warm partition against a transient baseline, and a
         # cross-backend comparison measures the backend, not the drift.
         print("ERROR: leidenalg/igraph not installed. Run: python -m pip install 'igraph' 'leidenalg'", file=sys.stderr)
         return 2
@@ -182,7 +190,8 @@ def run(json_out: bool = False, threshold: float | None = None) -> int:
         print(f"ERROR: {CLUSTERS_PATH} not found. Run `python tools/build.py clusters` first.", file=sys.stderr)
         return 2
 
-    from _build.clusters import RESOLUTION, SEED, build_hub_graph, to_igraph  # noqa: E402  (tools/ on sys.path at module top)
+    from _build.clusters import (RESOLUTION, SEED, anchor_start, build_hub_graph,
+                                 leiden_partition, to_igraph)  # noqa: E402  (tools/ on sys.path at module top)
 
     G, _hub_labels, _data, _id_map, _isolated = build_hub_graph(verbose=False)
 
@@ -223,29 +232,27 @@ def run(json_out: bool = False, threshold: float | None = None) -> int:
     quality_warm = warm_partition.quality()
     n_warm = len(set(warm_membership))
 
-    # Cold partition — fresh Leiden from singleton start.
-    cold_partition = leidenalg.find_partition(
-        g_ig,
-        leidenalg.RBConfigurationVertexPartition,
-        weights="weight",
-        resolution_parameter=RESOLUTION,
-        seed=SEED,
-        n_iterations=-1,
-    )
+    # Baseline — anchor-pinned Leiden, the same path as `build.py clusters --anchored`
+    # (rationale in the module docstring). Pure cold stays as a reference line only.
+    start = anchor_start(nodes)
+    cold_partition = leiden_partition(g_ig, RESOLUTION, SEED, *start)
     quality_cold = cold_partition.quality()
     n_cold = len(set(cold_partition.membership))
+    anchored = start[1] is not None
+    free_partition = leiden_partition(g_ig, RESOLUTION, SEED) if anchored else cold_partition
+    quality_free = free_partition.quality()
 
     quality_threshold = _resolved_threshold(threshold)
     delta = quality_cold - quality_warm
     # RBConfiguration quality is modularity-like and can be ≤0 for a degenerate
     # warm partition — the exact case this check exists to flag. Normalizing by
     # |quality_warm| keeps the relative-delta meaningful there (a much-better
-    # cold partition still trips the threshold) instead of being silenced to 0.
+    # baseline still trips the threshold) instead of being silenced to 0.
     denom = abs(quality_warm)
     rel_delta = delta / denom if denom > 0 else (1.0 if delta > 0 else 0.0)
     drifted = rel_delta > quality_threshold
 
-    cons_membership, cons_runs, cons_parts = _consensus(ig, leidenalg, g_ig, len(nodes), RESOLUTION)
+    cons_membership, cons_runs, cons_parts = _consensus(ig, leidenalg, g_ig, len(nodes), RESOLUTION, start)
     splits = _split_rates(cons_parts, clusters_data, node_idx)
     fragile = [r for r in splits if r[2] >= SPLIT_RATE_FLAG]
     n_cons = len(set(cons_membership))
@@ -260,6 +267,8 @@ def run(json_out: bool = False, threshold: float | None = None) -> int:
             "rel_delta": rel_delta,
             "warm_clusters": n_warm,
             "cold_clusters": n_cold,
+            "baseline": "anchored" if anchored else "cold",
+            "free_cold_quality": quality_free,
             "threshold": quality_threshold,
             "drifted": drifted,
             "consensus_runs": cons_runs,
@@ -277,9 +286,15 @@ def run(json_out: bool = False, threshold: float | None = None) -> int:
         return 1 if (drifted or cons_diverged) else 0
 
     print(f"Warm partition (current _clusters.json): quality={quality_warm:.2f}, clusters={n_warm}")
-    print(f"Cold partition (fresh Leiden, transient): quality={quality_cold:.2f}, clusters={n_cold}")
+    base = ("Anchored partition (anchor-pinned Leiden, transient)" if anchored
+            else "Cold partition (no anchor — fresh Leiden, transient)")
+    print(f"{base}: quality={quality_cold:.2f}, clusters={n_cold}")
+    if anchored:
+        print(f"  (reference) pure cold, anchors ignored: quality={quality_free:.2f}, "
+              f"clusters={len(set(free_partition.membership))}. The gap is the cost of "
+              f"keeping the declared boundaries, not drift.")
     pct = rel_delta * 100
-    print(f"Delta (cold - warm): {delta:+.2f}  ({pct:+.3f}% of warm; threshold: ±{quality_threshold * 100:.1f}%)")
+    print(f"Delta (baseline - warm): {delta:+.2f}  ({pct:+.3f}% of warm; threshold: ±{quality_threshold * 100:.1f}%)")
     print(f"Consensus ({cons_runs}-run, LF2012): clusters={n_cons}, ARI vs warm={cons_ari:.3f} "
           f"(floor {CONSENSUS_ARI_FLOOR})")
     print()
@@ -289,12 +304,12 @@ def run(json_out: bool = False, threshold: float | None = None) -> int:
         print(f"   does not represent the consensus structure. Quality alone cannot settle this —")
         print(f"   modularity is degenerate (see the module docstring). Check the declared anchors")
         print(f"   first (`lint graph clusters`), and if it still diverges:")
-        print(f"     python tools/build.py clusters --cold")
+        print(f"     python tools/build.py clusters --anchored")
     elif n_cons != n_warm:
         print(f"NOTE — the consensus cluster count ({n_cons}) differs from warm ({n_warm}), but ARI "
               f"{cons_ari:.3f} says the structure agrees: a few boundaries moved.")
     print()
-    print(f"[Split rate] share of the {cons_runs} cold runs in which more than "
+    print(f"[Split rate] share of the {cons_runs} {'anchor-pinned' if anchored else 'cold'} runs in which more than "
           f"{round((1 - SPLIT_DETACH_SHARE) * 100)}% of a cluster's members detached from its main body")
     for slug, size, rate, share in splits:
         mark = "  !" if rate >= SPLIT_RATE_FLAG else "   "
@@ -310,16 +325,16 @@ def run(json_out: bool = False, threshold: float | None = None) -> int:
     print()
 
     if drifted:
-        print(f"⚠️  DRIFT — cold-start partition is {pct:.3f}% better than warm.")
+        print(f"⚠️  DRIFT — baseline partition is {pct:.3f}% better than warm.")
         print(f"   Warm-start may be stuck in a stale local optimum. Consider:")
-        print(f"     python tools/build.py clusters --cold")
-        print(f"   to re-anchor. Note: cold rebuild may produce new auto-slug")
+        print(f"     python tools/build.py clusters --anchored")
+        print(f"   to re-anchor. Note: a rebuild may produce new auto-slug")
         print(f"   clusters that need editorial labelling in graph/cluster_labels.json.")
         return 1
 
-    quality_ok = (f"warm partition is {-pct:.3f}% BETTER than cold (not stuck)."
+    quality_ok = (f"warm partition is {-pct:.3f}% BETTER than baseline (not stuck)."
                   if delta < 0 else
-                  f"warm partition within {quality_threshold * 100:.1f}% of cold optimum.")
+                  f"warm partition within {quality_threshold * 100:.1f}% of baseline optimum.")
     if cons_diverged:
         # Quality is fine but the consensus diverged — opening with OK would contradict exit 1.
         print(f"   (the quality axis is healthy: {quality_ok})")

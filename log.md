@@ -1051,3 +1051,38 @@ low, an ambiguous "either A or B", was fixed along with the fourth high. Among t
 zero-base round asks more of the Desk (citation coverage, raw reads) than desk.md's own
 scope allows, and `--fix` sends every authored overview to the zero-base path, even
 when the run is only repairing a Rubric failure.
+
+
+## [2026-11-16] port | a drift check that counted kept boundaries as drift, a gate that lost track of cd, and a prune that missed uncommitted backfills
+
+A sibling round of 58 commits, 20 touching shared surfaces. Thirteen of those were ledger
+rows or corpus-specific allowlist slugs; three items were ported.
+
+**Cluster drift baseline.** `lint graph drift` compared the warm partition against a
+pure cold Leiden run, which uses the declared anchors only for naming. A cold run that
+breaks the anchor boundaries can score higher, and the check counted that gain as drift;
+the sibling measured a false alarm on a 681-hub corpus this way. The baseline and the
+consensus runs now pin the anchors, and pure cold prints as a reference line. The same
+pinned run is available as a rebuild, `build.py clusters --anchored`. On this corpus
+nothing changed: `_clusters.json` is byte-identical, and the split rates moved from
+45/45/5% to 45/40/15%, so the two soft cluster boundaries are not an anchor effect.
+Not ported: the sibling's cluster freeze, which exists for a reground campaign this repo
+does not run.
+
+**Commit gate and `cd`.** The gate now follows `pushd`/`popd` and a `cd` inside a
+subshell, and reads path arguments after a `cd` into a subdirectory from that directory,
+for both `git add` and a commit pathspec. That closes the residual `_commit_pathspec`
+had filed. The send-gate half of the same upstream commit was left out (declined in
+round 19).
+
+**Orphan prune.** `source_orphans --fix` unregistered an entry only when the source's
+HEAD version had linked the hub, so a new source, or a link added and removed again
+before the commit, left its entry behind. A hub-side pass now handles both, limited to
+sources this work created or edited.
+
+Each item carries a regression test confirmed failing on the old code; pytest 322.
+Ladder: rung 1 PASS (`lint.py meta`), rung 2 no depth findings. Blind review by a
+different model family converged at rotation 2: three lows in the `wiki-lint.md` drift
+row (an unconditional "anchor-pinned", an unconditional reference line, a sentence whose
+subject could not count anything) were fixed and found closed. Rung 4 judged out of
+scope: both guideline hunks align a tool description with its code.

@@ -579,6 +579,36 @@ def test_cd_into_another_repo_is_not_this_repos_commit(tmp_path, capsys, monkeyp
     assert "CLAUDE.md" in _payload(capsys)
 
 
+def test_subshell_and_popd_cd_do_not_leak(tmp_path, capsys, monkeypatch):
+    """A cd inside a subshell, or a pushd undone by popd, does not move a later commit."""
+    r, other = _repo(tmp_path), _repo(tmp_path / "b")
+    (r / "CLAUDE.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    dispatch.run_pre_bash(_bash(f"(cd {other.as_posix()} && make) && git add CLAUDE.md && git commit -m x"))
+    assert "CLAUDE.md" in _payload(capsys)
+    assert dispatch._cd_before("(cd a&&make)&&git commit", "commit") is None
+    assert dispatch._cd_before("cd b && pushd a && popd && git commit", "commit") == "b"
+    assert dispatch._cd_before("(cd a && git commit)", "commit") == "a"
+
+
+def test_cd_into_subdir_names_paths_relative_to_it(tmp_path, capsys, monkeypatch):
+    """`cd .claude && git add policies/x.md` — path arguments are read from the cd directory."""
+    r = _repo(tmp_path)
+    (r / ".claude" / "policies" / "naming.md").write_text("edited", encoding="utf-8")
+    monkeypatch.setattr(dispatch, "ROOT", r)
+    sub = (r / ".claude").as_posix()
+    dispatch.run_pre_bash(_bash(f"cd {sub} && git add policies/naming.md && git commit -m x"))
+    assert ".claude/policies/naming.md" in _payload(capsys)
+    dispatch.run_pre_bash(_bash(f"cd {sub} && git add policies && git commit -m x"))
+    assert ".claude/policies/naming.md" in _payload(capsys)
+    # A commit pathspec after the cd is read from there too.
+    dispatch.run_pre_bash(_bash(f"cd {sub} && git commit -m x -- policies/naming.md"))
+    assert ".claude/policies/naming.md" in _payload(capsys)
+    # A `git add` before the cd is still read from the root.
+    dispatch.run_pre_bash(_bash(f"git add .claude/policies/naming.md && cd {sub} && git commit -m x"))
+    assert ".claude/policies/naming.md" in _payload(capsys)
+
+
 def test_pre_bash_commit_all_reads_the_whole_repo(tmp_path, capsys, monkeypatch):
     """`git commit -am` names no path — with nothing to narrow by, the whole repo is right."""
     r = _repo(tmp_path)
